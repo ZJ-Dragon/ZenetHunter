@@ -1,0 +1,63 @@
+
+
+# ---- ZenetHunter .gitattributes ----
+# Normalize EOLs for text content. Store LF in repo; convert in working tree per OS unless overridden.
+# See: gitattributes `text`/`eol` behavior and renormalization guidance.
+* text=auto
+
+# Force LF for cross‑platform scripts/config/configs (avoid CRLF breakage in shells/CI)
+*.sh     text eol=lf
+*.bash   text eol=lf
+*.py     text eol=lf
+*.ts     text eol=lf
+*.tsx    text eol=lf
+*.js     text eol=lf
+*.jsx    text eol=lf
+*.json   text eol=lf
+*.yml    text eol=lf
+*.yaml   text eol=lf
+*.toml   text eol=lf
+*.ini    text eol=lf
+*.cfg    text eol=lf
+Dockerfile text eol=lf
+*.md     text eol=lf
+*.mdx    text eol=lf
+*.env    text eol=lf
+*.service text eol=lf
+
+# Binary assets: disable text EOL conversion and text diffs/merges.
+# The `binary` macro expands to `-text -diff -merge`.
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.webp binary
+*.ico  binary
+*.pdf  binary
+*.zip  binary
+*.tar  binary
+*.gz   binary
+*.bz2  binary
+*.7z   binary
+*.mp4  binary
+*.mov  binary
+*.mp3  binary
+*.ogg  binary
+*.wav  binary
+*.otf  binary
+*.ttf  binary
+*.woff binary
+*.woff2 binary
+
+# Merge policies (safe defaults)
+# Changelogs often benefit from a union merge to keep both sides' appended entries.
+CHANGELOG.md merge=union
+
+# Optional: Git LFS patterns (uncomment when LFS is enabled)
+# *.psd filter=lfs diff=lfs merge=lfs -text
+# *.blend filter=lfs diff=lfs merge=lfs -text
+# Mark some LFS files as lockable to avoid parallel edits (requires LFS locking enabled):
+# *.psd lockable
+
+# Tip: after introducing or changing EOL rules, run a one‑time renormalization:
+#   git add --renormalize . && git commit -m "chore: normalize line endings"
