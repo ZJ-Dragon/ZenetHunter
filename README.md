@@ -78,10 +78,10 @@ The images follow Docker **best practices** (multi-stage builds, .dockerignore, 
 ---
 
 ## Conventions
-- **Commits**: Conventional Commits (e.g., `feat:`, `fix:`, with BREAKING CHANGE footers). citeturn0search4
-- **Versioning**: SemVer (`MAJOR.MINOR.PATCH`). citeturn0search5
-- **Editor style**: EditorConfig enforced (charset/line endings/indent). citeturn0search6turn0search13
-- **Configuration**: 12‑Factor—store config in **environment variables**. citeturn0search3turn0search10
+- **Commits**: Conventional Commits (e.g., `feat:`, `fix:`, with BREAKING CHANGE footers). 
+- **Versioning**: SemVer (`MAJOR.MINOR.PATCH`). 
+- **Editor style**: EditorConfig enforced (charset/line endings/indent). 
+- **Configuration**: 12‑Factor—store config in **environment variables**. 
 
 ---
 
