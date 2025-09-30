@@ -1,0 +1,108 @@
+
+
+name: zenethunter
+
+# Docker Compose for local dev and NAS deployment
+# Services: backend (FastAPI), frontend (static via nginx), db (PostgreSQL placeholder)
+# - Uses healthchecks and a named bridge network for stable DNS and aliases
+# - Reads additional envs from ./env/.env if present (do not commit secrets)
+#
+# Notes:
+# - Top-level `name:` sets the Compose project name (see Docker docs). If unsupported
+#   by your Compose version, set COMPOSE_PROJECT_NAME in the environment instead.
+# - `depends_on.condition: service_healthy` requires Compose implementations that honor
+#   healthcheck conditions; otherwise startup order is still respected but not gated.
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: zh-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: zenethunter
+      POSTGRES_USER: zenethunter
+      POSTGRES_PASSWORD: zenethunter
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "zenethunter"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      - zh_net
+
+  backend:
+    # Build runtime image from repository root using the deploy Dockerfile
+    build:
+      context: ..
+      dockerfile: deploy/backend.Dockerfile
+    image: zenethunter/backend:dev
+    container_name: zh-backend
+    restart: unless-stopped
+    env_file:
+      - ./env/.env
+    environment:
+      APP_ENV: production
+      APP_HOST: 0.0.0.0
+      APP_PORT: 8000
+      LOG_LEVEL: info
+      # Allow the frontend origin in dev/prod (adjust as needed)
+      CORS_ORIGINS: http://localhost:8080
+      # DSN points to the Compose service name `db`
+      DATABASE_URL: postgresql://zenethunter:zenethunter@db:5432/zenethunter
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      # Expose API on host; adjust or remove on NAS if you prefer internal-only
+      - "8000:8000"
+    healthcheck:
+      # Use the Python runtime inside the image to avoid requiring curl/wget
+      test: [
+        "CMD", "python", "-c",
+        "import sys,urllib.request; sys.exit(0) if urllib.request.urlopen('http://127.0.0.1:8000/healthz').getcode()==200 else sys.exit(1)"
+      ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      zh_net:
+        aliases:
+          - api
+
+  frontend:
+    # Build static assets with Node, then serve via nginx
+    build:
+      context: ..
+      dockerfile: deploy/frontend.Dockerfile
+    image: zenethunter/frontend:dev
+    container_name: zh-frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      # Map host 8080 -> container 80 (nginx)
+      - "8080:80"
+    healthcheck:
+      # Alpine nginx base includes busybox wget; verify index responds
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1/ || exit 1"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    networks:
+      zh_net:
+        aliases:
+          - web
+
+networks:
+  zh_net:
+    name: zenethunter_net
+    driver: bridge
+
+volumes:
+  db_data:
+    name: zenethunter_db_data
