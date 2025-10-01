@@ -1,5 +1,3 @@
-
-
 # ZenetHunter — Python requirements (runtime + dev/test)
 #
 # Usage:
@@ -30,3 +28,4 @@ pytest
 httpx
 ruff
 black
+httpx
