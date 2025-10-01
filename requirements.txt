@@ -1,0 +1,31 @@
+# ZenetHunter — Python requirements (runtime + dev/test)
+#
+# Usage:
+#   pip install -r requirements.txt
+#
+# Notes:
+# - Runtime includes FastAPI and Uvicorn with the "standard" extras (uvloop, httptools,
+#   websockets, watchfiles) for better performance & dev reload. Pydantic Settings v2
+#   is included to support env‑driven config. `python-dotenv` is optional for local .env.
+# - Dev/test tools (pytest, httpx, ruff, black) can be skipped in production images.
+#
+# ------------------------------------------------------------
+# Runtime (required)
+# ------------------------------------------------------------
+fastapi
+uvicorn[standard]
+pydantic-settings>=2.0
+
+# ------------------------------------------------------------
+# Optional runtime (local dev convenience)
+# ------------------------------------------------------------
+python-dotenv
+
+# ------------------------------------------------------------
+# Dev / Test (install when developing or running tests)
+# ------------------------------------------------------------
+pytest
+httpx
+ruff
+black
+httpx

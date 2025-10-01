@@ -1,0 +1,26 @@
+{
+  "extends": "@tsconfig/recommended/tsconfig.json",
+  "compilerOptions": {
+    "target": "ES2020",
+    "module": "ESNext",
+    "moduleResolution": "Bundler",
+    "jsx": "react-jsx",
+    "strict": false,
+    "noEmit": true,
+    "allowJs": false,
+    "checkJs": false,
+    "useDefineForClassFields": true,
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "types": ["vite/client"]
+  },
+  "include": ["src", "vite.config.ts"],
+  "references": [
+    { "path": "./tsconfig.node.json" }
+  ]
+}

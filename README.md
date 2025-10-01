@@ -2,92 +2,93 @@
 
 # ZenetHunter
 
-> 家用/小型局域网的**设备可视化 + 自适应调度**项目。包含扫描器、调度器、干扰引擎（接口层）、**防御模块（Defender）**、配置/状态管理器以及前端 SPA。目标是在**合法合规**前提下，通过可观测与策略编排，提升自有网络的可控性与可用性。
+> Device visibility + adaptive orchestration for small/home LANs. Includes a network **Scanner**, **Dispatcher**, **Interference Engine (interface layer)**, **Defender**, **Config/State Manager**, and a **Frontend SPA**. The project focuses on **observability, access control, and lawful network defense** for your own network.
 
 ---
 
-## 仓库结构（Monorepo）
+## Repository Layout (Monorepo)
 ```
 .
-├─ backend/            # Python 后端（FastAPI）：API、WS、调度、状态/配置、事件总线
-├─ frontend/           # 前端 SPA（Vite + React + TS）
-├─ deploy/             # Dockerfile、docker-compose、环境变量样例、NAS/服务器部署脚本
-├─ docs/               # 文档站（入门、架构、接口、异常规范、数据模型、开发指南）
-├─ .github/            # CI 工作流
-└─ README.md           # 顶层说明（本文件）
+├─ backend/            # Python backend (FastAPI): API, WS, dispatcher, state/config, event bus
+├─ frontend/           # Frontend SPA (Vite + React + TypeScript)
+├─ deploy/             # Dockerfiles, docker-compose, env samples, NAS/server deployment notes
+├─ docs/               # Docs site (Getting Started, Architecture, APIs, Errors, Data Model, Guides)
+├─ .github/            # CI workflows
+└─ README.md           # This file
 ```
 
-> 详细说明见：`/docs/index.md`（文档站导航）。
+> See `/docs/index.md` for the documentation landing page.
 
 ---
 
-## 快速开始（最小可运行 · 占位）
-> 以下为**开发环境**最小启动命令，具体参数与脚本以各模块 README 为准；生产/容器见 `deploy/`。
+## Quick Start (dev; minimal)  
+These commands are for **development**. Production/container usage lives in `deploy/`.
 
-### 1) 后端（开发）
+### 1) Backend (dev)
 ```bash
 cd backend
 python -m venv .venv && source .venv/bin/activate  # Windows: .venv\\Scripts\\activate
-pip install -e .  # 如使用 PEP 621/pyproject；或改用项目内的 dev 脚本
+pip install -e .
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
-\- `uvicorn app.main:app --reload` 为开发模式；生产部署请使用进程管理/ASGI 服务器与关闭 `--reload`。
+The `uvicorn app.main:app` import string follows the FastAPI/Uvicorn convention (`main` module, `app = FastAPI()` object). During development you can enable `--reload`. citeturn0search0
 
-### 2) 前端（开发）
+### 2) Frontend (dev)
 ```bash
 cd frontend
-npm ci  # 或 npm install / pnpm i / bun install
+npm ci  # or npm install / pnpm i / bun install
 npm run dev
 ```
-默认开发端口（Vite）通常为 `5173`；可在 `vite.config.*` 中调整。
+Vite's dev server defaults to port **5173** and can be customized (e.g. `--host 0.0.0.0`). citeturn0search1turn0search15
 
-### 3) 一键编排（可选）
+### 3) One-Command Compose (optional)
 ```bash
 cd deploy
-docker compose up -d  # 以 compose 文件为准，首次请先修改 .env
+docker compose up -d  # edit .env first if needed
 ```
-> 生产镜像采用多阶段构建与非 root 用户运行（详见 `deploy/`）。
+The images follow Docker **best practices** (multi-stage builds, .dockerignore, non-root when feasible). citeturn0search2turn0search9
 
 ---
 
-## 模块概览
-- **Scanner（扫描器）**：网段扫描、设备发现与拓扑采集；向状态管理器上报。
-- **Dispatcher（调度器）**：承接前端/策略请求，编排扫描器、干扰引擎、**防御模块**。
-- **Attack Engine（接口层）**：规范化干预接口（实现受权限/环境约束，默认占位）。
-- **Defender（防御模块）**：SYNPROXY/限速整形/DNS RPZ/Walled Garden/TCP Reset 等**合法防护**能力抽象与接入。
-- **Config/State Manager**：设备/拓扑/名单/日志等核心模型与统一查询/写入 API。
-- **Frontend SPA**：设备列表、拓扑图、策略触发与状态订阅（WS）。
+## Modules
+- **Scanner**: subnet scanning, device discovery, topology capture; reports to the state manager.
+- **Dispatcher**: receives user/strategy intents and orchestrates Scanner, Interference Engine, and **Defender**.
+- **Interference Engine (interface layer)**: normalized hooks for interference actions (implementation gated by env/permissions; ships as a safe placeholder).
+- **Defender**: lawful defense primitives (e.g., SYN proxying, traffic shaping, DNS RPZ sinkholing, walled-garden, TCP resets) aggregated behind a unified API.
+- **Config/State Manager**: canonical models for devices/topology/allow-deny lists/logs with read/write APIs.
+- **Frontend SPA**: device list, topology, policy triggers, and real‑time status via WebSocket.
 
-> 详细 API/消息格式：见《模块交互接口文档》；数据模型：见《数据结构与数据库模型》。
-
----
-
-## 开发指南入口
-- **入门**：`/docs/入门.md`
-- **架构**：`/docs/架构设计.md`
-- **模块交互接口**：`/docs/模块交互接口文档.md`
-- **AI 调度设计**：`/docs/AI 调度器设计文档.md`
-- **防御模块说明**：`/docs/Defender 模块说明.md`
-- **错误与异常处理规范**：`/docs/错误与异常处理规范.md`
-- **数据结构与数据库模型**：`/docs/数据结构与数据库模型.md`
-- **部署（Ugreen / Docker）**：`/deploy/README.md`
-
-> 上述文档文件名为占位，实际以仓库内文件为准。
+> API & message formats: see **Module Interface Spec**.  
+> Data model: see **Data Structures & DB Model**.
 
 ---
 
-## 约定与规范
-- **提交信息**：Conventional Commits（如 `feat:`, `fix:`，含 BREAKING CHANGE）。
-- **版本**：SemVer（`MAJOR.MINOR.PATCH`）。
-- **代码风格**：EditorConfig + Lint/Formatter（后端 Ruff/Black；前端 ESLint/Prettier）。
-- **配置**：12-Factor，使用环境变量/密钥服务，不在仓库存放敏感信息。
+## Developer Guide Entrypoints
+- **Getting Started**: `/docs/getting-started.md`
+- **Architecture**: `/docs/architecture.md`
+- **Module Interface Spec**: `/docs/module-apis.md`
+- **AI Dispatcher Design**: `/docs/ai-dispatcher.md`
+- **Defender Module**: `/docs/defender.md`
+- **Errors & Exceptions**: `/docs/errors-and-exceptions.md`
+- **Data Structures & DB Model**: `/docs/data-model.md`
+- **Deployment (Ugreen / Docker)**: `/deploy/README.md`
+
+> Filenames may differ while docs are being migrated—treat these as pointers.
 
 ---
 
-## 合规与边界
-本项目仅面向**自有网络**的**可观测/接入控制/服务质量管理**与**合法防护**实践；严禁将本项目用于任何未授权的环境。
+## Conventions
+- **Commits**: Conventional Commits (e.g., `feat:`, `fix:`, with BREAKING CHANGE footers).
+- **Versioning**: SemVer (`MAJOR.MINOR.PATCH`).
+- **Editor style**: EditorConfig enforced (charset/line endings/indent).
+- **Configuration**: 12‑Factor—store config in **environment variables**.
 
 ---
 
-## 许可证
-本项目采用 MIT License，详见 `/LICENSE`。
+## Compliance & Scope
+ZenetHunter is for **your own network**: observability, access control, and lawful defensive measures. It must **not** be used against networks you don't own/manage.
+
+---
+
+## License
+MIT — see `/LICENSE`.

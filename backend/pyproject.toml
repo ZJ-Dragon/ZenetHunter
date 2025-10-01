@@ -1,0 +1,48 @@
+
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "zenethunter-backend"
+version = "0.1.0"
+description = "ZenetHunter backend service (FastAPI) with API/WS, dispatcher, and state/config."
+requires-python = ">=3.11"
+authors = [{ name = "ZJ-Dragon" }]
+license = { text = "MIT" }
+dependencies = [
+  "fastapi",
+  "uvicorn[standard]",
+]
+
+[project.optional-dependencies]
+# Developer toolchain (install with: pip install -e .[dev])
+dev = [
+  "ruff",
+  "black",
+  "pytest",
+]
+
+[tool.ruff]
+line-length = 88
+# Match runtime baseline (and Black's default assumptions via requires-python)
+target-version = "py311"
+extend-exclude = ["node_modules", "venv", ".venv", "build", "dist", ".tox", ".nox"]
+
+[tool.ruff.lint]
+# E,F,W: pycodestyle/pyflakes/warnings; I: isort; UP: pyupgrade; B: bugbear
+select = ["E", "F", "W", "I", "UP", "B"]
+ignore = []
+
+[tool.black]
+line-length = 88
+# Black infers from [project.requires-python], but we set this explicitly for clarity
+# https://black.readthedocs.io/en/stable/usage_and_configuration/the_basics.html
+target-version = ["py311"]
+
+[tool.pytest.ini_options]
+minversion = "6.0"
+addopts = "-ra -q"
+# Keep tests local to the backend package
+testpaths = ["tests"]

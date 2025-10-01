@@ -1,0 +1,45 @@
+# See https://pre-commit.com and hooks docs
+# Ruff hooks: https://github.com/astral-sh/ruff-pre-commit
+# Black hook: https://black.readthedocs.io/en/stable/integrations/source_version_control.html
+
+# Make python version explicit for python-language hooks (fallback if hook doesn't set it)
+default_language_version:
+  python: python3
+
+# Optionally reduce scanning on bulky folders (node_modules, build artifacts, docs site)
+exclude: |
+  (^frontend/(node_modules|dist|out|.next|.nuxt|.output)/)|
+  (^backend/(\.venv|env|ENV|venv|build|dist|site)/)|
+  (^docs/(site|build)/)
+
+repos:
+  # --- Hygiene / generic hooks ---
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    # Check latest tag at https://github.com/pre-commit/pre-commit-hooks/releases
+    rev: v6.0.0
+    hooks:
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+        # Preserve Markdown hard line breaks (two spaces at EOL)
+        args: ["--markdown-linebreak-ext=md"]
+
+  # --- Python: Ruff (linter & formatter) ---
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    # Pin to a released tag from https://github.com/astral-sh/ruff-pre-commit/releases
+    rev: v0.13.2
+    hooks:
+      # Lint first; allow autofix so Black/formatter can finalize style afterwards
+      - id: ruff-check
+        args: [--fix]
+      # Then run Ruff's formatter (safe to place after ruff-check --fix)
+      - id: ruff-format
+
+  # --- Python: Black (stable code formatting) ---
+  # Use the official pre-commit mirror for mypyc-compiled, faster Black builds
+  - repo: https://github.com/psf/black-pre-commit-mirror
+    # Match released version from https://black.readthedocs.io
+    rev: 25.9.0
+    hooks:
+      - id: black
+        # If your project targets a specific Python, set it here or via default_language_version
+        language_version: python3

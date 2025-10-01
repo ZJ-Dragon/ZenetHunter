@@ -1,0 +1,44 @@
+# ZenetHunter CODEOWNERS
+# Location: keep this file in the repo root (or .github/ or docs/). GitHub uses the first it finds on the default branch.
+# Order matters: the last matching pattern wins. Keep general rules first, specific rules later.
+# Teams must exist in the same org and have at least write permission to be requested for review.
+# Docs: https://docs.github.com/articles/about-code-owners
+
+# ---- Defaults (fallback) ----
+# Everything defaults to Maintainers if no specific owner matches
+*                                   @ZJ-Dragon/maintainers
+
+# ---- Backend ----
+/backend/                            @ZJ-Dragon/backend @ZJ-Dragon/maintainers
+/backend/**                          @ZJ-Dragon/backend @ZJ-Dragon/maintainers
+
+# ---- Frontend ----
+/frontend/                           @ZJ-Dragon/frontend @ZJ-Dragon/maintainers
+/frontend/**                         @ZJ-Dragon/frontend @ZJ-Dragon/maintainers
+
+# ---- Defender (future subdir if separated) ----
+/defender/                           @ZJ-Dragon/defender @ZJ-Dragon/maintainers
+/defender/**                         @ZJ-dragon/defender @ZJ-Dragon/maintainers
+
+# ---- Deploy / CI / Ops ----
+/deploy/                             @ZJ-Dragon/ops @ZJ-Dragon/maintainers
+/deploy/**                           @ZJ-Dragon/ops @ZJ-Dragon/maintainers
+/.github/workflows/**                @ZJ-Dragon/ci @ZJ-Dragon/maintainers
+
+# ---- Documentation ----
+/docs/                               @ZJ-Dragon/docs @ZJ-Dragon/maintainers
+/docs/**                             @ZJ-Dragon/docs @ZJ-Dragon/maintainers
+
+# ---- Sensitive policies & top-level files ----
+/SECURITY.md                         @ZJ-Dragon/security @ZJ-Dragon/maintainers
+/CODEOWNERS                          @ZJ-Dragon/maintainers
+/README.md                           @ZJ-Dragon/docs @ZJ-Dragon/maintainers
+/LICENSE                             @ZJ-Dragon/maintainers
+
+# ---- Examples of fine-grained patterns (uncomment/adjust as needed) ----
+# Only root-level files (no subdirectories):
+# /*                                  @ZJ-Dragon/maintainers
+# Specific file types:
+# /deploy/**/Dockerfile               @ZJ-Dragon/ops
+# /backend/**.py                      @ZJ-Dragon/backend
+# /frontend/**.{ts,tsx,js,jsx}        @ZJ-Dragon/frontend
