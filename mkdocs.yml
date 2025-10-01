@@ -1,0 +1,37 @@
+
+
+# ZenetHunter — MkDocs configuration (lightweight placeholder)
+# Docs: https://www.mkdocs.org/user-guide/configuration/
+
+site_name: ZenetHunter Docs
+site_description: Developer documentation for ZenetHunter (architecture, APIs, deployment)
+site_url:
+
+# Repository (adjust when you publish the repo)
+repo_url: https://github.com/ZJ-Dragon/ZenetHunter
+repo_name: ZJ-Dragon/ZenetHunter
+
+# Use the built-in lightweight theme to avoid extra dependencies
+# You can later switch to `material` if desired.
+theme:
+  name: mkdocs
+
+# Keep navigation minimal for now; add more pages as they land under /docs
+nav:
+  - Home: index.md
+
+# Common Markdown extensions (supported by MkDocs via Python-Markdown)
+markdown_extensions:
+  - admonition
+  - footnotes
+  - toc:
+      permalink: true
+
+# Built-in search plugin (usually enabled by default; explicit here for clarity)
+plugins:
+  - search
+
+# Optional extra metadata (free-form)
+extra:
+  project: ZenetHunter
+  owner: ZJ-Dragon
