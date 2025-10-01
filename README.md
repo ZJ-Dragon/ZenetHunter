@@ -1,5 +1,3 @@
-
-
 # ZenetHunter
 
 > Device visibility + adaptive orchestration for small/home LANs. Includes a network **Scanner**, **Dispatcher**, **Interference Engine (interface layer)**, **Defender**, **Config/State Manager**, and a **Frontend SPA**. The project focuses on **observability, access control, and lawful network defense** for your own network.
@@ -31,7 +29,7 @@ python -m venv .venv && source .venv/bin/activate  # Windows: .venv\\Scripts\\ac
 pip install -e .
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
-The `uvicorn app.main:app` import string follows the FastAPI/Uvicorn convention (`main` module, `app = FastAPI()` object). During development you can enable `--reload`. citeturn0search0
+The `uvicorn app.main:app` import string follows the FastAPI/Uvicorn convention (`main` module, `app = FastAPI()` object). During development you can enable `--reload`.
 
 ### 2) Frontend (dev)
 ```bash
@@ -39,14 +37,14 @@ cd frontend
 npm ci  # or npm install / pnpm i / bun install
 npm run dev
 ```
-Vite's dev server defaults to port **5173** and can be customized (e.g. `--host 0.0.0.0`). citeturn0search1turn0search15
+Vite's dev server defaults to port **5173** and can be customized (e.g. `--host 0.0.0.0`).
 
 ### 3) One-Command Compose (optional)
 ```bash
 cd deploy
 docker compose up -d  # edit .env first if needed
 ```
-The images follow Docker **best practices** (multi-stage builds, .dockerignore, non-root when feasible). citeturn0search2turn0search9
+The images follow Docker **best practices** (multi-stage builds, .dockerignore, non-root when feasible).
 
 ---
 

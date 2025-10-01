@@ -1,11 +1,9 @@
-
-
 # Contributing to **ZenetHunter**
 
 Thanks for taking the time to contribute! This guide covers **collaboration workflow, branch naming, commit message conventions**, and the basic local checks you should run before opening a pull request (PR). It’s written for an international team and aims to keep contributions small, consistent, and easy to review.
 
 > TL;DR — **Trunk‑Based Development + short‑lived feature branches**, PRs into a protected `main`, commit messages follow **Conventional Commits**, and all PRs must pass CI and pre‑commit checks.  
-> References: Trunk‑Based Development and GitHub Flow. citeturn0search2turn0search8turn0search3
+> References: Trunk‑Based Development and GitHub Flow.
 
 ---
 
@@ -16,7 +14,7 @@ Please collaborate professionally and respectfully. If you need to report a secu
 
 ## 1) Branching Strategy (Trunk‑Based + GitHub Flow)
 - **Protected branch**: `main` (merge via PR only).  
-- **Work style**: create **short‑lived feature branches** from `main`, keep the diff small, and merge back quickly. This reduces integration risk and supports continuous integration. citeturn0search2turn0search8
+- **Work style**: create **short‑lived feature branches** from `main`, keep the diff small, and merge back quickly. This reduces integration risk and supports continuous integration.
 - **Branch naming**: `<area>/<feature>-<short>` — all lowercase, hyphen‑separated. Examples:
   - `foundation/repo-scaffold`
   - `backend-core/scanner-api`
@@ -28,7 +26,7 @@ Please collaborate professionally and respectfully. If you need to report a secu
   - Keep them focused and well‑described (what/why). Link issues when relevant (`Closes #123`).
   - Must pass CI (lint/tests/build) and pre‑commit hooks.
   - At least one reviewer must approve before merge (avoid self‑merge).  
-  - Follow the GitHub Flow cycle: branch → commits → PR → review → merge → delete branch. citeturn0search3
+  - Follow the GitHub Flow cycle: branch → commits → PR → review → merge → delete branch.
 
 ---
 
@@ -55,7 +53,7 @@ fix(defender): handle tc shaping fallback on startup
 docs(readme): add English quick start and repo layout
 chore(gitignore): exclude venv and node_modules
 ```
-References: Conventional Commits spec; commitlint configuration with `@commitlint/config-conventional`. citeturn0search0turn0search7turn0search13
+References: Conventional Commits spec; commitlint configuration with `@commitlint/config-conventional`.
 
 ---
 
@@ -72,7 +70,7 @@ This repository includes:
 - Python: `ruff` (lint+format) and `black` (format).
 - (Optional) You may add project‑specific hooks over time (e.g., ESLint for the frontend) via `.pre-commit-config.yaml`.
 
-Reference: pre‑commit quick start docs. citeturn0search4
+Reference: pre‑commit quick start docs.
 
 ---
 
@@ -89,7 +87,7 @@ See each subdirectory’s `README.md` for detailed instructions. Production/cont
 ---
 
 ## 5) Versioning & Changelog
-- Versioning follows **Semantic Versioning 2.0.0** (`MAJOR.MINOR.PATCH`). citeturn0search5
+- Versioning follows **Semantic Versioning 2.0.0** (`MAJOR.MINOR.PATCH`).
 - Changes are tracked in `CHANGELOG.md`. The Conventional Commits structure enables tooling to generate or assist with release notes.
 
 ---
