@@ -92,10 +92,12 @@ const App: React.FC = () => {
       const data = (await resp.json()) as Device[] | { items?: Device[] };
       const items = Array.isArray(data) ? data : data.items ?? [];
       setDevices(items);
-    } catch (e: any) {
+    } catch (e: unknown) {
       setDevices([]);
       setError(
-        `Failed to fetch /api/devices: ${e?.message ?? e}. This is expected in early scaffolding — backend endpoint may not exist yet.`,
+        `Failed to fetch /api/devices: ${
+          e instanceof Error ? e.message : String(e)
+        }. This is expected in early scaffolding — backend endpoint may not exist yet.`,
       );
     } finally {
       setLoading(false);
