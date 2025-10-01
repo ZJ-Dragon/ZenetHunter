@@ -1,5 +1,3 @@
-
-
 """Application settings (12‑Factor style).
 
 Primary source of truth for runtime configuration. Values are loaded from
@@ -19,7 +17,7 @@ from __future__ import annotations
 import logging
 import os
 from functools import lru_cache
-from typing import Any, Dict, List, Literal, Optional
+from typing import Any, Literal
 
 try:
     # Preferred path: pydantic-settings (v2)
@@ -39,7 +37,7 @@ _DEFAULT_CORS = "http://localhost:5173"
 _ALLOWED_LOG_LEVELS = {"debug", "info", "warning", "error", "critical"}
 
 
-def _split_csv(value: str | List[str] | None) -> List[str]:
+def _split_csv(value: str | list[str] | None) -> list[str]:
     if value is None:
         return []
     if isinstance(value, list):
@@ -64,7 +62,9 @@ if _HAVE_PYDANTIC_SETTINGS:
             default="ZenetHunter API",
             validation_alias="APP_NAME",
         )
-        app_version: str = Field(default_factory=lambda: os.getenv("APP_VERSION", "0.1.0"))
+        app_version: str = Field(
+            default_factory=lambda: os.getenv("APP_VERSION", "0.1.0")
+        )
 
         # Runtime
         app_env: Literal["development", "staging", "production"] = Field(
@@ -78,13 +78,13 @@ if _HAVE_PYDANTIC_SETTINGS:
         log_level: str = Field(default="info", validation_alias="LOG_LEVEL")
 
         # External services (optional in early project phases)
-        database_url: Optional[str] = Field(default=None, validation_alias="DATABASE_URL")
+        database_url: str | None = Field(default=None, validation_alias="DATABASE_URL")
 
         # CORS: comma‑separated list → list[str]
         cors_origins_raw: str = Field(
             default_factory=lambda: os.getenv("CORS_ORIGINS", _DEFAULT_CORS)
         )
-        cors_origins: List[str] = Field(default_factory=list)
+        cors_origins: list[str] = Field(default_factory=list)
 
         # Model & source configuration
         model_config = SettingsConfigDict(
@@ -103,7 +103,7 @@ if _HAVE_PYDANTIC_SETTINGS:
 
         @field_validator("cors_origins", mode="before")
         @classmethod
-        def _parse_cors(cls, v: Any) -> List[str]:  # accepts str | list[str]
+        def _parse_cors(cls, v: Any) -> list[str]:  # accepts str | list[str]
             # If explicit value provided, honor it, else build from raw
             if v:
                 return _split_csv(v)  # type: ignore[arg-type]
@@ -123,14 +123,26 @@ else:
         model above so the rest of the code doesn't need to change.
         """
 
-        app_name: str = Field(default_factory=lambda: os.getenv("APP_NAME", "ZenetHunter API"))
-        app_version: str = Field(default_factory=lambda: os.getenv("APP_VERSION", "0.1.0"))
-        app_env: str = Field(default_factory=lambda: os.getenv("APP_ENV", "development"))
+        app_name: str = Field(
+            default_factory=lambda: os.getenv("APP_NAME", "ZenetHunter API")
+        )
+        app_version: str = Field(
+            default_factory=lambda: os.getenv("APP_VERSION", "0.1.0")
+        )
+        app_env: str = Field(
+            default_factory=lambda: os.getenv("APP_ENV", "development")
+        )
         app_host: str = Field(default_factory=lambda: os.getenv("APP_HOST", "0.0.0.0"))
-        app_port: int = Field(default_factory=lambda: int(os.getenv("APP_PORT", "8000")))
-        log_level: str = Field(default_factory=lambda: os.getenv("LOG_LEVEL", "info").lower())
-        database_url: Optional[str] = Field(default_factory=lambda: os.getenv("DATABASE_URL"))
-        cors_origins: List[str] = Field(
+        app_port: int = Field(
+            default_factory=lambda: int(os.getenv("APP_PORT", "8000"))
+        )
+        log_level: str = Field(
+            default_factory=lambda: os.getenv("LOG_LEVEL", "info").lower()
+        )
+        database_url: str | None = Field(
+            default_factory=lambda: os.getenv("DATABASE_URL")
+        )
+        cors_origins: list[str] = Field(
             default_factory=lambda: _split_csv(os.getenv("CORS_ORIGINS", _DEFAULT_CORS))
         )
 
@@ -154,7 +166,7 @@ def get_settings() -> Settings:
 # For ad‑hoc debugging: `python -m app.core.config`
 if __name__ == "__main__":  # pragma: no cover
     s = get_settings()
-    dump: Dict[str, Any] = {
+    dump: dict[str, Any] = {
         "app_name": s.app_name,
         "app_version": s.app_version,
         "app_env": s.app_env,

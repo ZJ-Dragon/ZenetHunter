@@ -1,5 +1,3 @@
-
-
 """Minimal health check test: `/healthz` should return 200 and a small JSON body.
 
 The test uses FastAPI's TestClient (which relies on `httpx`). If `httpx` is not
@@ -12,6 +10,7 @@ import pytest
 pytest.importorskip("httpx", reason="httpx is required for FastAPI TestClient")
 
 from fastapi.testclient import TestClient  # noqa: E402  (import after skip)
+
 from app.main import app  # noqa: E402
 
 

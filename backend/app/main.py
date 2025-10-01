@@ -1,5 +1,3 @@
-
-
 """ZenetHunter backend entrypoint (FastAPI).
 
 This module exposes `app` for ASGI servers (e.g. `uvicorn app.main:app`).
@@ -16,8 +14,8 @@ from __future__ import annotations
 
 import os
 from contextlib import asynccontextmanager
-from datetime import datetime, timezone
-from typing import Any, Dict, List
+from datetime import UTC, datetime
+from typing import Any
 
 from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -33,7 +31,7 @@ except Exception:  # pragma: no cover
 async def lifespan(app: FastAPI):  # noqa: D401 (docstring optional)
     """App lifespan: initialize lightweight resources; tear down on shutdown."""
     # Startup tasks (keep minimal here; heavy init goes to dedicated modules)
-    app.state.start_time = datetime.now(timezone.utc)
+    app.state.start_time = datetime.now(UTC)
     yield
     # Shutdown tasks
     # e.g., close DB pools/message buses when they are added later
@@ -47,9 +45,10 @@ app = FastAPI(title=APP_NAME, version=APP_VERSION, lifespan=lifespan)
 
 
 # ---- CORS (dev-friendly defaults; production should restrict origins) -------
-def _parse_origins(raw: str) -> List[str]:
+def _parse_origins(raw: str) -> list[str]:
     # Split by comma, strip spaces, drop empties
     return [o.strip() for o in raw.split(",") if o.strip()]
+
 
 _default_origins = "http://localhost:5173"
 origins = _parse_origins(os.getenv("CORS_ORIGINS", _default_origins))
@@ -65,7 +64,7 @@ app.add_middleware(
 
 # ---- Top-level routes -------------------------------------------------------
 @app.get("/", tags=["meta"])  # Root placeholder
-async def root() -> Dict[str, Any]:
+async def root() -> dict[str, Any]:
     """Root endpoint with basic service metadata and docs pointers."""
     return {
         "name": APP_NAME,
@@ -73,12 +72,12 @@ async def root() -> Dict[str, Any]:
         "docs": "/docs",
         "redoc": "/redoc",
         "healthz": "/healthz",
-        "time": datetime.now(timezone.utc).isoformat(),
+        "time": datetime.now(UTC).isoformat(),
     }
 
 
 @app.get("/healthz", tags=["meta"])  # Kubernetes-style health probe
-async def healthz() -> Dict[str, str]:
+async def healthz() -> dict[str, str]:
     return {"status": "ok"}
 
 

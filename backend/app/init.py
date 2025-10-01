@@ -1,5 +1,3 @@
-
-
 """ZenetHunter backend application package.
 
 This file marks `app` as a **regular Python package** so it can be imported by
