@@ -3,6 +3,7 @@
 import React from 'react'
 import { render } from '@testing-library/react'
 import App from './App'
+import test, { describe } from "node:test"
 
 // Minimal smoke test to ensure the App mounts in a jsdom environment
 // Docs:
