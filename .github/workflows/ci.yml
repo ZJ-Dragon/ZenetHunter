@@ -113,23 +113,25 @@ jobs:
           cache-dependency-path: frontend/package-lock.json
 
       - name: Install
-        working-directory: frontend
+        working-directory: ./frontend
         run: npm ci
 
       - name: Lint
-        working-directory: frontend
+        working-directory: ./frontend
         run: |
           if [ -f eslint.config.mjs ] || [ -f .eslintrc.* ]; then npm run -s lint; else echo "No ESLint config found; skipping"; fi
 
       - name: Typecheck
-        working-directory: frontend
+        working-directory: ./frontend
         run: |
-          if [ -f tsconfig.json ]; then \
-            if npm run -s | grep -q "typecheck"; then npm run -s typecheck; else npx -y typescript --noEmit; fi; \
-          else echo "No tsconfig.json found; skipping"; fi
+          if npm run -s | grep -q "typecheck"; then
+            npm run -s typecheck
+          else
+            npx -y typescript --noEmit
+          fi
 
       - name: Build
-        working-directory: frontend
+        working-directory: ./frontend
         run: npm run -s build
 
       - name: Upload frontend build artifact
