@@ -124,11 +124,7 @@ jobs:
       - name: Typecheck
         working-directory: ./frontend
         run: |
-          if npm run -s | grep -q "typecheck"; then
-            npm run -s typecheck
-          else
-            npx -y typescript --noEmit
-          fi
+          npm run -s typecheck --if-present || npx -y typescript --noEmit
 
       - name: Build
         working-directory: ./frontend
