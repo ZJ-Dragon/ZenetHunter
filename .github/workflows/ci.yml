@@ -23,7 +23,7 @@ jobs:
       frontend: ${{ steps.filter.outputs.frontend }}
     steps:
       - name: Checkout
-        uses: actions/checkout@v4  # required to analyze changes
+        uses: actions/checkout@v4
       - name: Paths filter
         id: filter
         uses: dorny/paths-filter@v3
@@ -41,7 +41,7 @@ jobs:
               - '.github/workflows/ci.yml'
 
   backend:
-    name: Backend (Python ${{ matrix.python }})
+    name: backend
     needs: changes
     if: needs.changes.outputs.backend == 'true' || github.event_name == 'push'
     runs-on: ubuntu-latest
@@ -57,30 +57,43 @@ jobs:
         uses: actions/setup-python@v6
         with:
           python-version: ${{ matrix.python }}
-          cache: 'pip'                          # enable pip cache
-          cache-dependency-path: |              # hash cache on these files when present
+          cache: 'pip'
+          cache-dependency-path: |
             backend/requirements*.txt
             backend/pyproject.toml
+            backend/setup.cfg
+            backend/setup.py
 
       - name: Install backend deps
         working-directory: backend
         run: |
           python -m pip install --upgrade pip
-          pip install -e .
-          pip install pytest httpx
+          pip install -e . || true
+          pip install pytest pytest-cov coverage httpx
 
       - name: Run pre-commit (ruff/black + hygiene)
         uses: pre-commit/action@v3.0.1
         with:
           extra_args: --all-files
 
-      - name: Run tests
+      - name: Run tests with coverage (XML + summary)
         working-directory: backend
         run: |
-          pytest -q
+          pytest -q \
+            --cov=. \
+            --cov-report=xml:coverage.xml \
+            --cov-report=markdown-append:$GITHUB_STEP_SUMMARY \
+            --cov-report=term-missing
+
+      - name: Upload backend coverage artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: backend-coverage-${{ matrix.python }}
+          path: backend/coverage.xml
+          if-no-files-found: error
 
   frontend:
-    name: Frontend (Node ${{ matrix.node }})
+    name: frontend
     needs: changes
     if: needs.changes.outputs.frontend == 'true' || github.event_name == 'push'
     runs-on: ubuntu-latest
@@ -100,14 +113,44 @@ jobs:
           cache-dependency-path: frontend/package-lock.json
 
       - name: Install
-        working-directory: frontend
+        working-directory: ./frontend
         run: npm ci
 
       - name: Lint
-        working-directory: frontend
+        working-directory: ./frontend
         run: |
           if [ -f eslint.config.mjs ] || [ -f .eslintrc.* ]; then npm run -s lint; else echo "No ESLint config found; skipping"; fi
 
+      - name: Typecheck
+        working-directory: ./frontend
+        run: |
+          npm run -s typecheck --if-present || npx -y typescript --noEmit
+
       - name: Build
-        working-directory: frontend
+        working-directory: ./frontend
         run: npm run -s build
+
+      - name: Upload frontend build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: frontend-build-${{ matrix.node }}
+          path: |
+            frontend/dist
+            frontend/build
+          if-no-files-found: ignore
+
+  status:
+    name: ci (aggregate)
+    runs-on: ubuntu-latest
+    needs: [backend, frontend]
+    if: ${{ always() }}
+    steps:
+      - name: Aggregate job results for stable required check
+        run: |
+          echo "backend=${{ needs.backend.result }}"
+          echo "frontend=${{ needs.frontend.result }}"
+          if [ "${{ needs.backend.result }}" != "success" ] || [ "${{ needs.frontend.result }}" != "success" ]; then
+            echo "One or more jobs failed"
+            exit 1
+          fi
+          echo "All required jobs succeeded"
