@@ -1,5 +1,3 @@
-
-
 # syntax=docker/dockerfile:1.6
 
 # ------------------------------------------------------------
@@ -40,7 +38,7 @@ RUN <<'EOF' bash
 set -eu
 cat > /etc/nginx/conf.d/default.conf <<'NGINX_CONF'
 server {
-  listen       80;
+  listen       8080;
   server_name  _;
 
   gzip on;
@@ -67,7 +65,12 @@ EOF
 # Copy the build output from the builder stage
 COPY --from=builder /app/dist/ /usr/share/nginx/html/
 
-# Healthcheck is defined in docker-compose.yml
-EXPOSE 80
+# Drop root: run as the built-in nginx user (uid/gid may be 101)
+USER nginx
+
+# Image-baked healthcheck probes the SPA root
+EXPOSE 8080
+HEALTHCHECK --interval=30s --timeout=3s --retries=3 \
+  CMD wget -qO- http://127.0.0.1:8080/ || exit 1
 
 # Default command (inherited): nginx -g 'daemon off;'
