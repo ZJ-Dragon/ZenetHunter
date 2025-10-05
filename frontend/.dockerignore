@@ -1,0 +1,64 @@
+############################
+# Dependencies
+############################
+node_modules/
+.pnpm-store/
+.yarn/
+.npm/
+.npmrc
+
+############################
+# Build outputs
+############################
+dist/
+build/
+out/
+.out/
+.next/
+.nuxt/
+storybook-static/
+
+############################
+# Vite / tool caches
+############################
+.vite/
+.vite-cache/
+.turbo/
+.parcel-cache/
+.eslintcache
+.stylelintcache
+.cache/
+coverage/
+.esbuild/
+rollup-cache/
+
+############################
+# Env / secrets
+############################
+.env
+.env.*
+**/*.env
+**/*.env.*
+
+############################
+# OS/IDE cruft
+############################
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+############################
+# Keep manifests/config needed for build
+############################
+!package.json
+!package-lock.json
+!yarn.lock
+!pnpm-lock.yaml
+!bun.lockb
+!vite.config.*
+!tsconfig*.json
+!eslint.config.*
+!.eslintrc*
+!postcss.config.*
+!tailwind.config.*
