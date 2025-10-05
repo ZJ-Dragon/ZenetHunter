@@ -1,3 +1,5 @@
+
+
 # ---- ZenetHunter .dockerignore ----
 # Goal: keep build context small & fast. See Docker docs on build context & .dockerignore.
 #
@@ -64,14 +66,6 @@ logs/
 report.*.json
 
 ############################
-# Environment / secrets
-############################
-.env
-.env.*
-**/*.env
-**/*.env.*
-
-############################
 # OS files
 ############################
 **/.DS_Store
@@ -91,6 +85,5 @@ nohup.out
 # Docs / misc (not needed for image build)
 ############################
 docs/
-**/*.md
 
 # End of file
