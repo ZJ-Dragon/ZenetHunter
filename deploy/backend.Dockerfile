@@ -1,5 +1,3 @@
-
-
 # syntax=docker/dockerfile:1.6
 
 # ------------------------------------------------------------
@@ -38,6 +36,10 @@ RUN pip install --no-cache-dir .
 # ------------------------------------------------------------
 FROM python:3.12-slim AS runtime
 
+# Install curl for runtime HEALTHCHECK (keep image minimal)
+RUN apt-get update && apt-get install -y --no-install-recommends curl \
+    && rm -rf /var/lib/apt/lists/*
+
 # Same envs as builder (recommended for consistency)
 ENV PYTHONDONTWRITEBYTECODE=1 \
     PYTHONUNBUFFERED=1 \
@@ -63,6 +65,10 @@ USER app
 # Expose the FastAPI port (for documentation purposes)
 EXPOSE 8000
 
+# Container healthcheck (hits FastAPI /healthz)
+HEALTHCHECK --interval=30s --timeout=3s --retries=3 \
+  CMD curl -fsS http://127.0.0.1:${APP_PORT}/healthz || exit 1
+
 # Default command: run Uvicorn
 # For multi-core CPUs you may set `--workers` via env or override the CMD in Compose
 # See FastAPI docs: server workers with Uvicorn/Gunicorn
@@ -70,7 +76,7 @@ CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000"]
 
 # ------------------------------------------------------------
 # Notes:
-# - Healthcheck is defined in docker-compose.yml to avoid duplication.
+# - Healthcheck is baked into the image via curl against /healthz.
 # - If BuildKit is enabled, you may cache pip downloads with cache mounts:
 #   (uncomment the syntax line >=1.6‑labs and RUN below)
 #   RUN --mount=type=cache,target=/root/.cache/pip pip install -r requirements.txt
