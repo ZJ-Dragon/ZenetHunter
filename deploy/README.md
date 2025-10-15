@@ -36,7 +36,9 @@ docker compose ps
 # docker compose down
 ```
 
-- Default ports: **8000/tcp** (backend API), **8080/tcp** (frontend via nginx). See the mapping in `docker-compose.yml` and edit if needed. Health checks for each service are already defined. (Backend `/healthz`.)
+CI note: the GitHub Actions "image-check" workflow performs build-only validation (pull latest bases, no push); locally prefer `docker compose build` for verification.
+
+- Default container ports: **8000/tcp** (backend API), **8080/tcp** (frontend via nginx). Host mapping (compose default): **1226 → 8080** for the frontend. Health checks are baked into both images (backend `/healthz`, frontend root `/`).
 
 ---
 
@@ -60,7 +62,7 @@ There are two common ways to run containers on UGREEN NAS:
    docker compose up -d
    ```
 6. Access:
-  - Frontend: `http://<NAS-IP>:8080/`
+  - Frontend: `http://<NAS-IP>:1226/`  (mapped to container 8080)
   - API: `http://<NAS-IP>:8000/` (health: `/healthz`)
 
 > Tip: Keep **volumes on SSD** (e.g., M.2) for container writable data to avoid keeping HDDs spinning and improve responsiveness. Community users recommend putting Docker app data on SSD for UGOS.
@@ -80,7 +82,7 @@ There are two common ways to run containers on UGREEN NAS:
 | Service   | Container Port | Host Port (default) | Volumes (default)                     | Restart policy        |
 |-----------|-----------------|---------------------|---------------------------------------|-----------------------|
 | backend   | 8000            | 8000                | (binds not required yet)              | `unless-stopped`      |
-| frontend  | 80 (nginx)      | 8080                | `dist/` baked into image              | `unless-stopped`      |
+| frontend  | 8080            | 1226                | `dist/` baked into image              | `unless-stopped`      |
 | db        | 5432            | *not published*     | `db_data:/var/lib/postgresql/data`    | `unless-stopped`      |
 
 - Edit `deploy/docker-compose.yml` to change **port mappings** or move volumes to SSD pools. Health checks gate service readiness, and `depends_on` is configured.
@@ -131,7 +133,8 @@ See also: `backend/app/core/config.py`.
 ## 9) Security notes
 
 - Expose ports only on trusted LANs; use NAS firewall if available.
-- Keep images up to date. Prefer **non‑root** containers (our backend image already runs as a non‑root user).
+- Keep images up to date; CI uses build-only validation to catch issues early.
+- **Non-root** by default: backend & frontend run as non-root; Compose sets `user: "101:101"`, `read_only: true`, and `tmpfs: /tmp`.
 - Never commit real secrets; inject via environment or secret stores.
 
 ---
