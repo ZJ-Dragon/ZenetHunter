@@ -48,6 +48,7 @@ jobs:
           file: ${{ matrix.file }}
           # keep CI lightweight; adjust to linux/amd64,linux/arm64 if you need to validate both
           platforms: linux/amd64
+          pull: true
           push: false
           load: false
           provenance: false
