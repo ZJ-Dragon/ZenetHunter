@@ -1,5 +1,3 @@
-
-
 name: zenethunter
 
 # Docker Compose for local dev and NAS deployment
@@ -40,7 +38,11 @@ services:
       dockerfile: deploy/backend.Dockerfile
     image: zenethunter/backend:dev
     container_name: zh-backend
+    user: "101:101"
     restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp
     env_file:
       - ./env/.env
     environment:
@@ -80,15 +82,19 @@ services:
       dockerfile: deploy/frontend.Dockerfile
     image: zenethunter/frontend:dev
     container_name: zh-frontend
+    user: "101:101"
     restart: unless-stopped
+    read_only: true
+    tmpfs:
+      - /tmp
     depends_on:
       - backend
     ports:
-      # Map host 8080 -> container 80 (nginx)
-      - "8080:80"
+      # Map host 1226 -> container 8080 (non-root in-container port)
+      - "1226:8080"
     healthcheck:
       # Alpine nginx base includes busybox wget; verify index responds
-      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1/ || exit 1"]
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8080/ || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5

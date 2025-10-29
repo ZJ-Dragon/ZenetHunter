@@ -36,7 +36,9 @@ docker compose ps
 # docker compose down
 ```
 
-- 默认端口：**8000/tcp**（后端 API），**8080/tcp**（通过 nginx 的前端）。查看 `docker-compose.yml` 中的映射并根据需要编辑。已为每个服务定义了健康检查。（后端 `/healthz`。）
+CI 说明：GitHub Actions 的 “image-check” 工作流仅做 **build-only** 验证（拉取最新基础镜像，不推送镜像到仓库）；本地建议优先使用 `docker compose build` 进行验证。
+
+- 默认容器端口：**8000/tcp**（后端 API），**8080/tcp**（前端 nginx）。Compose 默认主机映射：**1226 → 8080**（前端）。镜像内已内置健康检查（后端 `/healthz`，前端 `/`）。
 
 ---
 
@@ -60,7 +62,7 @@ docker compose ps
    docker compose up -d
    ```
 6. 访问：
-  - 前端：`http://<NAS-IP>:8080/`
+  - 前端：`http://<NAS-IP>:1226/`（映射至容器 8080）
   - API：`http://<NAS-IP>:8000/`（健康检查：`/healthz`）
 
 > 提示：将**卷保存在 SSD**（如 M.2）上以避免 HDD 持续运转并提高响应速度。社区用户建议将 Docker 应用数据放在 UGOS 的 SSD 上。
@@ -80,7 +82,7 @@ docker compose ps
 | 服务      | 容器端口        | 主机端口（默认）   | 卷（默认）                           | 重启策略            |
 |-----------|-----------------|---------------------|---------------------------------------|--------------------|
 | backend   | 8000           | 8000                | （暂不需要绑定）                      | `unless-stopped`   |
-| frontend  | 80 (nginx)     | 8080                | `dist/` 已烘焙到镜像中                | `unless-stopped`   |
+| frontend  | 8080           | 1226                | `dist/` 已烘焙到镜像中                | `unless-stopped`   |
 | db        | 5432           | *未公开*            | `db_data:/var/lib/postgresql/data`    | `unless-stopped`   |
 
 - 编辑 `deploy/docker-compose.yml` 以更改**端口映射**或将卷移动到 SSD 存储池。健康检查控制服务就绪状态，并已配置 `depends_on`。
@@ -131,8 +133,9 @@ docker compose ps
 ## 9) 安全说明
 
 - 仅在受信任的局域网上暴露端口；如果可用，使用 NAS 防火墙。
-- 保持镜像更新。首选**非 root** 容器（我们的后端镜像已经以非 root 用户运行）。
-- 永远不要提交真实的密钥；通过环境或密钥存储注入。
+- 保持镜像更新；CI 使用 **build-only** 验证提前发现问题。
+- **默认非 root**：后端与前端均以非 root 运行；Compose 设置 `user: "101:101"`、`read_only: true`、`tmpfs: /tmp`。
+- 切勿提交真实密钥；通过环境变量或秘密存储注入。
 
 ---
 
