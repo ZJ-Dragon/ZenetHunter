@@ -54,9 +54,11 @@ ruff check --fix . && ruff format . && black .
 | `APP_HOST` | `0.0.0.0` | 开发时 ASGI 监听地址 |
 | `APP_PORT` | `8000` | 开发时 ASGI 监听端口 |
 | `LOG_LEVEL` | `info` | 日志级别：`debug`/`info`/`warning`/`error` |
+| `API_TITLE` | `ZenetHunter API` | API 标题（用于 OpenAPI 文档） |
+| `API_VERSION` | `0.1.0` | API 版本（用于 OpenAPI 文档） |
 | `DATABASE_URL` | `postgresql://user:pass@localhost:5432/zenethunter` | 主数据库 DSN（占位） |
 | `SECRET_KEY` | `...` | 会话/签名密钥（**勿入库**） |
-| `CORS_ORIGINS` | `http://localhost:5173` | 逗号分隔的前端来源（开发） |
+| `CORS_ALLOW_ORIGINS` | `http://localhost:5173` | 逗号分隔的前端来源（开发，也接受 `CORS_ORIGINS`） |
 
 **实施说明（计划）**：通过 `pydantic-settings` 加载设置，支持可选 `.env`；见 `app/core/config.py`。
 
@@ -66,12 +68,17 @@ ruff check --fix . && ruff format . && black .
 ```
 backend/
 ├─ app/
-│  ├─ main.py            # FastAPI 入口（创建 `app`）、healthz、路由装配
-│  ├─ core/              # 配置、日志、鉴权、中间件（计划）
-│  ├─ api/               # 路由（devices、defense、attack、scanner）— 占位
-│  ├─ services/          # 领域/编排服务 — 占位
-│  └─ models/            # pydantic 模型/Schema — 占位
-├─ tests/                # pytest 用例（从 healthz 起步）
+│  ├─ __init__.py        # 包初始化
+│  ├─ main.py            # FastAPI 入口（创建 `app`）、CORS、路由装配
+│  ├─ core/              # 配置、日志、鉴权、中间件
+│  │  └─ config.py       # Settings（pydantic-settings）用于 12-Factor 配置
+│  ├─ routes/            # 按功能组织的 API 路由
+│  │  ├─ __init__.py     # 路由包
+│  │  └─ health.py       # 健康检查路由（GET /healthz）
+│  ├─ services/          # 编排与领域服务（计划）
+│  └─ models/            # pydantic 模型/Schema（计划）
+├─ tests/                # pytest 测试套件
+│  └─ test_healthz.py    # 健康检查和 OpenAPI 文档测试
 └─ pyproject.toml        # PEP 621 元数据 + 工具配置（ruff/black/pytest）
 ```
 
@@ -94,8 +101,11 @@ backend/
 ---
 
 ## 6) 健康检查与文档
-- 健康检查：`GET /healthz` → `200 OK`（项目早期即提供）。
-- API 文档：`GET /docs`（Swagger UI），`GET /redoc`。
+- **健康检查**：`GET /healthz` → `200 OK`，返回 `{"status": "ok"}`。用于容器编排系统（Kubernetes、Docker 健康检查）。
+- **API 文档**：
+  - `GET /docs` - Swagger UI（交互式 API 文档）
+  - `GET /redoc` - ReDoc（替代文档视图）
+  - `GET /openapi.json` - OpenAPI 模式（机器可读，用于客户端 SDK 生成）
 
 ---
 

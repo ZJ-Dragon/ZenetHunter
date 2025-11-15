@@ -48,6 +48,11 @@ docker compose up -d  # 以 compose 文件为准，首次请先修改 .env
 ```
 > 生产镜像采用多阶段构建与非 root 用户运行（详见 `deploy/`）。
 
+`docker compose up` 后，可通过以下地址检查后端健康状态：
+- **健康检查端点**：http://localhost:8000/healthz (HTTP 200)
+- **交互式 API 文档**：http://localhost:8000/docs (Swagger UI)
+- **OpenAPI 模式**：http://localhost:8000/openapi.json
+
 ---
 
 ## 模块概览

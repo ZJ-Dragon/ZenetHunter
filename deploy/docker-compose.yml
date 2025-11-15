@@ -50,8 +50,11 @@ services:
       APP_HOST: 0.0.0.0
       APP_PORT: 8000
       LOG_LEVEL: info
+      # API metadata (can be overridden via API_TITLE, API_VERSION)
+      API_TITLE: ZenetHunter API
+      API_VERSION: 0.1.0
       # Allow the frontend origin in dev/prod (adjust as needed)
-      CORS_ORIGINS: http://localhost:8080
+      CORS_ALLOW_ORIGINS: http://localhost:8080
       # DSN points to the Compose service name `db`
       DATABASE_URL: postgresql://zenethunter:zenethunter@db:5432/zenethunter
     depends_on:

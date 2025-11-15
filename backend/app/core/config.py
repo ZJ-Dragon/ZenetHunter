@@ -60,10 +60,12 @@ if _HAVE_PYDANTIC_SETTINGS:
         # Meta
         app_name: str = Field(
             default="ZenetHunter API",
-            validation_alias="APP_NAME",
+            # Also accepts APP_NAME for backward compatibility
+            validation_alias="API_TITLE",
         )
         app_version: str = Field(
-            default_factory=lambda: os.getenv("APP_VERSION", "0.1.0")
+            default_factory=lambda: os.getenv("API_VERSION")
+            or os.getenv("APP_VERSION", "0.1.0")
         )
 
         # Runtime
@@ -82,7 +84,8 @@ if _HAVE_PYDANTIC_SETTINGS:
 
         # CORS: comma‑separated list → list[str]
         cors_origins_raw: str = Field(
-            default_factory=lambda: os.getenv("CORS_ORIGINS", _DEFAULT_CORS)
+            default_factory=lambda: os.getenv("CORS_ALLOW_ORIGINS")
+            or os.getenv("CORS_ORIGINS", _DEFAULT_CORS)
         )
         cors_origins: list[str] = Field(default_factory=list)
 
@@ -107,7 +110,10 @@ if _HAVE_PYDANTIC_SETTINGS:
             # If explicit value provided, honor it, else build from raw
             if v:
                 return _split_csv(v)  # type: ignore[arg-type]
-            return _split_csv(os.getenv("CORS_ORIGINS", _DEFAULT_CORS))
+            return _split_csv(
+                os.getenv("CORS_ALLOW_ORIGINS")
+                or os.getenv("CORS_ORIGINS", _DEFAULT_CORS)
+            )
 
         # Convenience: integer logging level for stdlib logging
         @property
@@ -124,10 +130,12 @@ else:
         """
 
         app_name: str = Field(
-            default_factory=lambda: os.getenv("APP_NAME", "ZenetHunter API")
+            default_factory=lambda: os.getenv("API_TITLE")
+            or os.getenv("APP_NAME", "ZenetHunter API")
         )
         app_version: str = Field(
-            default_factory=lambda: os.getenv("APP_VERSION", "0.1.0")
+            default_factory=lambda: os.getenv("API_VERSION")
+            or os.getenv("APP_VERSION", "0.1.0")
         )
         app_env: str = Field(
             default_factory=lambda: os.getenv("APP_ENV", "development")
@@ -143,7 +151,10 @@ else:
             default_factory=lambda: os.getenv("DATABASE_URL")
         )
         cors_origins: list[str] = Field(
-            default_factory=lambda: _split_csv(os.getenv("CORS_ORIGINS", _DEFAULT_CORS))
+            default_factory=lambda: _split_csv(
+                os.getenv("CORS_ALLOW_ORIGINS")
+                or os.getenv("CORS_ORIGINS", _DEFAULT_CORS)
+            )
         )
 
         @property

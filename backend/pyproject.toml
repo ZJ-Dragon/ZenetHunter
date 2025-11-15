@@ -12,6 +12,7 @@ license = { text = "MIT" }
 dependencies = [
   "fastapi",
   "uvicorn[standard]",
+  "pydantic-settings>=2.0",  # For 12-Factor config management
 ]
 
 [project.optional-dependencies]
@@ -21,6 +22,7 @@ dev = [
   "black",
   "pytest",
   "pytest-cov",
+  "httpx",  # Required for FastAPI TestClient
 ]
 
 [tool.ruff]
