@@ -23,7 +23,7 @@ repos:
         # Preserve Markdown hard line breaks (two spaces at EOL)
         args: ["--markdown-linebreak-ext=md"]
 
-  # --- Python: Ruff (linter & formatter) ---
+  # --- Python: Ruff (linter only; Black handles formatting) ---
   - repo: https://github.com/astral-sh/ruff-pre-commit
     # Pin to a released tag from https://github.com/astral-sh/ruff-pre-commit/releases
     rev: v0.13.2
@@ -31,8 +31,8 @@ repos:
       # Lint first; allow autofix so Black/formatter can finalize style afterwards
       - id: ruff-check
         args: [--fix]
-      # Then run Ruff's formatter (safe to place after ruff-check --fix)
-      - id: ruff-format
+      # Note: ruff-format removed to avoid conflicts with Black
+      # Black is the authoritative formatter for this project
 
   # --- Python: Black (stable code formatting) ---
   # Use the official pre-commit mirror for mypyc-compiled, faster Black builds

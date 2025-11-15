@@ -31,6 +31,13 @@ line-length = 88
 target-version = "py311"
 extend-exclude = ["node_modules", "venv", ".venv", "build", "dist", ".tox", ".nox"]
 
+[tool.ruff.format]
+# Use Black-compatible formatting to avoid conflicts
+quote-style = "double"
+indent-style = "space"
+skip-magic-trailing-comma = false
+line-ending = "auto"
+
 [tool.ruff.lint]
 # E,F,W: pycodestyle/pyflakes/warnings; I: isort; UP: pyupgrade; B: bugbear
 select = ["E", "F", "W", "I", "UP", "B"]
