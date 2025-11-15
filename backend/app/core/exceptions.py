@@ -148,7 +148,7 @@ class AppError(Exception):
 
     def _generate_type_uri(self) -> str:
         """Generate Problem Details type URI from error code."""
-        code_lower = self.code.value.lower().replace(".", "/")
+        code_lower = self.code.value.lower().replace(".", "/").replace("_", "-")
         return f"https://zenethunter/errors/{code_lower}"
 
     def to_problem_details(self, instance: str | None = None) -> dict[str, Any]:
