@@ -46,6 +46,11 @@ docker compose up -d  # edit .env first if needed
 ```
 The images follow Docker **best practices** (multi-stage builds, .dockerignore, non-root when feasible).
 
+After `docker compose up`, check backend health at:
+- **Health endpoint**: http://localhost:8000/healthz (HTTP 200)
+- **Interactive API docs**: http://localhost:8000/docs (Swagger UI)
+- **OpenAPI schema**: http://localhost:8000/openapi.json
+
 ---
 
 ## Modules

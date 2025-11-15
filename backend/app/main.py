@@ -12,13 +12,15 @@ Refs:
 
 from __future__ import annotations
 
-import os
 from contextlib import asynccontextmanager
 from datetime import UTC, datetime
 from typing import Any
 
 from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
+from app.core.config import get_settings
+from app.routes import health
 
 try:  # Optional in dev; avoid hard dependency at import time
     import uvicorn  # type: ignore
@@ -38,24 +40,41 @@ async def lifespan(app: FastAPI):  # noqa: D401 (docstring optional)
 
 
 # ---- App factory ------------------------------------------------------------
-APP_NAME = "ZenetHunter API"
-APP_VERSION = os.getenv("APP_VERSION", "0.1.0")
+settings = get_settings()
 
-app = FastAPI(title=APP_NAME, version=APP_VERSION, lifespan=lifespan)
+APP_DESCRIPTION = """
+ZenetHunter backend API for network security scanning and interference management.
+
+## Features
+
+* Network device scanning and discovery
+* Device topology visualization
+* Automated interference strategies
+* Real-time status monitoring via WebSocket
+
+## API Documentation
+
+* **Swagger UI**: `/docs` - Interactive API documentation
+* **ReDoc**: `/redoc` - Alternative API documentation
+* **OpenAPI JSON**: `/openapi.json` - Machine-readable API specification
+"""
+
+app = FastAPI(
+    title=settings.app_name,
+    version=settings.app_version,
+    description=APP_DESCRIPTION,
+    lifespan=lifespan,
+    # OpenAPI metadata
+    openapi_url="/openapi.json",
+    docs_url="/docs",
+    redoc_url="/redoc",
+)
 
 
 # ---- CORS (dev-friendly defaults; production should restrict origins) -------
-def _parse_origins(raw: str) -> list[str]:
-    # Split by comma, strip spaces, drop empties
-    return [o.strip() for o in raw.split(",") if o.strip()]
-
-
-_default_origins = "http://localhost:5173"
-origins = _parse_origins(os.getenv("CORS_ORIGINS", _default_origins))
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins if origins != ["*"] else ["*"],
+    allow_origins=settings.cors_origins if settings.cors_origins != ["*"] else ["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -67,8 +86,8 @@ app.add_middleware(
 async def root() -> dict[str, Any]:
     """Root endpoint with basic service metadata and docs pointers."""
     return {
-        "name": APP_NAME,
-        "version": APP_VERSION,
+        "name": settings.app_name,
+        "version": settings.app_version,
         "docs": "/docs",
         "redoc": "/redoc",
         "healthz": "/healthz",
@@ -76,26 +95,25 @@ async def root() -> dict[str, Any]:
     }
 
 
-@app.get("/healthz", tags=["meta"])  # Kubernetes-style health probe
-async def healthz() -> dict[str, str]:
-    return {"status": "ok"}
+# ---- API routers (mounted from feature modules) ----------------------------
+# Health check router
+app.include_router(health.router)
 
-
-# ---- API routers (mounted from feature modules; placeholders for now) -------
+# API router for future feature modules
 api_router = APIRouter(prefix="/api")
 # Example (future):
-# from app.api import devices, defense, attack, scanner
+# from app.routes import devices, topology, scanner, attack
 # api_router.include_router(devices.router)
-# api_router.include_router(defense.router)
-# api_router.include_router(attack.router)
+# api_router.include_router(topology.router)
 # api_router.include_router(scanner.router)
+# api_router.include_router(attack.router)
 
 app.include_router(api_router)
 
 
 # ---- Local dev entry --------------------------------------------------------
 if __name__ == "__main__" and uvicorn is not None:  # pragma: no cover
-    host = os.getenv("APP_HOST", "0.0.0.0")
-    port = int(os.getenv("APP_PORT", "8000"))
-    reload = os.getenv("APP_RELOAD", "true").lower() == "true"
+    host = settings.app_host
+    port = settings.app_port
+    reload = settings.app_env == "development"
     uvicorn.run("app.main:app", host=host, port=port, reload=reload)

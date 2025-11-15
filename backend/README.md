@@ -54,9 +54,11 @@ We follow the **12‑Factor** principle: config is provided via **environment va
 | `APP_HOST` | `0.0.0.0` | Bind host for the ASGI server (dev) |
 | `APP_PORT` | `8000` | Bind port for the ASGI server (dev) |
 | `LOG_LEVEL` | `info` | Log level: `debug`/`info`/`warning`/`error` |
+| `API_TITLE` | `ZenetHunter API` | API title (used in OpenAPI docs) |
+| `API_VERSION` | `0.1.0` | API version (used in OpenAPI docs) |
 | `DATABASE_URL` | `postgresql://user:pass@localhost:5432/zenethunter` | Primary DB DSN (placeholder) |
 | `SECRET_KEY` | `...` | Secret material for session/signing (do **not** commit) |
-| `CORS_ORIGINS` | `http://localhost:5173` | Comma‑separated list for dev UI access |
+| `CORS_ALLOW_ORIGINS` | `http://localhost:5173` | Comma‑separated list for dev UI access (also accepts `CORS_ORIGINS`) |
 
 **Implementation note (planned):** settings are loaded via `pydantic-settings` with optional `.env` support. See `app/core/config.py`.
 
@@ -66,12 +68,17 @@ We follow the **12‑Factor** principle: config is provided via **environment va
 ```
 backend/
 ├─ app/
-│  ├─ main.py            # FastAPI app entrypoint (creates `app`), health check, API wiring
-│  ├─ core/              # config, logging, auth, middleware (planned)
-│  ├─ api/               # routers (devices, defense, attack, scanner) – placeholders
-│  ├─ services/          # orchestration & domain services – placeholders
-│  └─ models/            # pydantic models / schemas – placeholders
-├─ tests/                # pytest test suite (starts with healthz test)
+│  ├─ __init__.py        # Package initialization
+│  ├─ main.py            # FastAPI app entrypoint (creates `app`), CORS, API wiring
+│  ├─ core/              # config, logging, auth, middleware
+│  │  └─ config.py       # Settings (pydantic-settings) for 12-Factor config
+│  ├─ routes/            # API routers organized by feature
+│  │  ├─ __init__.py     # Routes package
+│  │  └─ health.py       # Health check router (GET /healthz)
+│  ├─ services/          # orchestration & domain services (planned)
+│  └─ models/            # pydantic models / schemas (planned)
+├─ tests/                # pytest test suite
+│  └─ test_healthz.py    # Health check and OpenAPI docs tests
 └─ pyproject.toml        # PEP 621 metadata + tool config (ruff/black/pytest)
 ```
 
@@ -94,8 +101,11 @@ backend/
 ---
 
 ## 6) Health & Docs
-- Health check: `GET /healthz` → `200 OK` (added early in the project).
-- API docs: `GET /docs` (Swagger UI) and `GET /redoc`.
+- **Health check**: `GET /healthz` → `200 OK` with `{"status": "ok"}`. Used by container orchestration systems (Kubernetes, Docker healthchecks).
+- **API documentation**:
+  - `GET /docs` - Swagger UI (interactive API documentation)
+  - `GET /redoc` - ReDoc (alternative documentation view)
+  - `GET /openapi.json` - OpenAPI schema (machine-readable, for client SDK generation)
 
 ---
 
