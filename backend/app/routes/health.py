@@ -20,4 +20,3 @@ async def healthz() -> dict[str, str]:
         GET /healthz -> 200 OK {"status": "ok"}
     """
     return {"status": "ok"}
-

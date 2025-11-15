@@ -8,4 +8,3 @@ Example:
     from app.routes import health
     app.include_router(health.router)
 """
-
