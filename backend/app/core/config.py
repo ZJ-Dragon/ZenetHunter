@@ -21,7 +21,7 @@ from typing import Any, Literal
 
 try:
     # Preferred path: pydantic-settings (v2)
-    from pydantic import BaseModel, Field, field_validator
+    from pydantic import BaseModel, Field, field_validator, model_validator
     from pydantic_settings import BaseSettings, SettingsConfigDict
 
     _HAVE_PYDANTIC_SETTINGS = True
@@ -76,7 +76,7 @@ if _HAVE_PYDANTIC_SETTINGS:
         app_host: str = Field(default="0.0.0.0", validation_alias="APP_HOST")
         app_port: int = Field(default=8000, validation_alias="APP_PORT")
 
-        # Logging
+        # Logging - environment-specific defaults
         log_level: str = Field(default="info", validation_alias="LOG_LEVEL")
 
         # External services (optional in early project phases)
@@ -91,14 +91,68 @@ if _HAVE_PYDANTIC_SETTINGS:
 
         # Model & source configuration
         model_config = SettingsConfigDict(
-            # If you later add a real .env, set env_file=".env" (requires python-dotenv)
+            # Support .env files for local development (requires python-dotenv)
+            # pydantic-settings will automatically look for .env files in:
+            # 1. Current working directory
+            # 2. Parent directories (up to the filesystem root)
+            # Set env_file=".env" explicitly if you want to restrict to a specific path
+            env_file=".env",
+            env_file_encoding="utf-8",
+            case_sensitive=False,
             extra="ignore",
         )
 
-        @field_validator("log_level")
+        @model_validator(mode="after")
+        def _apply_env_defaults(self) -> Settings:
+            """Apply environment-specific default values after model validation."""
+            env = self.app_env.lower()
+            # Set log level defaults based on environment (only if not explicitly set)
+            if not os.getenv("LOG_LEVEL"):
+                if env == "development" and self.log_level == "info":
+                    # Only override if still at default "info"
+                    self.log_level = "debug"
+                elif env == "staging" and self.log_level == "info":
+                    # Keep info for staging
+                    pass
+                elif env == "production" and self.log_level == "info":
+                    # Production should use warning or error
+                    self.log_level = "warning"
+            # Set CORS defaults based on environment
+            cors_env_set = os.getenv("CORS_ALLOW_ORIGINS") or os.getenv("CORS_ORIGINS")
+            if not cors_env_set:
+                if env == "development":
+                    # Development: allow common dev ports
+                    default_origins = _split_csv(_DEFAULT_CORS)
+                    if not self.cors_origins or self.cors_origins == default_origins:
+                        self.cors_origins = [
+                            "http://localhost:5173",
+                            "http://localhost:3000",
+                            "http://127.0.0.1:5173",
+                            "http://127.0.0.1:3000",
+                        ]
+                elif env == "production":
+                    # Production: should be explicitly set, but default to empty
+                    # (forces explicit configuration)
+                    default_origins = _split_csv(_DEFAULT_CORS)
+                    if not self.cors_origins or self.cors_origins == default_origins:
+                        self.cors_origins = []
+                        import warnings
+
+                        warnings.warn(
+                            "CORS_ALLOW_ORIGINS not set in production. "
+                            "Please configure allowed origins explicitly.",
+                            UserWarning,
+                            stacklevel=2,
+                        )
+            return self
+
+        @field_validator("log_level", mode="before")
         @classmethod
-        def _normalize_log_level(cls, v: str) -> str:
-            v = (v or "").lower().strip()
+        def _normalize_log_level(cls, v: Any) -> str:
+            """Normalize and validate log level."""
+            if v is None:
+                return "info"
+            v = str(v).lower().strip()
             if v not in _ALLOWED_LOG_LEVELS:
                 # default conservatively to info
                 return "info"
