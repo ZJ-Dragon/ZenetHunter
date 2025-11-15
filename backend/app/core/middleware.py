@@ -74,7 +74,7 @@ class ErrorHandlerMiddleware(BaseHTTPMiddleware):
                     "correlation_id": correlation_id,
                     "code": e.code.value,
                     "http_status": e.http_status,
-                    "module": "api",
+                    "component": "api",
                     "sd": {"error_code": e.code.value, "type_uri": e.type_uri},
                 },
                 exc_info=True,
@@ -87,7 +87,7 @@ class ErrorHandlerMiddleware(BaseHTTPMiddleware):
                 extra={
                     "correlation_id": correlation_id,
                     "code": ErrorCode.INTERNAL_UNCAUGHT.value,
-                    "module": "api",
+                    "component": "api",
                     "sd": {"exception_type": type(e).__name__},
                 },
                 exc_info=True,
