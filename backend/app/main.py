@@ -20,6 +20,8 @@ from fastapi import APIRouter, FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import get_settings
+from app.core.logging import setup_logging
+from app.core.middleware import ErrorHandlerMiddleware
 from app.routes import health
 
 try:  # Optional in dev; avoid hard dependency at import time
@@ -33,6 +35,7 @@ except Exception:  # pragma: no cover
 async def lifespan(app: FastAPI):  # noqa: D401 (docstring optional)
     """App lifespan: initialize lightweight resources; tear down on shutdown."""
     # Startup tasks (keep minimal here; heavy init goes to dedicated modules)
+    setup_logging()  # Initialize structured logging
     app.state.start_time = datetime.now(UTC)
     yield
     # Shutdown tasks
@@ -71,7 +74,11 @@ app = FastAPI(
 )
 
 
-# ---- CORS (dev-friendly defaults; production should restrict origins) -------
+# ---- Middleware (order matters: error handler first, then CORS) ------------
+# Error handler middleware must be added first to catch all exceptions
+app.add_middleware(ErrorHandlerMiddleware)
+
+# CORS middleware (dev-friendly defaults; production should restrict origins)
 app.add_middleware(
     CORSMiddleware,
     allow_origins=settings.cors_origins if settings.cors_origins != ["*"] else ["*"],
