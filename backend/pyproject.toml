@@ -42,7 +42,7 @@ line-ending = "auto"
 [tool.ruff.lint]
 # E,F,W: pycodestyle/pyflakes/warnings; I: isort; UP: pyupgrade; B: bugbear
 select = ["E", "F", "W", "I", "UP", "B"]
-ignore = []
+ignore = ["B008"]  # B008: Do not perform function call `Depends` in argument defaults
 
 [tool.black]
 line-length = 88
