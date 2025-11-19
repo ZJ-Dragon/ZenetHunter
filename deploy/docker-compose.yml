@@ -44,19 +44,25 @@ services:
     tmpfs:
       - /tmp
     env_file:
+      # Load environment variables from .env file (if exists)
+      # Copy deploy/env/.env.example to deploy/env/.env and customize
       - ./env/.env
     environment:
-      APP_ENV: production
-      APP_HOST: 0.0.0.0
-      APP_PORT: 8000
-      LOG_LEVEL: info
-      # API metadata (can be overridden via API_TITLE, API_VERSION)
-      API_TITLE: ZenetHunter API
-      API_VERSION: 0.1.0
-      # Allow the frontend origin in dev/prod (adjust as needed)
-      CORS_ALLOW_ORIGINS: http://localhost:8080
-      # DSN points to the Compose service name `db`
-      DATABASE_URL: postgresql://zenethunter:zenethunter@db:5432/zenethunter
+      # Environment name: development, staging, or production
+      # Controls default values for logging, CORS, and other settings
+      APP_ENV: ${APP_ENV:-production}
+      # Server configuration (can be overridden via .env file)
+      APP_HOST: ${APP_HOST:-0.0.0.0}
+      APP_PORT: ${APP_PORT:-8000}
+      # Logging level (environment-specific defaults apply if not set)
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+      # API metadata (can be overridden via .env file)
+      API_TITLE: ${API_TITLE:-ZenetHunter API}
+      API_VERSION: ${API_VERSION:-0.1.0}
+      # CORS origins (comma-separated, environment-specific defaults apply)
+      CORS_ALLOW_ORIGINS: ${CORS_ALLOW_ORIGINS:-http://localhost:8080}
+      # Database connection (DSN points to the Compose service name `db`)
+      DATABASE_URL: ${DATABASE_URL:-postgresql://zenethunter:zenethunter@db:5432/zenethunter}
     depends_on:
       db:
         condition: service_healthy

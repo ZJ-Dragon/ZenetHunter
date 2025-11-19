@@ -13,6 +13,7 @@ dependencies = [
   "fastapi",
   "uvicorn[standard]",
   "pydantic-settings>=2.0",  # For 12-Factor config management
+  "python-dotenv>=1.0.0",  # For .env file support (optional, but recommended for local dev)
 ]
 
 [project.optional-dependencies]

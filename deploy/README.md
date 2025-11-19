@@ -91,14 +91,49 @@ There are two common ways to run containers on UGREEN NAS:
 
 ## 5) Configuration via environment (.env)
 
-All runtime configuration is environment‑driven (12‑Factor). Use `deploy/env/.env.example` as a template:
+All runtime configuration is environment‑driven (12‑Factor). The application automatically loads configuration from environment variables and optionally from `.env` files.
 
-- **CORS_ORIGINS**: For NAS default, include the nginx host origin, e.g. `http://<NAS-IP>:8080`.
-- **VITE_API_BASE**: The frontend uses this to call the API; on NAS, set `VITE_API_BASE=http://<NAS-IP>:8000`.
-- **DATABASE_URL**: Compose connects backend → `db` service by name. For an external DB, replace with that DSN.
-- **LOG_LEVEL**: `debug|info|warning|error|critical` (backend).
+### Quick Setup
 
-See also: `backend/app/core/config.py`.
+1. Copy the example file:
+   ```bash
+   cd deploy
+   cp env/.env.example env/.env
+   ```
+
+2. Edit `env/.env` and customize values for your environment
+
+3. The application will automatically load variables from `env/.env` when using Docker Compose
+
+### Environment-Specific Defaults
+
+The application applies different default values based on `APP_ENV`:
+
+- **Development** (`APP_ENV=development`):
+  - Log level: `debug` (if not explicitly set)
+  - CORS: Allows common dev ports
+
+- **Staging** (`APP_ENV=staging`):
+  - Log level: `info` (if not explicitly set)
+
+- **Production** (`APP_ENV=production`):
+  - Log level: `warning` (if not explicitly set)
+  - CORS: **Must be explicitly configured** (warns if not set)
+
+### Key Configuration Variables
+
+| Variable | Example | Description |
+|---|---|---|
+| `APP_ENV` | `production` | Environment: `development`/`staging`/`production` |
+| `CORS_ALLOW_ORIGINS` | `http://<NAS-IP>:8080` | Comma-separated CORS origins (for NAS, include nginx host) |
+| `DATABASE_URL` | `postgresql://zenethunter:zenethunter@db:5432/zenethunter` | PostgreSQL DSN (Compose uses service name `db`) |
+| `LOG_LEVEL` | `info` | Log level: `debug`/`info`/`warning`/`error`/`critical` |
+| `API_TITLE` | `ZenetHunter API` | API title (OpenAPI docs) |
+| `API_VERSION` | `0.1.0` | API version (OpenAPI docs) |
+
+**Note**: Environment variables set directly in `docker-compose.yml` take precedence over `.env` file values.
+
+See also: `backend/app/core/config.py` and `backend/README.md`.
 
 ---
 
