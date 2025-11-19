@@ -21,7 +21,7 @@ async def get_device(mac: str, state: StateManager = Depends(get_state_manager))
     device = state.get_device(mac)
     if not device:
         raise AppError(
-            ErrorCode.CONFIG.NOT_FOUND,
+            ErrorCode.CONFIG_NOT_FOUND,
             f"Device with MAC {mac} not found",
             extra={"mac": mac}
         )

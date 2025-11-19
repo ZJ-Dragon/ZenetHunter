@@ -1,8 +1,8 @@
-from datetime import datetime
+from datetime import UTC, datetime
 from enum import Enum
 from typing import Optional
 
-from pydantic import BaseModel, Field, IPvAnyAddress
+from pydantic import BaseModel, ConfigDict, Field, IPvAnyAddress
 
 
 class DeviceType(str, Enum):
@@ -28,9 +28,7 @@ class Device(BaseModel):
     vendor: Optional[str] = Field(None, description="Device vendor resolved from MAC OUI")
     type: DeviceType = Field(default=DeviceType.UNKNOWN, description="Device type category")
     status: DeviceStatus = Field(default=DeviceStatus.ONLINE, description="Current connection status")
-    first_seen: datetime = Field(default_factory=datetime.utcnow, description="Timestamp when device was first detected")
-    last_seen: datetime = Field(default_factory=datetime.utcnow, description="Timestamp when device was last active")
+    first_seen: datetime = Field(default_factory=lambda: datetime.now(UTC), description="Timestamp when device was first detected")
+    last_seen: datetime = Field(default_factory=lambda: datetime.now(UTC), description="Timestamp when device was last active")
     
-    class Config:
-        from_attributes = True
-
+    model_config = ConfigDict(from_attributes=True)
