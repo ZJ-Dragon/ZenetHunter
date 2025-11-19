@@ -1,8 +1,7 @@
 import logging
 from threading import Lock
-from typing import Dict, List, Optional
 
-from app.models.device import Device, DeviceStatus, DeviceType
+from app.models.device import Device, DeviceType
 from app.models.log import SystemLog
 from app.models.topology import NetworkTopology, TopologyLink, TopologyNode
 
@@ -14,36 +13,36 @@ class StateManager:
     In-memory state manager for devices, logs, and configuration.
     Thread-safe implementation using locks.
     """
-    
+
     _instance = None
     _lock = Lock()
 
     def __new__(cls):
         with cls._lock:
             if cls._instance is None:
-                cls._instance = super(StateManager, cls).__new__(cls)
+                cls._instance = super().__new__(cls)
                 cls._instance._initialized = False
             return cls._instance
 
     def __init__(self):
         if self._initialized:
             return
-            
-        self._devices: Dict[str, Device] = {}
-        self._logs: List[SystemLog] = []
+
+        self._devices: dict[str, Device] = {}
+        self._logs: list[SystemLog] = []
         # Simple Allow/Block lists (MAC addresses)
         self._allow_list: set[str] = set()
         self._block_list: set[str] = set()
-        
+
         self._data_lock = Lock()
         self._initialized = True
 
-    def get_all_devices(self) -> List[Device]:
+    def get_all_devices(self) -> list[Device]:
         """Return a list of all tracked devices."""
         with self._data_lock:
             return list(self._devices.values())
 
-    def get_device(self, mac: str) -> Optional[Device]:
+    def get_device(self, mac: str) -> Device | None:
         """Get a specific device by MAC address."""
         with self._data_lock:
             return self._devices.get(mac.lower())
@@ -59,28 +58,28 @@ class StateManager:
         with self._data_lock:
             nodes = []
             links = []
-            
+
             # Assume a simple star topology for now (Gateway <-> Devices)
             # In a real scanner, we might detect the gateway.
             # For now, we'll just list devices as nodes.
-            
+
             gateway_mac = None
-            
+
             for mac, device in self._devices.items():
                 node_type = "device"
                 if device.type == DeviceType.ROUTER:
                     node_type = "router"
                     gateway_mac = mac
-                    
+
                 nodes.append(
                     TopologyNode(
                         id=mac,
                         label=device.name or str(device.ip),
                         type=node_type,
-                        data=device
+                        data=device,
                     )
                 )
-            
+
             # If we have a gateway, link everyone to it
             if gateway_mac:
                 for mac in self._devices:
@@ -89,10 +88,10 @@ class StateManager:
                             TopologyLink(
                                 source=gateway_mac,
                                 target=mac,
-                                type="ethernet" # Default to ethernet for now
+                                type="ethernet",  # Default to ethernet for now
                             )
                         )
-            
+
             return NetworkTopology(nodes=nodes, links=links)
 
     def add_log(self, log: SystemLog) -> None:
@@ -103,18 +102,18 @@ class StateManager:
             if len(self._logs) > 1000:
                 self._logs = self._logs[-1000:]
 
-    def get_logs(self, limit: int = 100) -> List[SystemLog]:
+    def get_logs(self, limit: int = 100) -> list[SystemLog]:
         """Get recent system logs."""
         with self._data_lock:
             return sorted(self._logs, key=lambda x: x.timestamp, reverse=True)[:limit]
-            
+
     # --- List Management ---
-    
-    def get_allow_list(self) -> List[str]:
+
+    def get_allow_list(self) -> list[str]:
         with self._data_lock:
             return list(self._allow_list)
-            
-    def get_block_list(self) -> List[str]:
+
+    def get_block_list(self) -> list[str]:
         with self._data_lock:
             return list(self._block_list)
 
@@ -143,4 +142,3 @@ class StateManager:
 # Global accessor
 def get_state_manager() -> StateManager:
     return StateManager()
-

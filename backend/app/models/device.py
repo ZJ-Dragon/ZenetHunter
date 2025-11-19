@@ -1,6 +1,5 @@
 from datetime import UTC, datetime
 from enum import Enum
-from typing import Optional
 
 from pydantic import BaseModel, ConfigDict, Field, IPvAnyAddress
 
@@ -21,14 +20,28 @@ class DeviceStatus(str, Enum):
 
 class Device(BaseModel):
     """Device model representing a network host."""
-    
-    mac: str = Field(..., description="MAC address of the device", pattern=r"^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$")
+
+    mac: str = Field(
+        ...,
+        description="MAC address of the device",
+        pattern=r"^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$",
+    )
     ip: IPvAnyAddress = Field(..., description="IP address of the device")
-    name: Optional[str] = Field(None, description="Hostname or alias")
-    vendor: Optional[str] = Field(None, description="Device vendor resolved from MAC OUI")
-    type: DeviceType = Field(default=DeviceType.UNKNOWN, description="Device type category")
-    status: DeviceStatus = Field(default=DeviceStatus.ONLINE, description="Current connection status")
-    first_seen: datetime = Field(default_factory=lambda: datetime.now(UTC), description="Timestamp when device was first detected")
-    last_seen: datetime = Field(default_factory=lambda: datetime.now(UTC), description="Timestamp when device was last active")
-    
+    name: str | None = Field(None, description="Hostname or alias")
+    vendor: str | None = Field(None, description="Device vendor resolved from MAC OUI")
+    type: DeviceType = Field(
+        default=DeviceType.UNKNOWN, description="Device type category"
+    )
+    status: DeviceStatus = Field(
+        default=DeviceStatus.ONLINE, description="Current connection status"
+    )
+    first_seen: datetime = Field(
+        default_factory=lambda: datetime.now(UTC),
+        description="Timestamp when device was first detected",
+    )
+    last_seen: datetime = Field(
+        default_factory=lambda: datetime.now(UTC),
+        description="Timestamp when device was last active",
+    )
+
     model_config = ConfigDict(from_attributes=True)

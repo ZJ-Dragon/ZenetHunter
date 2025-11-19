@@ -12,19 +12,19 @@ def test_get_topology_structure():
         "ip": "10.0.0.1",
         "name": "Gateway Router",
         "type": "router",
-        "status": "online"
+        "status": "online",
     }
     client.post("/api/devices", json=device_data)
-    
+
     response = client.get("/api/topology")
     assert response.status_code == 200
     data = response.json()
-    
+
     assert "nodes" in data
     assert "links" in data
     assert isinstance(data["nodes"], list)
     assert isinstance(data["links"], list)
-    
+
     # Verify our device is in nodes
     found = False
     target_mac = device_data["mac"].lower()
@@ -33,4 +33,3 @@ def test_get_topology_structure():
             found = True
             break
     assert found
-

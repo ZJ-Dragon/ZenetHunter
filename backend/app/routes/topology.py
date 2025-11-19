@@ -10,4 +10,3 @@ router = APIRouter(prefix="/topology", tags=["topology"])
 async def get_topology(state: StateManager = Depends(get_state_manager)):
     """Get the current network topology."""
     return state.get_topology()
-
