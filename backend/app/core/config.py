@@ -79,6 +79,12 @@ if _HAVE_PYDANTIC_SETTINGS:
         # Logging - environment-specific defaults
         log_level: str = Field(default="info", validation_alias="LOG_LEVEL")
 
+        # Security
+        secret_key: str = Field(
+            default="insecure-dev-secret-key-do-not-use-in-production",
+            validation_alias="SECRET_KEY",
+        )
+
         # External services (optional in early project phases)
         database_url: str | None = Field(default=None, validation_alias="DATABASE_URL")
 
@@ -200,6 +206,11 @@ else:
         )
         log_level: str = Field(
             default_factory=lambda: os.getenv("LOG_LEVEL", "info").lower()
+        )
+        secret_key: str = Field(
+            default_factory=lambda: os.getenv(
+                "SECRET_KEY", "insecure-dev-secret-key-do-not-use-in-production"
+            )
         )
         database_url: str | None = Field(
             default_factory=lambda: os.getenv("DATABASE_URL")
