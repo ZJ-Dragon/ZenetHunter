@@ -71,7 +71,7 @@ jobs:
           # Fail loudly and show verbose output if installation fails
           pip install -e . -v
           # Install test tooling explicitly
-          pip install pytest pytest-cov coverage httpx
+          pip install pytest pytest-cov coverage httpx pytest-asyncio
           # Show dependency sanity check
           pip check || true
 
