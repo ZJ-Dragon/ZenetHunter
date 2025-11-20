@@ -23,6 +23,7 @@ dev = [
   "black",
   "pytest",
   "pytest-cov",
+  "pytest-asyncio",
   "httpx",  # Required for FastAPI TestClient
 ]
 
@@ -55,3 +56,5 @@ minversion = "6.0"
 addopts = "-q --cov=app --cov-report=xml"
 # Keep tests local to the backend package
 testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
