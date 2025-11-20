@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from threading import Lock
 
@@ -5,6 +6,7 @@ from app.models.attack import AttackStatus
 from app.models.device import Device, DeviceType
 from app.models.log import SystemLog
 from app.models.topology import NetworkTopology, TopologyLink, TopologyNode
+from app.services.websocket import get_connection_manager
 
 logger = logging.getLogger(__name__)
 
@@ -36,7 +38,36 @@ class StateManager:
         self._block_list: set[str] = set()
 
         self._data_lock = Lock()
+        # We need to access WebSocket manager but avoid circular imports if possible.
+        # Or use a lazy getter or dependency injection.
+        # For singleton pattern, lazy import inside methods is common.
         self._initialized = True
+
+    def _emit_event(self, event_name: str, data: dict) -> None:
+        """Emit an event via WebSocket bus (fire and forget)."""
+        try:
+            # Lazy access to avoid init loops if any
+            ws = get_connection_manager()
+            # We need to run async broadcast from sync context.
+            # If we are in an async loop (FastAPI request), we can use create_task?
+            # But StateManager methods might be called from anywhere.
+            # Best practice: StateManager should probably be async or we use
+            # asyncio.run_coroutine_threadsafe if we have access to the loop.
+            # if we have access to the loop.
+            # For simplicity in this MVP, we'll assume we are in an async context or
+            # we just create a task on the running loop.
+
+            # Check if there is a running loop
+            try:
+                loop = asyncio.get_running_loop()
+                loop.create_task(ws.broadcast({"event": event_name, "data": data}))
+            except RuntimeError:
+                # No running loop (e.g. synchronous test or script), skip or warn
+                logger.warning(
+                    f"Could not emit event {event_name}: No running event loop"
+                )
+        except Exception as e:
+            logger.error(f"Failed to emit event {event_name}: {e}")
 
     def reset(self) -> None:
         """Reset all state (for testing)."""
@@ -59,8 +90,29 @@ class StateManager:
     def update_device(self, device: Device) -> Device:
         """Update or add a device."""
         with self._data_lock:
-            self._devices[device.mac.lower()] = device
-            return device
+            mac = device.mac.lower()
+            existing = self._devices.get(mac)
+
+            # Check for status change or new device
+            is_new = existing is None
+            status_changed = existing and existing.status != device.status
+
+            self._devices[mac] = device
+
+        # Emit events outside lock
+        if is_new:
+            self._emit_event("deviceAdded", device.model_dump(mode="json"))
+        elif status_changed:
+            self._emit_event(
+                "deviceStatusChanged",
+                {
+                    "mac": mac,
+                    "status": device.status,
+                    "device": device.model_dump(mode="json"),
+                },
+            )
+
+        return device
 
     def update_device_attack_status(
         self, mac: str, status: AttackStatus
@@ -70,9 +122,10 @@ class StateManager:
             device = self._devices.get(mac.lower())
             if device:
                 device.attack_status = status
-                # Pydantic v2 models are mutable by default if not frozen
-                # But to be safe and trigger updates if we had observers, we re-set it
                 self._devices[mac.lower()] = device
+                # Emit event handled by AttackService usually, but we can add
+                # deviceUpdated here
+                # self._emit_event("deviceUpdated", device.model_dump(mode="json"))
                 return device
             return None
 
@@ -124,6 +177,9 @@ class StateManager:
             # Keep only last 1000 logs to prevent memory leak
             if len(self._logs) > 1000:
                 self._logs = self._logs[-1000:]
+
+        # Emit log event
+        self._emit_event("logAdded", log.model_dump(mode="json"))
 
     def get_logs(self, limit: int = 100) -> list[SystemLog]:
         """Get recent system logs."""

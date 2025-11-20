@@ -24,13 +24,15 @@ class ScannerService:
         Returns a ScanResult immediately with status=RUNNING (or similar).
         """
         # Create initial result
-        scan_id = uuid4()  # Import uuid4 needs to be added
+        scan_id = uuid4()
 
         # Start the background task
         asyncio.create_task(self._run_scan_task(scan_id, request))
 
         return ScanResult(
-            id=scan_id, status=ScanStatus.RUNNING, started_at=datetime.now(UTC)
+            id=scan_id,
+            status=ScanStatus.RUNNING,
+            started_at=datetime.now(UTC),
         )
 
     async def _run_scan_task(self, scan_id, request: ScanRequest):
