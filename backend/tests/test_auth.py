@@ -37,9 +37,7 @@ def test_protected_route_admin():
     token = get_admin_token()
     headers = {"Authorization": f"Bearer {token}"}
     # Try starting a scan
-    response = client.post(
-        "/api/scan/start", json={"type": "quick"}, headers=headers
-    )
+    response = client.post("/api/scan/start", json={"type": "quick"}, headers=headers)
     # Should succeed (202) or fail validation (422), but not 401/403
     assert response.status_code == 202
 
@@ -48,9 +46,7 @@ def test_protected_route_guest():
     token = get_guest_token()
     headers = {"Authorization": f"Bearer {token}"}
     # Try starting a scan
-    response = client.post(
-        "/api/scan/start", json={"type": "quick"}, headers=headers
-    )
+    response = client.post("/api/scan/start", json={"type": "quick"}, headers=headers)
     assert response.status_code == 403
 
 
@@ -59,4 +55,3 @@ def test_protected_route_no_token():
     response = client.post("/api/scan/start", json={"type": "quick"})
     # No token -> Guest -> Admin check fails -> 403
     assert response.status_code == 403
-
