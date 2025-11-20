@@ -1,7 +1,6 @@
 from fastapi.testclient import TestClient
 
 from app.main import app
-from app.models.device import DeviceStatus, DeviceType
 
 client = TestClient(app)
 
@@ -61,4 +60,3 @@ def test_ws_events_log_added():
         data = websocket.receive_json()
         assert data["event"] == "logAdded"
         assert data["data"]["message"] == "Test Log Event"
-
