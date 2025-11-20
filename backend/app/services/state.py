@@ -1,6 +1,7 @@
 import logging
 from threading import Lock
 
+from app.models.attack import AttackStatus
 from app.models.device import Device, DeviceType
 from app.models.log import SystemLog
 from app.models.topology import NetworkTopology, TopologyLink, TopologyNode
@@ -37,6 +38,14 @@ class StateManager:
         self._data_lock = Lock()
         self._initialized = True
 
+    def reset(self) -> None:
+        """Reset all state (for testing)."""
+        with self._data_lock:
+            self._devices.clear()
+            self._logs.clear()
+            self._allow_list.clear()
+            self._block_list.clear()
+
     def get_all_devices(self) -> list[Device]:
         """Return a list of all tracked devices."""
         with self._data_lock:
@@ -52,6 +61,20 @@ class StateManager:
         with self._data_lock:
             self._devices[device.mac.lower()] = device
             return device
+
+    def update_device_attack_status(
+        self, mac: str, status: AttackStatus
+    ) -> Device | None:
+        """Update the attack status of a device."""
+        with self._data_lock:
+            device = self._devices.get(mac.lower())
+            if device:
+                device.attack_status = status
+                # Pydantic v2 models are mutable by default if not frozen
+                # But to be safe and trigger updates if we had observers, we re-set it
+                self._devices[mac.lower()] = device
+                return device
+            return None
 
     def get_topology(self) -> NetworkTopology:
         """Generate network topology from device list."""
