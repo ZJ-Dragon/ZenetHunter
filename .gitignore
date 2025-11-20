@@ -1,5 +1,4 @@
 
-
 # ---- ZenetHunter .gitignore (merged from GitHub official templates) ----
 # Sources:
 #  - github/gitignore Python & Node templates
@@ -49,6 +48,7 @@ env.bak/
 htmlcov/
 .tox/
 .nox/
+coverage.xml
 
 # Type checkers & tooling caches
 .mypy_cache/
