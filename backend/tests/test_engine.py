@@ -1,8 +1,10 @@
+from unittest.mock import patch
+
 import pytest
-from unittest.mock import patch, MagicMock
+
 from app.core.engine.dummy import DummyAttackEngine
-from app.core.engine.scapy import ScapyAttackEngine
 from app.core.engine.factory import get_attack_engine
+from app.core.engine.scapy import ScapyAttackEngine
 from app.models.attack import AttackType
 
 
@@ -52,4 +54,3 @@ def test_factory_scapy():
     with patch.object(ScapyAttackEngine, "check_permissions", return_value=True):
         engine = get_attack_engine()
         assert isinstance(engine, ScapyAttackEngine)
-

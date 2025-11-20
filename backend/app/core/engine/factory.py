@@ -12,7 +12,7 @@ logger = logging.getLogger(__name__)
 def get_attack_engine() -> AttackEngine:
     """
     Get the appropriate attack engine.
-    
+
     Strategy:
     1. Try ScapyAttackEngine.
     2. Check permissions (root).
@@ -23,10 +23,9 @@ def get_attack_engine() -> AttackEngine:
     if scapy_engine.check_permissions():
         logger.info("Using ScapyAttackEngine (Root permissions detected)")
         return scapy_engine
-    
+
     logger.warning(
         "Root permissions missing. Falling back to DummyAttackEngine. "
         "Attacks will be simulated."
     )
     return DummyAttackEngine()
-
