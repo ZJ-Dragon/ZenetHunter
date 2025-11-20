@@ -8,4 +8,3 @@ def reset_state():
     """Reset the singleton StateManager before each test."""
     state = get_state_manager()
     state.reset()
-
