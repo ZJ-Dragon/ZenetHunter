@@ -57,5 +57,6 @@ def test_protected_route_guest():
 def test_protected_route_no_token():
     # Try starting a scan without header
     response = client.post("/api/scan/start", json={"type": "quick"})
-    assert response.status_code == 401
+    # No token -> Guest -> Admin check fails -> 403
+    assert response.status_code == 403
 
