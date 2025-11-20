@@ -9,8 +9,7 @@ router = APIRouter(tags=["scan"])
 
 @router.post("/scan/start", response_model=ScanResult, status_code=202)
 async def start_scan(
-    request: ScanRequest,
-    service: ScannerService = Depends(get_scanner_service)
+    request: ScanRequest, service: ScannerService = Depends(get_scanner_service)
 ):
     """Start a network scan (async)."""
     return await service.start_scan(request)
@@ -18,8 +17,7 @@ async def start_scan(
 
 @router.websocket("/ws")
 async def websocket_endpoint(
-    websocket: WebSocket,
-    manager: ConnectionManager = Depends(get_connection_manager)
+    websocket: WebSocket, manager: ConnectionManager = Depends(get_connection_manager)
 ):
     """WebSocket endpoint for real-time events."""
     await manager.connect(websocket)
@@ -27,8 +25,7 @@ async def websocket_endpoint(
         while True:
             # Keep connection alive and handle incoming messages if needed
             # For now, we just listen/echo or ignore
-            data = await websocket.receive_json()
+            await websocket.receive_json()
             # Optional: handle client commands via WS
     except WebSocketDisconnect:
         manager.disconnect(websocket)
-

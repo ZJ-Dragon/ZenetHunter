@@ -10,7 +10,7 @@ def test_start_scan():
     response = client.post("/api/scan/start", json={"type": "quick"})
     assert response.status_code == 202
     data = response.json()
-    
+
     assert "id" in data
     assert data["status"] == "running"
     assert "started_at" in data
@@ -22,7 +22,6 @@ def test_start_scan_invalid_type():
 
 
 def test_websocket_connection():
-    with client.websocket_connect("/api/ws") as websocket:
+    with client.websocket_connect("/api/ws"):
         # Connection established
         pass
-
