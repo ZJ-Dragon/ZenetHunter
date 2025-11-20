@@ -24,4 +24,3 @@ class AttackEngine(ABC):
     async def stop_attack(self, target_mac: str) -> None:
         """Stop an attack on a specific target."""
         pass
-
