@@ -17,7 +17,8 @@ class ScapyAttackEngine(AttackEngine):
         try:
             return os.geteuid() == 0
         except AttributeError:
-            # Windows doesn't have geteuid, assuming False for safety or True if admin check implemented
+            # Windows doesn't have geteuid, assuming False for safety or
+            # True if admin check implemented
             return False
 
     async def start_attack(
@@ -29,7 +30,7 @@ class ScapyAttackEngine(AttackEngine):
         if not self.check_permissions():
             logger.error("Scapy engine requires root privileges.")
             raise PermissionError("Root required for Scapy engine")
-            
+
         logger.info(f"[ScapyEngine] Injecting packets for {target_mac} ({attack_type})")
         # TODO: Implement actual packet injection
         # sendp(RadioTap()/Dot11(...), iface=monitor_interface, count=...)
@@ -41,4 +42,3 @@ class ScapyAttackEngine(AttackEngine):
         # If using subprocess, we'd kill the process.
         logger.info(f"[ScapyEngine] Stopping injection for {target_mac}")
         pass
-
