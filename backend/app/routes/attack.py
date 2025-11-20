@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, status
 
 from app.core.exceptions import AppError, ErrorCode
 from app.models.attack import AttackRequest, AttackResponse
@@ -36,6 +36,7 @@ async def stop_attack(
     """Stop an attack on a specific device."""
     response = await service.stop_attack(mac)
     if response.status == "failed":
-        raise AppError(ErrorCode.CONFIG_NOT_FOUND, response.message or "Device not found")
+        raise AppError(
+            ErrorCode.CONFIG_NOT_FOUND, response.message or "Device not found"
+        )
     return response
-
