@@ -3,6 +3,8 @@ from enum import Enum
 
 from pydantic import BaseModel, ConfigDict, Field, IPvAnyAddress
 
+from app.models.attack import AttackStatus
+
 
 class DeviceType(str, Enum):
     UNKNOWN = "unknown"
@@ -34,6 +36,9 @@ class Device(BaseModel):
     )
     status: DeviceStatus = Field(
         default=DeviceStatus.ONLINE, description="Current connection status"
+    )
+    attack_status: AttackStatus = Field(
+        default=AttackStatus.IDLE, description="Current attack status"
     )
     first_seen: datetime = Field(
         default_factory=lambda: datetime.now(UTC),
