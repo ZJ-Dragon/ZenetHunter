@@ -1,10 +1,10 @@
 from typing import Annotated
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, status
 from fastapi.security import OAuth2PasswordBearer
 
 from app.core.exceptions import AppError, ErrorCode
-from app.models.auth import TokenData, User, UserRole
+from app.models.auth import User, UserRole
 from app.services.auth import verify_token
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/auth/login", auto_error=False)
@@ -27,7 +27,7 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]) -> Use
             http_status=status.HTTP_401_UNAUTHORIZED,
             extra={"headers": {"WWW-Authenticate": "Bearer"}},
         )
-    
+
     return User(username=token_data.username, role=token_data.role or UserRole.GUEST)
 
 
@@ -38,4 +38,3 @@ async def get_current_admin(
     if current_user.role != UserRole.ADMIN:
         raise AppError(ErrorCode.AUTH_FORBIDDEN, "Admin privileges required")
     return current_user
-
