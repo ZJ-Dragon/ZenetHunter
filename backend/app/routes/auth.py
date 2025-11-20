@@ -12,7 +12,7 @@ router = APIRouter(tags=["auth"])
 
 @router.post("/auth/login", response_model=Token)
 async def login_for_access_token(
-    form_data: Annotated[OAuth2PasswordRequestForm, Depends()]
+    form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
 ):
     """
     Login to get access token.
@@ -25,11 +25,10 @@ async def login_for_access_token(
             data={"sub": form_data.username, "role": UserRole.ADMIN}
         )
         return {"access_token": access_token, "token_type": "bearer"}
-    
+
     raise AppError(
         ErrorCode.AUTH_INVALID_TOKEN,
         "Incorrect username or password",
         http_status=status.HTTP_401_UNAUTHORIZED,
         extra={"headers": {"WWW-Authenticate": "Bearer"}},
     )
-

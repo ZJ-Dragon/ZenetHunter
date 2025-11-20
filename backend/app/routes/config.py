@@ -1,5 +1,7 @@
 from fastapi import APIRouter, Body, Depends, status
 
+from app.core.security import get_current_admin
+from app.models.auth import User
 from app.services.state import StateManager, get_state_manager
 
 router = APIRouter(prefix="/config", tags=["config"])
@@ -19,9 +21,10 @@ async def add_to_allow_list(
     mac: str = Body(
         ..., embed=True, pattern=r"^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$"
     ),
+    admin: User = Depends(get_current_admin),
     state: StateManager = Depends(get_state_manager),
 ):
-    """Add MAC to allow list (removes from block list)."""
+    """Add MAC to allow list (Admin only)."""
     state.add_to_allow_list(mac)
 
 
@@ -30,13 +33,18 @@ async def add_to_block_list(
     mac: str = Body(
         ..., embed=True, pattern=r"^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$"
     ),
+    admin: User = Depends(get_current_admin),
     state: StateManager = Depends(get_state_manager),
 ):
-    """Add MAC to block list (removes from allow list)."""
+    """Add MAC to block list (Admin only)."""
     state.add_to_block_list(mac)
 
 
 @router.delete("/lists/{mac}", status_code=status.HTTP_204_NO_CONTENT)
-async def remove_from_lists(mac: str, state: StateManager = Depends(get_state_manager)):
-    """Remove MAC from both allow and block lists."""
+async def remove_from_lists(
+    mac: str,
+    admin: User = Depends(get_current_admin),
+    state: StateManager = Depends(get_state_manager),
+):
+    """Remove MAC from both allow and block lists (Admin only)."""
     state.remove_from_lists(mac)
