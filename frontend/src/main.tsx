@@ -1,15 +1,14 @@
-import React from 'react'
-import { createRoot } from 'react-dom/client'
-import App from './App'
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import { RouterProvider } from 'react-router-dom';
+import { router } from './router';
+import { AuthProvider } from './contexts/AuthContext';
+import './index.css';
 
-// Bootstrap React 18 app into #root (see index.html)
-const container = document.getElementById('root') as HTMLElement
-if (!container) {
-  throw new Error('Root container #root not found. Ensure index.html contains <div id="root"></div>.')
-}
-
-createRoot(container).render(
+ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
-    <App />
+    <AuthProvider>
+      <RouterProvider router={router} />
+    </AuthProvider>
   </React.StrictMode>
-)
+);
