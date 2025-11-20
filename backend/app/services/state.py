@@ -38,6 +38,14 @@ class StateManager:
         self._data_lock = Lock()
         self._initialized = True
 
+    def reset(self) -> None:
+        """Reset all state (for testing)."""
+        with self._data_lock:
+            self._devices.clear()
+            self._logs.clear()
+            self._allow_list.clear()
+            self._block_list.clear()
+
     def get_all_devices(self) -> list[Device]:
         """Return a list of all tracked devices."""
         with self._data_lock:
