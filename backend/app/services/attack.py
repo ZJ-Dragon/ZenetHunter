@@ -82,31 +82,11 @@ class AttackService:
         """Background task to run attack via engine."""
         try:
             # Delegate actual attack to the engine
-            # Note: This assumes engine.start_attack might be blocking or handle
-            # its own loop/duration. If engine just starts a thread, we wait here.
-            # If engine runs the loop, we await it.
-
-            # For now, we assume engine.start_attack runs for the duration or
-            # returns immediately. But since we pass duration, let's assume the
-            # engine implementation handles the "doing" and we just await it if
-            # it's designed to run for that long, OR we wrap it.
-
-            # Given our Base class definition: async def start_attack(...):
-            # Implementation detail:
-            # DummyEngine: logs and returns. We need to sleep here to simulate duration?
-            # ScapyEngine: injects packets.
-
-            # Ideally, the Engine should respect the duration if it's continuous.
-            # Let's keep the sleep here for control, and assume engine.start_attack
-            # initiates it.
-
             logger.info(
                 f"Attack {request.type} running on {mac} for {request.duration}s"
             )
 
             # Start the attack
-            # In a real scenario, this might return a task or handle ID.
-            # Here we just fire and wait.
             _ = asyncio.create_task(
                 self.engine.start_attack(mac, request.type, request.duration)
             )
@@ -116,8 +96,6 @@ class AttackService:
 
             # Stop the attack (if it hasn't stopped itself)
             await self.engine.stop_attack(mac)
-            # Ensure task is done (optional, depending on implementation)
-            # await attack_task
 
             # Automatically stop if still running
             device = self.state.get_device(mac)
