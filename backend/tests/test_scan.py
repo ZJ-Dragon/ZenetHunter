@@ -5,9 +5,11 @@ from app.main import app
 client = TestClient(app)
 
 
-def test_start_scan():
+def test_start_scan(admin_headers):
     # Start scan
-    response = client.post("/api/scan/start", json={"type": "quick"})
+    response = client.post(
+        "/api/scan/start", json={"type": "quick"}, headers=admin_headers
+    )
     assert response.status_code == 202
     data = response.json()
 
@@ -16,8 +18,10 @@ def test_start_scan():
     assert "started_at" in data
 
 
-def test_start_scan_invalid_type():
-    response = client.post("/api/scan/start", json={"type": "invalid"})
+def test_start_scan_invalid_type(admin_headers):
+    response = client.post(
+        "/api/scan/start", json={"type": "invalid"}, headers=admin_headers
+    )
     assert response.status_code == 422
 
 

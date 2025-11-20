@@ -5,7 +5,7 @@ from app.main import app
 client = TestClient(app)
 
 
-def test_config_lists():
+def test_config_lists(admin_headers):
     mac = "11:22:33:44:55:66"
 
     # Initial state empty
@@ -15,14 +15,18 @@ def test_config_lists():
     assert response.json()["block_list"] == []
 
     # Add to allow list
-    response = client.post("/api/config/lists/allow", json={"mac": mac})
+    response = client.post(
+        "/api/config/lists/allow", json={"mac": mac}, headers=admin_headers
+    )
     assert response.status_code == 204
 
     response = client.get("/api/config/lists")
     assert mac in response.json()["allow_list"]
 
     # Move to block list
-    response = client.post("/api/config/lists/block", json={"mac": mac})
+    response = client.post(
+        "/api/config/lists/block", json={"mac": mac}, headers=admin_headers
+    )
     assert response.status_code == 204
 
     response = client.get("/api/config/lists")
@@ -30,7 +34,7 @@ def test_config_lists():
     assert mac in response.json()["block_list"]
 
     # Remove from lists
-    response = client.delete(f"/api/config/lists/{mac}")
+    response = client.delete(f"/api/config/lists/{mac}", headers=admin_headers)
     assert response.status_code == 204
 
     response = client.get("/api/config/lists")
