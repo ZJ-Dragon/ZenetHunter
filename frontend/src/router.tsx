@@ -1,6 +1,7 @@
 import { createBrowserRouter } from 'react-router-dom';
 import { Login } from './pages/Login';
 import { NotFound } from './pages/NotFound';
+import { DeviceList } from './pages/DeviceList';
 import { AppShell } from './components/layout/AppShell';
 import { RequireAuth } from './components/auth/RequireAuth';
 
@@ -32,7 +33,7 @@ export const router = createBrowserRouter([
       },
       {
         path: 'devices',
-        element: <div>Devices Page (Coming Soon)</div>,
+        element: <DeviceList />,
       },
       {
         path: 'attacks',
@@ -49,4 +50,3 @@ export const router = createBrowserRouter([
     element: <NotFound />,
   },
 ]);
-
