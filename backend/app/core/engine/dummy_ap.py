@@ -34,4 +34,3 @@ class DummyAccessPointManager(AccessPointManager):
     async def remove_vlan_assignment(self, mac: str) -> bool:
         logger.info(f"[DummyAP] Removing VLAN assignment for {mac}")
         return True
-

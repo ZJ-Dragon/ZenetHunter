@@ -23,11 +23,11 @@ class AccessPointManager(ABC):
     ) -> bool:
         """
         Configure WPA3 security on the access point.
-        
+
         Args:
             config: WPA3 configuration (mode, SSID, RADIUS, etc.)
             params: Additional device-specific parameters
-            
+
         Returns:
             True if configuration succeeded
         """
@@ -39,12 +39,12 @@ class AccessPointManager(ABC):
     ) -> bool:
         """
         Assign a device to a specific VLAN after 802.1X authentication.
-        
+
         Args:
             mac: Device MAC address
             vlan_id: Target VLAN ID
             port: Physical port (if applicable)
-            
+
         Returns:
             True if assignment succeeded
         """
@@ -54,4 +54,3 @@ class AccessPointManager(ABC):
     async def remove_vlan_assignment(self, mac: str) -> bool:
         """Remove VLAN assignment for a device."""
         pass
-
