@@ -47,8 +47,35 @@ async def test_linux_defense_synproxy():
 
 
 @pytest.mark.asyncio
+async def test_linux_defense_udp_limit():
+    engine = LinuxDefenseEngine()
+
+    from asyncio import Future
+
+    f = Future()
+    f.set_result((0, "ok", ""))
+    engine._run_cmd = MagicMock(return_value=f)
+
+    await engine.enable_global_protection(DefenseType.UDP_RATE_LIMIT)
+
+    # Verify tc calls
+    # Expecting 6 commands (clean, root, classes, filter)
+    assert engine._run_cmd.call_count == 6
+    call_args = engine._run_cmd.call_args_list
+
+    # Check critical commands
+    assert "tc" in call_args[1][0][0]
+    assert "htb" in call_args[1][0][0]
+    # Check UDP filter
+    filter_cmd = call_args[5][0][0]
+    assert "protocol" in filter_cmd
+    assert "17" in filter_cmd  # UDP proto
+
+
+@pytest.mark.asyncio
 async def test_dummy_defense():
     engine = DummyDefenseEngine()
     await engine.enable_global_protection(DefenseType.SYN_PROXY)
+    await engine.enable_global_protection(DefenseType.UDP_RATE_LIMIT)
     # Should just log, no error
     assert True

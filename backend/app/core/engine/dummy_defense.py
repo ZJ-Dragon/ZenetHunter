@@ -1,5 +1,3 @@
-"""Dummy implementation of Defense Engine for non-root/testing environments."""
-
 import logging
 from typing import Any
 
@@ -30,6 +28,8 @@ class DummyDefenseEngine(DefenseEngine):
         logger.info(f"[DummyDefense] Enabling global protection: {policy}")
         if policy == DefenseType.SYN_PROXY:
             logger.info("[DummyDefense] SYNPROXY simulation enabled.")
+        elif policy == DefenseType.UDP_RATE_LIMIT:
+            logger.info("[DummyDefense] UDP Rate Limit simulation enabled (tc qdisc).")
 
     async def disable_global_protection(self, policy: DefenseType) -> None:
         logger.info(f"[DummyDefense] Disabling global protection: {policy}")
