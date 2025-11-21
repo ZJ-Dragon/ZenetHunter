@@ -62,9 +62,9 @@ export const DeviceList: React.FC = () => {
         device.ip.includes(search) ||
         device.mac.toLowerCase().includes(search.toLowerCase()) ||
         device.vendor?.toLowerCase().includes(search.toLowerCase());
-        
+
       const matchesStatus = filterStatus === 'all' || device.status === filterStatus;
-      
+
       return matchesSearch && matchesStatus;
     });
   }, [devices, search, filterStatus]);
@@ -171,4 +171,3 @@ export const DeviceList: React.FC = () => {
     </div>
   );
 };
-

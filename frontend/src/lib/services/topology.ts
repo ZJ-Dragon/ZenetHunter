@@ -7,4 +7,3 @@ export const topologyService = {
     return response.data;
   },
 };
-
