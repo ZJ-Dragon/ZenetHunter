@@ -21,7 +21,7 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
+/lib/
 lib64/
 parts/
 sdist/
@@ -205,4 +205,5 @@ nohup.out
 /.idea/copilot.data.migration.edit.xml
 
 # Docs
-docs/secrets/
+/docs/secrets/
+/docs/secrets/branches/
