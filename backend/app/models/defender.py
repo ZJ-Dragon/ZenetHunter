@@ -12,6 +12,7 @@ class DefenseType(str, Enum):
     UDP_RATE_LIMIT = "udp_rate_limit"  # UDP Traffic Shaping/Rate Limiting (Global)
     ARP_DAI = "arp_dai"  # ARP Dynamic Inspection (Switch/Passive Monitoring)
     DNS_RPZ = "dns_rpz"  # DNS Response Policy Zone (Sinkhole/Redirect)
+    TCP_RESET_POLICY = "tcp_reset_policy"  # TCP Reset for unauthorized traffic
     # Future: LIMIT_SPEED, etc.
 
 
