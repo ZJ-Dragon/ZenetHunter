@@ -88,7 +88,7 @@ export const SetupWizard: React.FC = () => {
               <select
                 className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-brand-500 focus:border-brand-500 sm:text-sm rounded-md"
                 value={formData.default_policy}
-                onChange={(e) => setFormData({ ...formData, default_policy: e.target.value as any })}
+                onChange={(e) => setFormData({ ...formData, default_policy: e.target.value as 'monitor' | 'block_unknown' })}
               >
                 <option value="monitor">Monitor Only (Recommended)</option>
                 <option value="block_unknown">Auto-Block Unknown</option>
