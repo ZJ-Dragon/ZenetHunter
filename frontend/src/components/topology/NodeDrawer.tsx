@@ -2,6 +2,7 @@ import React from 'react';
 import { X, Monitor, Smartphone, Router, Shield, Activity, Clock, Hash } from 'lucide-react';
 import { TopologyNode } from '../../types/topology';
 import { DeviceStatus } from '../../types/device';
+import { AttackControl } from '../actions/AttackControl';
 import { clsx } from 'clsx';
 
 interface NodeDrawerProps {
@@ -101,12 +102,7 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({ node, onClose }) => {
 
       {/* Actions */}
       <div className="border-t border-gray-200 p-4 bg-gray-50">
-        <button
-          className="w-full flex justify-center items-center px-4 py-2 border border-transparent shadow-sm text-sm font-medium rounded-md text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-        >
-          <Shield className="mr-2 h-4 w-4" />
-          Block Device
-        </button>
+        <AttackControl device={device} className="w-full justify-center" />
       </div>
     </div>
   );

@@ -6,6 +6,7 @@ import { NetworkTopology, TopologyNode } from '../types/topology';
 import { useWebSocketEvent } from '../contexts/WebSocketContext';
 import { WSEventType } from '../types/websocket';
 import { RefreshCw, Network } from 'lucide-react';
+import { ScanButton } from '../components/actions/ScanButton';
 import { clsx } from 'clsx';
 
 export const Topology: React.FC = () => {
@@ -49,16 +50,19 @@ export const Topology: React.FC = () => {
           <Network className="h-6 w-6 text-brand-600" />
           <h1 className="text-2xl font-bold text-gray-900">Network Map</h1>
         </div>
-        <button
-          onClick={() => {
-            setIsLoading(true);
-            fetchTopology();
-          }}
-          className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none"
-        >
-          <RefreshCw className={clsx("h-4 w-4 mr-2", isLoading && "animate-spin")} />
-          Refresh
-        </button>
+        <div className="flex space-x-2">
+          <ScanButton />
+          <button
+            onClick={() => {
+              setIsLoading(true);
+              fetchTopology();
+            }}
+            className="inline-flex items-center px-3 py-2 border border-gray-300 shadow-sm text-sm leading-4 font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none"
+          >
+            <RefreshCw className={clsx("h-4 w-4 mr-2", isLoading && "animate-spin")} />
+            Refresh
+          </button>
+        </div>
       </div>
 
       <div className="flex-1 relative bg-white rounded-lg shadow border border-gray-200 overflow-hidden">
