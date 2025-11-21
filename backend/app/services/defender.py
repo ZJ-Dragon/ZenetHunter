@@ -57,6 +57,14 @@ AVAILABLE_POLICIES = [
             "Block or redirect malicious domains using DNS Response Policy Zones."
         ),
     ),
+    DefensePolicy(
+        id=DefenseType.TCP_RESET_POLICY,
+        name="TCP Reset Policy (Active Defense)",
+        description=(
+            "Quickly terminate unauthorized connections using TCP RST "
+            "and ICMP rejections to prevent resource exhaustion."
+        ),
+    ),
 ]
 
 
@@ -89,6 +97,7 @@ class DefenderService:
             DefenseType.UDP_RATE_LIMIT,
             DefenseType.ARP_DAI,
             DefenseType.DNS_RPZ,
+            DefenseType.TCP_RESET_POLICY,
         ]:
             if mac.lower() != "global":
                 # Global policies are usually interface-based, not MAC-based
@@ -164,6 +173,7 @@ class DefenderService:
             # Stop known global policies
             await self.engine.disable_global_protection(DefenseType.SYN_PROXY)
             await self.engine.disable_global_protection(DefenseType.UDP_RATE_LIMIT)
+            await self.engine.disable_global_protection(DefenseType.TCP_RESET_POLICY)
             # Stop ARP Monitor
             await self.arp_monitor.stop_monitoring()
             await self.engine.disable_global_protection(DefenseType.ARP_DAI)
