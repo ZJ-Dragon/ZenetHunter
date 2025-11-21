@@ -37,7 +37,7 @@ export const AttackControl: React.FC<AttackControlProps> = ({ device, className 
 
   // If device is us (Router or Gateway), disable attack for safety
   // This logic ideally comes from backend "is_safe" flag, but frontend check helps UX
-  const isSafeDevice = device.type === 'router'; 
+  const isSafeDevice = device.type === 'router';
 
   if (isSafeDevice) return null;
 
@@ -65,4 +65,3 @@ export const AttackControl: React.FC<AttackControlProps> = ({ device, className 
     </button>
   );
 };
-

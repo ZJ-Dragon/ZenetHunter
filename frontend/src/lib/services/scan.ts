@@ -17,4 +17,3 @@ export const scanService = {
     return response.data;
   },
 };
-

@@ -9,7 +9,7 @@ export const ScanButton: React.FC<{ className?: string }> = ({ className }) => {
 
   const handleScan = async () => {
     if (isScanning) return;
-    
+
     setIsScanning(true);
     const toastId = toast.loading('Starting network scan...');
 
@@ -51,4 +51,3 @@ export const ScanButton: React.FC<{ className?: string }> = ({ className }) => {
     </button>
   );
 };
-
