@@ -18,9 +18,8 @@ class SwitchManager(ABC):
     async def enable_dai(self, vlan_id: int = 1) -> bool:
         """Enable Dynamic ARP Inspection on a VLAN."""
         pass
-    
+
     @abstractmethod
     async def bind_ip_mac(self, ip: str, mac: str, port: str) -> bool:
         """Create a static IP source binding (IP Source Guard / ARP ACL)."""
         pass
-
