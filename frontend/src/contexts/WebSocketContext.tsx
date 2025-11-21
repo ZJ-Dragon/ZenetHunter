@@ -17,7 +17,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   const [isConnected, setIsConnected] = useState(false);
   const [lastMessage, setLastMessage] = useState<WebSocketEvent | null>(null);
   const ws = useRef<WebSocket | null>(null);
-  const reconnectTimeout = useRef<NodeJS.Timeout>();
+  const reconnectTimeout = useRef<ReturnType<typeof setTimeout>>(undefined);
 
   const connect = useCallback(() => {
     if (!isAuthenticated || !token) return;
@@ -27,7 +27,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     // Alternatively, some backends require ticket or cookie.
     // FastAPI can handle query params in WebSocket endpoint dependency.
     const url = `${WS_URL}?token=${token}`;
-    
+
     const socket = new WebSocket(url);
 
     socket.onopen = () => {
@@ -113,4 +113,3 @@ export const useWebSocketEvent = <T = any>(
     }
   }, [lastMessage, eventType, handler]);
 };
-
