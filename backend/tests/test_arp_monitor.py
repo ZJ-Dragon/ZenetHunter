@@ -1,5 +1,5 @@
 import asyncio
-from unittest.mock import MagicMock, patch
+from unittest.mock import patch
 
 import pytest
 
@@ -49,12 +49,27 @@ async def test_arp_monitor_dummy_loop():
     monitor._is_running = True
 
     # We mock asyncio.sleep to avoid waiting
-    with patch("asyncio.sleep", new_callable=MagicMock) as mock_sleep:
-        mock_sleep.return_value = None  # Immediate return
+    # Important: asyncio.sleep is awaitable, so our mock must be awaitable too
+    # or return a value that can be awaited if used in `await asyncio.sleep(...)`
+    # context.
+    # However, here we are patching `asyncio.sleep` which is a coroutine function.
+    # The best way to mock an async function is using AsyncMock or setting side_effect
+    # to an async def.
 
+    async def async_sleep_mock(*args, **kwargs):
+        return None
+
+    with patch("asyncio.sleep", side_effect=async_sleep_mock):
         task = asyncio.create_task(monitor._dummy_monitor_loop())
 
-        # Let it "run" for a moment
+        # Let it "run" for a moment (yield control to the loop)
+        # We use real sleep(0) to yield control, but our patched sleep will return
+        # instantly inside the task. We need to ensure we are NOT calling the mocked
+        # sleep here if we want real yielding?
+        # Actually, since we patched asyncio.sleep globally in this block,
+        # 'await asyncio.sleep(0)' below will ALSO call the mock and return instantly,
+        # which is fine for yielding control in test loop.
+
         await asyncio.sleep(0)
 
         # Stop it
