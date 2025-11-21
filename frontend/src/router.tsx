@@ -2,6 +2,7 @@ import { createBrowserRouter } from 'react-router-dom';
 import { Login } from './pages/Login';
 import { NotFound } from './pages/NotFound';
 import { DeviceList } from './pages/DeviceList';
+import { Topology } from './pages/Topology';
 import { AppShell } from './components/layout/AppShell';
 import { RequireAuth } from './components/auth/RequireAuth';
 
@@ -34,6 +35,10 @@ export const router = createBrowserRouter([
       {
         path: 'devices',
         element: <DeviceList />,
+      },
+      {
+        path: 'topology',
+        element: <Topology />,
       },
       {
         path: 'attacks',

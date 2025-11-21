@@ -74,6 +74,7 @@ export const AppShell: React.FC = () => {
         <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto">
           <NavItem to="/" icon={LayoutDashboard}>Dashboard</NavItem>
           <NavItem to="/devices" icon={Network}>Devices</NavItem>
+          <NavItem to="/topology" icon={Activity}>Topology</NavItem>
           <NavItem to="/attacks" icon={Shield}>Interference</NavItem>
           <NavItem to="/settings" icon={Settings}>Settings</NavItem>
         </nav>
