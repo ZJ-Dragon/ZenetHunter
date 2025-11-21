@@ -8,6 +8,7 @@ class DefenseType(str, Enum):
 
     QUARANTINE = "quarantine"  # Complete isolation (local & wan)
     BLOCK_WAN = "block_wan"  # Block internet access only
+    SYN_PROXY = "syn_proxy"  # SYN Flood protection (Global/Gateway)
     # Future: LIMIT_SPEED, DNS_FILTER, etc.
 
 
