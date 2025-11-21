@@ -1,9 +1,10 @@
+from unittest.mock import MagicMock, patch
+
 import pytest
-from unittest.mock import patch, MagicMock, ANY
-from app.core.engine.factory import get_attack_engine
+
 from app.core.engine.defense_factory import get_defense_engine
-from app.core.engine.linux_defense import LinuxDefenseEngine
 from app.core.engine.dummy_defense import DummyDefenseEngine
+from app.core.engine.linux_defense import LinuxDefenseEngine
 from app.models.defender import DefenseType
 
 
@@ -26,16 +27,17 @@ async def test_linux_defense_synproxy():
     engine = LinuxDefenseEngine()
     # Mock the internal _run_cmd to avoid actual system calls
     engine._run_cmd = MagicMock(return_value=(0, "ok", ""))
-    
+
     # Test Enable
     # We need to await the async method
     from asyncio import Future
+
     f = Future()
     f.set_result((0, "ok", ""))
     engine._run_cmd = MagicMock(return_value=f)
-    
+
     await engine.enable_global_protection(DefenseType.SYN_PROXY)
-    
+
     # Verify iptables calls were made
     # We expect 3 calls for enable
     assert engine._run_cmd.call_count == 3
@@ -43,29 +45,31 @@ async def test_linux_defense_synproxy():
     assert "iptables" in call_args[0][0][0]
     assert "SYNPROXY" in call_args[1][0][0]
 
+
 @pytest.mark.asyncio
 async def test_linux_defense_udp_limit():
     engine = LinuxDefenseEngine()
-    
+
     from asyncio import Future
+
     f = Future()
     f.set_result((0, "ok", ""))
     engine._run_cmd = MagicMock(return_value=f)
-    
+
     await engine.enable_global_protection(DefenseType.UDP_RATE_LIMIT)
-    
+
     # Verify tc calls
     # Expecting 6 commands (clean, root, classes, filter)
     assert engine._run_cmd.call_count == 6
     call_args = engine._run_cmd.call_args_list
-    
+
     # Check critical commands
     assert "tc" in call_args[1][0][0]
     assert "htb" in call_args[1][0][0]
     # Check UDP filter
     filter_cmd = call_args[5][0][0]
     assert "protocol" in filter_cmd
-    assert "17" in filter_cmd # UDP proto
+    assert "17" in filter_cmd  # UDP proto
 
 
 @pytest.mark.asyncio

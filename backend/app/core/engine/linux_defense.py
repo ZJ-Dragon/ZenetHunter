@@ -76,12 +76,12 @@ class LinuxDefenseEngine(DefenseEngine):
         """
         Apply UDP rate limiting using Traffic Control (tc).
         Uses HTB (Hierarchical Token Bucket) or TBF (Token Bucket Filter).
-        
+
         Target: Default interface (eth0/wlan0), egress traffic.
-        Strategy: 
+        Strategy:
           - Limit UDP traffic to reasonable bandwidth (e.g., 1Mbps for non-video UDP)
           - Use fq_codel to reduce bufferbloat.
-        
+
         Simplified implementation for MVP:
         tc qdisc add dev eth0 root handle 1: htb default 10
         tc class add dev eth0 parent 1: classid 1:1 htb rate 100mbit burst 15k
@@ -89,54 +89,133 @@ class LinuxDefenseEngine(DefenseEngine):
         tc filter add dev eth0 protocol ip parent 1:0 prio 1 u32 match ip protocol 17 0xff flowid 1:10
         """
         logger.info("[LinuxDefense] Enabling UDP Rate Limiting (tc)...")
-        
+
         # Detect primary interface (simplified)
         # In a real app, this should be configurable or auto-detected via 'ip route'
-        iface = "eth0" 
-        
+        iface = "eth0"
+
         # Note: This is a destructive operation for existing qdiscs
         cmds = [
             # 1. Clean existing qdiscs
             ["tc", "qdisc", "del", "dev", iface, "root"],
-            
             # 2. Add HTB root
-            ["tc", "qdisc", "add", "dev", iface, "root", "handle", "1:", "htb", "default", "20"],
-            
+            [
+                "tc",
+                "qdisc",
+                "add",
+                "dev",
+                iface,
+                "root",
+                "handle",
+                "1:",
+                "htb",
+                "default",
+                "20",
+            ],
             # 3. Root class (Total bandwidth, e.g., 100Mbit)
-            ["tc", "class", "add", "dev", iface, "parent", "1:", "classid", "1:1", "htb", "rate", "100mbit", "burst", "15k"],
-            
+            [
+                "tc",
+                "class",
+                "add",
+                "dev",
+                iface,
+                "parent",
+                "1:",
+                "classid",
+                "1:1",
+                "htb",
+                "rate",
+                "100mbit",
+                "burst",
+                "15k",
+            ],
             # 4. Class for UDP (Limited, e.g., 5Mbit)
-            ["tc", "class", "add", "dev", iface, "parent", "1:1", "classid", "1:10", "htb", "rate", "5mbit", "ceil", "10mbit", "burst", "15k", "prio", "1"],
-            
+            [
+                "tc",
+                "class",
+                "add",
+                "dev",
+                iface,
+                "parent",
+                "1:1",
+                "classid",
+                "1:10",
+                "htb",
+                "rate",
+                "5mbit",
+                "ceil",
+                "10mbit",
+                "burst",
+                "15k",
+                "prio",
+                "1",
+            ],
             # 5. Class for others (Default, higher bandwidth)
-            ["tc", "class", "add", "dev", iface, "parent", "1:1", "classid", "1:20", "htb", "rate", "90mbit", "ceil", "100mbit", "burst", "15k", "prio", "2"],
-            
+            [
+                "tc",
+                "class",
+                "add",
+                "dev",
+                iface,
+                "parent",
+                "1:1",
+                "classid",
+                "1:20",
+                "htb",
+                "rate",
+                "90mbit",
+                "ceil",
+                "100mbit",
+                "burst",
+                "15k",
+                "prio",
+                "2",
+            ],
             # 6. Filter to direct UDP (proto 17) to class 1:10
-            ["tc", "filter", "add", "dev", iface, "protocol", "ip", "parent", "1:0", "prio", "1", "u32", "match", "ip", "protocol", "17", "0xff", "flowid", "1:10"],
+            [
+                "tc",
+                "filter",
+                "add",
+                "dev",
+                iface,
+                "protocol",
+                "ip",
+                "parent",
+                "1:0",
+                "prio",
+                "1",
+                "u32",
+                "match",
+                "ip",
+                "protocol",
+                "17",
+                "0xff",
+                "flowid",
+                "1:10",
+            ],
         ]
-        
+
         for cmd in cmds:
             # Ignore errors on 'del' command
             ignore_error = cmd[2] == "del"
             code, _, stderr = await self._run_cmd(cmd)
-            
+
             if code != 0 and not ignore_error:
-                 logger.error(
+                logger.error(
                     f"[LinuxDefense] Failed to execute: {' '.join(cmd)}. "
                     f"Error: {stderr}"
                 )
-                 # For MVP we log and continue, but ideally should rollback
-                 # raise RuntimeError(f"Failed to enable UDP Limit: {stderr}")
+                # For MVP we log and continue, but ideally should rollback
+                # raise RuntimeError(f"Failed to enable UDP Limit: {stderr}")
 
     async def _disable_udp_limit(self) -> None:
         """Disable UDP rate limiting (reset tc)."""
         logger.info("[LinuxDefense] Disabling UDP Rate Limiting...")
-        
+
         iface = "eth0"
         # Simply delete root qdisc
         cmd = ["tc", "qdisc", "del", "dev", iface, "root"]
         await self._run_cmd(cmd)
-
 
     async def _enable_synproxy(self) -> None:
         """
