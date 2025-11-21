@@ -21,4 +21,3 @@ export const attackService = {
     return response.data;
   },
 };
-
