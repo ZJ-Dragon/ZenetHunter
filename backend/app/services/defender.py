@@ -5,6 +5,7 @@ from fastapi import HTTPException
 from app.core.engine.arp_monitor import ArpMonitor
 from app.core.engine.defense_factory import get_defense_engine
 from app.core.engine.dns_rpz import DnsRpzEngine, DummyDnsRpzEngine
+from app.core.engine.dummy_ap import DummyAccessPointManager
 from app.models.defender import (
     DefenseApplyRequest,
     DefensePolicy,
@@ -73,6 +74,14 @@ AVAILABLE_POLICIES = [
             "All other traffic is redirected or blocked."
         ),
     ),
+    DefensePolicy(
+        id=DefenseType.WPA3_8021X,
+        name="WPA3/802.1X Enterprise Access Control",
+        description=(
+            "Configure WPA3-Personal/Enterprise with 802.1X authentication. "
+            "Supports RADIUS integration and VLAN-based policy assignment."
+        ),
+    ),
 ]
 
 
@@ -90,6 +99,8 @@ class DefenderService:
         self.arp_monitor = ArpMonitor()
         # Initialize DNS RPZ Engine (currently dummy, future factory)
         self.dns_engine: DnsRpzEngine = DummyDnsRpzEngine()
+        # Initialize Access Point Manager (currently dummy, future factory)
+        self.ap_manager = DummyAccessPointManager()
 
     def get_policies(self) -> list[DefensePolicy]:
         """Return list of available defense policies."""
@@ -107,6 +118,7 @@ class DefenderService:
             DefenseType.DNS_RPZ,
             DefenseType.TCP_RESET_POLICY,
             DefenseType.WALLED_GARDEN,
+            DefenseType.WPA3_8021X,
         ]:
             if mac.lower() != "global":
                 # Global policies are usually interface-based, not MAC-based
@@ -123,6 +135,14 @@ class DefenderService:
                 # For MVP, enable a default blocklist
                 await self.dns_engine.add_zone("blacklist")
                 await self.dns_engine.add_rule("malware.test", "NXDOMAIN")
+            elif request.policy == DefenseType.WPA3_8021X:
+                # WPA3/802.1X is typically a global wireless network configuration
+                # For MVP, we log that it would be configured
+                # In production, this would call AP manager to configure SSID/RADIUS
+                logger.info(
+                    "[DefenderService] WPA3/802.1X configuration requested. "
+                    "This requires AP manager integration."
+                )
             else:
                 await self.engine.enable_global_protection(request.policy)
             return
@@ -187,6 +207,7 @@ class DefenderService:
             # Stop ARP Monitor
             await self.arp_monitor.stop_monitoring()
             await self.engine.disable_global_protection(DefenseType.ARP_DAI)
+            # WPA3/802.1X is persistent configuration, no explicit "stop"
             return
 
         device = self.state_manager.get_device(mac)
