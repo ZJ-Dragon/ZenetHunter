@@ -1,13 +1,13 @@
 import React, { useState } from 'react';
 import { Link, useLocation, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
-import { 
-  LayoutDashboard, 
-  Network, 
-  Shield, 
-  Settings, 
-  LogOut, 
-  Menu, 
+import {
+  LayoutDashboard,
+  Network,
+  Shield,
+  Settings,
+  LogOut,
+  Menu,
   X,
   Activity
 } from 'lucide-react';
@@ -16,7 +16,7 @@ import { clsx } from 'clsx';
 const NavItem: React.FC<{ to: string; icon: React.ElementType; children: React.ReactNode }> = ({ to, icon: Icon, children }) => {
   const location = useLocation();
   const isActive = location.pathname === to;
-  
+
   return (
     <Link
       to={to}
@@ -47,7 +47,7 @@ export const AppShell: React.FC = () => {
     <div className="min-h-screen bg-gray-100 flex">
       {/* Mobile Sidebar Backdrop */}
       {isSidebarOpen && (
-        <div 
+        <div
           className="fixed inset-0 bg-gray-600 bg-opacity-75 z-20 lg:hidden"
           onClick={() => setIsSidebarOpen(false)}
         />
@@ -63,7 +63,7 @@ export const AppShell: React.FC = () => {
             <Activity className="h-6 w-6" />
             <span className="text-lg font-bold">ZenetHunter</span>
           </div>
-          <button 
+          <button
             onClick={() => setIsSidebarOpen(false)}
             className="lg:hidden p-1 rounded-md hover:bg-brand-700 focus:outline-none"
           >
@@ -111,4 +111,3 @@ export const AppShell: React.FC = () => {
     </div>
   );
 };
-
