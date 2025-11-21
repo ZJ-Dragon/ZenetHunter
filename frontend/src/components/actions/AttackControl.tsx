@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { attackService, AttackType } from '../../lib/services/attack';
 import { AttackStatus, Device } from '../../types/device';
-import { Shield, ShieldOff, AlertTriangle } from 'lucide-react';
+import { ShieldOff, AlertTriangle } from 'lucide-react';
 import { clsx } from 'clsx';
 import toast from 'react-hot-toast';
 
