@@ -35,6 +35,11 @@ class DummyDefenseEngine(DefenseEngine):
                 "[DummyDefense] TCP Reset Policy simulation enabled "
                 "(iptables REJECT with tcp-reset)."
             )
+        elif policy == DefenseType.WALLED_GARDEN:
+            logger.info(
+                "[DummyDefense] Walled Garden simulation enabled "
+                "(HTTP/HTTPS redirect to Portal)."
+            )
 
     async def disable_global_protection(self, policy: DefenseType) -> None:
         logger.info(f"[DummyDefense] Disabling global protection: {policy}")

@@ -64,6 +64,8 @@ class LinuxDefenseEngine(DefenseEngine):
             await self._enable_udp_limit()
         elif policy == DefenseType.TCP_RESET_POLICY:
             await self._enable_tcp_reset_policy()
+        elif policy == DefenseType.WALLED_GARDEN:
+            await self._enable_walled_garden()
         else:
             logger.warning(f"[LinuxDefense] Global policy {policy} not supported")
 
@@ -75,6 +77,8 @@ class LinuxDefenseEngine(DefenseEngine):
             await self._disable_udp_limit()
         elif policy == DefenseType.TCP_RESET_POLICY:
             await self._disable_tcp_reset_policy()
+        elif policy == DefenseType.WALLED_GARDEN:
+            await self._disable_walled_garden()
 
     async def _enable_udp_limit(self) -> None:
         """
@@ -318,6 +322,170 @@ class LinuxDefenseEngine(DefenseEngine):
                 "REJECT",
                 "--reject-with",
                 "icmp-port-unreachable",
+            ],
+        ]
+
+        for cmd in cmds:
+            # Suppress errors on deletion (rule might not exist)
+            await self._run_cmd(cmd)
+
+    async def _enable_walled_garden(self) -> None:
+        """
+        Enable Walled Garden / Captive Portal for unauthorized devices.
+
+        Strategy:
+        - Allow access to Portal server and essential services (NTP, DNS)
+        - Redirect HTTP/HTTPS traffic to Portal page via DNAT
+        - Redirect DNS queries to Portal server (for captive portal detection)
+        - Block all other outbound traffic
+
+        This creates a "walled garden" where unauthorized devices can only
+        access the authentication portal and a few whitelisted services.
+
+        Commands equivalent to:
+        # Allow Portal server (assume gateway IP is 192.168.1.1)
+        iptables -I FORWARD -d 192.168.1.1 -j ACCEPT
+        # Allow DNS to Portal
+        iptables -I FORWARD -p udp --dport 53 -d 192.168.1.1 -j ACCEPT
+        # Redirect HTTP to Portal
+        iptables -t nat -A PREROUTING -p tcp --dport 80 -j DNAT \
+            --to-destination 192.168.1.1:8080
+        iptables -t nat -A PREROUTING -p tcp --dport 443 -j DNAT \
+            --to-destination 192.168.1.1:8080
+        # Block other outbound (default policy)
+        """
+        logger.info("[LinuxDefense] Enabling Walled Garden...")
+
+        # Portal server IP (typically the gateway)
+        portal_ip = "192.168.1.1"
+        portal_port = "8080"
+
+        cmds = [
+            # 1. Allow access to Portal server itself
+            [
+                "iptables",
+                "-I",
+                "FORWARD",
+                "-d",
+                portal_ip,
+                "-j",
+                "ACCEPT",
+            ],
+            # 2. Allow DNS queries to Portal (for captive portal detection)
+            [
+                "iptables",
+                "-I",
+                "FORWARD",
+                "-p",
+                "udp",
+                "--dport",
+                "53",
+                "-d",
+                portal_ip,
+                "-j",
+                "ACCEPT",
+            ],
+            # 3. Redirect HTTP to Portal
+            [
+                "iptables",
+                "-t",
+                "nat",
+                "-A",
+                "PREROUTING",
+                "-p",
+                "tcp",
+                "--dport",
+                "80",
+                "-j",
+                "DNAT",
+                "--to-destination",
+                f"{portal_ip}:{portal_port}",
+            ],
+            # 4. Redirect HTTPS to Portal
+            [
+                "iptables",
+                "-t",
+                "nat",
+                "-A",
+                "PREROUTING",
+                "-p",
+                "tcp",
+                "--dport",
+                "443",
+                "-j",
+                "DNAT",
+                "--to-destination",
+                f"{portal_ip}:{portal_port}",
+            ],
+        ]
+
+        for cmd in cmds:
+            code, _, stderr = await self._run_cmd(cmd)
+            if code != 0:
+                logger.error(
+                    f"[LinuxDefense] Failed to execute: {' '.join(cmd)}. "
+                    f"Error: {stderr}"
+                )
+
+    async def _disable_walled_garden(self) -> None:
+        """Disable Walled Garden."""
+        logger.info("[LinuxDefense] Disabling Walled Garden...")
+
+        portal_ip = "192.168.1.1"
+        portal_port = "8080"
+
+        cmds = [
+            [
+                "iptables",
+                "-D",
+                "FORWARD",
+                "-d",
+                portal_ip,
+                "-j",
+                "ACCEPT",
+            ],
+            [
+                "iptables",
+                "-D",
+                "FORWARD",
+                "-p",
+                "udp",
+                "--dport",
+                "53",
+                "-d",
+                portal_ip,
+                "-j",
+                "ACCEPT",
+            ],
+            [
+                "iptables",
+                "-t",
+                "nat",
+                "-D",
+                "PREROUTING",
+                "-p",
+                "tcp",
+                "--dport",
+                "80",
+                "-j",
+                "DNAT",
+                "--to-destination",
+                f"{portal_ip}:{portal_port}",
+            ],
+            [
+                "iptables",
+                "-t",
+                "nat",
+                "-D",
+                "PREROUTING",
+                "-p",
+                "tcp",
+                "--dport",
+                "443",
+                "-j",
+                "DNAT",
+                "--to-destination",
+                f"{portal_ip}:{portal_port}",
             ],
         ]
 
