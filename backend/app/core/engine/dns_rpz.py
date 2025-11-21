@@ -1,7 +1,7 @@
 """DNS RPZ / Sinkhole Engine."""
 
-from abc import ABC, abstractmethod
 import logging
+from abc import ABC, abstractmethod
 
 logger = logging.getLogger(__name__)
 
@@ -42,4 +42,3 @@ class DummyDnsRpzEngine(DnsRpzEngine):
     async def remove_rule(self, domain: str) -> bool:
         logger.info(f"[DummyDNS] Unblocking domain {domain}")
         return True
-
