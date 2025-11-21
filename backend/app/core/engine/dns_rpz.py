@@ -9,7 +9,8 @@ logger = logging.getLogger(__name__)
 class DnsRpzEngine(ABC):
     """
     Interface for managing DNS Response Policy Zones (RPZ).
-    Integrates with local DNS resolvers like BIND, Unbound, or Dnsmasq (via ipset/nftset).
+    Integrates with local DNS resolvers like BIND, Unbound,
+    or Dnsmasq (via ipset/nftset).
     """
 
     @abstractmethod
