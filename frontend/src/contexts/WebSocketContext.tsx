@@ -27,7 +27,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     // Alternatively, some backends require ticket or cookie.
     // FastAPI can handle query params in WebSocket endpoint dependency.
     const url = `${WS_URL}?token=${token}`;
-    
+
     const socket = new WebSocket(url);
 
     socket.onopen = () => {
