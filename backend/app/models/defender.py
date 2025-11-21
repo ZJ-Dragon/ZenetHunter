@@ -10,6 +10,7 @@ class DefenseType(str, Enum):
     BLOCK_WAN = "block_wan"  # Block internet access only
     SYN_PROXY = "syn_proxy"  # SYN Flood protection (Global/Gateway)
     UDP_RATE_LIMIT = "udp_rate_limit"  # UDP Traffic Shaping/Rate Limiting (Global)
+    ARP_DAI = "arp_dai"  # ARP Dynamic Inspection (Switch/Passive Monitoring)
     # Future: DNS_FILTER, etc.
 
 
