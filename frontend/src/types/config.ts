@@ -12,4 +12,3 @@ export interface OOBESetupRequest {
   default_policy: 'monitor' | 'block_unknown';
   admin_password?: string; // Optional if we enforce reset
 }
-
