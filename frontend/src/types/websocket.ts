@@ -21,4 +21,3 @@ export enum WSEventType {
   // Log Events
   LOG_ADDED = 'logAdded',
 }
-
