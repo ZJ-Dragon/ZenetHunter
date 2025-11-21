@@ -22,7 +22,17 @@ from fastapi.middleware.cors import CORSMiddleware
 from app.core.config import get_settings
 from app.core.logging import setup_logging
 from app.core.middleware import ErrorHandlerMiddleware
-from app.routes import attack, auth, config, devices, health, logs, scan, topology
+from app.routes import (
+    attack,
+    auth,
+    config,
+    defender,
+    devices,
+    health,
+    logs,
+    scan,
+    topology,
+)
 
 try:  # Optional in dev; avoid hard dependency at import time
     import uvicorn  # type: ignore
@@ -115,6 +125,7 @@ api_router.include_router(logs.router)
 api_router.include_router(config.router)
 api_router.include_router(scan.router)
 api_router.include_router(attack.router)
+api_router.include_router(defender.router)
 
 app.include_router(api_router)
 

@@ -4,6 +4,7 @@ from enum import Enum
 from pydantic import BaseModel, ConfigDict, Field, IPvAnyAddress
 
 from app.models.attack import AttackStatus
+from app.models.defender import DefenseStatus, DefenseType
 
 
 class DeviceType(str, Enum):
@@ -39,6 +40,12 @@ class Device(BaseModel):
     )
     attack_status: AttackStatus = Field(
         default=AttackStatus.IDLE, description="Current attack status"
+    )
+    defense_status: DefenseStatus = Field(
+        default=DefenseStatus.INACTIVE, description="Current defense status"
+    )
+    active_defense_policy: DefenseType | None = Field(
+        default=None, description="Currently active defense policy"
     )
     first_seen: datetime = Field(
         default_factory=lambda: datetime.now(UTC),

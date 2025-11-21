@@ -126,4 +126,3 @@ export const SetupWizard: React.FC = () => {
     </WizardLayout>
   );
 };
-

@@ -12,4 +12,3 @@ export const configService = {
     await api.post('/config/setup', data);
   },
 };
-

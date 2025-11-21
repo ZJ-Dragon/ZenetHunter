@@ -3,6 +3,7 @@ import logging
 from threading import Lock
 
 from app.models.attack import AttackStatus
+from app.models.defender import DefenseStatus, DefenseType
 from app.models.device import Device, DeviceType
 from app.models.log import SystemLog
 from app.models.topology import NetworkTopology, TopologyLink, TopologyNode
@@ -123,9 +124,26 @@ class StateManager:
             if device:
                 device.attack_status = status
                 self._devices[mac.lower()] = device
-                # Emit event handled by AttackService usually, but we can add
-                # deviceUpdated here
-                # self._emit_event("deviceUpdated", device.model_dump(mode="json"))
+                return device
+            return None
+
+    def update_device_defense_status(
+        self,
+        mac: str,
+        status: DefenseStatus,
+        policy: DefenseType | None = None,
+    ) -> Device | None:
+        """Update the defense status of a device."""
+        with self._data_lock:
+            device = self._devices.get(mac.lower())
+            if device:
+                device.defense_status = status
+                if policy is not None:
+                    device.active_defense_policy = policy
+                elif status == DefenseStatus.INACTIVE:
+                    device.active_defense_policy = None
+
+                self._devices[mac.lower()] = device
                 return device
             return None
 
