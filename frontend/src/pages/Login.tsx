@@ -63,7 +63,7 @@ export const Login: React.FC = () => {
                 {error}
               </div>
             )}
-            
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Username</label>
               <div className="relative">
@@ -111,4 +111,3 @@ export const Login: React.FC = () => {
     </div>
   );
 };
-
