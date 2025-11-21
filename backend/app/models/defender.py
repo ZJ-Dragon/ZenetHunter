@@ -15,6 +15,7 @@ class DefenseType(str, Enum):
     TCP_RESET_POLICY = "tcp_reset_policy"  # TCP Reset for unauthorized traffic
     WALLED_GARDEN = "walled_garden"  # Portal/Captive Portal for unauthorized devices
     WPA3_8021X = "wpa3_8021x"  # WPA3/802.1X Enterprise Access Control
+    TARPIT = "tarpit"  # TCP Tarpit (slow down unauthorized connections)
     # Future: LIMIT_SPEED, etc.
 
 

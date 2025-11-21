@@ -82,6 +82,15 @@ AVAILABLE_POLICIES = [
             "Supports RADIUS integration and VLAN-based policy assignment."
         ),
     ),
+    DefensePolicy(
+        id=DefenseType.TARPIT,
+        name="TCP Tarpit (Optional)",
+        description=(
+            "Slow down unauthorized connections by keeping them open but "
+            "responding extremely slowly. Reduces scanning efficiency. "
+            "Requires xtables-addons or nf_tarpit kernel module."
+        ),
+    ),
 ]
 
 
@@ -119,6 +128,7 @@ class DefenderService:
             DefenseType.TCP_RESET_POLICY,
             DefenseType.WALLED_GARDEN,
             DefenseType.WPA3_8021X,
+            DefenseType.TARPIT,
         ]:
             if mac.lower() != "global":
                 # Global policies are usually interface-based, not MAC-based
@@ -204,6 +214,7 @@ class DefenderService:
             await self.engine.disable_global_protection(DefenseType.UDP_RATE_LIMIT)
             await self.engine.disable_global_protection(DefenseType.TCP_RESET_POLICY)
             await self.engine.disable_global_protection(DefenseType.WALLED_GARDEN)
+            await self.engine.disable_global_protection(DefenseType.TARPIT)
             # Stop ARP Monitor
             await self.arp_monitor.stop_monitoring()
             await self.engine.disable_global_protection(DefenseType.ARP_DAI)

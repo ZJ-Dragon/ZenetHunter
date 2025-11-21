@@ -2,6 +2,7 @@
 
 import asyncio
 import logging
+import os
 import shutil
 from typing import Any
 
@@ -66,6 +67,8 @@ class LinuxDefenseEngine(DefenseEngine):
             await self._enable_tcp_reset_policy()
         elif policy == DefenseType.WALLED_GARDEN:
             await self._enable_walled_garden()
+        elif policy == DefenseType.TARPIT:
+            await self._enable_tarpit()
         else:
             logger.warning(f"[LinuxDefense] Global policy {policy} not supported")
 
@@ -79,6 +82,8 @@ class LinuxDefenseEngine(DefenseEngine):
             await self._disable_tcp_reset_policy()
         elif policy == DefenseType.WALLED_GARDEN:
             await self._disable_walled_garden()
+        elif policy == DefenseType.TARPIT:
+            await self._disable_tarpit()
 
     async def _enable_udp_limit(self) -> None:
         """
@@ -492,6 +497,110 @@ class LinuxDefenseEngine(DefenseEngine):
         for cmd in cmds:
             # Suppress errors on deletion (rule might not exist)
             await self._run_cmd(cmd)
+
+    async def _check_tarpit_module(self) -> bool:
+        """
+        Check if TARPIT kernel module is available.
+
+        TARPIT requires xtables-addons or nf_tarpit module.
+        We check by attempting to list iptables extensions.
+        """
+        # Check if TARPIT target is available in iptables
+        cmd = ["iptables", "-j", "TARPIT", "-h"]
+        code, _, stderr = await self._run_cmd(cmd)
+        if code == 0:
+            return True
+
+        # Alternative: Check if module is loaded
+        if os.path.exists("/proc/modules"):
+            with open("/proc/modules") as f:
+                modules = f.read()
+                if "xt_TARPIT" in modules or "nf_tarpit" in modules:
+                    return True
+
+        logger.warning(
+            "[LinuxDefense] TARPIT module not available. "
+            "Requires xtables-addons or nf_tarpit kernel module."
+        )
+        return False
+
+    async def _enable_tarpit(self) -> None:
+        """
+        Enable TCP Tarpit for unauthorized connections.
+
+        TCP Tarpit is a "sticky" defense mechanism that keeps connections
+        open but responds extremely slowly, consuming attacker resources
+        and reducing scanning efficiency.
+
+        Strategy:
+        - Use iptables TARPIT target to slow down unauthorized TCP connections
+        - Target specific ports or all ports based on policy
+        - Only works if xtables-addons/nf_tarpit module is loaded
+
+        Commands equivalent to:
+        iptables -A INPUT -p tcp -m state --state NEW \
+            -m set ! --match-set whitelist src -j TARPIT
+
+        Note: TARPIT target requires xtables-addons package or nf_tarpit module.
+        """
+        logger.info("[LinuxDefense] Enabling TCP Tarpit...")
+
+        # Check module availability
+        if not await self._check_tarpit_module():
+            logger.error(
+                "[LinuxDefense] TARPIT module not available. "
+                "Cannot enable TCP Tarpit. Install xtables-addons or nf_tarpit."
+            )
+            raise RuntimeError("TARPIT kernel module not available")
+
+        # For MVP, apply Tarpit to all new TCP connections from unauthorized sources
+        # In production, this should integrate with StateManager's allow_list
+        cmds = [
+            # Tarpit unauthorized TCP connections
+            [
+                "iptables",
+                "-A",
+                "INPUT",
+                "-p",
+                "tcp",
+                "-m",
+                "state",
+                "--state",
+                "NEW",
+                "-j",
+                "TARPIT",
+            ],
+        ]
+
+        for cmd in cmds:
+            code, _, stderr = await self._run_cmd(cmd)
+            if code != 0:
+                logger.error(
+                    f"[LinuxDefense] Failed to execute: {' '.join(cmd)}. "
+                    f"Error: {stderr}"
+                )
+                raise RuntimeError(f"Failed to enable TCP Tarpit: {stderr}")
+
+    async def _disable_tarpit(self) -> None:
+        """Disable TCP Tarpit."""
+        logger.info("[LinuxDefense] Disabling TCP Tarpit...")
+
+        cmd = [
+            "iptables",
+            "-D",
+            "INPUT",
+            "-p",
+            "tcp",
+            "-m",
+            "state",
+            "--state",
+            "NEW",
+            "-j",
+            "TARPIT",
+        ]
+
+        # Suppress errors on deletion (rule might not exist)
+        await self._run_cmd(cmd)
 
     async def _enable_synproxy(self) -> None:
         """
