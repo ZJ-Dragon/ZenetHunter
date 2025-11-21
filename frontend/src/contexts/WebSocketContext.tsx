@@ -4,8 +4,8 @@ import { WSEventType, WebSocketEvent } from '../types/websocket';
 
 interface WebSocketContextType {
   isConnected: boolean;
-  lastMessage: WebSocketEvent | null;
-  sendMessage: (message: any) => void;
+  lastMessage: WebSocketEvent<unknown> | null;
+  sendMessage: (message: unknown) => void;
 }
 
 const WebSocketContext = createContext<WebSocketContextType | undefined>(undefined);
@@ -15,7 +15,7 @@ const WS_URL = import.meta.env.VITE_WS_URL || 'ws://localhost:8000/api/ws';
 export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const { token, isAuthenticated } = useAuth();
   const [isConnected, setIsConnected] = useState(false);
-  const [lastMessage, setLastMessage] = useState<WebSocketEvent | null>(null);
+  const [lastMessage, setLastMessage] = useState<WebSocketEvent<unknown> | null>(null);
   const ws = useRef<WebSocket | null>(null);
   const reconnectTimeout = useRef<ReturnType<typeof setTimeout>>(undefined);
 
@@ -27,7 +27,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     // Alternatively, some backends require ticket or cookie.
     // FastAPI can handle query params in WebSocket endpoint dependency.
     const url = `${WS_URL}?token=${token}`;
-
+    
     const socket = new WebSocket(url);
 
     socket.onopen = () => {
@@ -76,7 +76,7 @@ export const WebSocketProvider: React.FC<{ children: React.ReactNode }> = ({ chi
     };
   }, [isAuthenticated, connect]);
 
-  const sendMessage = useCallback((message: any) => {
+  const sendMessage = useCallback((message: unknown) => {
     if (ws.current?.readyState === WebSocket.OPEN) {
       ws.current.send(JSON.stringify(message));
     } else {
@@ -101,7 +101,7 @@ export const useWebSocket = () => {
   return context;
 };
 
-export const useWebSocketEvent = <T = any>(
+export const useWebSocketEvent = <T = unknown>(
   eventType: WSEventType,
   handler: (data: T) => void
 ) => {
@@ -109,7 +109,8 @@ export const useWebSocketEvent = <T = any>(
 
   useEffect(() => {
     if (lastMessage && lastMessage.event === eventType) {
-      handler(lastMessage.data);
+      // Assuming backend data matches T
+      handler(lastMessage.data as T);
     }
   }, [lastMessage, eventType, handler]);
 };

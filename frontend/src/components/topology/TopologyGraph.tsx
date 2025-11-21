@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState, useCallback } from 'react';
-import ForceGraph2D, { ForceGraphMethods } from 'react-force-graph-2d';
-import { TopologyNode, TopologyLink, NetworkTopology } from '../../types/topology';
-import { clsx } from 'clsx';
+import ForceGraph2D, { ForceGraphMethods, NodeObject } from 'react-force-graph-2d';
+import { TopologyNode, NetworkTopology } from '../../types/topology';
 
 interface TopologyGraphProps {
   data: NetworkTopology;
@@ -37,26 +36,28 @@ export const TopologyGraph: React.FC<TopologyGraphProps> = ({ data, onNodeClick 
   }, [data]);
 
   // Node painting logic
-  const nodePaint = useCallback((node: any, ctx: CanvasRenderingContext2D, globalScale: number) => {
-    const label = node.label;
+  const nodePaint = useCallback((node: NodeObject, ctx: CanvasRenderingContext2D, globalScale: number) => {
+    // Cast node to TopologyNode to access custom properties
+    const topologyNode = node as unknown as TopologyNode & { x: number; y: number };
+    const label = topologyNode.label;
     const fontSize = 12 / globalScale;
     const radius = 5;
 
     // Draw Node Circle
     ctx.beginPath();
-    ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI, false);
-
+    ctx.arc(topologyNode.x, topologyNode.y, radius, 0, 2 * Math.PI, false);
+    
     // Color based on type or status
-    if (node.data?.status === 'offline') {
+    if (topologyNode.data?.status === 'offline') {
       ctx.fillStyle = '#9ca3af'; // gray
-    } else if (node.data?.status === 'blocked') {
+    } else if (topologyNode.data?.status === 'blocked') {
       ctx.fillStyle = '#ef4444'; // red
-    } else if (node.type === 'router') {
+    } else if (topologyNode.type === 'router') {
       ctx.fillStyle = '#8b5cf6'; // purple
     } else {
       ctx.fillStyle = '#0ea5e9'; // brand blue
     }
-
+    
     ctx.fill();
 
     // Draw Label
@@ -64,7 +65,7 @@ export const TopologyGraph: React.FC<TopologyGraphProps> = ({ data, onNodeClick 
     ctx.textAlign = 'center';
     ctx.textBaseline = 'middle';
     ctx.fillStyle = '#1f2937'; // gray-800
-    ctx.fillText(label, node.x, node.y + radius + fontSize);
+    ctx.fillText(label, topologyNode.x, topologyNode.y + radius + fontSize);
   }, []);
 
   return (

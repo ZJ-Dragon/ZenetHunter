@@ -1,4 +1,4 @@
-export type WebSocketEvent<T = any> = {
+export type WebSocketEvent<T = unknown> = {
   event: string;
   data: T;
 };
