@@ -20,7 +20,7 @@ class DefenseEngine(ABC):
     ) -> None:
         """
         Apply a defense policy to a target.
-        
+
         Args:
             target: Target identifier (MAC or IP depending on context)
             policy: The policy type to apply
@@ -42,4 +42,3 @@ class DefenseEngine(ABC):
     async def disable_global_protection(self, policy: DefenseType) -> None:
         """Disable a global protection mechanism."""
         pass
-

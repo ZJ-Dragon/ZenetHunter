@@ -30,4 +30,3 @@ def get_defense_engine() -> DefenseEngine:
             "Defense capabilities will be simulated."
         )
         return DummyDefenseEngine()
-

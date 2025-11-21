@@ -1,9 +1,10 @@
+from unittest.mock import MagicMock, patch
+
 import pytest
-from unittest.mock import patch, MagicMock
-from app.core.engine.factory import get_attack_engine
+
 from app.core.engine.defense_factory import get_defense_engine
-from app.core.engine.linux_defense import LinuxDefenseEngine
 from app.core.engine.dummy_defense import DummyDefenseEngine
+from app.core.engine.linux_defense import LinuxDefenseEngine
 from app.models.defender import DefenseType
 
 
@@ -26,16 +27,17 @@ async def test_linux_defense_synproxy():
     engine = LinuxDefenseEngine()
     # Mock the internal _run_cmd to avoid actual system calls
     engine._run_cmd = MagicMock(return_value=(0, "ok", ""))
-    
+
     # Test Enable
     # We need to await the async method
     from asyncio import Future
+
     f = Future()
     f.set_result((0, "ok", ""))
     engine._run_cmd = MagicMock(return_value=f)
-    
+
     await engine.enable_global_protection(DefenseType.SYN_PROXY)
-    
+
     # Verify iptables calls were made
     # We expect 3 calls for enable
     assert engine._run_cmd.call_count == 3
@@ -50,4 +52,3 @@ async def test_dummy_defense():
     await engine.enable_global_protection(DefenseType.SYN_PROXY)
     # Should just log, no error
     assert True
-
