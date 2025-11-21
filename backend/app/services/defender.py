@@ -36,7 +36,8 @@ AVAILABLE_POLICIES = [
         id=DefenseType.UDP_RATE_LIMIT,
         name="UDP Traffic Rate Limiting (Global)",
         description=(
-            "Apply traffic control (tc) to limit UDP packet rates and prevent flood attacks."
+            "Apply traffic control (tc) to limit UDP packet rates "
+            "and prevent flood attacks."
         ),
     ),
 ]
@@ -64,9 +65,10 @@ class DefenderService:
         # Special handling for global policies
         if request.policy in [DefenseType.SYN_PROXY, DefenseType.UDP_RATE_LIMIT]:
             if mac.lower() != "global":
-                # We could allow specific IPs, but global policies are usually interface-based
+                # Global policies are usually interface-based, not MAC-based
                 logger.warning(
-                    f"{request.policy} is a global policy, but applied to specific MAC."
+                    f"{request.policy} is a global policy, "
+                    "but applied to specific MAC."
                 )
 
             await self.engine.enable_global_protection(request.policy)
@@ -121,7 +123,7 @@ class DefenderService:
         """
         # Special handling for global policies - simplistic for now
         # We need to know WHAT policy to stop.
-        # For now, assume if mac is 'global', we try to stop all global policies or check params
+        # For now, assume if mac is 'global', we try to stop all global policies
         # Ideally stop_defense should take a policy argument too.
         if mac == "global":
             # Stop known global policies
