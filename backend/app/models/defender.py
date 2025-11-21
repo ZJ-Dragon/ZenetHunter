@@ -13,6 +13,7 @@ class DefenseType(str, Enum):
     ARP_DAI = "arp_dai"  # ARP Dynamic Inspection (Switch/Passive Monitoring)
     DNS_RPZ = "dns_rpz"  # DNS Response Policy Zone (Sinkhole/Redirect)
     TCP_RESET_POLICY = "tcp_reset_policy"  # TCP Reset for unauthorized traffic
+    WALLED_GARDEN = "walled_garden"  # Portal/Captive Portal for unauthorized devices
     # Future: LIMIT_SPEED, etc.
 
 
