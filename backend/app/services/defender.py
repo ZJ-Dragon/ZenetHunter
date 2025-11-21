@@ -4,6 +4,7 @@ from fastapi import HTTPException
 
 from app.core.engine.arp_monitor import ArpMonitor
 from app.core.engine.defense_factory import get_defense_engine
+from app.core.engine.dns_rpz import DnsRpzEngine, DummyDnsRpzEngine
 from app.models.defender import (
     DefenseApplyRequest,
     DefensePolicy,
@@ -49,6 +50,13 @@ AVAILABLE_POLICIES = [
             "or manage Switch DAI capabilities."
         ),
     ),
+    DefensePolicy(
+        id=DefenseType.DNS_RPZ,
+        name="DNS Sinkhole / RPZ",
+        description=(
+            "Block or redirect malicious domains using DNS Response Policy Zones."
+        ),
+    ),
 ]
 
 
@@ -64,6 +72,8 @@ class DefenderService:
         self.engine = get_defense_engine()
         # Initialize ARP Monitor (singleton-ish within service)
         self.arp_monitor = ArpMonitor()
+        # Initialize DNS RPZ Engine (currently dummy, future factory)
+        self.dns_engine: DnsRpzEngine = DummyDnsRpzEngine()
 
     def get_policies(self) -> list[DefensePolicy]:
         """Return list of available defense policies."""
@@ -78,6 +88,7 @@ class DefenderService:
             DefenseType.SYN_PROXY,
             DefenseType.UDP_RATE_LIMIT,
             DefenseType.ARP_DAI,
+            DefenseType.DNS_RPZ,
         ]:
             if mac.lower() != "global":
                 # Global policies are usually interface-based, not MAC-based
@@ -90,6 +101,10 @@ class DefenderService:
                 await self.arp_monitor.start_monitoring()
                 # Also trigger switch DAI if implemented in engine
                 await self.engine.enable_global_protection(request.policy)
+            elif request.policy == DefenseType.DNS_RPZ:
+                # For MVP, enable a default blocklist
+                await self.dns_engine.add_zone("blacklist")
+                await self.dns_engine.add_rule("malware.test", "NXDOMAIN")
             else:
                 await self.engine.enable_global_protection(request.policy)
             return
