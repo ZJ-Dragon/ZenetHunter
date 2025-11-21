@@ -36,4 +36,3 @@ export interface DeviceFilter {
   status?: DeviceStatus | 'all';
   type?: DeviceType | 'all';
 }
-
