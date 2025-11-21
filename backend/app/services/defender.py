@@ -44,11 +44,11 @@ class DefenderService:
     async def apply_defense(self, mac: str, request: DefenseApplyRequest) -> None:
         """
         Apply a defense policy to a device.
-        
+
         Args:
             mac: MAC address of target device
             request: Defense configuration
-            
+
         Raises:
             HTTPException: If device not found
         """
@@ -57,7 +57,7 @@ class DefenderService:
             raise HTTPException(status_code=404, detail="Device not found")
 
         current_status = device.defense_status
-        
+
         # Determine event type
         event_name = (
             "defenseStarted"
@@ -75,7 +75,7 @@ class DefenderService:
                 f"Applying defense policy '{request.policy}' to {mac}. "
                 f"Event: {event_name}"
             )
-            
+
             # Broadcast event
             await self.ws_manager.broadcast(
                 {
@@ -87,18 +87,18 @@ class DefenderService:
                     },
                 }
             )
-            
-            # TODO: Integrate with AttackEngine/PacketManipulator to actually 
+
+            # TODO: Integrate with AttackEngine/PacketManipulator to actually
             # enforce the policy (e.g. ARP Spoofing, IPTables).
             # For now, this is a control plane implementation.
 
     async def stop_defense(self, mac: str) -> None:
         """
         Stop any active defense on a device.
-        
+
         Args:
             mac: MAC address of target device
-            
+
         Raises:
             HTTPException: If device not found
         """
@@ -124,4 +124,3 @@ class DefenderService:
                 },
             }
         )
-

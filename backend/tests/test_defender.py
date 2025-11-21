@@ -1,7 +1,6 @@
 from fastapi.testclient import TestClient
 
 from app.models.defender import DefenseStatus, DefenseType
-from app.models.device import Device, DeviceType
 
 
 def test_get_policies(client: TestClient):
@@ -62,4 +61,3 @@ def test_apply_and_stop_defense(client: TestClient):
     dev_response = client.get(f"/api/devices/{mac}")
     assert dev_response.json()["defense_status"] == DefenseStatus.INACTIVE
     assert dev_response.json()["active_defense_policy"] is None
-

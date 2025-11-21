@@ -1,6 +1,11 @@
 from fastapi import APIRouter, Depends, Path, status
 
-from app.models.defender import DefenseApplyRequest, DefensePolicy, DefenseResponse, DefenseStatus
+from app.models.defender import (
+    DefenseApplyRequest,
+    DefensePolicy,
+    DefenseResponse,
+    DefenseStatus,
+)
 from app.services.defender import DefenderService
 
 router = APIRouter(tags=["defense"])
@@ -30,7 +35,11 @@ async def get_policies(
 )
 async def apply_defense(
     request: DefenseApplyRequest,
-    mac: str = Path(..., title="Device MAC address", pattern=r"^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$"),
+    mac: str = Path(
+        ...,
+        title="Device MAC address",
+        pattern=r"^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$",
+    ),
     service: DefenderService = Depends(get_defender_service),
 ) -> DefenseResponse:
     """
@@ -52,7 +61,11 @@ async def apply_defense(
     summary="Stop defense on a device",
 )
 async def stop_defense(
-    mac: str = Path(..., title="Device MAC address", pattern=r"^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$"),
+    mac: str = Path(
+        ...,
+        title="Device MAC address",
+        pattern=r"^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$",
+    ),
     service: DefenderService = Depends(get_defender_service),
 ) -> DefenseResponse:
     """Stop any active defense mechanism on a specific device."""
@@ -62,4 +75,3 @@ async def stop_defense(
         status=DefenseStatus.INACTIVE,
         message="Defense stopped",
     )
-
