@@ -205,4 +205,5 @@ nohup.out
 /.idea/copilot.data.migration.edit.xml
 
 # Docs
-docs/secrets/
+/docs/secrets/
+/docs/secrets/branches/
