@@ -30,6 +30,11 @@ class DummyDefenseEngine(DefenseEngine):
             logger.info("[DummyDefense] SYNPROXY simulation enabled.")
         elif policy == DefenseType.UDP_RATE_LIMIT:
             logger.info("[DummyDefense] UDP Rate Limit simulation enabled (tc qdisc).")
+        elif policy == DefenseType.TCP_RESET_POLICY:
+            logger.info(
+                "[DummyDefense] TCP Reset Policy simulation enabled "
+                "(iptables REJECT with tcp-reset)."
+            )
 
     async def disable_global_protection(self, policy: DefenseType) -> None:
         logger.info(f"[DummyDefense] Disabling global protection: {policy}")
