@@ -65,6 +65,14 @@ AVAILABLE_POLICIES = [
             "and ICMP rejections to prevent resource exhaustion."
         ),
     ),
+    DefensePolicy(
+        id=DefenseType.WALLED_GARDEN,
+        name="Walled Garden / Captive Portal",
+        description=(
+            "Restrict unauthorized devices to Portal page and whitelisted services. "
+            "All other traffic is redirected or blocked."
+        ),
+    ),
 ]
 
 
@@ -98,6 +106,7 @@ class DefenderService:
             DefenseType.ARP_DAI,
             DefenseType.DNS_RPZ,
             DefenseType.TCP_RESET_POLICY,
+            DefenseType.WALLED_GARDEN,
         ]:
             if mac.lower() != "global":
                 # Global policies are usually interface-based, not MAC-based
@@ -174,6 +183,7 @@ class DefenderService:
             await self.engine.disable_global_protection(DefenseType.SYN_PROXY)
             await self.engine.disable_global_protection(DefenseType.UDP_RATE_LIMIT)
             await self.engine.disable_global_protection(DefenseType.TCP_RESET_POLICY)
+            await self.engine.disable_global_protection(DefenseType.WALLED_GARDEN)
             # Stop ARP Monitor
             await self.arp_monitor.stop_monitoring()
             await self.engine.disable_global_protection(DefenseType.ARP_DAI)
