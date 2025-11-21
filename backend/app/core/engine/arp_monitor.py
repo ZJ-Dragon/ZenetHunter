@@ -9,7 +9,8 @@ logger = logging.getLogger(__name__)
 class ArpMonitor:
     """
     Passive engine that listens for ARP packets to detect spoofing.
-    Compare source MAC in ARP header vs Ethernet header, or track changes in IP-MAC mappings.
+    Compare source MAC in ARP header vs Ethernet header,
+    or track changes in IP-MAC mappings.
     """
 
     def __init__(self):
@@ -51,7 +52,8 @@ class ArpMonitor:
         known_mac = self._known_mappings[ip]
         if known_mac != claimed_mac:
             logger.warning(
-                f"[ArpMonitor] SPOOF DETECTED! IP {ip} moved from {known_mac} to {claimed_mac}"
+                f"[ArpMonitor] SPOOF DETECTED! "
+                f"IP {ip} moved from {known_mac} to {claimed_mac}"
             )
             return True
 

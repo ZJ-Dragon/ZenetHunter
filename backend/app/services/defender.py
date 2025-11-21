@@ -45,7 +45,8 @@ AVAILABLE_POLICIES = [
         id=DefenseType.ARP_DAI,
         name="ARP Inspection & Monitoring",
         description=(
-            "Detect ARP spoofing via passive monitoring or manage Switch DAI capabilities."
+            "Detect ARP spoofing via passive monitoring "
+            "or manage Switch DAI capabilities."
         ),
     ),
 ]
