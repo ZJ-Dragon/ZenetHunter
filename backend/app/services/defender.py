@@ -32,6 +32,13 @@ AVAILABLE_POLICIES = [
             "Enable kernel-level SYN Proxy on gateway interface to mitigate SYN floods."
         ),
     ),
+    DefensePolicy(
+        id=DefenseType.UDP_RATE_LIMIT,
+        name="UDP Traffic Rate Limiting (Global)",
+        description=(
+            "Apply traffic control (tc) to limit UDP packet rates and prevent flood attacks."
+        ),
+    ),
 ]
 
 
@@ -55,17 +62,14 @@ class DefenderService:
         Apply a defense policy to a device.
         """
         # Special handling for global policies
-        if request.policy == DefenseType.SYN_PROXY:
+        if request.policy in [DefenseType.SYN_PROXY, DefenseType.UDP_RATE_LIMIT]:
             if mac.lower() != "global":
-                # We could allow specific IPs, but SYNPROXY is usually interface-based
+                # We could allow specific IPs, but global policies are usually interface-based
                 logger.warning(
-                    "SYN_PROXY is a global policy, but applied to specific MAC."
+                    f"{request.policy} is a global policy, but applied to specific MAC."
                 )
 
             await self.engine.enable_global_protection(request.policy)
-            # Global state tracking is not yet in Device model,
-            # but we can treat '00:00:00:00:00:00' or similar as a system object later.
-            # For now, we just execute the engine command.
             return
 
         device = self.state_manager.get_device(mac)
@@ -117,9 +121,12 @@ class DefenderService:
         """
         # Special handling for global policies - simplistic for now
         # We need to know WHAT policy to stop.
-        # For now, assume if mac is 'global', we stop SYN_PROXY
+        # For now, assume if mac is 'global', we try to stop all global policies or check params
+        # Ideally stop_defense should take a policy argument too.
         if mac == "global":
+            # Stop known global policies
             await self.engine.disable_global_protection(DefenseType.SYN_PROXY)
+            await self.engine.disable_global_protection(DefenseType.UDP_RATE_LIMIT)
             return
 
         device = self.state_manager.get_device(mac)
