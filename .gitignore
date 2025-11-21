@@ -1,3 +1,208 @@
 
-# Documentation secrets
+# ---- ZenetHunter .gitignore (merged from GitHub official templates) ----
+# Sources:
+#  - github/gitignore Python & Node templates
+#  - github/gitignore Global templates (macOS, Windows, Linux, JetBrains)
+#  - Visual Studio Code global suggestions (kept minimal here)
+# See: https://github.com/github/gitignore
+
+############################
+# Python (subset of Python.gitignore)
+############################
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
+
+# Virtual environments
+.venv/
+venv/
+ENV/
+env/
+venv.bak/
+env.bak/
+
+# Unit test / coverage
+.pytest_cache/
+.coverage
+.coverage.*
+htmlcov/
+.tox/
+.nox/
+coverage.xml
+
+# Type checkers & tooling caches
+.mypy_cache/
+.dmypy.json
+.pyre/
+.pytype/
+.ruff_cache/
+
+# MkDocs / static site output
+/site
+
+############################
+# Node / JavaScript (subset of Node.gitignore)
+############################
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+lerna-debug.log*
+
+# Diagnostic reports
+report.*.json
+
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Dependencies
+node_modules/
+jspm_packages/
+web_modules/
+
+# Package managers / caches
+.pnp.*
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+.npm
+
+# TypeScript
+*.tsbuildinfo
+
+# Build outputs
+coverage/
+*.lcov
+.nyc_output/
+.grunt/
+.cache/
+.parcel-cache/
+.next/
+out/
+.nuxt/
+.output/
+.svelte-kit/
+.docusaurus/
+.vite/
+**/.vitepress/dist
+**/.vitepress/cache
+
+dist/
+build/
+
+# dotenv files
+.env
+.env.*
+!.env.example
+
+# Tool caches
+.eslintcache
+.stylelintcache
+
+############################
+# macOS (subset of Global/macOS.gitignore)
+############################
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+.Spotlight-V100
+.Trashes
+
+############################
+# Windows (subset of Global/Windows.gitignore)
+############################
+Thumbs.db
+Thumbs.db:encryptable
+ehthumbs.db
+ehthumbs_vista.db
+[Dd]esktop.ini
+$RECYCLE.BIN/
+*.lnk
+
+############################
+# Linux (subset of Global/Linux.gitignore)
+############################
+*~
+.fuse_hidden*
+.directory
+.Trash-*
+.nfs*
+nohup.out
+
+############################
+# JetBrains IDEs (subset of Global/JetBrains.gitignore)
+############################
+.idea/**/workspace.xml
+.idea/**/tasks.xml
+.idea/**/usage.statistics.xml
+.idea/**/dictionaries
+.idea/**/shelf
+.idea/**/contentModel.xml
+.idea/**/dataSources/
+.idea/**/dataSources.ids
+.idea/**/dataSources.local.xml
+.idea/**/sqlDataSources.xml
+.idea/**/dynamic.xml
+.idea/**/uiDesigner.xml
+.idea/**/dbnavigator.xml
+*.iml
+
+############################
+# Visual Studio Code (minimal, keep project recommendations tracked)
+############################
+.vscode/*
+!.vscode/extensions.json
+
+############################
+# Project-level extras
+############################
+# SQLite sample databases
+*.sqlite
+*.sqlite3
+
+# OS/editor swaps
+*.swp
+*.swo
+/.idea/.gitignore
+/.idea/misc.xml
+/.idea/modules.xml
+/.idea/inspectionProfiles/profiles_settings.xml
+/.idea/inspectionProfiles/Project_Default.xml
+/.idea/vcs.xml
+/.idea/copilot.data.migration.agent.xml
+/.idea/copilot.data.migration.ask.xml
+/.idea/copilot.data.migration.ask2agent.xml
+/.idea/copilot.data.migration.edit.xml
+
+# Docs
 docs/secrets/
