@@ -35,9 +35,18 @@ export const Login: React.FC = () => {
       const { access_token } = response.data;
       login(access_token);
       navigate(from, { replace: true });
-    } catch (err: any) {
-        console.error(err);
-      setError(err.response?.data?.detail || 'Login failed. Please check your credentials.');
+    } catch (err: unknown) {
+      if (typeof err === 'object' && err !== null && 'response' in err) {
+        // Use type assertion to access error response
+        const errorResponse = err as { response?: { data?: { detail?: string } } };
+        setError(
+          errorResponse.response?.data?.detail ||
+            'Login failed. Please check your credentials.'
+        );
+      } else {
+        setError('Login failed. Please check your credentials.');
+      }
+      console.error(err);
     } finally {
       setIsLoading(false);
     }
@@ -63,7 +72,7 @@ export const Login: React.FC = () => {
                 {error}
               </div>
             )}
-            
+
             <div>
               <label className="block text-sm font-medium text-gray-700 mb-1">Username</label>
               <div className="relative">
@@ -111,4 +120,3 @@ export const Login: React.FC = () => {
     </div>
   );
 };
-

@@ -21,4 +21,3 @@ export const RequireAuth: React.FC<{ children: JSX.Element }> = ({ children }) =
 
   return children;
 };
-
