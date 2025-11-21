@@ -30,4 +30,3 @@ export const deviceService = {
     await api.delete(`/devices/${mac}`);
   }
 };
-
