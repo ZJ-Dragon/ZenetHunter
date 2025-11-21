@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { configService } from '../lib/services/config';
-import { useAuth } from '../contexts/AuthContext';
+import { configService } from '../../lib/services/config';
+import { useAuth } from '../../contexts/AuthContext';
 
 interface OOBEGuardProps {
   children: JSX.Element;
@@ -14,7 +14,7 @@ export const OOBEGuard: React.FC<OOBEGuardProps> = ({ children }) => {
   useEffect(() => {
     const checkStatus = async () => {
       try {
-        // We can check status even if not authenticated, 
+        // We can check status even if not authenticated,
         // but usually OOBE happens before auth or with a temporary token.
         // For this MVP, let's assume we check it on root load.
         const status = await configService.getStatus();
@@ -33,4 +33,3 @@ export const OOBEGuard: React.FC<OOBEGuardProps> = ({ children }) => {
 
   return children;
 };
-

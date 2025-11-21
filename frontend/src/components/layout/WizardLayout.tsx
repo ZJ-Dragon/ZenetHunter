@@ -33,7 +33,7 @@ export const WizardLayout: React.FC<WizardLayoutProps> = ({
         <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
           Initial Setup
         </h2>
-        
+
         {/* Step Indicators */}
         <div className="mt-4 flex justify-center space-x-4">
           {Array.from({ length: totalSteps }).map((_, index) => (
@@ -95,4 +95,3 @@ export const WizardLayout: React.FC<WizardLayoutProps> = ({
     </div>
   );
 };
-

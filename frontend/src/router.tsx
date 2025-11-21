@@ -3,8 +3,10 @@ import { Login } from './pages/Login';
 import { NotFound } from './pages/NotFound';
 import { DeviceList } from './pages/DeviceList';
 import { Topology } from './pages/Topology';
+import { SetupWizard } from './pages/SetupWizard';
 import { AppShell } from './components/layout/AppShell';
 import { RequireAuth } from './components/auth/RequireAuth';
+import { OOBEGuard } from './components/auth/OOBEGuard';
 
 // Placeholder for Dashboard
 const Dashboard = () => (
@@ -16,6 +18,10 @@ const Dashboard = () => (
 
 export const router = createBrowserRouter([
   {
+    path: '/setup',
+    element: <SetupWizard />,
+  },
+  {
     path: '/login',
     element: <Login />,
   },
@@ -23,7 +29,9 @@ export const router = createBrowserRouter([
     path: '/',
     element: (
       <RequireAuth>
-        <AppShell />
+        <OOBEGuard>
+          <AppShell />
+        </OOBEGuard>
       </RequireAuth>
     ),
     errorElement: <NotFound />,
