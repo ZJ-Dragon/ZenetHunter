@@ -111,4 +111,3 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({ node, onClose }) => {
     </div>
   );
 };
-

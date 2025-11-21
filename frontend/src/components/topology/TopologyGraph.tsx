@@ -45,7 +45,7 @@ export const TopologyGraph: React.FC<TopologyGraphProps> = ({ data, onNodeClick 
     // Draw Node Circle
     ctx.beginPath();
     ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI, false);
-    
+
     // Color based on type or status
     if (node.data?.status === 'offline') {
       ctx.fillStyle = '#9ca3af'; // gray
@@ -56,7 +56,7 @@ export const TopologyGraph: React.FC<TopologyGraphProps> = ({ data, onNodeClick 
     } else {
       ctx.fillStyle = '#0ea5e9'; // brand blue
     }
-    
+
     ctx.fill();
 
     // Draw Label
@@ -83,4 +83,3 @@ export const TopologyGraph: React.FC<TopologyGraphProps> = ({ data, onNodeClick 
     </div>
   );
 };
-

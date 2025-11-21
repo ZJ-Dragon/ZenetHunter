@@ -67,15 +67,15 @@ export const Topology: React.FC = () => {
             <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-brand-600"></div>
           </div>
         )}
-        
-        <TopologyGraph 
-          data={data} 
-          onNodeClick={setSelectedNode} 
+
+        <TopologyGraph
+          data={data}
+          onNodeClick={setSelectedNode}
         />
 
         {/* Drawer Overlay */}
         {selectedNode && (
-          <div 
+          <div
             className="absolute inset-0 bg-black bg-opacity-25 z-40 transition-opacity"
             onClick={() => setSelectedNode(null)}
           />
@@ -83,13 +83,12 @@ export const Topology: React.FC = () => {
 
         {/* Drawer */}
         {selectedNode && (
-          <NodeDrawer 
-            node={selectedNode} 
-            onClose={() => setSelectedNode(null)} 
+          <NodeDrawer
+            node={selectedNode}
+            onClose={() => setSelectedNode(null)}
           />
         )}
       </div>
     </div>
   );
 };
-
