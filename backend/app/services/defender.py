@@ -2,6 +2,7 @@ import logging
 
 from fastapi import HTTPException
 
+from app.core.engine.arp_monitor import ArpMonitor
 from app.core.engine.defense_factory import get_defense_engine
 from app.models.defender import (
     DefenseApplyRequest,
@@ -40,6 +41,13 @@ AVAILABLE_POLICIES = [
             "and prevent flood attacks."
         ),
     ),
+    DefensePolicy(
+        id=DefenseType.ARP_DAI,
+        name="ARP Inspection & Monitoring",
+        description=(
+            "Detect ARP spoofing via passive monitoring or manage Switch DAI capabilities."
+        ),
+    ),
 ]
 
 
@@ -53,6 +61,8 @@ class DefenderService:
         self.state_manager = get_state_manager()
         self.ws_manager = get_connection_manager()
         self.engine = get_defense_engine()
+        # Initialize ARP Monitor (singleton-ish within service)
+        self.arp_monitor = ArpMonitor()
 
     def get_policies(self) -> list[DefensePolicy]:
         """Return list of available defense policies."""
@@ -63,7 +73,11 @@ class DefenderService:
         Apply a defense policy to a device.
         """
         # Special handling for global policies
-        if request.policy in [DefenseType.SYN_PROXY, DefenseType.UDP_RATE_LIMIT]:
+        if request.policy in [
+            DefenseType.SYN_PROXY,
+            DefenseType.UDP_RATE_LIMIT,
+            DefenseType.ARP_DAI,
+        ]:
             if mac.lower() != "global":
                 # Global policies are usually interface-based, not MAC-based
                 logger.warning(
@@ -71,7 +85,12 @@ class DefenderService:
                     "but applied to specific MAC."
                 )
 
-            await self.engine.enable_global_protection(request.policy)
+            if request.policy == DefenseType.ARP_DAI:
+                await self.arp_monitor.start_monitoring()
+                # Also trigger switch DAI if implemented in engine
+                await self.engine.enable_global_protection(request.policy)
+            else:
+                await self.engine.enable_global_protection(request.policy)
             return
 
         device = self.state_manager.get_device(mac)
@@ -129,6 +148,9 @@ class DefenderService:
             # Stop known global policies
             await self.engine.disable_global_protection(DefenseType.SYN_PROXY)
             await self.engine.disable_global_protection(DefenseType.UDP_RATE_LIMIT)
+            # Stop ARP Monitor
+            await self.arp_monitor.stop_monitoring()
+            await self.engine.disable_global_protection(DefenseType.ARP_DAI)
             return
 
         device = self.state_manager.get_device(mac)
