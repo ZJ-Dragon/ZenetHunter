@@ -40,6 +40,11 @@ class DummyDefenseEngine(DefenseEngine):
                 "[DummyDefense] Walled Garden simulation enabled "
                 "(HTTP/HTTPS redirect to Portal)."
             )
+        elif policy == DefenseType.TARPIT:
+            logger.info(
+                "[DummyDefense] TCP Tarpit simulation enabled "
+                "(iptables TARPIT target)."
+            )
 
     async def disable_global_protection(self, policy: DefenseType) -> None:
         logger.info(f"[DummyDefense] Disabling global protection: {policy}")
