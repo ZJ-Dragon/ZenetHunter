@@ -28,7 +28,9 @@ AVAILABLE_POLICIES = [
     DefensePolicy(
         id=DefenseType.SYN_PROXY,
         name="SYN Flood Protection (Global)",
-        description="Enable kernel-level SYN Proxy on gateway interface to mitigate SYN floods.",
+        description=(
+            "Enable kernel-level SYN Proxy on gateway interface to mitigate SYN floods."
+        ),
     ),
 ]
 
@@ -56,10 +58,12 @@ class DefenderService:
         if request.policy == DefenseType.SYN_PROXY:
             if mac.lower() != "global":
                 # We could allow specific IPs, but SYNPROXY is usually interface-based
-                logger.warning("SYN_PROXY is a global policy, but applied to specific MAC.")
-            
+                logger.warning(
+                    "SYN_PROXY is a global policy, but applied to specific MAC."
+                )
+
             await self.engine.enable_global_protection(request.policy)
-            # Global state tracking is not yet in Device model, 
+            # Global state tracking is not yet in Device model,
             # but we can treat '00:00:00:00:00:00' or similar as a system object later.
             # For now, we just execute the engine command.
             return
@@ -69,14 +73,14 @@ class DefenderService:
             raise HTTPException(status_code=404, detail="Device not found")
 
         current_status = device.defense_status
-        
+
         # Determine event type
         event_name = (
             "defenseStarted"
             if current_status == DefenseStatus.INACTIVE
             else "defenseUpdated"
         )
-        
+
         # Apply via Engine
         await self.engine.apply_policy(mac, request.policy)
 
@@ -115,8 +119,8 @@ class DefenderService:
         # We need to know WHAT policy to stop.
         # For now, assume if mac is 'global', we stop SYN_PROXY
         if mac == "global":
-             await self.engine.disable_global_protection(DefenseType.SYN_PROXY)
-             return
+            await self.engine.disable_global_protection(DefenseType.SYN_PROXY)
+            return
 
         device = self.state_manager.get_device(mac)
         if not device:
@@ -124,9 +128,9 @@ class DefenderService:
 
         if device.defense_status == DefenseStatus.INACTIVE:
             return  # Already stopped
-        
+
         active_policy = device.active_defense_policy
-        
+
         # Call engine to remove rules
         if active_policy:
             await self.engine.remove_policy(mac, active_policy)

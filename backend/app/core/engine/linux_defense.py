@@ -22,7 +22,7 @@ class LinuxDefenseEngine(DefenseEngine):
         # 1. Check for iptables command
         if not shutil.which("iptables"):
             return False
-            
+
         # 2. Check if we can list rules (implies root/sudo)
         # This is a bit aggressive for a check, but effective.
         # We'll assume the caller handles the permission check via `os.geteuid()`
@@ -44,12 +44,16 @@ class LinuxDefenseEngine(DefenseEngine):
     ) -> None:
         """Apply specific policy."""
         # Implementation deferred for QUARANTINE/BLOCK_WAN
-        logger.info(f"[LinuxDefense] Applying {policy} to {target} (Not implemented yet)")
+        logger.info(
+            f"[LinuxDefense] Applying {policy} to {target} (Not implemented yet)"
+        )
         pass
 
     async def remove_policy(self, target: str, policy: DefenseType) -> None:
         """Remove specific policy."""
-        logger.info(f"[LinuxDefense] Removing {policy} from {target} (Not implemented yet)")
+        logger.info(
+            f"[LinuxDefense] Removing {policy} from {target} (Not implemented yet)"
+        )
         pass
 
     async def enable_global_protection(self, policy: DefenseType) -> None:
@@ -67,51 +71,140 @@ class LinuxDefenseEngine(DefenseEngine):
     async def _enable_synproxy(self) -> None:
         """
         Enable SYNPROXY on the PREROUTING chain.
-        
+
         Commands equivalent to:
         iptables -t raw -I PREROUTING -p tcp -m tcp --syn -j CT --notrack
-        iptables -A INPUT -p tcp -m tcp -m conntrack --ctstate INVALID,UNTRACKED -j SYNPROXY --sack-perm --timestamp --wscale 7 --mss 1460
+        iptables -A INPUT -p tcp -m tcp -m conntrack --ctstate INVALID,UNTRACKED \
+            -j SYNPROXY --sack-perm --timestamp --wscale 7 --mss 1460
         iptables -A INPUT -m conntrack --ctstate INVALID -j DROP
         """
         logger.info("[LinuxDefense] Enabling SYNPROXY...")
-        
+
         # 1. Set backend/kernel parameters (optional but recommended)
         # echo 1 > /proc/sys/net/ipv4/tcp_syncookies
-        
+
         cmds = [
             # Mark SYN packets as UNTRACKED to bypass default connection tracking
-            ["iptables", "-t", "raw", "-I", "PREROUTING", "-p", "tcp", "-m", "tcp", "--syn", "-j", "CT", "--notrack"],
-            
+            [
+                "iptables",
+                "-t",
+                "raw",
+                "-I",
+                "PREROUTING",
+                "-p",
+                "tcp",
+                "-m",
+                "tcp",
+                "--syn",
+                "-j",
+                "CT",
+                "--notrack",
+            ],
             # Redirect UNTRACKED SYN packets to SYNPROXY target
             # Using standard MSS 1460 (MTU 1500 - 40 bytes header)
-            ["iptables", "-A", "INPUT", "-p", "tcp", "-m", "tcp", "-m", "conntrack", "--ctstate", "INVALID,UNTRACKED", "-j", "SYNPROXY", "--sack-perm", "--timestamp", "--wscale", "7", "--mss", "1460"],
-            
+            [
+                "iptables",
+                "-A",
+                "INPUT",
+                "-p",
+                "tcp",
+                "-m",
+                "tcp",
+                "-m",
+                "conntrack",
+                "--ctstate",
+                "INVALID,UNTRACKED",
+                "-j",
+                "SYNPROXY",
+                "--sack-perm",
+                "--timestamp",
+                "--wscale",
+                "7",
+                "--mss",
+                "1460",
+            ],
             # Drop any other INVALID packets that leaked through
-            ["iptables", "-A", "INPUT", "-m", "conntrack", "--ctstate", "INVALID", "-j", "DROP"],
+            [
+                "iptables",
+                "-A",
+                "INPUT",
+                "-m",
+                "conntrack",
+                "--ctstate",
+                "INVALID",
+                "-j",
+                "DROP",
+            ],
         ]
 
         for cmd in cmds:
             code, _, stderr = await self._run_cmd(cmd)
             if code != 0:
-                logger.error(f"[LinuxDefense] Failed to execute: {' '.join(cmd)}. Error: {stderr}")
+                logger.error(
+                    f"[LinuxDefense] Failed to execute: {' '.join(cmd)}. "
+                    f"Error: {stderr}"
+                )
                 # In a real scenario, we should rollback partial changes here.
                 raise RuntimeError(f"Failed to enable SYNPROXY: {stderr}")
 
     async def _disable_synproxy(self) -> None:
         """Disable SYNPROXY."""
         logger.info("[LinuxDefense] Disabling SYNPROXY...")
-        
+
         # Simple cleanup: delete the rules we added.
-        # Note: In production, we should use specific rule handles or comments to delete safely.
-        # For MVP, we attempt to delete the exact signatures.
-        
+        # Note: In production, we should use specific rule handles or comments to delete
+        # safely. For MVP, we attempt to delete the exact signatures.
+
         cmds = [
-             ["iptables", "-t", "raw", "-D", "PREROUTING", "-p", "tcp", "-m", "tcp", "--syn", "-j", "CT", "--notrack"],
-             ["iptables", "-D", "INPUT", "-p", "tcp", "-m", "tcp", "-m", "conntrack", "--ctstate", "INVALID,UNTRACKED", "-j", "SYNPROXY", "--sack-perm", "--timestamp", "--wscale", "7", "--mss", "1460"],
-             ["iptables", "-D", "INPUT", "-m", "conntrack", "--ctstate", "INVALID", "-j", "DROP"],
+            [
+                "iptables",
+                "-t",
+                "raw",
+                "-D",
+                "PREROUTING",
+                "-p",
+                "tcp",
+                "-m",
+                "tcp",
+                "--syn",
+                "-j",
+                "CT",
+                "--notrack",
+            ],
+            [
+                "iptables",
+                "-D",
+                "INPUT",
+                "-p",
+                "tcp",
+                "-m",
+                "tcp",
+                "-m",
+                "conntrack",
+                "--ctstate",
+                "INVALID,UNTRACKED",
+                "-j",
+                "SYNPROXY",
+                "--sack-perm",
+                "--timestamp",
+                "--wscale",
+                "7",
+                "--mss",
+                "1460",
+            ],
+            [
+                "iptables",
+                "-D",
+                "INPUT",
+                "-m",
+                "conntrack",
+                "--ctstate",
+                "INVALID",
+                "-j",
+                "DROP",
+            ],
         ]
-        
+
         for cmd in cmds:
             # Suppress errors on deletion (rule might not exist)
             await self._run_cmd(cmd)
-
