@@ -6,6 +6,7 @@ from app.models.attack import AttackStatus
 from app.models.defender import DefenseStatus, DefenseType
 from app.models.device import Device, DeviceType
 from app.models.log import SystemLog
+from app.models.scheduler import StrategyFeedback
 from app.models.topology import NetworkTopology, TopologyLink, TopologyNode
 from app.services.websocket import get_connection_manager
 
@@ -37,6 +38,8 @@ class StateManager:
         # Simple Allow/Block lists (MAC addresses)
         self._allow_list: set[str] = set()
         self._block_list: set[str] = set()
+        # Strategy feedback history (for AI scheduler)
+        self._strategy_feedback: list[StrategyFeedback] = []
 
         self._data_lock = Lock()
         # We need to access WebSocket manager but avoid circular imports if possible.
@@ -77,6 +80,7 @@ class StateManager:
             self._logs.clear()
             self._allow_list.clear()
             self._block_list.clear()
+            self._strategy_feedback.clear()
 
     def get_all_devices(self) -> list[Device]:
         """Return a list of all tracked devices."""
@@ -234,6 +238,68 @@ class StateManager:
                 self._allow_list.remove(mac.lower())
             if mac.lower() in self._block_list:
                 self._block_list.remove(mac.lower())
+
+    # --- Strategy Feedback Management (for AI Scheduler) ---
+
+    def add_strategy_feedback(self, feedback: StrategyFeedback) -> None:
+        """Add strategy feedback for AI scheduler learning."""
+        with self._data_lock:
+            self._strategy_feedback.append(feedback)
+            # Keep only last 1000 feedback entries
+            if len(self._strategy_feedback) > 1000:
+                self._strategy_feedback = self._strategy_feedback[-1000:]
+
+    def get_strategy_feedback(
+        self, device_mac: str | None = None, limit: int = 100
+    ) -> list[StrategyFeedback]:
+        """
+        Get strategy feedback history.
+
+        Args:
+            device_mac: Filter by device MAC (optional)
+            limit: Maximum number of entries to return
+
+        Returns:
+            List of strategy feedback entries, sorted by timestamp (newest first)
+        """
+        with self._data_lock:
+            feedback = self._strategy_feedback
+            if device_mac:
+                feedback = [
+                    f for f in feedback if f.device_mac.lower() == device_mac.lower()
+                ]
+            return sorted(feedback, key=lambda x: x.timestamp, reverse=True)[:limit]
+
+    def get_device_state_features(self, mac: str) -> dict[str, Any]:
+        """
+        Extract device state features for Q-learning state representation.
+        Aligns with Device model for consistent state hashing.
+
+        Args:
+            mac: Device MAC address
+
+        Returns:
+            Dictionary of device features for state representation
+        """
+        device = self.get_device(mac)
+        if not device:
+            return {}
+
+        return {
+            "mac": device.mac.lower(),
+            "type": device.type.value,
+            "status": device.status.value,
+            "attack_status": device.attack_status.value,
+            "defense_status": device.defense_status.value,
+            "active_defense_policy": (
+                device.active_defense_policy.value if device.active_defense_policy else None
+            ),
+            "is_first_seen": (
+                (device.last_seen - device.first_seen).total_seconds() < 3600
+            ),
+            "is_in_allow_list": device.mac.lower() in self._allow_list,
+            "is_in_block_list": device.mac.lower() in self._block_list,
+        }
 
 
 # Global accessor
