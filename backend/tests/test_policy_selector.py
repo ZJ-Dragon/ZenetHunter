@@ -1,16 +1,18 @@
 """Tests for Policy Selector Service."""
 
 import tempfile
-from datetime import UTC, datetime, timedelta
 from pathlib import Path
 
 import pytest
 
-from app.models.attack import AttackType
 from app.models.defender import DefenseType
 from app.models.device import Device, DeviceStatus, DeviceType
 from app.models.scheduler import StrategyFeedback, StrategyIdentifier, StrategyType
-from app.services.policy_selector import PolicySelector, StrategyBackoff, StrategyCooldown
+from app.services.policy_selector import (
+    PolicySelector,
+    StrategyBackoff,
+    StrategyCooldown,
+)
 from app.services.qtable_persistence import QTablePersistence
 from app.services.state import StateManager
 
@@ -127,7 +129,9 @@ def test_policy_selector_rule_based_scoring(
     assert 0.0 <= score <= 1.0
 
 
-def test_policy_selector_strategy_sequence(policy_selector, sample_device, state_manager):
+def test_policy_selector_strategy_sequence(
+    policy_selector, sample_device, state_manager
+):
     """Test strategy sequence generation."""
     # Add device to state
     state_manager.update_device(sample_device)
@@ -158,7 +162,9 @@ def test_policy_selector_cooldown_filtering(
     policy_selector.cooldown.set_cooldown(strategy, duration_seconds=300)
 
     # Generate sequence
-    sequence = policy_selector.select_strategy_sequence(sample_device, max_strategies=10)
+    sequence = policy_selector.select_strategy_sequence(
+        sample_device, max_strategies=10
+    )
 
     # Cooldown strategy should not be in sequence
     assert strategy not in sequence
@@ -185,9 +191,7 @@ def test_policy_selector_score_update(
     )
 
     # Update score
-    policy_selector.update_strategy_score(
-        sample_device.mac, strategy, feedback
-    )
+    policy_selector.update_strategy_score(sample_device.mac, strategy, feedback)
 
     # Verify feedback was stored
     stored_feedback = state_manager.get_strategy_feedback(sample_device.mac, limit=1)
@@ -223,9 +227,7 @@ def test_policy_selector_low_effectiveness_cooldown(
     )
 
     # Update score
-    policy_selector.update_strategy_score(
-        sample_device.mac, strategy, feedback
-    )
+    policy_selector.update_strategy_score(sample_device.mac, strategy, feedback)
 
     # Strategy should be on cooldown
     assert policy_selector.cooldown.is_on_cooldown(strategy)
@@ -246,4 +248,3 @@ def test_policy_selector_get_best_strategy(
     assert isinstance(best, StrategyIdentifier)
     # Should be defense (defense-first)
     assert best.type == StrategyType.DEFENSE
-
