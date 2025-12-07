@@ -81,7 +81,9 @@ class TelemetryService:
         try:
             # Append to JSONL file (one JSON object per line)
             with open(self.log_file, "a") as f:
-                json_line = json.dumps(event.model_dump(mode="json"), ensure_ascii=False)
+                json_line = json.dumps(
+                    event.model_dump(mode="json"), ensure_ascii=False
+                )
                 f.write(json_line + "\n")
 
             # Also log via standard logger
@@ -316,4 +318,3 @@ def get_telemetry_service() -> TelemetryService:
     if _telemetry_instance is None:
         _telemetry_instance = TelemetryService()
     return _telemetry_instance
-

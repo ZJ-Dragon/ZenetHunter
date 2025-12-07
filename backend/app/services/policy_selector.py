@@ -15,7 +15,6 @@ from app.models.scheduler import (
 )
 from app.services.qtable_persistence import QTablePersistence
 from app.services.state import StateManager, get_state_manager
-from app.services.telemetry import TelemetryService, get_telemetry_service
 
 logger = logging.getLogger(__name__)
 
