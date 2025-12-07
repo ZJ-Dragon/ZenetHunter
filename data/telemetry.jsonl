@@ -1,0 +1,1 @@
+{"event_type": "score_update", "timestamp": "2025-12-07T09:18:27.514946Z", "device_mac": "AA:BB:CC:DD:EE:FF", "strategy": {"type": "defense", "strategy_id": "tcp_reset_policy"}, "metrics": {"old_q_value": null, "new_q_value": 0.06, "reward": 0.6, "q_value_change": 0.06}, "metadata": {}}
