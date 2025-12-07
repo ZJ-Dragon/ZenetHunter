@@ -44,10 +44,12 @@ class SchedulerService:
                 without actual engine calls
         """
         self.state = state_manager or get_state_manager()
-        self.selector = policy_selector or PolicySelector(state_manager=self.state)
+        self.telemetry = telemetry_service or get_telemetry_service()
+        self.selector = policy_selector or PolicySelector(
+            state_manager=self.state, telemetry_service=self.telemetry
+        )
         self.defender = defender_service or DefenderService()
         self.attack = attack_service or AttackService()
-        self.telemetry = telemetry_service or get_telemetry_service()
         self.simulation_mode = simulation_mode
 
     async def execute_strategy_flow(
