@@ -1,6 +1,5 @@
 """Tests for AI Scheduler Schema and Persistence."""
 
-import json
 import tempfile
 from pathlib import Path
 
@@ -106,9 +105,7 @@ def test_q_table_operations():
     assert entry.visit_count == 1
 
     # Update entry (Q-learning with next state)
-    entry = qtable.update_entry(
-        state_hash, strategy, reward=0.3, next_max_q=0.8
-    )
+    entry = qtable.update_entry(state_hash, strategy, reward=0.3, next_max_q=0.8)
     # Q(s,a) = Q(s,a) + α[r + γ*max(Q(s',a')) - Q(s,a)]
     # Q = 0.05 + 0.1 * [0.3 + 0.9*0.8 - 0.05] = 0.05 + 0.1 * 0.97 = 0.147
     assert entry.q_value == pytest.approx(0.147, abs=0.001)
@@ -165,4 +162,3 @@ def test_qtable_persistence_device_state_hash():
     assert hash1 == hash2
     # Different data should produce different hash
     assert hash1 != hash3
-
