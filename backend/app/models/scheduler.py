@@ -2,7 +2,6 @@
 
 from datetime import UTC, datetime
 from enum import Enum
-from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field
 
@@ -32,9 +31,7 @@ class StrategyScore(BaseModel):
     """Score for a strategy based on multiple factors."""
 
     strategy: StrategyIdentifier = Field(..., description="Strategy identifier")
-    score: float = Field(
-        ..., ge=0.0, le=1.0, description="Overall score (0.0-1.0)"
-    )
+    score: float = Field(..., ge=0.0, le=1.0, description="Overall score (0.0-1.0)")
     factors: dict[str, float] = Field(
         default_factory=dict,
         description="Individual factor scores (e.g., feature_match, resource_cost)",
@@ -53,7 +50,10 @@ class StrategyFeedback(BaseModel):
     device_mac: str = Field(..., description="Target device MAC")
     strategy: StrategyIdentifier = Field(..., description="Strategy that was applied")
     effect_score: float = Field(
-        ..., ge=0.0, le=1.0, description="Effectiveness (0.0=no effect, 1.0=highly effective)"
+        ...,
+        ge=0.0,
+        le=1.0,
+        description="Effectiveness (0.0=no effect, 1.0=highly effective)",
     )
     resource_cost: float = Field(
         ..., ge=0.0, le=1.0, description="Resource consumption (0.0=low, 1.0=high)"
@@ -62,7 +62,8 @@ class StrategyFeedback(BaseModel):
         ..., ge=0, description="How long the strategy was active"
     )
     device_response: str | None = Field(
-        None, description="Observed device response (e.g., 'disconnected', 'still_active')"
+        None,
+        description="Observed device response (e.g., 'disconnected', 'still_active')",
     )
     timestamp: datetime = Field(
         default_factory=lambda: datetime.now(UTC),
@@ -79,9 +80,7 @@ class QEntry(BaseModel):
         ..., description="Hash of device state (MAC + features)"
     )
     strategy: StrategyIdentifier = Field(..., description="Strategy identifier")
-    q_value: float = Field(
-        default=0.0, description="Q-value (expected future reward)"
-    )
+    q_value: float = Field(default=0.0, description="Q-value (expected future reward)")
     visit_count: int = Field(default=0, ge=0, description="Number of times tried")
     last_updated: datetime = Field(
         default_factory=lambda: datetime.now(UTC),
@@ -154,4 +153,3 @@ class QTable(BaseModel):
     def _make_key(self, device_state_hash: str, strategy: StrategyIdentifier) -> str:
         """Generate a unique key for state-action pair."""
         return f"{device_state_hash}:{strategy.type.value}:{strategy.strategy_id.value}"
-

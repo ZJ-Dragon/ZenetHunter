@@ -48,7 +48,7 @@ class QTablePersistence:
                 return self._qtable
 
             try:
-                with open(self.storage_path, "r") as f:
+                with open(self.storage_path) as f:
                     data = json.load(f)
 
                 # Reconstruct Q-table from JSON
@@ -57,7 +57,8 @@ class QTablePersistence:
                     # Reconstruct StrategyIdentifier
                     strategy_data = entry_data["strategy"]
                     strategy = StrategyIdentifier(
-                        type=strategy_data["type"], strategy_id=strategy_data["strategy_id"]
+                        type=strategy_data["type"],
+                        strategy_id=strategy_data["strategy_id"],
                     )
                     entries[key] = QEntry(
                         device_state_hash=entry_data["device_state_hash"],
@@ -144,4 +145,3 @@ class QTablePersistence:
         # Create a deterministic representation of device state
         state_str = json.dumps(device_data, sort_keys=True)
         return hashlib.sha256(state_str.encode()).hexdigest()[:16]  # Use first 16 chars
-
