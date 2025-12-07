@@ -146,9 +146,7 @@ def test_telemetry_log_effectiveness(telemetry_service):
 
 def test_telemetry_log_score_update(telemetry_service):
     """Test logging score update."""
-    strategy = StrategyIdentifier(
-        type=StrategyType.ATTACK, strategy_id=AttackType.KICK
-    )
+    strategy = StrategyIdentifier(type=StrategyType.ATTACK, strategy_id=AttackType.KICK)
 
     telemetry_service.log_score_update(
         device_mac="AA:BB:CC:DD:EE:FF",
@@ -158,9 +156,7 @@ def test_telemetry_log_score_update(telemetry_service):
         reward=0.3,
     )
 
-    events = telemetry_service.search_events(
-        event_type=TelemetryEventType.SCORE_UPDATE
-    )
+    events = telemetry_service.search_events(event_type=TelemetryEventType.SCORE_UPDATE)
     assert len(events) == 1
     assert events[0].metrics["old_q_value"] == 0.5
     assert events[0].metrics["new_q_value"] == 0.6
@@ -222,9 +218,7 @@ def test_telemetry_search_by_time_range(telemetry_service):
     start_time = datetime.now(UTC) - timedelta(hours=1)
     end_time = datetime.now(UTC) + timedelta(hours=1)
 
-    events = telemetry_service.search_events(
-        start_time=start_time, end_time=end_time
-    )
+    events = telemetry_service.search_events(start_time=start_time, end_time=end_time)
     assert len(events) == 1
 
     # Search outside time range
@@ -281,4 +275,3 @@ def test_telemetry_get_strategy_switches(telemetry_service):
 
     switches = telemetry_service.get_strategy_switches(device_mac="AA:BB:CC:DD:EE:FF")
     assert len(switches) == 2
-

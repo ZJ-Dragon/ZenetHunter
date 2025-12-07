@@ -15,6 +15,7 @@ from app.models.scheduler import (
 )
 from app.services.qtable_persistence import QTablePersistence
 from app.services.state import StateManager, get_state_manager
+from app.services.telemetry import TelemetryService, get_telemetry_service
 
 logger = logging.getLogger(__name__)
 
@@ -129,6 +130,7 @@ class PolicySelector:
         self,
         state_manager: StateManager | None = None,
         qtable_persistence: QTablePersistence | None = None,
+        telemetry_service: TelemetryService | None = None,
     ):
         """
         Initialize policy selector.
@@ -136,12 +138,15 @@ class PolicySelector:
         Args:
             state_manager: StateManager instance (default: get_state_manager())
             qtable_persistence: QTablePersistence instance (default: new instance)
+            telemetry_service: TelemetryService instance
+                (default: get_telemetry_service())
         """
         self.state = state_manager or get_state_manager()
         self.qtable_persistence = qtable_persistence or QTablePersistence()
         self.qtable = self.qtable_persistence.load()
         self.cooldown = StrategyCooldown()
         self.backoff = StrategyBackoff()
+        self.telemetry = telemetry_service or get_telemetry_service()
 
     def select_strategy_sequence(
         self, device: Device, max_strategies: int = 5
@@ -347,9 +352,20 @@ class PolicySelector:
         )
 
         # Update backoff based on effectiveness
-        self.backoff.update_backoff(
-            strategy, feedback.effect_score, device_mac=device_mac
-        )
+        # Get old backoff factor before update
+        old_backoff = self.backoff.get_backoff_factor(strategy)
+        self.backoff.update_backoff(strategy, feedback.effect_score)
+        new_backoff = self.backoff.get_backoff_factor(strategy)
+
+        # Log backoff change if it changed
+        if abs(new_backoff - old_backoff) > 0.001:
+            self.telemetry.log_backoff(
+                device_mac=device_mac,
+                strategy=strategy,
+                old_factor=old_backoff,
+                new_factor=new_backoff,
+                effect_score=feedback.effect_score,
+            )
 
         # Set cooldown if strategy was ineffective
         if feedback.effect_score < 0.3:
