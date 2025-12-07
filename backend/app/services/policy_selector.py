@@ -8,7 +8,6 @@ from app.models.attack import AttackType
 from app.models.defender import DefenseType
 from app.models.device import Device
 from app.models.scheduler import (
-    QTable,
     StrategyFeedback,
     StrategyIdentifier,
     StrategyScore,
@@ -37,16 +36,12 @@ class StrategyCooldown:
             return False
         return True
 
-    def set_cooldown(
-        self, strategy: StrategyIdentifier, duration_seconds: int
-    ) -> None:
+    def set_cooldown(self, strategy: StrategyIdentifier, duration_seconds: int) -> None:
         """Set cooldown for a strategy."""
         key = self._make_key(strategy)
         self._cooldowns[key] = datetime.now(UTC) + timedelta(seconds=duration_seconds)
 
-    def get_remaining_cooldown(
-        self, strategy: StrategyIdentifier
-    ) -> int | None:
+    def get_remaining_cooldown(self, strategy: StrategyIdentifier) -> int | None:
         """Get remaining cooldown in seconds, or None if not on cooldown."""
         key = self._make_key(strategy)
         until = self._cooldowns.get(key)
@@ -98,9 +93,7 @@ class StrategyBackoff:
             new_factor = current
 
         self._backoff_factors[key] = new_factor
-        logger.debug(
-            f"Updated backoff for {key}: {current:.2f} -> {new_factor:.2f}"
-        )
+        logger.debug(f"Updated backoff for {key}: {current:.2f} -> {new_factor:.2f}")
 
     def _make_key(self, strategy: StrategyIdentifier) -> str:
         """Generate key for strategy."""
@@ -164,9 +157,7 @@ class PolicySelector:
             List of strategies ordered by priority (defense first)
         """
         device_features = self.state.get_device_state_features(device.mac)
-        state_hash = self.qtable_persistence.compute_device_state_hash(
-            device_features
-        )
+        state_hash = self.qtable_persistence.compute_device_state_hash(device_features)
 
         # Score all available strategies
         scored_strategies = self._score_strategies(device, device_features, state_hash)
@@ -331,9 +322,7 @@ class PolicySelector:
             return
 
         device_features = self.state.get_device_state_features(device_mac)
-        state_hash = self.qtable_persistence.compute_device_state_hash(
-            device_features
-        )
+        state_hash = self.qtable_persistence.compute_device_state_hash(device_features)
 
         # Calculate reward from feedback
         # Reward = effect_score - resource_cost (normalized)
@@ -363,9 +352,7 @@ class PolicySelector:
             f"reward={reward:.2f}, effect={feedback.effect_score:.2f}"
         )
 
-    def get_best_strategy(
-        self, device: Device
-    ) -> StrategyIdentifier | None:
+    def get_best_strategy(self, device: Device) -> StrategyIdentifier | None:
         """
         Get the best strategy for a device (single strategy, not sequence).
 
@@ -374,4 +361,3 @@ class PolicySelector:
         """
         sequence = self.select_strategy_sequence(device, max_strategies=1)
         return sequence[0] if sequence else None
-
