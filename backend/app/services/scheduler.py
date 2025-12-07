@@ -1,8 +1,6 @@
 """AI Scheduler Service: Orchestrates strategy selection and execution."""
 
-import asyncio
 import logging
-from datetime import UTC, datetime
 from typing import Any
 
 from app.models.attack import AttackRequest, AttackType
@@ -39,7 +37,8 @@ class SchedulerService:
             policy_selector: PolicySelector instance
             defender_service: DefenderService instance
             attack_service: AttackService instance
-            simulation_mode: If True, simulate strategy execution without actual engine calls
+            simulation_mode: If True, simulate strategy execution
+                without actual engine calls
         """
         self.state = state_manager or get_state_manager()
         self.selector = policy_selector or PolicySelector(state_manager=self.state)
@@ -92,7 +91,7 @@ class SchedulerService:
         # Step 3: Collect feedback (simulated for now)
         # In a real implementation, we'd monitor device response
         feedback_results = []
-        for i, (strategy, result) in enumerate(zip(strategies, results)):
+        for strategy, result in zip(strategies, results, strict=False):
             if result.get("success"):
                 # Simulate feedback collection
                 feedback = await self._collect_feedback(
@@ -306,4 +305,3 @@ def get_scheduler_service() -> SchedulerService:
     if _scheduler_instance is None:
         _scheduler_instance = SchedulerService()
     return _scheduler_instance
-
