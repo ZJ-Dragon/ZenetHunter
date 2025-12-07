@@ -11,6 +11,7 @@ from app.services.attack import AttackService
 from app.services.defender import DefenderService
 from app.services.policy_selector import PolicySelector
 from app.services.state import StateManager, get_state_manager
+from app.services.telemetry import TelemetryService, get_telemetry_service
 
 logger = logging.getLogger(__name__)
 
@@ -27,6 +28,7 @@ class SchedulerService:
         policy_selector: PolicySelector | None = None,
         defender_service: DefenderService | None = None,
         attack_service: AttackService | None = None,
+        telemetry_service: TelemetryService | None = None,
         simulation_mode: bool = False,
     ):
         """
@@ -37,6 +39,7 @@ class SchedulerService:
             policy_selector: PolicySelector instance
             defender_service: DefenderService instance
             attack_service: AttackService instance
+            telemetry_service: TelemetryService instance
             simulation_mode: If True, simulate strategy execution
                 without actual engine calls
         """
@@ -44,6 +47,7 @@ class SchedulerService:
         self.selector = policy_selector or PolicySelector(state_manager=self.state)
         self.defender = defender_service or DefenderService()
         self.attack = attack_service or AttackService()
+        self.telemetry = telemetry_service or get_telemetry_service()
         self.simulation_mode = simulation_mode
 
     async def execute_strategy_flow(
@@ -84,9 +88,28 @@ class SchedulerService:
 
         # Step 2: Apply strategies
         results = []
+        previous_strategy = None
         for strategy in strategies:
+            # Log strategy switch
+            if previous_strategy:
+                self.telemetry.log_strategy_switch(
+                    device_mac=device.mac,
+                    from_strategy=previous_strategy,
+                    to_strategy=strategy,
+                    reason="Policy selector recommendation",
+                )
+            previous_strategy = strategy
+
             result = await self._apply_strategy(device, strategy)
             results.append(result)
+
+            # Log strategy application
+            self.telemetry.log_strategy_applied(
+                device_mac=device.mac,
+                strategy=strategy,
+                success=result.get("success", False),
+                error=result.get("error"),
+            )
 
         # Step 3: Collect feedback (simulated for now)
         # In a real implementation, we'd monitor device response
@@ -98,6 +121,9 @@ class SchedulerService:
                     device_mac, strategy, result, duration_seconds=60
                 )
                 if feedback:
+                    # Log effectiveness metrics
+                    self.telemetry.log_effectiveness(device_mac, strategy, feedback)
+
                     # Update strategy score
                     self.selector.update_strategy_score(device_mac, strategy, feedback)
                     feedback_results.append(feedback)

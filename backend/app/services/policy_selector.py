@@ -15,6 +15,7 @@ from app.models.scheduler import (
 )
 from app.services.qtable_persistence import QTablePersistence
 from app.services.state import StateManager, get_state_manager
+from app.services.telemetry import TelemetryService, get_telemetry_service
 
 logger = logging.getLogger(__name__)
 
@@ -328,17 +329,39 @@ class PolicySelector:
         # Reward = effect_score - resource_cost (normalized)
         reward = feedback.effect_score - (feedback.resource_cost * 0.5)
 
+        # Get old Q-value for telemetry
+        old_entry = self.qtable.get_entry(state_hash, strategy)
+        old_q_value = old_entry.q_value if old_entry else None
+
         # Update Q-table
         # For simplicity, we don't have next state max Q, so we use reward directly
-        self.qtable.update_entry(state_hash, strategy, reward=reward)
+        new_entry = self.qtable.update_entry(state_hash, strategy, reward=reward)
+        new_q_value = new_entry.q_value
+
+        # Log score update
+        self.telemetry.log_score_update(
+            device_mac=device_mac,
+            strategy=strategy,
+            old_q_value=old_q_value,
+            new_q_value=new_q_value,
+            reward=reward,
+        )
 
         # Update backoff based on effectiveness
-        self.backoff.update_backoff(strategy, feedback.effect_score)
+        self.backoff.update_backoff(
+            strategy, feedback.effect_score, device_mac=device_mac
+        )
 
         # Set cooldown if strategy was ineffective
         if feedback.effect_score < 0.3:
             cooldown_duration = 300  # 5 minutes
             self.cooldown.set_cooldown(strategy, cooldown_duration)
+            self.telemetry.log_cooldown(
+                device_mac=device_mac,
+                strategy=strategy,
+                duration_seconds=cooldown_duration,
+                reason="Low effectiveness",
+            )
             logger.info(
                 f"Strategy {strategy.strategy_id.value} on cooldown for "
                 f"{cooldown_duration}s due to low effectiveness"
