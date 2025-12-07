@@ -1,6 +1,7 @@
 import asyncio
 import logging
 from threading import Lock
+from typing import Any
 
 from app.models.attack import AttackStatus
 from app.models.defender import DefenseStatus, DefenseType
@@ -292,7 +293,9 @@ class StateManager:
             "attack_status": device.attack_status.value,
             "defense_status": device.defense_status.value,
             "active_defense_policy": (
-                device.active_defense_policy.value if device.active_defense_policy else None
+                device.active_defense_policy.value
+                if device.active_defense_policy
+                else None
             ),
             "is_first_seen": (
                 (device.last_seen - device.first_seen).total_seconds() < 3600
