@@ -87,9 +87,10 @@ class TelemetryService:
                 f.write(json_line + "\n")
 
             # Also log via standard logger
+            strategy_id = event.strategy.strategy_id.value if event.strategy else None
             logger.info(
                 f"[Telemetry] {event.event_type.value}: "
-                f"device={event.device_mac}, strategy={event.strategy.strategy_id.value if event.strategy else None}"
+                f"device={event.device_mac}, strategy={strategy_id}"
             )
         except Exception as e:
             logger.error(f"Failed to log telemetry event: {e}")
