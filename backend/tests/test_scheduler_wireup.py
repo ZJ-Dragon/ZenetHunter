@@ -9,8 +9,6 @@ from app.models.attack import AttackType
 from app.models.defender import DefenseType
 from app.models.device import Device, DeviceStatus, DeviceType
 from app.models.scheduler import StrategyIdentifier, StrategyType
-from app.services.attack import AttackService
-from app.services.defender import DefenderService
 from app.services.policy_selector import PolicySelector
 from app.services.qtable_persistence import QTablePersistence
 from app.services.scheduler import SchedulerService
@@ -77,9 +75,7 @@ async def test_scheduler_execute_strategy_flow(
 
 
 @pytest.mark.asyncio
-async def test_scheduler_apply_defense_strategy(
-    scheduler_service, sample_device
-):
+async def test_scheduler_apply_defense_strategy(scheduler_service, sample_device):
     """Test applying a defense strategy."""
     strategy = StrategyIdentifier(
         type=StrategyType.DEFENSE, strategy_id=DefenseType.UDP_RATE_LIMIT
@@ -94,13 +90,9 @@ async def test_scheduler_apply_defense_strategy(
 
 
 @pytest.mark.asyncio
-async def test_scheduler_apply_attack_strategy(
-    scheduler_service, sample_device
-):
+async def test_scheduler_apply_attack_strategy(scheduler_service, sample_device):
     """Test applying an attack strategy."""
-    strategy = StrategyIdentifier(
-        type=StrategyType.ATTACK, strategy_id=AttackType.KICK
-    )
+    strategy = StrategyIdentifier(type=StrategyType.ATTACK, strategy_id=AttackType.KICK)
 
     result = await scheduler_service._apply_strategy(sample_device, strategy)
 
@@ -111,9 +103,7 @@ async def test_scheduler_apply_attack_strategy(
 
 
 @pytest.mark.asyncio
-async def test_scheduler_collect_feedback_simulation(
-    scheduler_service, sample_device
-):
+async def test_scheduler_collect_feedback_simulation(scheduler_service, sample_device):
     """Test feedback collection in simulation mode."""
     strategy = StrategyIdentifier(
         type=StrategyType.DEFENSE, strategy_id=DefenseType.TCP_RESET_POLICY
@@ -182,4 +172,3 @@ async def test_scheduler_error_handling(scheduler_service, sample_device):
     assert "success" in result
     # Should handle gracefully even if underlying service fails
     assert isinstance(result, dict)
-
