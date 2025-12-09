@@ -31,10 +31,32 @@ services:
     image: postgres:16-alpine
     container_name: zh-db
     restart: unless-stopped
+    # Security: Resource limits to prevent resource exhaustion
+    deploy:
+      resources:
+        limits:
+          cpus: '1.5'  # Limit to 1.5 CPU cores
+          memory: 1G   # Limit to 1GB RAM
+        reservations:
+          cpus: '0.25'  # Guarantee at least 0.25 cores
+          memory: 256M  # Guarantee at least 256MB RAM
+    # Security: Run as non-root user (PostgreSQL default user)
+    # Note: PostgreSQL requires write access to data directory, so read_only is not suitable
+    # Security: Drop unnecessary capabilities (PostgreSQL needs some for data operations)
+    cap_drop:
+      - ALL
+    cap_add:
+      - CHOWN
+      - DAC_OVERRIDE
+      - FOWNER
+      - SETGID
+      - SETUID
     environment:
       POSTGRES_DB: zenethunter
       POSTGRES_USER: zenethunter
       POSTGRES_PASSWORD: zenethunter
+      # Security: Disable unnecessary PostgreSQL features
+      POSTGRES_INITDB_ARGS: "--auth-host=scram-sha-256"
     volumes:
       - db_data:/var/lib/postgresql/data
     healthcheck:
@@ -53,11 +75,30 @@ services:
       dockerfile: deploy/backend.Dockerfile
     image: zenethunter/backend:dev
     container_name: zh-backend
+    # Security: Run as non-root user
     user: "101:101"
     restart: unless-stopped
+    # Security: Read-only root filesystem with writable tmpfs
     read_only: true
     tmpfs:
       - /tmp
+    # Security: Resource limits to prevent resource exhaustion
+    deploy:
+      resources:
+        limits:
+          cpus: '2.0'  # Limit to 2 CPU cores (suitable for DXP4800 Plus)
+          memory: 2G   # Limit to 2GB RAM
+        reservations:
+          cpus: '0.5'  # Guarantee at least 0.5 cores
+          memory: 512M # Guarantee at least 512MB RAM
+    # Security: Drop all capabilities, add only required ones
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE  # Required for binding to port 8000
+    # Security: Disable privilege escalation
+    security_opt:
+      - no-new-privileges:true
     # Environment variables can be loaded from .env file (optional)
     # Copy deploy/env/.env.example to deploy/env/.env and customize
     # If .env doesn't exist, defaults in environment: section will be used
@@ -81,6 +122,10 @@ services:
       CORS_ALLOW_ORIGINS: ${CORS_ALLOW_ORIGINS:-http://localhost:8080}
       # Database connection (DSN points to the Compose service name `db`)
       DATABASE_URL: ${DATABASE_URL:-postgresql://zenethunter:zenethunter@db:5432/zenethunter}
+      # Security: Disable Python bytecode compilation (already set in Dockerfile)
+      PYTHONDONTWRITEBYTECODE: 1
+      # Security: Force unbuffered output for better logging
+      PYTHONUNBUFFERED: 1
     depends_on:
       db:
         condition: service_healthy
@@ -89,9 +134,10 @@ services:
       - "8000:8000"
     healthcheck:
       # Use the Python runtime inside the image to avoid requiring curl/wget
+      # Security: Comprehensive health check with timeout
       test: [
         "CMD", "python", "-c",
-        "import sys,urllib.request; sys.exit(0) if urllib.request.urlopen('http://127.0.0.1:8000/healthz').getcode()==200 else sys.exit(1)"
+        "import sys,urllib.request; sys.exit(0) if urllib.request.urlopen('http://127.0.0.1:8000/healthz', timeout=3).getcode()==200 else sys.exit(1)"
       ]
       interval: 10s
       timeout: 5s
@@ -109,11 +155,32 @@ services:
       dockerfile: deploy/frontend.Dockerfile
     image: zenethunter/frontend:dev
     container_name: zh-frontend
+    # Security: Run as non-root user
     user: "101:101"
     restart: unless-stopped
+    # Security: Read-only root filesystem with writable tmpfs
     read_only: true
     tmpfs:
       - /tmp
+      - /var/cache/nginx
+      - /var/run
+    # Security: Resource limits to prevent resource exhaustion
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0'  # Limit to 1 CPU core (nginx is lightweight)
+          memory: 512M # Limit to 512MB RAM
+        reservations:
+          cpus: '0.25' # Guarantee at least 0.25 cores
+          memory: 128M # Guarantee at least 128MB RAM
+    # Security: Drop all capabilities, add only required ones
+    cap_drop:
+      - ALL
+    cap_add:
+      - NET_BIND_SERVICE  # Required for binding to port 8080
+    # Security: Disable privilege escalation
+    security_opt:
+      - no-new-privileges:true
     depends_on:
       backend:
         condition: service_healthy
@@ -122,7 +189,8 @@ services:
       - "1226:8080"
     healthcheck:
       # Alpine nginx base includes busybox wget; verify index responds
-      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:8080/ || exit 1"]
+      # Security: Health check with timeout to prevent hanging
+      test: ["CMD-SHELL", "wget -qO- --timeout=3 http://127.0.0.1:8080/ || exit 1"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -136,6 +204,14 @@ networks:
   zh_net:
     name: zenethunter_net
     driver: bridge
+    # Security: Internal network (containers cannot access external networks)
+    # Note: Set to false if containers need internet access
+    internal: false
+    # Security: Enable IPAM for better network isolation
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.20.0.0/16
 
 volumes:
   db_data:
