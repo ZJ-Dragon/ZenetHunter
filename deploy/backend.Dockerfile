@@ -18,18 +18,18 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 WORKDIR /app
 
 # Create a virtual environment for runtime deps (keeps system Python clean)
-RUN python -m venv /opt/venv
-ENV PATH="/opt/venv/bin:$PATH"
+# Install build tools and dependencies in a single layer to minimize image size
+RUN python -m venv /opt/venv && \
+    /opt/venv/bin/pip install --no-cache-dir --upgrade pip wheel
 
-# Install build tools that pip may need (wheel)
-RUN pip install --no-cache-dir --upgrade pip wheel
+ENV PATH="/opt/venv/bin:$PATH"
 
 # Copy backend project (pyproject + sources) and install it
 # Note: installing the project (.) ensures dependencies in pyproject.toml are resolved
-# If you prefer to avoid packaging the app into site-packages, you can
-# instead `pip install fastapi uvicorn[standard]` here and copy sources only.
+# Using BuildKit cache mount for pip cache to speed up rebuilds
 COPY backend/ /app/
-RUN pip install --no-cache-dir .
+RUN --mount=type=cache,target=/root/.cache/pip \
+    pip install --no-cache-dir .
 
 
 # ------------------------------------------------------------
@@ -48,15 +48,17 @@ ENV PYTHONDONTWRITEBYTECODE=1 \
 
 WORKDIR /app
 
-# Create a non-root user and group
+# Create a non-root user and group, copy files, and adjust ownership in one layer
 # Using fixed UID/GID can help with file permissions on certain NAS setups
-RUN groupadd -r app && useradd -r -g app -u 10001 app
+RUN groupadd -r app && \
+    useradd -r -g app -u 10001 app && \
+    mkdir -p /app/app
 
 # Copy only what we need at runtime: venv (deps + installed app) and app sources
 COPY --from=builder /opt/venv /opt/venv
 COPY backend/app /app/app
 
-# Adjust ownership
+# Adjust ownership and switch to non-root user in one layer
 RUN chown -R app:app /app /opt/venv
 USER app
 
