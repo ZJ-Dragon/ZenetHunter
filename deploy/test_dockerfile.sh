@@ -33,32 +33,32 @@ fi
 validate_dockerfile() {
     local dockerfile=$1
     local name=$2
-    
+
     echo -e "${YELLOW}Validating ${name}...${NC}"
-    
+
     if [ ! -f "$dockerfile" ]; then
         echo -e "${RED}Error: ${dockerfile} not found${NC}"
         return 1
     fi
-    
+
     # Check for multi-stage build
     if ! grep -q "FROM.*AS.*builder" "$dockerfile" && ! grep -q "FROM.*AS.*runtime" "$dockerfile"; then
         echo -e "${RED}Error: ${name} does not appear to use multi-stage build${NC}"
         return 1
     fi
-    
+
     # Check for non-root user
     if ! grep -q "USER.*app\|USER.*[0-9]" "$dockerfile"; then
         echo -e "${RED}Error: ${name} does not set non-root user${NC}"
         return 1
     fi
-    
+
     # Check for minimal layers (merged RUN commands)
     run_count=$(grep -c "^RUN" "$dockerfile" || true)
     if [ "$run_count" -gt 10 ]; then
         echo -e "${YELLOW}Warning: ${name} has ${run_count} RUN commands (consider merging)${NC}"
     fi
-    
+
     echo -e "${GREEN}✓ ${name} syntax validation passed${NC}"
     return 0
 }
@@ -68,28 +68,28 @@ test_build() {
     local dockerfile=$1
     local name=$2
     local tag=$3
-    
+
     if ! docker info &> /dev/null; then
         return 0
     fi
-    
+
     echo -e "${YELLOW}Building ${name}...${NC}"
-    
+
     cd "$REPO_ROOT"
     if docker build -f "$dockerfile" -t "$tag" . > /tmp/docker_build_${name}.log 2>&1; then
         echo -e "${GREEN}✓ ${name} build successful${NC}"
-        
+
         # Get image size
         local size=$(docker images "$tag" --format "{{.Size}}" | head -1)
         echo "  Image size: ${size}"
-        
+
         # Count layers (approximate)
         local layers=$(docker history "$tag" --format "{{.ID}}" | wc -l | tr -d ' ')
         echo "  Layers: ${layers}"
-        
+
         # Cleanup
         docker rmi "$tag" &> /dev/null || true
-        
+
         return 0
     else
         echo -e "${RED}✗ ${name} build failed${NC}"
@@ -112,4 +112,3 @@ test_build "$SCRIPT_DIR/frontend.Dockerfile" "frontend" "zenethunter/frontend:te
 
 echo ""
 echo -e "${GREEN}=== All Dockerfile validations passed ===${NC}"
-
