@@ -31,16 +31,14 @@ RUN npm run build
 # ------------------------------------------------------------
 FROM nginx:alpine AS runtime
 
-# Optional: tune Nginx for SPA and static assets
-# We replace the default site with a minimal config that:
-# - serves files from /usr/share/nginx/html
-# - falls back to index.html for client‑side routing (SPA)
-# - enables basic gzip for text assets
-RUN <<'EOF' bash
+# Create nginx config for SPA and non-root user in minimal layers
+# nginx:alpine can run as non-root when listening on port >1024 (8080)
+RUN <<'EOF' sh
 set -eu
+# Create nginx config for SPA (listening on non-privileged port 8080)
 cat > /etc/nginx/conf.d/default.conf <<'NGINX_CONF'
 server {
-  listen       80;
+  listen       8080;
   server_name  _;
 
   gzip on;
@@ -62,12 +60,26 @@ server {
   }
 }
 NGINX_CONF
+# Modify main nginx.conf for non-root operation (pid file in writable location)
+sed -i 's|pid /var/run/nginx.pid;|pid /tmp/nginx.pid;|' /etc/nginx/nginx.conf && \
+sed -i 's|user  nginx;|# user  nginx;|' /etc/nginx/nginx.conf && \
+# Create non-root user (UID/GID 101 matches docker-compose.yml)
+addgroup -g 101 -S app && \
+adduser -S -D -H -u 101 -h /var/cache/nginx -s /sbin/nologin -G app -g app app && \
+# Create directories and set permissions for non-root nginx
+mkdir -p /var/cache/nginx /var/log/nginx /var/run /tmp /usr/share/nginx/html && \
+chown -R app:app /var/cache/nginx /var/log/nginx /var/run /tmp /usr/share/nginx/html /etc/nginx /usr/share/nginx
 EOF
 
 # Copy the build output from the builder stage
 COPY --from=builder /app/dist/ /usr/share/nginx/html/
+RUN chown -R app:app /usr/share/nginx/html
+
+# Switch to non-root user
+USER app
 
 # Healthcheck is defined in docker-compose.yml
-EXPOSE 80
+EXPOSE 8080
 
-# Default command (inherited): nginx -g 'daemon off;'
+# Default command: nginx runs as non-root user (listening on port 8080)
+CMD ["nginx", "-g", "daemon off;"]
