@@ -70,4 +70,3 @@ echo "  Stop services: $COMPOSE_CMD down"
 echo "  Restart services: $COMPOSE_CMD restart"
 echo "  View status: $COMPOSE_CMD ps"
 echo ""
-

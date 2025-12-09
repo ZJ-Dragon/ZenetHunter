@@ -43,12 +43,12 @@ echo ""
 # Function to validate compose file
 validate_compose() {
     echo -e "${YELLOW}Validating docker-compose.yml...${NC}"
-    
+
     if [ ! -f "docker-compose.yml" ]; then
         echo -e "${RED}Error: docker-compose.yml not found${NC}"
         return 1
     fi
-    
+
     # Create temporary .env file if it doesn't exist (for validation only)
     if [ ! -f "env/.env" ]; then
         if [ -f "env/.env.example" ]; then
@@ -63,7 +63,7 @@ validate_compose() {
     else
         TEMP_ENV=false
     fi
-    
+
     # Validate compose file syntax
     if $COMPOSE_CMD config > /dev/null 2>&1; then
         echo -e "${GREEN}✓ docker-compose.yml syntax is valid${NC}"
@@ -74,10 +74,10 @@ validate_compose() {
         [ "$TEMP_ENV" = true ] && rm -f env/.env
         return 1
     fi
-    
+
     # Cleanup temp .env if created
     [ "$TEMP_ENV" = true ] && rm -f env/.env
-    
+
     # Check for required services
     local services=("db" "backend" "frontend")
     for service in "${services[@]}"; do
@@ -88,35 +88,35 @@ validate_compose() {
             return 1
         fi
     done
-    
+
     # Check for health checks
     if grep -q "healthcheck:" docker-compose.yml; then
         echo -e "${GREEN}✓ Health checks configured${NC}"
     else
         echo -e "${YELLOW}⚠ No health checks found${NC}"
     fi
-    
+
     # Check for depends_on
     if grep -q "depends_on:" docker-compose.yml; then
         echo -e "${GREEN}✓ Service dependencies configured${NC}"
     else
         echo -e "${YELLOW}⚠ No service dependencies found${NC}"
     fi
-    
+
     # Check for networks
     if grep -q "networks:" docker-compose.yml; then
         echo -e "${GREEN}✓ Networks configured${NC}"
     else
         echo -e "${YELLOW}⚠ No networks configured${NC}"
     fi
-    
+
     # Check for volumes
     if grep -q "volumes:" docker-compose.yml; then
         echo -e "${GREEN}✓ Volumes configured${NC}"
     else
         echo -e "${YELLOW}⚠ No volumes configured${NC}"
     fi
-    
+
     return 0
 }
 
@@ -124,18 +124,18 @@ validate_compose() {
 test_compose_config() {
     echo ""
     echo -e "${YELLOW}Testing compose configuration (dry run)...${NC}"
-    
+
     # Show service list
     echo "Services:"
     $COMPOSE_CMD config --services | while read -r service; do
         echo "  - $service"
     done
-    
+
     # Show port mappings
     echo ""
     echo "Port mappings:"
     $COMPOSE_CMD config | grep -A 2 "ports:" | grep -E "^\s+-" | sed 's/^/  /' || echo "  (none)"
-    
+
     return 0
 }
 
@@ -146,12 +146,12 @@ test_startup() {
         echo -e "${YELLOW}⚠ Docker daemon is not running. Skipping startup test.${NC}"
         return 0
     fi
-    
+
     echo ""
     echo -e "${YELLOW}Testing one-command startup...${NC}"
     echo "  (This will build images and start services)"
     echo ""
-    
+
     # Build images
     echo -e "${BLUE}Building images...${NC}"
     if $COMPOSE_CMD build --quiet > /tmp/compose_build.log 2>&1; then
@@ -161,20 +161,20 @@ test_startup() {
         echo "  See /tmp/compose_build.log for details"
         return 1
     fi
-    
+
     # Start services
     echo -e "${BLUE}Starting services...${NC}"
     if $COMPOSE_CMD up -d > /tmp/compose_start.log 2>&1; then
         echo -e "${GREEN}✓ Services started${NC}"
-        
+
         # Wait a bit for services to initialize
         sleep 5
-        
+
         # Check service status
         echo ""
         echo -e "${BLUE}Service status:${NC}"
         $COMPOSE_CMD ps
-        
+
         # Cleanup
         echo ""
         echo -e "${BLUE}Stopping services...${NC}"
@@ -186,7 +186,7 @@ test_startup() {
         $COMPOSE_CMD down 2>/dev/null || true
         return 1
     fi
-    
+
     return 0
 }
 
@@ -199,4 +199,3 @@ test_compose_config
 
 echo ""
 echo -e "${GREEN}=== All compose validations passed ===${NC}"
-
