@@ -30,6 +30,7 @@ from app.routes import (
     devices,
     health,
     integration_router,
+    integration_webhooks,
     logs,
     scan,
     topology,
@@ -128,6 +129,7 @@ api_router.include_router(scan.router)
 api_router.include_router(attack.router)
 api_router.include_router(defender.router)
 api_router.include_router(integration_router.router)
+api_router.include_router(integration_webhooks.router)
 
 app.include_router(api_router)
 
