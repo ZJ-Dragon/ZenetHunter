@@ -2,6 +2,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
 
+from app.core.exceptions import ErrorCode
 from app.core.security import get_current_admin
 from app.models.auth import User
 from app.models.scan import ScanRequest, ScanResult
@@ -33,7 +34,14 @@ async def websocket_endpoint(
         while True:
             # Keep connection alive and handle incoming messages if needed
             # For now, we just listen/echo or ignore
-            await websocket.receive_json()
-            # Optional: handle client commands via WS
+            try:
+                await websocket.receive_json()
+            except Exception:
+                # Send standardized error envelope and continue loop
+                await manager.send_error(
+                    websocket,
+                    ErrorCode.WS_BAD_MESSAGE,
+                    detail="Invalid WebSocket message format",
+                )
     except WebSocketDisconnect:
         manager.disconnect(websocket)

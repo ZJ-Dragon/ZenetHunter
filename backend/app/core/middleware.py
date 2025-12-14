@@ -14,7 +14,8 @@ import logging
 import uuid
 from collections.abc import Callable
 
-from fastapi import Request, Response
+from fastapi import HTTPException, Request, Response
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 
@@ -80,6 +81,45 @@ class ErrorHandlerMiddleware(BaseHTTPMiddleware):
                 exc_info=True,
             )
             return self._create_problem_response(e, correlation_id, request.url.path)
+        except RequestValidationError as err:
+            # 422 Unprocessable Entity → map to CONFIG_VALIDATION
+            sanitized = sanitize_validation_errors(err.errors())
+            app_error = AppError(
+                ErrorCode.CONFIG_VALIDATION,
+                detail="Request validation failed",
+                http_status=422,
+                extra={"errors": sanitized},
+            )
+            logger.warning(
+                "Validation error",
+                extra={
+                    "correlation_id": correlation_id,
+                    "code": app_error.code.value,
+                    "component": "api",
+                    "sd": {"errors": sanitized},
+                },
+            )
+            return self._create_problem_response(
+                app_error, correlation_id, request.url.path
+            )
+        except HTTPException as err:
+            # Map HTTPException into AppError with API.BAD_REQUEST by default
+            app_error = AppError(
+                ErrorCode.API_BAD_REQUEST,
+                detail=str(err.detail) if hasattr(err, "detail") else "Bad request",
+                http_status=err.status_code if hasattr(err, "status_code") else 400,
+            )
+            logger.warning(
+                "HTTPException",
+                extra={
+                    "correlation_id": correlation_id,
+                    "code": app_error.code.value,
+                    "component": "api",
+                },
+            )
+            return self._create_problem_response(
+                app_error, correlation_id, request.url.path
+            )
         except Exception as e:
             # Unexpected error - log with full traceback
             logger.error(
@@ -126,3 +166,50 @@ class ErrorHandlerMiddleware(BaseHTTPMiddleware):
             content=problem_details,
             headers={"X-Correlation-Id": correlation_id},
         )
+
+
+def _stringify_value(value):
+    """Best-effort stringify for potentially non-serializable values.
+
+    - Exceptions → str(exception)
+    - Other basic JSON-serializable types left intact
+    - Fallback to str(value)
+    """
+    try:
+        if isinstance(value, Exception):
+            return str(value)
+        # Primitive types are fine
+        if isinstance(value, (str, int, float, bool)) or value is None:
+            return value
+        # Leave dict/list processing to caller
+        return value
+    except Exception:
+        return str(value)
+
+
+def sanitize_validation_errors(errors: list[dict]) -> list[dict]:
+    """Sanitize pydantic/fastapi validation errors for JSON safety.
+
+    FastAPI's RequestValidationError.errors() returns a list of dicts where
+    each dict may have a "ctx" key containing extra information. Sometimes,
+    validators raise exceptions (e.g., ValueError) and that exception object
+    can be present in ctx, which is not JSON-serializable. This helper maps
+    any Exception values (and other odd values) in ctx to strings.
+    """
+    sanitized: list[dict] = []
+    for err in errors or []:
+        item = dict(err)
+        ctx = item.get("ctx")
+        if isinstance(ctx, dict):
+            new_ctx: dict = {}
+            for k, v in ctx.items():
+                if isinstance(v, dict):
+                    # shallow sanitize nested dicts
+                    new_ctx[k] = {kk: _stringify_value(vv) for kk, vv in v.items()}
+                elif isinstance(v, list):
+                    new_ctx[k] = [_stringify_value(x) for x in v]
+                else:
+                    new_ctx[k] = _stringify_value(v)
+            item["ctx"] = new_ctx
+        sanitized.append(item)
+    return sanitized
