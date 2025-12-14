@@ -14,7 +14,8 @@ import logging
 import uuid
 from collections.abc import Callable
 
-from fastapi import Request, Response
+from fastapi import HTTPException, Request, Response
+from fastapi.exceptions import RequestValidationError
 from fastapi.responses import JSONResponse
 from starlette.middleware.base import BaseHTTPMiddleware
 
@@ -80,6 +81,44 @@ class ErrorHandlerMiddleware(BaseHTTPMiddleware):
                 exc_info=True,
             )
             return self._create_problem_response(e, correlation_id, request.url.path)
+        except RequestValidationError as err:
+            # 422 Unprocessable Entity → map to CONFIG_VALIDATION
+            app_error = AppError(
+                ErrorCode.CONFIG_VALIDATION,
+                detail="Request validation failed",
+                http_status=422,
+                extra={"errors": err.errors()},
+            )
+            logger.warning(
+                "Validation error",
+                extra={
+                    "correlation_id": correlation_id,
+                    "code": app_error.code.value,
+                    "component": "api",
+                    "sd": {"errors": err.errors()},
+                },
+            )
+            return self._create_problem_response(
+                app_error, correlation_id, request.url.path
+            )
+        except HTTPException as err:
+            # Map HTTPException into AppError with API.BAD_REQUEST by default
+            app_error = AppError(
+                ErrorCode.API_BAD_REQUEST,
+                detail=str(err.detail) if hasattr(err, "detail") else "Bad request",
+                http_status=err.status_code if hasattr(err, "status_code") else 400,
+            )
+            logger.warning(
+                "HTTPException",
+                extra={
+                    "correlation_id": correlation_id,
+                    "code": app_error.code.value,
+                    "component": "api",
+                },
+            )
+            return self._create_problem_response(
+                app_error, correlation_id, request.url.path
+            )
         except Exception as e:
             # Unexpected error - log with full traceback
             logger.error(

@@ -1,6 +1,9 @@
 import logging
+import uuid
 
 from fastapi import WebSocket
+
+from app.core.exceptions import ErrorCode
 
 logger = logging.getLogger(__name__)
 
@@ -52,6 +55,37 @@ class ConnectionManager:
 
         for dead_conn in disconnected:
             self.disconnect(dead_conn)
+
+    async def send_error(
+        self,
+        websocket: WebSocket,
+        code: ErrorCode | str,
+        detail: str,
+        correlation_id: str | None = None,
+    ):
+        """Send a standardized error envelope to a single WS client."""
+        cid = correlation_id or str(uuid.uuid4())
+        payload = {
+            "event": "error",
+            "code": code.value if isinstance(code, ErrorCode) else str(code),
+            "detail": detail,
+            "correlation_id": cid,
+        }
+        try:
+            await websocket.send_json(payload)
+        except Exception:
+            # Treat as disconnected
+            self.disconnect(websocket)
+
+    async def close_with_error(
+        self, websocket: WebSocket, code: ErrorCode | str, detail: str
+    ):
+        """Send error then close connection."""
+        await self.send_error(websocket, code, detail)
+        try:
+            await websocket.close()
+        except Exception:
+            self.disconnect(websocket)
 
 
 # Global accessor
