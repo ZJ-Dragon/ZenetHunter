@@ -88,6 +88,19 @@ if _HAVE_PYDANTIC_SETTINGS:
         # External services (optional in early project phases)
         database_url: str | None = Field(default=None, validation_alias="DATABASE_URL")
 
+        # Integration: Router adapter selection & connection params
+        router_adapter: str = Field(
+            default="dummy", validation_alias="ROUTER_ADAPTER"
+        )
+        router_host: str | None = Field(default=None, validation_alias="ROUTER_HOST")
+        router_port: int | None = Field(default=None, validation_alias="ROUTER_PORT")
+        router_username: str | None = Field(
+            default=None, validation_alias="ROUTER_USERNAME"
+        )
+        router_password: str | None = Field(
+            default=None, validation_alias="ROUTER_PASSWORD"
+        )
+
         # CORS: comma‑separated list → list[str]
         cors_origins_raw: str = Field(
             default_factory=lambda: os.getenv("CORS_ALLOW_ORIGINS")
@@ -222,6 +235,25 @@ else:
             )
         )
 
+        # Integration: Router adapter selection & connection params (fallback)
+        router_adapter: str = Field(
+            default_factory=lambda: os.getenv("ROUTER_ADAPTER", "dummy").lower()
+        )
+        router_host: str | None = Field(
+            default_factory=lambda: os.getenv("ROUTER_HOST")
+        )
+        router_port: int | None = Field(
+            default_factory=lambda: (
+                int(os.getenv("ROUTER_PORT")) if os.getenv("ROUTER_PORT") else None
+            )
+        )
+        router_username: str | None = Field(
+            default_factory=lambda: os.getenv("ROUTER_USERNAME")
+        )
+        router_password: str | None = Field(
+            default_factory=lambda: os.getenv("ROUTER_PASSWORD")
+        )
+
         @property
         def log_level_int(self) -> int:
             return getattr(logging, self.log_level.upper(), logging.INFO)
@@ -252,6 +284,7 @@ if __name__ == "__main__":  # pragma: no cover
         "log_level_int": s.log_level_int,
         "database_url": bool(s.database_url),
         "cors_origins": s.cors_origins,
+        "router_adapter": getattr(s, "router_adapter", "dummy"),
     }
     import json
 

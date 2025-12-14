@@ -30,6 +30,7 @@ from app.routes import (
     devices,
     health,
     logs,
+    integration_router,
     scan,
     topology,
 )
@@ -126,6 +127,7 @@ api_router.include_router(config.router)
 api_router.include_router(scan.router)
 api_router.include_router(attack.router)
 api_router.include_router(defender.router)
+api_router.include_router(integration_router.router)
 
 app.include_router(api_router)
 
