@@ -276,12 +276,12 @@ services:
   service_name:
     # Non-root user
     user: "101:101"
-    
+
     # Read-only filesystem
     read_only: true
     tmpfs:
       - /tmp
-    
+
     # Resource limits
     deploy:
       resources:
@@ -291,17 +291,17 @@ services:
         reservations:
           cpus: '0.5'
           memory: 512M
-    
+
     # Capability management
     cap_drop:
       - ALL
     cap_add:
       - NET_BIND_SERVICE
-    
+
     # Disable privilege escalation
     security_opt:
       - no-new-privileges:true
-    
+
     # Health check
     healthcheck:
       test: ["CMD", "health-check-command"]
@@ -347,4 +347,3 @@ docker logs <container> | grep -i "permission\|privilege\|root"
 **Last Updated**: 2024-12-09  
 **Version**: 1.0  
 **Applicable To**: ZenetHunter v0.1.0+
-

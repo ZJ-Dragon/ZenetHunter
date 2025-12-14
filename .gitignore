@@ -208,3 +208,4 @@ nohup.out
 /docs/secrets/
 /docs/secrets/branches/
 /PROJECT_SUMMARY.md
+/.idea/compiler.xml

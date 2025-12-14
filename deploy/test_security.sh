@@ -219,4 +219,3 @@ else
     echo -e "${RED}✗ Security baseline verification failed${NC}"
     exit 1
 fi
-
