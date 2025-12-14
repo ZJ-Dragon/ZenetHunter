@@ -1,5 +1,5 @@
-import hmac
 import hashlib
+import hmac
 import json
 import time
 
@@ -8,12 +8,11 @@ from fastapi.testclient import TestClient
 from app.core.config import get_settings
 from app.main import app
 
-
 client = TestClient(app)
 
 
 def _sign(secret: str, ts: int, body: bytes) -> str:
-    msg = f"{ts}.".encode("utf-8") + body
+    msg = f"{ts}.".encode() + body
     return "sha256=" + hmac.new(secret.encode("utf-8"), msg, hashlib.sha256).hexdigest()
 
 
@@ -43,9 +42,9 @@ def test_webhook_valid_device_online():
 
 def test_webhook_invalid_signature():
     ts = int(time.time())
-    body = json.dumps({"id": "evt_2", "type": "device.online", "data": {"mac": "11:22:33:44:55:66"}}).encode(
-        "utf-8"
-    )
+    body = json.dumps(
+        {"id": "evt_2", "type": "device.online", "data": {"mac": "11:22:33:44:55:66"}}
+    ).encode("utf-8")
     r = client.post(
         "/api/integration/webhooks",
         data=body,
@@ -61,9 +60,13 @@ def test_webhook_invalid_signature():
 def test_webhook_stale_timestamp():
     s = get_settings()
     ts = int(time.time()) - (int(getattr(s, "webhook_tolerance_sec", 300)) + 10)
-    body = json.dumps({"id": "evt_3", "type": "policy.switched", "data": {"mac": "aa", "to_policy": "guest"}}).encode(
-        "utf-8"
-    )
+    body = json.dumps(
+        {
+            "id": "evt_3",
+            "type": "policy.switched",
+            "data": {"mac": "aa", "to_policy": "guest"},
+        }
+    ).encode("utf-8")
     sig = _sign(s.webhook_secret, ts, body)
     r = client.post(
         "/api/integration/webhooks",

@@ -1,7 +1,7 @@
 from __future__ import annotations
 
-import hmac
 import hashlib
+import hmac
 import json
 from datetime import UTC, datetime
 from typing import Annotated
@@ -12,7 +12,6 @@ from app.core.config import get_settings
 from app.core.exceptions import AppError, ErrorCode
 from app.models.webhook import HEADER_SIGNATURE, HEADER_TIMESTAMP
 from app.services.webhook import WebhookService, get_webhook_service
-
 
 router = APIRouter(tags=["integration", "webhooks"])
 
@@ -33,7 +32,9 @@ async def receive_webhook(
     zh_signature: Annotated[str | None, Header(alias=HEADER_SIGNATURE)] = None,
     service: WebhookService = Depends(get_webhook_service),
 ):
-    """Receive integration webhooks (device online / policy switched) with HMAC verification.
+    """Receive webhooks with HMAC verification.
+
+    Handles "device online" and "policy switched" events.
 
     Security:
     - Headers: X-ZH-Timestamp, X-ZH-Signature (sha256=<hex>)
@@ -46,8 +47,8 @@ async def receive_webhook(
     settings = get_settings()
     try:
         ts = int(zh_timestamp)
-    except Exception:
-        raise AppError(ErrorCode.API_BAD_REQUEST, "Invalid timestamp header")
+    except Exception as err:
+        raise AppError(ErrorCode.API_BAD_REQUEST, "Invalid timestamp header") from err
 
     now = int(datetime.now(UTC).timestamp())
     if abs(now - ts) > int(getattr(settings, "webhook_tolerance_sec", 300)):
@@ -61,8 +62,8 @@ async def receive_webhook(
     # Parse JSON and dispatch
     try:
         payload = json.loads(raw.decode("utf-8"))
-    except Exception:
-        raise AppError(ErrorCode.API_BAD_REQUEST, "Invalid JSON body")
+    except Exception as err:
+        raise AppError(ErrorCode.API_BAD_REQUEST, "Invalid JSON body") from err
 
     await service.handle(payload)
     return {"status": "ok"}
