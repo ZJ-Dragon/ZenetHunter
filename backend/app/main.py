@@ -29,8 +29,8 @@ from app.routes import (
     defender,
     devices,
     health,
-    logs,
     integration_router,
+    logs,
     scan,
     topology,
 )

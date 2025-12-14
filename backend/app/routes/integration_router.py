@@ -13,7 +13,6 @@ from app.models.router_integration import (
 )
 from app.services.router import RouterService, get_router_service
 
-
 router = APIRouter(tags=["integration", "router"])
 
 

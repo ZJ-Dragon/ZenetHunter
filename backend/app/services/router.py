@@ -55,7 +55,9 @@ class RouterService:
         return RouterActionResult(
             status=ActionStatus.SUCCESS if ok else ActionStatus.FAILED,
             message=(
-                f"ACL rule {rule_id} removed" if ok else f"ACL rule {rule_id} not removed"
+                f"ACL rule {rule_id} removed"
+                if ok
+                else f"ACL rule {rule_id} not removed"
             ),
         )
 

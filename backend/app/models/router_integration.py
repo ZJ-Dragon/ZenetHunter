@@ -1,13 +1,12 @@
-from __future__ import annotations
-
 """Models for router integration (rate limit, ACL, guest isolation).
 
 This module defines the stable data contracts used by the Router abstraction
 layer and the REST API endpoints under /api/integration/router.
 """
 
+from __future__ import annotations
+
 from enum import Enum
-from typing import Literal
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
@@ -47,7 +46,7 @@ class RateLimitPolicy(BaseModel):
     )
 
     @model_validator(mode="after")
-    def _validate_directions(self) -> "RateLimitPolicy":
+    def _validate_directions(self) -> RateLimitPolicy:
         if self.up_kbps is None and self.down_kbps is None:
             raise ValueError("At least one of up_kbps or down_kbps must be set")
         return self
@@ -119,7 +118,7 @@ class IsolationPolicy(BaseModel):
     )
 
     @model_validator(mode="after")
-    def _validate_mode(self) -> "IsolationPolicy":
+    def _validate_mode(self) -> IsolationPolicy:
         if self.mode == IsolationMode.GUEST_VLAN and self.vlan_id is None:
             raise ValueError("vlan_id is required for guest_vlan mode")
         if self.mode == IsolationMode.SSID and not self.ssid:

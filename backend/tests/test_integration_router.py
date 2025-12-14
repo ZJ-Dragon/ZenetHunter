@@ -2,7 +2,6 @@ from fastapi.testclient import TestClient
 
 from app.main import app
 
-
 client = TestClient(app)
 
 
@@ -60,7 +59,9 @@ def test_acl_apply_and_remove(admin_headers):
     rule_id = data["data"]["rule_id"]
 
     # Remove
-    resp = client.delete(f"/api/integration/router/acl/{rule_id}", headers=admin_headers)
+    resp = client.delete(
+        f"/api/integration/router/acl/{rule_id}", headers=admin_headers
+    )
     assert resp.status_code == 202
     assert resp.json()["status"] == "success"
 

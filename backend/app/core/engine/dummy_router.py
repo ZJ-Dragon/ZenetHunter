@@ -1,7 +1,5 @@
 import asyncio
 import hashlib
-from collections import defaultdict
-from typing import Dict
 
 from app.core.engine.base_router import RouterManager
 from app.models.router_integration import ACLRule, IsolationPolicy, RateLimitPolicy
@@ -15,12 +13,12 @@ class DummyRouterManager(RouterManager):
 
     def __init__(self) -> None:
         # State stores
-        self._rate_limits: Dict[str, RateLimitPolicy] = {}
-        self._isolation: Dict[str, IsolationPolicy] = {}
-        self._acl_rules: Dict[str, ACLRule] = {}
+        self._rate_limits: dict[str, RateLimitPolicy] = {}
+        self._isolation: dict[str, IsolationPolicy] = {}
+        self._acl_rules: dict[str, ACLRule] = {}
 
         # Timers for auto-revert (per target)
-        self._timers: Dict[str, asyncio.Task] = {}
+        self._timers: dict[str, asyncio.Task] = {}
 
     # ---- helpers -----------------------------------------------------------
     def _fingerprint_rule(self, rule: ACLRule) -> str:
@@ -56,7 +54,9 @@ class DummyRouterManager(RouterManager):
         self._rate_limits[policy.target_mac] = policy
         if policy.duration:
             self._schedule_revert(
-                f"rl:{policy.target_mac}", policy.duration, lambda: self.remove_rate_limit(policy.target_mac)
+                f"rl:{policy.target_mac}",
+                policy.duration,
+                lambda: self.remove_rate_limit(policy.target_mac),
             )
         return True
 
@@ -84,7 +84,9 @@ class DummyRouterManager(RouterManager):
         self._isolation[policy.target_mac] = policy
         if policy.duration:
             self._schedule_revert(
-                f"iso:{policy.target_mac}", policy.duration, lambda: self.reintegrate_device(policy.target_mac)
+                f"iso:{policy.target_mac}",
+                policy.duration,
+                lambda: self.reintegrate_device(policy.target_mac),
             )
         return True
 

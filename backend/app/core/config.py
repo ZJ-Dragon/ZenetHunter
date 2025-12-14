@@ -89,9 +89,7 @@ if _HAVE_PYDANTIC_SETTINGS:
         database_url: str | None = Field(default=None, validation_alias="DATABASE_URL")
 
         # Integration: Router adapter selection & connection params
-        router_adapter: str = Field(
-            default="dummy", validation_alias="ROUTER_ADAPTER"
-        )
+        router_adapter: str = Field(default="dummy", validation_alias="ROUTER_ADAPTER")
         router_host: str | None = Field(default=None, validation_alias="ROUTER_HOST")
         router_port: int | None = Field(default=None, validation_alias="ROUTER_PORT")
         router_username: str | None = Field(
