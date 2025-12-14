@@ -16,12 +16,15 @@ from contextlib import asynccontextmanager
 from datetime import UTC, datetime
 from typing import Any
 
-from fastapi import APIRouter, FastAPI
+from fastapi import APIRouter, FastAPI, HTTPException, Request
+from fastapi.exceptions import RequestValidationError, ValidationException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
 
 from app.core.config import get_settings
+from app.core.exceptions import AppError, ErrorCode
 from app.core.logging import setup_logging
-from app.core.middleware import ErrorHandlerMiddleware
+from app.core.middleware import ErrorHandlerMiddleware, get_correlation_id
 from app.routes import (
     attack,
     auth,
@@ -98,6 +101,58 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# ---- Exception handlers (validation & HTTP) ---------------------------------
+def _problem_response(request: Request, app_error: AppError) -> JSONResponse:
+    correlation_id = get_correlation_id(request)
+    instance_uri = f"/errors/{correlation_id}"
+    body = app_error.to_problem_details(instance=instance_uri)
+    body["correlation_id"] = correlation_id
+    return JSONResponse(
+        status_code=app_error.http_status,
+        content=body,
+        headers={"X-Correlation-Id": correlation_id},
+    )
+
+
+@app.exception_handler(RequestValidationError)
+async def validation_exception_handler(
+    request: Request, exc: RequestValidationError
+):  # noqa: D401
+    """Return RFC9457 Problem Details for request validation errors."""
+    app_error = AppError(
+        ErrorCode.CONFIG_VALIDATION,
+        detail="Request validation failed",
+        http_status=422,
+        extra={"errors": exc.errors()},
+    )
+    return _problem_response(request, app_error)
+
+
+@app.exception_handler(ValidationException)
+async def validation_exception_handler_v2(
+    request: Request, exc: ValidationException
+):  # noqa: D401
+    """Return RFC9457 Problem Details for generic ValidationException."""
+    app_error = AppError(
+        ErrorCode.CONFIG_VALIDATION,
+        detail="Request validation failed",
+        http_status=422,
+        extra={"errors": getattr(exc, "errors", lambda: [])()},
+    )
+    return _problem_response(request, app_error)
+
+
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException):  # noqa: D401
+    """Return RFC9457 Problem Details for HTTPException."""
+    app_error = AppError(
+        ErrorCode.API_BAD_REQUEST,
+        detail=str(exc.detail) if hasattr(exc, "detail") else "Bad request",
+        http_status=exc.status_code if hasattr(exc, "status_code") else 400,
+    )
+    return _problem_response(request, app_error)
 
 
 # ---- Top-level routes -------------------------------------------------------
