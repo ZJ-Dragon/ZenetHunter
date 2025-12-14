@@ -32,4 +32,3 @@ pytest
 httpx
 ruff
 black
-httpx

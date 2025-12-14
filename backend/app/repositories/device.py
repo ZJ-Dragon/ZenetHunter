@@ -139,20 +139,24 @@ class DeviceRepository:
 
         Args:
             mac: MAC address
-            defense_status: New defense status
+            defense_status: New defense status (enum or string)
             policy: Active defense policy (optional)
 
         Returns:
             Updated Device model or None if not found
         """
         mac_lower = mac.lower()
+        # Handle enum or string
+        defense_status_value = (
+            defense_status.value if hasattr(defense_status, "value") else defense_status
+        )
         values = {
             "defense_status": defense_status,
             "last_seen": datetime.now(UTC),
         }
         if policy is not None:
             values["active_defense_policy"] = policy
-        elif defense_status.value == "inactive":
+        elif defense_status_value == "inactive":
             values["active_defense_policy"] = None
 
         await self.session.execute(

@@ -117,6 +117,9 @@ async def init_db() -> None:
 
     This should be called on application startup.
     """
+    # Import all models to ensure they are registered with Base.metadata
+    from app.models.db import DeviceModel, EventLogModel, TrustListModel  # noqa: F401
+
     engine = get_engine()
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
