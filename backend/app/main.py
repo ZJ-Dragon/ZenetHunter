@@ -24,7 +24,11 @@ from fastapi.responses import JSONResponse
 from app.core.config import get_settings
 from app.core.exceptions import AppError, ErrorCode
 from app.core.logging import setup_logging
-from app.core.middleware import ErrorHandlerMiddleware, get_correlation_id
+from app.core.middleware import (
+    ErrorHandlerMiddleware,
+    get_correlation_id,
+    sanitize_validation_errors,
+)
 from app.routes import (
     attack,
     auth,
@@ -133,7 +137,7 @@ async def validation_exception_handler(
         ErrorCode.CONFIG_VALIDATION,
         detail="Request validation failed",
         http_status=422,
-        extra={"errors": exc.errors()},
+        extra={"errors": sanitize_validation_errors(exc.errors())},
     )
     return _problem_response(request, app_error)
 
@@ -147,7 +151,9 @@ async def validation_exception_handler_v2(
         ErrorCode.CONFIG_VALIDATION,
         detail="Request validation failed",
         http_status=422,
-        extra={"errors": getattr(exc, "errors", lambda: [])()},
+        extra={
+            "errors": sanitize_validation_errors(getattr(exc, "errors", lambda: [])())
+        },
     )
     return _problem_response(request, app_error)
 
