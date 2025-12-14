@@ -52,9 +52,17 @@ async def lifespan(app: FastAPI):  # noqa: D401 (docstring optional)
     # Startup tasks (keep minimal here; heavy init goes to dedicated modules)
     setup_logging()  # Initialize structured logging
     app.state.start_time = datetime.now(UTC)
+
+    # Initialize database
+    from app.core.database import init_db
+
+    await init_db()
+
     yield
     # Shutdown tasks
-    # e.g., close DB pools/message buses when they are added later
+    from app.core.database import close_db
+
+    await close_db()
 
 
 # ---- App factory ------------------------------------------------------------
