@@ -2,14 +2,12 @@
 
 from __future__ import annotations
 
-import json
 from datetime import UTC, datetime
 from typing import Any
 
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.exceptions import AppError, ErrorCode
 from app.models.db.device import DeviceModel, DeviceStatusEnum, DeviceTypeEnum
 from app.models.device import Device, DeviceStatus, DeviceType
 
@@ -94,9 +92,7 @@ class DeviceRepository:
         await self.session.flush()
         return self._model_to_domain(model)
 
-    async def update_status(
-        self, mac: str, status: DeviceStatus
-    ) -> Device | None:
+    async def update_status(self, mac: str, status: DeviceStatus) -> Device | None:
         """Update device status.
 
         Args:
@@ -110,14 +106,14 @@ class DeviceRepository:
         await self.session.execute(
             update(DeviceModel)
             .where(DeviceModel.mac == mac_lower)
-            .values(status=self._domain_status_to_db(status), last_seen=datetime.now(UTC))
+            .values(
+                status=self._domain_status_to_db(status), last_seen=datetime.now(UTC)
+            )
         )
         await self.session.flush()
         return await self.get_by_mac(mac_lower)
 
-    async def update_attack_status(
-        self, mac: str, attack_status: Any
-    ) -> Device | None:
+    async def update_attack_status(self, mac: str, attack_status: Any) -> Device | None:
         """Update device attack status.
 
         Args:

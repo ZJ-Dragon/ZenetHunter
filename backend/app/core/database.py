@@ -7,7 +7,7 @@ and database initialization. Supports both SQLite (default) and PostgreSQL.
 from __future__ import annotations
 
 import logging
-from typing import AsyncGenerator
+from collections.abc import AsyncGenerator
 
 from sqlalchemy.ext.asyncio import (
     AsyncSession,
@@ -69,7 +69,9 @@ def get_engine():
             connect_args=connect_args,
             pool_pre_ping=True,  # Verify connections before using
         )
-        logger.info(f"Database engine created: {url.split('@')[-1] if '@' in url else url}")
+        logger.info(
+            f"Database engine created: {url.split('@')[-1] if '@' in url else url}"
+        )
     return _engine
 
 

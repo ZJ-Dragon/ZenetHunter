@@ -5,7 +5,8 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from enum import Enum
 
-from sqlalchemy import DateTime, Enum as SQLEnum, String, UniqueConstraint
+from sqlalchemy import DateTime, String, UniqueConstraint
+from sqlalchemy import Enum as SQLEnum
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.database import Base
@@ -39,4 +40,6 @@ class TrustListModel(Base):
     notes: Mapped[str | None] = mapped_column(String(500), nullable=True)
 
     # Unique constraint: same MAC cannot be in both lists
-    __table_args__ = (UniqueConstraint("mac", "list_type", name="uq_trust_list_mac_type"),)
+    __table_args__ = (
+        UniqueConstraint("mac", "list_type", name="uq_trust_list_mac_type"),
+    )

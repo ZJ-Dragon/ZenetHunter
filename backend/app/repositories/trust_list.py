@@ -61,7 +61,9 @@ class TrustListRepository:
         existing = result.scalar_one_or_none()
 
         if existing is None:
-            model = TrustListModel(mac=mac_lower, list_type=TrustListTypeEnum.ALLOW, notes=notes)
+            model = TrustListModel(
+                mac=mac_lower, list_type=TrustListTypeEnum.ALLOW, notes=notes
+            )
             self.session.add(model)
             await self.session.flush()
 
@@ -86,7 +88,9 @@ class TrustListRepository:
         existing = result.scalar_one_or_none()
 
         if existing is None:
-            model = TrustListModel(mac=mac_lower, list_type=TrustListTypeEnum.BLOCK, notes=notes)
+            model = TrustListModel(
+                mac=mac_lower, list_type=TrustListTypeEnum.BLOCK, notes=notes
+            )
             self.session.add(model)
             await self.session.flush()
 

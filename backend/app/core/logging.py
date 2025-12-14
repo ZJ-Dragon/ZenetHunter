@@ -71,7 +71,10 @@ class StructuredFormatter(logging.Formatter):
 
         # Recursively sanitize lists
         if isinstance(value, list):
-            return [self._sanitize_value(f"{key}[{i}]", item) for i, item in enumerate(value)]
+            return [
+                self._sanitize_value(f"{key}[{i}]", item)
+                for i, item in enumerate(value)
+            ]
 
         return value
 
@@ -107,7 +110,9 @@ class StructuredFormatter(logging.Formatter):
                 exc_message = str(exc_value) if exc_value else ""
                 log_data["otel"] = {
                     "exception.type": exc_type.__name__,
-                    "exception.message": self._sanitize_value("exception.message", exc_message),
+                    "exception.message": self._sanitize_value(
+                        "exception.message", exc_message
+                    ),
                 }
                 if exc_traceback:
                     # Stack traces are usually safe, but sanitize message parts

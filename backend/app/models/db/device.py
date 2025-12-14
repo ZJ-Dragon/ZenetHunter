@@ -5,7 +5,8 @@ from __future__ import annotations
 from datetime import UTC, datetime
 from enum import Enum
 
-from sqlalchemy import DateTime, Enum as SQLEnum, String, Text
+from sqlalchemy import DateTime, String, Text
+from sqlalchemy import Enum as SQLEnum
 from sqlalchemy.orm import Mapped, mapped_column
 
 from app.core.database import Base
@@ -76,4 +77,6 @@ class DeviceModel(Base):
     )
     # Additional metadata (JSON stored as text)
     tags: Mapped[str | None] = mapped_column(Text, nullable=True)  # JSON array of tags
-    alias: Mapped[str | None] = mapped_column(String(255), nullable=True)  # User-friendly alias
+    alias: Mapped[str | None] = mapped_column(
+        String(255), nullable=True
+    )  # User-friendly alias
