@@ -24,7 +24,56 @@ class StructuredFormatter(logging.Formatter):
 
     Produces logs in a format compatible with RFC 5424 Syslog and
     OpenTelemetry conventions, including exception semantics.
+    Includes sensitive data sanitization for security.
     """
+
+    # Fields that may contain sensitive information
+    _SENSITIVE_FIELDS = {
+        "password",
+        "token",
+        "secret",
+        "key",
+        "authorization",
+        "auth",
+        "cookie",
+        "session",
+        "api_key",
+        "apikey",
+        "access_token",
+        "refresh_token",
+    }
+
+    def _sanitize_value(self, key: str, value: Any) -> Any:
+        """Sanitize sensitive values in log data.
+
+        Args:
+            key: Field name
+            value: Field value
+
+        Returns:
+            Sanitized value (masked if sensitive)
+        """
+        if value is None:
+            return value
+
+        # Check if key contains sensitive keywords
+        key_lower = key.lower()
+        if any(sensitive in key_lower for sensitive in self._SENSITIVE_FIELDS):
+            if isinstance(value, str):
+                if len(value) > 8:
+                    return f"{value[:4]}****{value[-4:]}"
+                return "****"
+            return "****"
+
+        # Recursively sanitize dictionaries
+        if isinstance(value, dict):
+            return {k: self._sanitize_value(k, v) for k, v in value.items()}
+
+        # Recursively sanitize lists
+        if isinstance(value, list):
+            return [self._sanitize_value(f"{key}[{i}]", item) for i, item in enumerate(value)]
+
+        return value
 
     def format(self, record: logging.LogRecord) -> str:
         """Format log record as JSON.
@@ -40,7 +89,7 @@ class StructuredFormatter(logging.Formatter):
             "timestamp": datetime.now(UTC).isoformat(),
             "severity": self._map_severity(record.levelno),
             "module": record.module,
-            "message": record.getMessage(),
+            "message": self._sanitize_value("message", record.getMessage()),
         }
 
         # Add logger name if different from module
@@ -55,20 +104,21 @@ class StructuredFormatter(logging.Formatter):
         if record.exc_info:
             exc_type, exc_value, exc_traceback = record.exc_info
             if exc_type:
+                exc_message = str(exc_value) if exc_value else ""
                 log_data["otel"] = {
                     "exception.type": exc_type.__name__,
-                    "exception.message": str(exc_value) if exc_value else "",
+                    "exception.message": self._sanitize_value("exception.message", exc_message),
                 }
                 if exc_traceback:
-                    log_data["otel"]["exception.stacktrace"] = self.formatException(
-                        record.exc_info
-                    )
+                    # Stack traces are usually safe, but sanitize message parts
+                    stacktrace = self.formatException(record.exc_info)
+                    log_data["otel"]["exception.stacktrace"] = stacktrace
 
-        # Add structured data (RFC 5424 SD)
+        # Add structured data (RFC 5424 SD) with sanitization
         if hasattr(record, "sd") and record.sd:
-            log_data["sd"] = record.sd
+            log_data["sd"] = self._sanitize_value("sd", record.sd)
 
-        # Add any extra fields
+        # Add any extra fields with sanitization
         for key, value in record.__dict__.items():
             if key not in {
                 "name",
@@ -95,7 +145,7 @@ class StructuredFormatter(logging.Formatter):
                 "correlation_id",
                 "sd",
             }:
-                log_data[key] = value
+                log_data[key] = self._sanitize_value(key, value)
 
         return json.dumps(log_data, ensure_ascii=False)
 
