@@ -99,6 +99,14 @@ if _HAVE_PYDANTIC_SETTINGS:
             default=None, validation_alias="ROUTER_PASSWORD"
         )
 
+        # Integration: Webhook verification
+        webhook_secret: str = Field(
+            default="dev-webhook-secret", validation_alias="WEBHOOK_SECRET"
+        )
+        webhook_tolerance_sec: int = Field(
+            default=300, validation_alias="WEBHOOK_TOLERANCE_SEC"
+        )
+
         # CORS: comma‑separated list → list[str]
         cors_origins_raw: str = Field(
             default_factory=lambda: os.getenv("CORS_ALLOW_ORIGINS")
@@ -252,6 +260,14 @@ else:
             default_factory=lambda: os.getenv("ROUTER_PASSWORD")
         )
 
+        # Integration: Webhook verification (fallback)
+        webhook_secret: str = Field(
+            default_factory=lambda: os.getenv("WEBHOOK_SECRET", "dev-webhook-secret")
+        )
+        webhook_tolerance_sec: int = Field(
+            default_factory=lambda: int(os.getenv("WEBHOOK_TOLERANCE_SEC", "300"))
+        )
+
         @property
         def log_level_int(self) -> int:
             return getattr(logging, self.log_level.upper(), logging.INFO)
@@ -283,6 +299,7 @@ if __name__ == "__main__":  # pragma: no cover
         "database_url": bool(s.database_url),
         "cors_origins": s.cors_origins,
         "router_adapter": getattr(s, "router_adapter", "dummy"),
+        "webhook_tolerance_sec": getattr(s, "webhook_tolerance_sec", 300),
     }
     import json
 
