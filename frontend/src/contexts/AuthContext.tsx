@@ -15,12 +15,31 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const [token, setToken] = useState<string | null>(localStorage.getItem('token'));
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
+  const logout = () => {
+    localStorage.removeItem('token');
+    setToken(null);
+    delete api.defaults.headers.common['Authorization'];
+  };
+
   useEffect(() => {
     const storedToken = localStorage.getItem('token');
     if (storedToken) {
       setToken(storedToken);
+      // Ensure API default header is set on mount
+      api.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
     }
     setIsLoading(false);
+    
+    // Listen for logout events from API interceptor
+    const handleLogout = () => {
+      logout();
+    };
+    window.addEventListener('auth:logout', handleLogout);
+    
+    return () => {
+      window.removeEventListener('auth:logout', handleLogout);
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const login = (newToken: string) => {
@@ -28,12 +47,6 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     setToken(newToken);
     // Setup default header immediately
     api.defaults.headers.common['Authorization'] = `Bearer ${newToken}`;
-  };
-
-  const logout = () => {
-    localStorage.removeItem('token');
-    setToken(null);
-    delete api.defaults.headers.common['Authorization'];
   };
 
   const value = {
