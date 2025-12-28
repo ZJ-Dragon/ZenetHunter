@@ -1,7 +1,8 @@
 """Tests for Scapy attack engine."""
 
-import pytest
 from unittest.mock import patch
+
+import pytest
 
 from app.core.engine.scapy import ScapyAttackEngine
 from app.models.attack import AttackType
@@ -27,7 +28,7 @@ def test_check_permissions_non_root():
 async def test_start_attack_no_permissions():
     """Test start_attack raises PermissionError without permissions."""
     engine = ScapyAttackEngine()
-    
+
     with patch.object(engine, "check_permissions", return_value=False):
         with pytest.raises(PermissionError):
             await engine.start_attack("00:11:22:33:44:55", AttackType.KICK, 5)
@@ -37,7 +38,7 @@ async def test_start_attack_no_permissions():
 async def test_stop_attack():
     """Test stop_attack method."""
     engine = ScapyAttackEngine()
-    
+
     # Should complete without error (even if no attack running)
     await engine.stop_attack("00:11:22:33:44:55")
 
@@ -46,7 +47,7 @@ async def test_stop_attack():
 async def test_start_attack_unknown_type():
     """Test start_attack with unknown attack type."""
     engine = ScapyAttackEngine()
-    
+
     with patch.object(engine, "check_permissions", return_value=True):
         # This should log a warning but not raise an error
         # We can't easily test the actual attack methods without network access
