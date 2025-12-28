@@ -7,7 +7,7 @@ from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.attack import AttackStatus
-from app.models.db.device import DeviceModel
+from app.models.db.device import DeviceModel, DeviceStatusEnum, DeviceTypeEnum
 from app.models.defender import DefenseStatus, DefenseType
 from app.models.device import Device, DeviceStatus, DeviceType
 
@@ -26,8 +26,8 @@ class DeviceRepository:
             name=device.name,
             vendor=device.vendor,
             model=device.model,
-            type=device.type.value,
-            status=device.status.value,
+            type=DeviceTypeEnum(device.type.value),
+            status=DeviceStatusEnum(device.status.value),
             attack_status=device.attack_status.value,
             defense_status=device.defense_status.value,
             active_defense_policy=(
@@ -51,6 +51,66 @@ class DeviceRepository:
         )
         return result.scalar_one_or_none()
 
+    async def upsert(self, device: Device) -> Device:
+        """Insert or update a device based on MAC address.
+
+        Args:
+            device: Device model to upsert
+
+        Returns:
+            Updated Device domain model
+        """
+        mac_lower = device.mac.lower()
+        db_device = await self.get_by_mac(mac_lower)
+
+        if db_device:
+            # Update existing device
+            db_device.ip = str(device.ip)
+            db_device.name = device.name
+            db_device.vendor = device.vendor
+            db_device.model = device.model
+            db_device.type = DeviceTypeEnum(device.type.value)
+            db_device.status = DeviceStatusEnum(device.status.value)
+            db_device.attack_status = device.attack_status.value
+            db_device.defense_status = device.defense_status.value
+            db_device.active_defense_policy = (
+                device.active_defense_policy.value
+                if device.active_defense_policy
+                else None
+            )
+            db_device.last_seen = device.last_seen
+            db_device.tags = device.tags or []
+            db_device.alias = device.alias
+            # Update first_seen only if it's earlier than current
+            if device.first_seen < db_device.first_seen:
+                db_device.first_seen = device.first_seen
+        else:
+            # Create new device
+            db_device = DeviceModel(
+                mac=mac_lower,
+                ip=str(device.ip),
+                name=device.name,
+                vendor=device.vendor,
+                model=device.model,
+                type=DeviceTypeEnum(device.type.value),
+                status=DeviceStatusEnum(device.status.value),
+                attack_status=device.attack_status.value,
+                defense_status=device.defense_status.value,
+                active_defense_policy=(
+                    device.active_defense_policy.value
+                    if device.active_defense_policy
+                    else None
+                ),
+                first_seen=device.first_seen,
+                last_seen=device.last_seen,
+                tags=device.tags or [],
+                alias=device.alias,
+            )
+            self.session.add(db_device)
+
+        await self.session.flush()
+        return self.to_domain_model(db_device)
+
     async def get_all(self) -> list[DeviceModel]:
         """Get all devices."""
         result = await self.session.execute(select(DeviceModel))
@@ -66,8 +126,8 @@ class DeviceRepository:
         device_model.name = device.name
         device_model.vendor = device.vendor
         device_model.model = device.model
-        device_model.type = device.type.value
-        device_model.status = device.status.value
+        device_model.type = DeviceTypeEnum(device.type.value)
+        device_model.status = DeviceStatusEnum(device.status.value)
         device_model.attack_status = device.attack_status.value
         device_model.defense_status = device.defense_status.value
         device_model.active_defense_policy = (
@@ -153,8 +213,8 @@ class DeviceRepository:
             name=device_model.name,
             vendor=device_model.vendor,
             model=device_model.model,
-            type=DeviceType(device_model.type),
-            status=DeviceStatus(device_model.status),
+            type=DeviceType(device_model.type.value),
+            status=DeviceStatus(device_model.status.value),
             attack_status=AttackStatus(device_model.attack_status),
             defense_status=DefenseStatus(device_model.defense_status),
             active_defense_policy=(
