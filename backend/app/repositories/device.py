@@ -7,9 +7,9 @@ from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.attack import AttackStatus
+from app.models.db.device import DeviceModel
 from app.models.defender import DefenseStatus, DefenseType
 from app.models.device import Device, DeviceStatus, DeviceType
-from app.repositories.models import DeviceModel
 
 
 class DeviceRepository:
