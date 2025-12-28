@@ -18,7 +18,9 @@ async def test_apply_policy():
     engine = DummyDefenseEngine()
     # Should complete without error
     await engine.apply_policy("00:11:22:33:44:55", DefenseType.BLOCK_WAN)
-    await engine.apply_policy("00:11:22:33:44:55", DefenseType.QUARANTINE, {"param": "value"})
+    await engine.apply_policy(
+        "00:11:22:33:44:55", DefenseType.QUARANTINE, {"param": "value"}
+    )
 
 
 @pytest.mark.asyncio

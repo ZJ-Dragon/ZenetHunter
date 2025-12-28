@@ -31,7 +31,9 @@ class DeviceRepository:
             attack_status=device.attack_status.value,
             defense_status=device.defense_status.value,
             active_defense_policy=(
-                device.active_defense_policy.value if device.active_defense_policy else None
+                device.active_defense_policy.value
+                if device.active_defense_policy
+                else None
             ),
             first_seen=device.first_seen,
             last_seen=device.last_seen,
@@ -98,7 +100,9 @@ class DeviceRepository:
         await self.session.flush()
         return count
 
-    async def update_last_seen(self, mac: str, timestamp: datetime | None = None) -> None:
+    async def update_last_seen(
+        self, mac: str, timestamp: datetime | None = None
+    ) -> None:
         """Update the last_seen timestamp for a device."""
         if timestamp is None:
             timestamp = datetime.now(UTC)

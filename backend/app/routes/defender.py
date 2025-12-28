@@ -1,7 +1,5 @@
 from datetime import UTC, datetime
 
-from typing import Annotated
-
 from fastapi import APIRouter, Depends, Path, status
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -81,12 +79,12 @@ async def apply_defense(
     This action is asynchronous and may take time to fully propagate.
     """
     await service.apply_defense(mac, request)
-    
+
     # Update device defense status in database
     repo = DeviceRepository(db)
     await repo.update_defense_status(mac, DefenseStatus.ACTIVE, request.policy)
     await db.commit()
-    
+
     return DefenseResponse(
         device_mac=mac,
         status=DefenseStatus.ACTIVE,
@@ -111,12 +109,12 @@ async def stop_defense(
 ) -> DefenseResponse:
     """Stop any active defense mechanism on a specific device."""
     await service.stop_defense(mac)
-    
+
     # Update device defense status in database
     repo = DeviceRepository(db)
     await repo.update_defense_status(mac, DefenseStatus.INACTIVE, None)
     await db.commit()
-    
+
     return DefenseResponse(
         device_mac=mac,
         status=DefenseStatus.INACTIVE,
