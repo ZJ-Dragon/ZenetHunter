@@ -45,13 +45,14 @@ def test_protected_route_admin():
 def test_protected_route_guest():
     token = get_guest_token()
     headers = {"Authorization": f"Bearer {token}"}
-    # Try starting a scan
+    # Try starting a scan - should fail with 403 (guest not allowed)
     response = client.post("/api/scan/start", json={"type": "quick"}, headers=headers)
+    # Guest token -> Admin check fails -> 403
     assert response.status_code == 403
 
 
 def test_protected_route_no_token():
     # Try starting a scan without header
     response = client.post("/api/scan/start", json={"type": "quick"})
-    # No token -> Guest -> Admin check fails -> 403
+    # No token -> get_current_user returns guest -> get_current_admin checks guest -> 403
     assert response.status_code == 403
