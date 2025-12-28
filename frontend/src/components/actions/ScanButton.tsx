@@ -76,8 +76,11 @@ export const ScanButton: React.FC<{ className?: string }> = ({ className }) => {
         window.location.href = '/login';
       } else if (errorMessage.toLowerCase().includes('network') || errorMessage.toLowerCase().includes('network error')) {
         errorMessage = 'Network Error: Please check Docker configuration. Network scanning requires host network mode and NET_RAW/NET_ADMIN capabilities. See README for details.';
-      } else if (error && typeof error === 'object' && 'code' in error && (error.code === 'ECONNREFUSED' || (error.message && String(error.message).includes('Failed to fetch')))) {
-        errorMessage = 'Connection Error: Cannot reach backend server. Please check if the backend is running.';
+      } else if (error && typeof error === 'object' && 'code' in error) {
+        const codeError = error as { code?: string | number; message?: string };
+        if (codeError.code === 'ECONNREFUSED' || (codeError.message && String(codeError.message).includes('Failed to fetch'))) {
+          errorMessage = 'Connection Error: Cannot reach backend server. Please check if the backend is running.';
+        }
       }
 
       toast.error(

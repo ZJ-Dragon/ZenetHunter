@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { deviceService, Device } from '../lib/services/device';
+import { deviceService } from '../lib/services/device';
+import { Device } from '../types/device';
 import { attackService } from '../lib/services/attack';
 import { useWebSocketEvent } from '../contexts/WebSocketContext';
 import { WSEventType } from '../types/websocket';

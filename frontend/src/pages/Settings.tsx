@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { logsService } from '../lib/services/logs';
 import { Settings as SettingsIcon, Moon, Sun, Monitor, Server, Save, RefreshCw } from 'lucide-react';
 import { clsx } from 'clsx';
@@ -25,6 +25,29 @@ export const Settings: React.FC = () => {
   } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+
+  const fetchSystemInfo = useCallback(async () => {
+    try {
+      const info = await logsService.getSystemInfo();
+      setSystemInfo(info);
+
+      // Auto-detect platform from system info
+      if (info.platform) {
+        const platformLower = info.platform.toLowerCase();
+        if (platformLower.includes('windows')) {
+          setPlatform('windows');
+        } else if (platformLower.includes('darwin') || platformLower.includes('mac')) {
+          setPlatform('macos');
+        } else {
+          setPlatform('linux');
+        }
+      }
+    } catch (error) {
+      console.error('Failed to fetch system info:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     // Load theme from localStorage
@@ -66,29 +89,6 @@ export const Settings: React.FC = () => {
       mediaQuery.removeEventListener('change', handleSystemThemeChange);
     };
   }, [theme]);
-
-  const fetchSystemInfo = useCallback(async () => {
-    try {
-      const info = await logsService.getSystemInfo();
-      setSystemInfo(info);
-
-      // Auto-detect platform from system info
-      if (info.platform) {
-        const platformLower = info.platform.toLowerCase();
-        if (platformLower.includes('windows')) {
-          setPlatform('windows');
-        } else if (platformLower.includes('darwin') || platformLower.includes('mac')) {
-          setPlatform('macos');
-        } else {
-          setPlatform('linux');
-        }
-      }
-    } catch (error) {
-      console.error('Failed to fetch system info:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  }, []);
 
   const applyTheme = (newTheme: Theme) => {
     const root = document.documentElement;

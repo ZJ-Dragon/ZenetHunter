@@ -3,7 +3,7 @@ import { logsService, SystemLog, SystemInfo } from '../lib/services/logs';
 import { RefreshCw, AlertCircle, Info, AlertTriangle, XCircle, CheckCircle, Terminal, Server } from 'lucide-react';
 import { clsx } from 'clsx';
 
-const LogLevelIcon: React.FC<{ level: string }> = ({ level }) => {
+const LogLevelIcon: React.FC<{ level: string; className?: string }> = ({ level, className }) => {
   const levelLower = level.toLowerCase();
   if (levelLower === 'error' || levelLower === 'critical') {
     return <XCircle className="h-4 w-4 text-red-500" />;
@@ -264,7 +264,9 @@ export const Logs: React.FC = () => {
                     </td>
                     <td className="px-6 py-4 text-sm" style={{ color: 'var(--winui-text-primary)' }}>
                       <div className="flex items-start">
-                        <LogLevelIcon level={log.level} className="mr-2 mt-0.5 flex-shrink-0" />
+                        <div className="mr-2 mt-0.5 flex-shrink-0">
+                          <LogLevelIcon level={log.level} />
+                        </div>
                         <div>
                           <div>{log.message}</div>
                           {log.device_mac && (
