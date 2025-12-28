@@ -5,7 +5,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
 
 from app.core.exceptions import ErrorCode
-from app.core.security import get_current_user
+from app.core.security import get_current_admin
 from app.models.auth import User
 from app.models.scan import ScanRequest, ScanResult
 from app.services.scanner import ScannerService, get_scanner_service
@@ -19,7 +19,7 @@ router = APIRouter(tags=["scan"])
 @router.post("/scan/start", response_model=ScanResult, status_code=202)
 async def start_scan(
     request: ScanRequest,
-    current_user: Annotated[User, Depends(get_current_user)],
+    current_user: Annotated[User, Depends(get_current_admin)],
     service: ScannerService = Depends(get_scanner_service),
 ):
     """
@@ -28,7 +28,7 @@ async def start_scan(
     Returns immediately with scan_id. Actual scanning happens in background.
     Monitor progress via WebSocket events or check scan status.
 
-    Note: For local HTML frontend, guest users are allowed to scan.
+    Requires admin authentication.
     """
     try:
         logger.info(

@@ -420,12 +420,6 @@ class PolicySelector:
             f"reward={reward:.2f}, effect={feedback.effect_score:.2f}"
         )
 
-
-# Global accessor
-def get_policy_selector() -> PolicySelector:
-    """Get or create policy selector instance."""
-    return PolicySelector()
-
     def get_best_strategy(self, device: Device) -> StrategyIdentifier | None:
         """
         Get the best strategy for a device (single strategy, not sequence).
@@ -522,3 +516,9 @@ def get_policy_selector() -> PolicySelector:
         )
 
         return applied
+
+
+# Global accessor
+def get_policy_selector() -> PolicySelector:
+    """Get or create policy selector instance."""
+    return PolicySelector()
