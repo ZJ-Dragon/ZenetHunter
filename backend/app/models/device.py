@@ -58,5 +58,11 @@ class Device(BaseModel):
         default_factory=lambda: datetime.now(UTC),
         description="Timestamp when device was last active",
     )
+    tags: list[str] | None = Field(
+        default_factory=list, description="Tags associated with the device"
+    )
+    alias: str | None = Field(
+        None, description="User-friendly alias for the device"
+    )
 
     model_config = ConfigDict(from_attributes=True)

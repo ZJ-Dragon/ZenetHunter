@@ -1,5 +1,6 @@
 """Device repository for database operations."""
 
+import json
 from datetime import UTC, datetime
 from typing import Any
 
@@ -37,7 +38,7 @@ class DeviceRepository:
             ),
             first_seen=device.first_seen,
             last_seen=device.last_seen,
-            tags=device.tags or [],
+            tags=json.dumps(device.tags) if device.tags else None,
             alias=device.alias,
         )
         self.session.add(device_model)
@@ -85,7 +86,7 @@ class DeviceRepository:
                 else None
             )
             db_device.last_seen = device.last_seen
-            db_device.tags = device.tags or []
+            db_device.tags = json.dumps(device.tags) if device.tags else None
             db_device.alias = device.alias
             # Update first_seen only if it's earlier than current
             if device.first_seen < db_device.first_seen:
@@ -237,7 +238,7 @@ class DeviceRepository:
             ),
             first_seen=device_model.first_seen,
             last_seen=device_model.last_seen,
-            tags=device_model.tags or [],
+            tags=json.loads(device_model.tags) if device_model.tags else [],
             alias=device_model.alias,
         )
 
