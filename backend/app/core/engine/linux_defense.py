@@ -44,18 +44,133 @@ class LinuxDefenseEngine(DefenseEngine):
         self, target: str, policy: DefenseType, params: dict[str, Any] | None = None
     ) -> None:
         """Apply specific policy."""
-        # Implementation deferred for QUARANTINE/BLOCK_WAN
-        logger.info(
-            f"[LinuxDefense] Applying {policy} to {target} (Not implemented yet)"
-        )
-        pass
+        logger.info(f"[LinuxDefense] Applying {policy} to {target}")
+
+        if policy == DefenseType.BLOCK_WAN:
+            await self._enable_block_wan(target)
+        elif policy == DefenseType.QUARANTINE:
+            await self._enable_quarantine(target)
+        else:
+            logger.warning(
+                f"[LinuxDefense] Policy {policy} not supported for specific target implementation yet"
+            )
 
     async def remove_policy(self, target: str, policy: DefenseType) -> None:
         """Remove specific policy."""
-        logger.info(
-            f"[LinuxDefense] Removing {policy} from {target} (Not implemented yet)"
-        )
-        pass
+        logger.info(f"[LinuxDefense] Removing {policy} from {target}")
+
+        if policy == DefenseType.BLOCK_WAN:
+            await self._disable_block_wan(target)
+        elif policy == DefenseType.QUARANTINE:
+            await self._disable_quarantine(target)
+        else:
+            logger.warning(
+                f"[LinuxDefense] Policy {policy} removal not supported for specific target implementation yet"
+            )
+
+    async def _enable_block_wan(self, mac: str) -> None:
+        """
+        Block WAN access for a specific MAC address.
+        """
+        # iptables -I FORWARD -m mac --mac-source <MAC> -j DROP
+        cmd = [
+            "iptables",
+            "-I",
+            "FORWARD",
+            "-m",
+            "mac",
+            "--mac-source",
+            mac,
+            "-j",
+            "DROP",
+        ]
+        code, _, stderr = await self._run_cmd(cmd)
+        if code != 0:
+            logger.error(f"[LinuxDefense] Failed to block WAN for {mac}: {stderr}")
+            # raise RuntimeError(f"Failed to block WAN: {stderr}")
+
+    async def _disable_block_wan(self, mac: str) -> None:
+        """
+        Unblock WAN access for a specific MAC address.
+        """
+        cmd = [
+            "iptables",
+            "-D",
+            "FORWARD",
+            "-m",
+            "mac",
+            "--mac-source",
+            mac,
+            "-j",
+            "DROP",
+        ]
+        await self._run_cmd(cmd)
+
+    async def _enable_quarantine(self, mac: str) -> None:
+        """
+        Quarantine a device: Block all access except basic DHCP/DNS if needed,
+        or completely isolate. Here we implement strict isolation.
+        """
+        # Block INPUT (traffic to router services)
+        cmd_input = [
+            "iptables",
+            "-I",
+            "INPUT",
+            "-m",
+            "mac",
+            "--mac-source",
+            mac,
+            "-j",
+            "DROP",
+        ]
+        # Block FORWARD (traffic to other networks/WAN)
+        cmd_forward = [
+            "iptables",
+            "-I",
+            "FORWARD",
+            "-m",
+            "mac",
+            "--mac-source",
+            mac,
+            "-j",
+            "DROP",
+        ]
+
+        # Execute
+        for cmd in [cmd_input, cmd_forward]:
+            code, _, stderr = await self._run_cmd(cmd)
+            if code != 0:
+                logger.error(f"[LinuxDefense] Failed to quarantine {mac}: {stderr}")
+
+    async def _disable_quarantine(self, mac: str) -> None:
+        """
+        Remove quarantine for a device.
+        """
+        cmd_input = [
+            "iptables",
+            "-D",
+            "INPUT",
+            "-m",
+            "mac",
+            "--mac-source",
+            mac,
+            "-j",
+            "DROP",
+        ]
+        cmd_forward = [
+            "iptables",
+            "-D",
+            "FORWARD",
+            "-m",
+            "mac",
+            "--mac-source",
+            mac,
+            "-j",
+            "DROP",
+        ]
+
+        for cmd in [cmd_input, cmd_forward]:
+            await self._run_cmd(cmd)
 
     async def enable_global_protection(self, policy: DefenseType) -> None:
         """Enable global protection."""
