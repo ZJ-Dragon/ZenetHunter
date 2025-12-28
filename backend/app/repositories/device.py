@@ -44,12 +44,15 @@ class DeviceRepository:
         await self.session.flush()
         return device_model
 
-    async def get_by_mac(self, mac: str) -> DeviceModel | None:
+    async def get_by_mac(self, mac: str) -> Device | None:
         """Get a device by MAC address."""
         result = await self.session.execute(
             select(DeviceModel).where(DeviceModel.mac == mac.lower())
         )
-        return result.scalar_one_or_none()
+        model = result.scalar_one_or_none()
+        if model is None:
+            return None
+        return self.to_domain_model(model)
 
     async def upsert(self, device: Device) -> Device:
         """Insert or update a device based on MAC address.
@@ -61,7 +64,10 @@ class DeviceRepository:
             Updated Device domain model
         """
         mac_lower = device.mac.lower()
-        db_device = await self.get_by_mac(mac_lower)
+        result = await self.session.execute(
+            select(DeviceModel).where(DeviceModel.mac == mac_lower)
+        )
+        db_device = result.scalar_one_or_none()
 
         if db_device:
             # Update existing device
@@ -111,14 +117,18 @@ class DeviceRepository:
         await self.session.flush()
         return self.to_domain_model(db_device)
 
-    async def get_all(self) -> list[DeviceModel]:
+    async def get_all(self) -> list[Device]:
         """Get all devices."""
         result = await self.session.execute(select(DeviceModel))
-        return list(result.scalars().all())
+        models = result.scalars().all()
+        return [self.to_domain_model(model) for model in models]
 
-    async def update(self, device: Device) -> DeviceModel | None:
+    async def update(self, device: Device) -> Device | None:
         """Update an existing device."""
-        device_model = await self.get_by_mac(device.mac)
+        db_device = await self.session.execute(
+            select(DeviceModel).where(DeviceModel.mac == device.mac.lower())
+        )
+        device_model = db_device.scalar_one_or_none()
         if not device_model:
             return None
 
@@ -138,7 +148,7 @@ class DeviceRepository:
         device_model.alias = device.alias
 
         await self.session.flush()
-        return device_model
+        return self.to_domain_model(device_model)
 
     async def delete(self, mac: str) -> bool:
         """Delete a device by MAC address."""
