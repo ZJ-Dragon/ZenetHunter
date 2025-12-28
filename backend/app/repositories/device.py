@@ -89,8 +89,19 @@ class DeviceRepository:
             db_device.tags = json.dumps(device.tags) if device.tags else None
             db_device.alias = device.alias
             # Update first_seen only if it's earlier than current
-            if device.first_seen < db_device.first_seen:
-                db_device.first_seen = device.first_seen
+            # Ensure both datetimes are timezone-aware before comparison
+            device_first_seen = (
+                device.first_seen.replace(tzinfo=UTC)
+                if device.first_seen.tzinfo is None
+                else device.first_seen
+            )
+            db_first_seen = (
+                db_device.first_seen.replace(tzinfo=UTC)
+                if db_device.first_seen.tzinfo is None
+                else db_device.first_seen
+            )
+            if device_first_seen < db_first_seen:
+                db_device.first_seen = device_first_seen
         else:
             # Create new device
             db_device = DeviceModel(
