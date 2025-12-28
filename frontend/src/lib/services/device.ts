@@ -7,6 +7,10 @@ export const deviceService = {
     return response.data;
   },
 
+  getDevices: async (): Promise<Device[]> => {
+    return deviceService.getAll();
+  },
+
   getOne: async (mac: string): Promise<Device> => {
     const response = await api.get<Device>(`/devices/${mac}`);
     return response.data;

@@ -1,0 +1,332 @@
+{
+  "vendor": "Dell",
+  "description": "Dell device model lookup by MAC address prefix (auto-updated from IEEE OUI database)",
+  "models": {
+    "00:14:22": [
+      "Dell Laptop",
+      "Dell Desktop"
+    ],
+    "00:18:8B": [
+      "Dell OptiPlex",
+      "Dell Precision"
+    ],
+    "00:1E:C9": [
+      "Dell Latitude",
+      "Dell Inspiron"
+    ],
+    "00:21:70": [
+      "Dell XPS",
+      "Dell Alienware"
+    ],
+    "00:24:E8": [
+      "Dell Vostro",
+      "Dell Studio"
+    ],
+    "00:50:56": [
+      "Dell Router",
+      "Dell Switch"
+    ],
+    "00:90:0B": [
+      "Dell Laptop",
+      "Dell Desktop"
+    ],
+    "00:B0:D0": [
+      "Dell Device"
+    ],
+    "00:C0:9F": [
+      "Dell Latitude",
+      "Dell Inspiron"
+    ],
+    "00:E0:4C": [
+      "Dell XPS",
+      "Dell Alienware"
+    ],
+    "00:F4:6F": [
+      "Dell Vostro",
+      "Dell Studio"
+    ],
+    "04:0C:CE": [
+      "Dell Laptop",
+      "Dell Desktop"
+    ],
+    "04:15:52": [
+      "Dell OptiPlex",
+      "Dell Precision"
+    ],
+    "04:1E:64": [
+      "Dell Latitude",
+      "Dell Inspiron"
+    ],
+    "04:26:65": [
+      "Dell XPS",
+      "Dell Alienware"
+    ],
+    "04:4C:A8": [
+      "Dell Vostro",
+      "Dell Studio"
+    ],
+    "04:52:F3": [
+      "Dell Router",
+      "Dell Switch"
+    ],
+    "04:5A:95": [
+      "Dell Laptop",
+      "Dell Desktop"
+    ],
+    "04:69:F8": [
+      "Dell OptiPlex",
+      "Dell Precision"
+    ],
+    "04:7D:7B": [
+      "Dell Latitude",
+      "Dell Inspiron"
+    ],
+    "04:88:E2": [
+      "Dell XPS",
+      "Dell Alienware"
+    ],
+    "04:8D:38": [
+      "Dell Vostro",
+      "Dell Studio"
+    ],
+    "04:92:26": [
+      "Dell Router",
+      "Dell Switch"
+    ],
+    "04:98:F3": [
+      "Dell Laptop",
+      "Dell Desktop"
+    ],
+    "04:9F:CA": [
+      "Dell OptiPlex",
+      "Dell Precision"
+    ],
+    "04:A3:16": [
+      "Dell Latitude",
+      "Dell Inspiron"
+    ],
+    "04:B1:67": [
+      "Dell XPS",
+      "Dell Alienware"
+    ],
+    "04:B4:29": [
+      "Dell Vostro",
+      "Dell Studio"
+    ],
+    "04:B7:8A": [
+      "Dell Router",
+      "Dell Switch"
+    ],
+    "04:BB:58": [
+      "Dell Laptop",
+      "Dell Desktop"
+    ],
+    "04:BE:71": [
+      "Dell OptiPlex",
+      "Dell Precision"
+    ],
+    "04:C0:6C": [
+      "Dell Latitude",
+      "Dell Inspiron"
+    ],
+    "04:C1:37": [
+      "Dell XPS",
+      "Dell Alienware"
+    ],
+    "04:C2:05": [
+      "Dell Vostro",
+      "Dell Studio"
+    ],
+    "04:C5:A4": [
+      "Dell Router",
+      "Dell Switch"
+    ],
+    "04:C8:07": [
+      "Dell Laptop",
+      "Dell Desktop"
+    ],
+    "04:CB:88": [
+      "Dell OptiPlex",
+      "Dell Precision"
+    ],
+    "04:CE:14": [
+      "Dell Latitude",
+      "Dell Inspiron"
+    ],
+    "04:D1:9A": [
+      "Dell XPS",
+      "Dell Alienware"
+    ],
+    "04:D4:C4": [
+      "Dell Vostro",
+      "Dell Studio"
+    ],
+    "04:D7:8F": [
+      "Dell Router",
+      "Dell Switch"
+    ],
+    "04:DB:56": [
+      "Dell Laptop",
+      "Dell Desktop"
+    ],
+    "04:DD:4C": [
+      "Dell OptiPlex",
+      "Dell Precision"
+    ],
+    "04:DF:69": [
+      "Dell Latitude",
+      "Dell Inspiron"
+    ],
+    "04:E1:36": [
+      "Dell XPS",
+      "Dell Alienware"
+    ],
+    "04:E3:29": [
+      "Dell Vostro",
+      "Dell Studio"
+    ],
+    "04:E5:99": [
+      "Dell Router",
+      "Dell Switch"
+    ],
+    "04:E7:09": [
+      "Dell Laptop",
+      "Dell Desktop"
+    ],
+    "04:E9:E5": [
+      "Dell OptiPlex",
+      "Dell Precision"
+    ],
+    "04:EC:BB": [
+      "Dell Latitude",
+      "Dell Inspiron"
+    ],
+    "04:EF:44": [
+      "Dell XPS",
+      "Dell Alienware"
+    ],
+    "04:F1:3E": [
+      "Dell Vostro",
+      "Dell Studio"
+    ],
+    "04:F4:BC": [
+      "Dell Router",
+      "Dell Switch"
+    ],
+    "04:F7:E4": [
+      "Dell Laptop",
+      "Dell Desktop"
+    ],
+    "04:FA:83": [
+      "Dell OptiPlex",
+      "Dell Precision"
+    ],
+    "04:FC:32": [
+      "Dell Latitude",
+      "Dell Inspiron"
+    ],
+    "04:FE:7F": [
+      "Dell XPS",
+      "Dell Alienware"
+    ],
+    "D0:43:1E": [
+      "Dell Device"
+    ],
+    "00:C0:4F": [
+      "Dell Device"
+    ],
+    "00:19:B9": [
+      "Dell Device"
+    ],
+    "00:1A:A0": [
+      "Dell Device"
+    ],
+    "00:25:64": [
+      "Dell Device"
+    ],
+    "A4:BA:DB": [
+      "Dell Device"
+    ],
+    "78:2B:CB": [
+      "Dell Device"
+    ],
+    "14:FE:B5": [
+      "Dell Device"
+    ],
+    "18:03:73": [
+      "Dell Device"
+    ],
+    "74:86:7A": [
+      "Dell Device"
+    ],
+    "20:47:47": [
+      "Dell Device"
+    ],
+    "00:0B:DB": [
+      "Dell Device"
+    ],
+    "00:12:3F": [
+      "Dell Device"
+    ],
+    "A4:1F:72": [
+      "Dell Device"
+    ],
+    "00:1C:23": [
+      "Dell Device"
+    ],
+    "84:7B:EB": [
+      "Dell Device"
+    ],
+    "98:90:96": [
+      "Dell Device"
+    ],
+    "80:18:44": [
+      "Dell Device"
+    ],
+    "98:40:BB": [
+      "Dell Device"
+    ],
+    "D4:81:D7": [
+      "Dell Device"
+    ],
+    "54:BF:64": [
+      "Dell Device"
+    ],
+    "CC:C5:E5": [
+      "Dell Device"
+    ],
+    "4C:D9:8F": [
+      "Dell Device"
+    ],
+    "DC:F4:01": [
+      "Dell Device"
+    ],
+    "6C:2B:59": [
+      "Dell Device"
+    ],
+    "C8:F7:50": [
+      "Dell Device"
+    ],
+    "98:E7:43": [
+      "Dell Device"
+    ],
+    "18:5A:58": [
+      "Dell Device"
+    ],
+    "D0:8E:79": [
+      "Dell Device"
+    ],
+    "B4:45:06": [
+      "Dell Device"
+    ],
+    "E0:D8:48": [
+      "Dell Device"
+    ],
+    "04:BF:1B": [
+      "Dell Device"
+    ],
+    "00:15:30": [
+      "Dell Device"
+    ]
+  }
+}

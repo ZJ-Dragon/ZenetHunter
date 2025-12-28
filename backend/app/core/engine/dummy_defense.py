@@ -42,8 +42,7 @@ class DummyDefenseEngine(DefenseEngine):
             )
         elif policy == DefenseType.TARPIT:
             logger.info(
-                "[DummyDefense] TCP Tarpit simulation enabled "
-                "(iptables TARPIT target)."
+                "[DummyDefense] TCP Tarpit simulation enabled (iptables TARPIT target)."
             )
 
     async def disable_global_protection(self, policy: DefenseType) -> None:

@@ -1,5 +1,6 @@
 """Policy Selector Service: Rule-based + Lightweight RL Strategy Selection."""
 
+import asyncio
 import logging
 from datetime import UTC, datetime, timedelta
 from typing import Any
@@ -121,9 +122,17 @@ class PolicySelector:
     ]
 
     # Attack strategies (only used if defense is insufficient)
+    # Ordered by intensity: lighter attacks first
     ATTACK_STRATEGIES = [
-        AttackType.KICK,  # Deauth/disassociate
+        AttackType.PORT_SCAN,  # Reconnaissance (lightest)
+        AttackType.TRAFFIC_SHAPE,  # Bandwidth limiting
+        AttackType.DNS_SPOOF,  # DNS redirection
+        AttackType.DHCP_SPOOF,  # DHCP redirection
+        AttackType.ICMP_REDIRECT,  # Route manipulation
         AttackType.BLOCK,  # ARP spoofing/ban
+        AttackType.KICK,  # WiFi deauth/disassociate
+        AttackType.MAC_FLOOD,  # Switch exhaustion
+        AttackType.BEACON_FLOOD,  # WiFi confusion
     ]
 
     def __init__(
@@ -301,7 +310,28 @@ class PolicySelector:
             ]:
                 score += 0.1
 
-        return min(1.0, score)
+        # Attack type specific scoring
+        if strategy.type == StrategyType.ATTACK:
+            # Port scan is lightweight, good for reconnaissance
+            if strategy.strategy_id == AttackType.PORT_SCAN:
+                score += 0.1
+            # Traffic shaping is less intrusive
+            elif strategy.strategy_id == AttackType.TRAFFIC_SHAPE:
+                score += 0.15
+            # DNS/DHCP spoofing are moderate
+            elif strategy.strategy_id in [AttackType.DNS_SPOOF, AttackType.DHCP_SPOOF]:
+                score += 0.1
+            # ICMP redirect is moderate
+            elif strategy.strategy_id == AttackType.ICMP_REDIRECT:
+                score += 0.1
+            # MAC/Beacon flood are more aggressive
+            elif strategy.strategy_id in [
+                AttackType.MAC_FLOOD,
+                AttackType.BEACON_FLOOD,
+            ]:
+                score -= 0.1  # Penalty for aggressive attacks
+
+        return min(1.0, max(0.0, score))
 
     def update_strategy_score(
         self,
@@ -399,3 +429,96 @@ class PolicySelector:
         """
         sequence = self.select_strategy_sequence(device, max_strategies=1)
         return sequence[0] if sequence else None
+
+    async def auto_select_and_apply(
+        self, device: Device, max_strategies: int = 3
+    ) -> list[StrategyIdentifier]:
+        """
+        Automatically select and apply the best strategies for a device.
+        This is the main entry point for AI-driven automatic defense.
+
+        Args:
+            device: Target device
+            max_strategies: Maximum number of strategies to apply
+
+        Returns:
+            List of strategies that were selected and applied
+        """
+        logger.info(
+            f"[PolicySelector] Auto-selecting strategies for device {device.mac}"
+        )
+
+        # Get strategy sequence
+        strategies = self.select_strategy_sequence(
+            device, max_strategies=max_strategies
+        )
+
+        if not strategies:
+            logger.warning(
+                f"[PolicySelector] No strategies available for device {device.mac}"
+            )
+            return []
+
+        # Apply strategies (defense first, then attack if needed)
+        applied = []
+        for strategy in strategies:
+            try:
+                if strategy.type == StrategyType.DEFENSE:
+                    # Apply defense policy
+                    from app.models.defender import DefenseApplyRequest
+                    from app.services.defender import (
+                        get_defender_service,
+                    )
+
+                    defender = get_defender_service()
+                    await defender.apply_defense(
+                        device.mac, DefenseApplyRequest(policy=strategy.strategy_id)
+                    )
+                    applied.append(strategy)
+                    logger.info(
+                        f"[PolicySelector] Applied defense strategy "
+                        f"{strategy.strategy_id.value} to device {device.mac}"
+                    )
+
+                elif strategy.type == StrategyType.ATTACK:
+                    # Apply attack (with default duration)
+                    from app.models.attack import AttackRequest
+                    from app.services.attack import get_attack_service
+
+                    attack_service = get_attack_service()
+                    await attack_service.start_attack(
+                        device.mac,
+                        AttackRequest(
+                            type=strategy.strategy_id,
+                            duration=60,  # Default 60 seconds
+                        ),
+                    )
+                    applied.append(strategy)
+                    logger.info(
+                        f"[PolicySelector] Applied attack strategy "
+                        f"{strategy.strategy_id.value} to device {device.mac}"
+                    )
+
+                # Add small delay between strategies
+                await asyncio.sleep(1)
+
+            except Exception as e:
+                logger.error(
+                    f"[PolicySelector] Failed to apply strategy "
+                    f"{strategy.strategy_id.value} to device {device.mac}: {e}",
+                    exc_info=True,
+                )
+                # Continue with next strategy even if one fails
+
+        logger.info(
+            f"[PolicySelector] Auto-applied {len(applied)} strategies "
+            f"to device {device.mac}"
+        )
+
+        return applied
+
+
+# Global accessor
+def get_policy_selector() -> PolicySelector:
+    """Get or create policy selector instance."""
+    return PolicySelector()

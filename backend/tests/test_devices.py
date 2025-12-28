@@ -1,11 +1,26 @@
+import asyncio
+
 from fastapi.testclient import TestClient
 
+from app.core.database import get_session_factory
 from app.main import app
+from app.repositories.device import DeviceRepository
 
 client = TestClient(app)
 
 
-def test_list_devices_empty():
+def test_list_devices_empty(reset_state):
+    # Clear all devices from database before test
+    # Note: TestClient uses sync API, so we use asyncio.run for async cleanup
+    async def clear_db():
+        session_factory = get_session_factory()
+        async with session_factory() as session:
+            repo = DeviceRepository(session)
+            await repo.clear_all()
+            await session.commit()
+
+    asyncio.run(clear_db())
+
     response = client.get("/api/devices")
     assert response.status_code == 200
     assert response.json() == []

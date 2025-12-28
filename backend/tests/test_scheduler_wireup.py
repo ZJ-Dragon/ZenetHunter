@@ -15,10 +15,37 @@ from app.services.scheduler import SchedulerService
 from app.services.state import StateManager
 
 
+@pytest.fixture(autouse=True)
+def reset_state_manager():
+    """Automatically reset StateManager before and after each test.
+
+    This ensures test isolation since StateManager is a singleton.
+    We force reset the singleton instance to ensure complete isolation.
+    Note: conftest.py also has a reset_state fixture, but this provides
+    additional cleanup after each test in this module.
+    """
+    # Force reset singleton instance for complete isolation
+    StateManager._instance = None
+    StateManager._initialized = False
+    manager = StateManager()
+    manager.reset()
+    yield
+    # Clean up after test to prevent state leakage
+    StateManager._instance = None
+    StateManager._initialized = False
+    manager.reset()
+
+
 @pytest.fixture
 def state_manager():
     """Create a fresh StateManager for testing."""
-    return StateManager()
+    # Force reset singleton to ensure clean state
+    StateManager._instance = None
+    StateManager._initialized = False
+    manager = StateManager()
+    # Reset state to ensure test isolation (StateManager is a singleton)
+    manager.reset()
+    return manager
 
 
 @pytest.fixture
@@ -151,12 +178,21 @@ async def test_scheduler_flow_with_feedback_update(
 
 
 @pytest.mark.asyncio
-async def test_scheduler_unknown_device(scheduler_service):
+async def test_scheduler_unknown_device(scheduler_service, state_manager):
     """Test scheduler with non-existent device."""
+    # Ensure state is clean (no devices exist)
+    # The autouse fixture resets before test, but explicitly clear devices
+    state_manager.clear_devices()
+    # Verify device doesn't exist in the state manager used by scheduler
+    assert state_manager.get_device("00:00:00:00:00:00") is None
+    # Also verify scheduler's internal state is clean
+    assert scheduler_service.state.get_device("00:00:00:00:00:00") is None
+
     result = await scheduler_service.execute_strategy_flow("00:00:00:00:00:00")
 
     assert result["success"] is False
     assert "error" in result
+    assert "not found" in result["error"].lower()
 
 
 @pytest.mark.asyncio

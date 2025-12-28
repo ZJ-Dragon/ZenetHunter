@@ -27,6 +27,14 @@ export default defineConfig(({ mode }) => {
       port: 5173,
       strictPort: true, // fail fast if port is taken
       open: false,
+      // Proxy API requests to backend
+      proxy: {
+        '/api': {
+          target: 'http://localhost:8000',
+          changeOrigin: true,
+          secure: false,
+        },
+      },
     },
 
     // Preview built assets locally (mirrors server settings)

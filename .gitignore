@@ -63,8 +63,8 @@ coverage.xml
 ############################
 # Node / JavaScript (subset of Node.gitignore)
 ############################
-# Logs
-logs
+# Logs (only ignore logs directory at root, not source code directories)
+/logs
 *.log
 npm-debug.log*
 yarn-debug.log*
@@ -189,6 +189,9 @@ nohup.out
 # SQLite sample databases
 *.sqlite
 *.sqlite3
+
+# Cache cleanup scripts (keep in repo, but ignore any generated files)
+# clean-cache.py, clean-cache.sh, clean-cache.bat are tracked
 
 # OS/editor swaps
 *.swp

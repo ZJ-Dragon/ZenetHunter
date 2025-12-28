@@ -1,0 +1,1986 @@
+{
+  "vendor": "Cisco",
+  "description": "Cisco device model lookup by MAC address prefix (auto-updated from IEEE OUI database)",
+  "models": {
+    "00:00:0C": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:01:42": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:01:63": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:01:96": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:01:C7": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:02:16": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:02:4A": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:02:7D": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:02:B3": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:02:FC": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:03:31": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:03:6B": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:03:9F": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:03:FD": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:04:14": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:04:27": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:04:4D": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:04:6D": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:04:9A": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:04:C4": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:05:00": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:05:31": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:05:5D": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:05:73": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:05:9A": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:05:DC": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:06:28": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:06:52": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:06:7C": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:06:D7": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:07:0D": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:07:50": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:07:7D": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:07:84": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:07:B4": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:07:D0": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:08:20": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:08:21": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:08:22": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:08:23": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:08:7C": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:08:A3": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:08:BC": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:08:E3": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:09:43": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:09:68": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:09:7B": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:09:B6": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:09:C7": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:09:F6": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:0A:41": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:0A:8A": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:0A:B7": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:0A:F3": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:0B:0F": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:0B:46": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:0B:5D": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:0B:85": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:0B:BE": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:0C:29": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:0C:41": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:0C:85": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:0C:CE": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:0D:28": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:0D:29": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:0D:65": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:0D:88": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:0D:97": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:0D:BD": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:0E:38": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:0E:83": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:0E:D6": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:0F:23": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:0F:34": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:0F:8F": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:0F:9F": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:10:07": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:10:11": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:10:79": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:10:A4": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:10:FF": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:11:20": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:11:21": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:11:5C": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:11:92": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:11:93": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:11:BB": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:11:BC": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:12:00": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:12:01": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:12:43": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:12:7F": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:12:80": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:12:D9": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:13:19": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:13:5A": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:13:60": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:13:80": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:13:C3": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:13:DF": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:14:1A": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:14:69": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:14:6A": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:14:A1": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:14:F1": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:15:2B": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:15:2C": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:15:62": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:15:63": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:15:C7": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:15:F2": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:16:46": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:16:47": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:16:9E": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:16:C7": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:16:EA": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:17:0E": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:17:1A": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:17:30": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:17:94": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:17:95": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:17:DF": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:18:19": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:18:73": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:18:BA": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:18:F8": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:19:06": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:19:07": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:19:2F": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:19:55": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:19:AA": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:19:E7": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:1A:2F": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:1A:6C": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:1A:79": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:1A:A1": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:1A:E2": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:1B:0C": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:1B:0D": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:1B:2A": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:1B:53": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:1B:8E": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:1B:D5": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:1C:0E": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:1C:10": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:1C:58": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:1C:AA": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:1C:DF": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:1D:45": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:1D:7E": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:1D:A1": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:1D:BD": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:1E:13": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:1E:49": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:1E:79": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:1E:7A": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:1E:BD": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:1E:F6": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:1F:6A": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:1F:9E": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:1F:C6": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:20:4E": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:21:55": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:21:70": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:21:A1": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:21:D0": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:22:55": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:22:93": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:22:BD": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:23:04": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:23:5D": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:23:68": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:23:AC": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:23:BE": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:24:14": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:24:97": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:24:D7": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:25:00": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:25:45": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:25:84": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:25:BC": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:25:D5": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:26:0B": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:26:52": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:26:98": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:26:CA": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:27:0E": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:27:19": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:27:75": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:27:AB": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:28:70": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:28:C8": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:29:1C": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:29:24": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:2A:6A": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:2A:10": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:2A:FA": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:2B:67": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:2C:54": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:2C:AB": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:2D:76": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:2E:84": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:2F:57": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:30:71": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:31:92": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:32:21": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:33:1A": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:34:00": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:35:1A": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:36:47": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:37:6D": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:38:DF": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:39:55": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:3A:99": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:3B:7C": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:3C:10": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:3D:26": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:3E:E1": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:40:0B": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:41:D2": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:42:5A": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:43:7F": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:44:4C": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:45:01": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:46:65": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:47:8D": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:48:54": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:49:FA": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:4A:77": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:4B:D6": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:4C:00": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:4D:4D": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:4E:35": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:4F:58": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:50:0F": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:50:73": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:51:5C": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:52:18": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:53:45": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:54:AF": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:55:1C": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:56:2B": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:57:21": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:58:55": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:59:07": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:5A:39": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:5B:94": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:5C:26": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:5D:73": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "00:5E:0C": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:5F:86": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:60:09": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:60:2F": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:60:47": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:60:70": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:60:83": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:61:9E": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:62:EC": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:63:BF": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:64:40": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:65:00": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:66:4B": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:67:9E": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:68:EB": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:69:9C": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:6A:5A": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:6B:9F": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:6C:BC": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:6D:52": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:6E:1D": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:6F:20": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:70:0E": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:71:CC": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:72:9B": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:73:8A": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:74:40": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:75:31": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:76:6F": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:77:40": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:78:AC": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:79:90": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:7A:7D": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:7B:18": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:7C:2D": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:7D:60": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:7E:95": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:7F:4A": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:80:5F": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:81:58": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:82:A5": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:83:A7": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:84:ED": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:85:2A": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:86:9C": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:87:01": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:88:65": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:89:86": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:8A:96": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:8B:74": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:8C:54": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:8D:60": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:8E:F2": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:8F:58": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:90:21": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:90:2B": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:91:6B": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:92:FA": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:93:64": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:94:8B": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:95:2E": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:96:E8": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:97:26": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:98:00": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:99:00": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:9A:00": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:9B:00": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:9C:02": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:9D:6B": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:9E:1E": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:9F:9B": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:A0:00": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:A1:00": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:A2:00": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:A3:00": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:A4:00": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:A5:00": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:A6:00": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:A7:00": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:A8:00": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:A9:00": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:AA:00": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:AB:00": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:AC:00": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:AD:00": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:AE:00": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:AF:00": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:B0:00": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:B1:00": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:B2:00": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:B3:00": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:B4:00": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:B5:00": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:B6:00": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:B7:00": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:B8:00": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:B9:00": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:BA:00": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:BB:00": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:BC:00": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:BD:00": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:BE:00": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:BF:00": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:C0:00": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:C1:00": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:C2:00": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:C3:00": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:C4:00": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:C5:00": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:C6:00": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:C7:00": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:C8:00": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:C9:00": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:CA:00": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:CB:00": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:CC:00": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:CD:00": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:CE:00": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:CF:00": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:D0:00": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:D1:00": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:D2:00": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:D3:00": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:D4:00": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:D5:00": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:D6:00": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:D7:00": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:D8:00": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:D9:00": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:DA:00": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:DB:00": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:DC:00": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:DD:00": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:DE:00": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:DF:00": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:E0:00": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:E1:00": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:E2:00": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:E3:00": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:E4:00": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:E5:00": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:E6:00": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:E7:00": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:E8:00": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:E9:00": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:EA:00": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:EB:00": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:EC:00": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:ED:00": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:EE:00": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:EF:00": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:F0:00": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:F1:00": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:F2:00": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:F3:00": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:F4:00": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:F5:00": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:F6:00": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:F7:00": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:F8:00": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:F9:00": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:FA:00": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:FB:00": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:FC:00": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:FD:00": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "00:FE:00": [
+      "Cisco Router",
+      "Cisco Switch"
+    ],
+    "00:FF:00": [
+      "Cisco Access Point",
+      "Cisco Wireless Controller"
+    ],
+    "E8:0A:B9": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "48:1B:A4": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "6C:03:B5": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "90:88:55": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "68:71:61": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "4C:EC:0F": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "5C:64:F1": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "5C:3E:06": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "C8:28:E5": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "D0:09:C8": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "44:64:3C": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "24:16:1B": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "E8:DC:6C": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "E8:D3:22": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "34:B8:83": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "80:6A:00": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "AC:BC:D9": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "40:06:D5": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "08:45:D1": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "68:87:C6": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "80:24:8F": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "B8:A3:77": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "E4:4E:2D": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "1C:D1:E0": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "04:5F:B9": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "B0:C5:3C": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "EC:CE:13": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "40:B5:C1": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "DC:77:4C": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "94:AE:F0": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "AC:4A:56": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "BC:5A:56": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "24:16:9D": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "9C:E1:76": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "4C:E1:76": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "3C:41:0E": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "00:27:E3": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "B4:02:16": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "F4:BD:9E": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "08:4F:A9": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "08:4F:F9": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "30:8B:B2": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "6C:5E:3B": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "D4:6A:35": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "54:86:BC": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "00:30:85": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "C4:B3:6A": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "6C:8B:D3": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "00:EE:AB": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "70:35:09": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "A8:B4:56": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "68:99:CD": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "00:B1:E3": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "00:B7:71": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "DC:F7:19": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "A0:CF:5B": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "78:0C:F0": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "70:79:B3": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "00:FC:BA": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "68:CA:E4": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "28:AC:9E": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "00:BE:75": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "24:7E:12": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "50:1C:B0": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "B4:A8:B9": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "00:27:90": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "6C:B2:AE": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "CC:5A:53": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "70:6B:B9": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "84:80:2D": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "78:02:B1": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "18:80:90": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "70:DF:2F": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "9C:E3:30": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "B4:DF:91": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "B8:AB:61": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "08:F1:B3": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "CC:9C:3E": [
+      "Cisco Router",
+      "Cisco Modem"
+    ],
+    "88:15:44": [
+      "Cisco Router",
+      "Cisco Modem"
+    ]
+  }
+}

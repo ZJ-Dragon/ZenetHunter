@@ -1,17 +1,200 @@
 @import "tailwindcss";
 
+/* ============================================================================
+   ZenetHunter - WinUI3 Fluent Design Theme for React
+   ============================================================================ */
+
 :root {
-  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  /* WinUI3 Color Palette */
+  --winui-bg-primary: #f3f3f3;
+  --winui-bg-secondary: #ffffff;
+  --winui-bg-tertiary: #fafafa;
+  --winui-surface: #ffffff;
+  --winui-surface-elevated: #ffffff;
+
+  --winui-text-primary: #000000;
+  --winui-text-secondary: #6d6d6d;
+  --winui-text-tertiary: #9d9d9d;
+
+  --winui-accent: #0078d4;
+  --winui-accent-hover: #106ebe;
+  --winui-accent-pressed: #005a9e;
+
+  --winui-border: #e0e0e0;
+  --winui-border-subtle: #f0f0f0;
+
+  --winui-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --winui-shadow-md: 0 2px 8px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+  --winui-shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.12), 0 2px 4px rgba(0, 0, 0, 0.08);
+
+  --winui-radius-sm: 4px;
+  --winui-radius-md: 8px;
+  --winui-radius-lg: 12px;
+
+  --winui-transition: 200ms cubic-bezier(0.1, 0.9, 0.2, 1);
+
+  font-family: 'Segoe UI', -apple-system, BlinkMacSystemFont, 'Roboto', 'Helvetica Neue', Arial, sans-serif;
+}
+
+/* Dark mode support */
+.dark {
+  --winui-bg-primary: #202020;
+  --winui-bg-secondary: #1c1c1c;
+  --winui-bg-tertiary: #181818;
+  --winui-surface: #2c2c2c;
+  --winui-surface-elevated: #323232;
+
+  --winui-text-primary: #ffffff;
+  --winui-text-secondary: #c0c0c0;
+  --winui-text-tertiary: #808080;
+
+  --winui-accent: #60cdff;
+  --winui-accent-hover: #40b8ff;
+  --winui-accent-pressed: #20a2ff;
+
+  --winui-border: #404040;
+  --winui-border-subtle: #303030;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --winui-bg-primary: #202020;
+    --winui-bg-secondary: #1c1c1c;
+    --winui-bg-tertiary: #181818;
+    --winui-surface: #2c2c2c;
+    --winui-surface-elevated: #323232;
+
+    --winui-text-primary: #ffffff;
+    --winui-text-secondary: #c0c0c0;
+    --winui-text-tertiary: #808080;
+
+    --winui-accent: #60cdff;
+    --winui-accent-hover: #7dd3ff;
+    --winui-accent-pressed: #4ac0ff;
+
+    --winui-border: #404040;
+    --winui-border-subtle: #303030;
+
+    --winui-shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.3);
+    --winui-shadow-md: 0 2px 8px rgba(0, 0, 0, 0.4), 0 1px 2px rgba(0, 0, 0, 0.3);
+    --winui-shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.5), 0 2px 4px rgba(0, 0, 0, 0.4);
+  }
 }
 
 @theme {
   --color-brand-50: #f0f9ff;
   --color-brand-100: #e0f2fe;
-  --color-brand-500: #0ea5e9;
-  --color-brand-600: #0284c7;
-  --color-brand-900: #0c4a6e;
+  --color-brand-500: #0078d4;
+  --color-brand-600: #106ebe;
+  --color-brand-700: #005a9e;
+  --color-brand-900: #004578;
+
+  --color-success: #107c10;
+  --color-error: #d13438;
+  --color-warning: #ffaa44;
+
+  --radius-sm: var(--winui-radius-sm);
+  --radius-md: var(--winui-radius-md);
+  --radius-lg: var(--winui-radius-lg);
+
+  --shadow-sm: var(--winui-shadow-sm);
+  --shadow-md: var(--winui-shadow-md);
+  --shadow-lg: var(--winui-shadow-lg);
 }
 
 body {
   @apply bg-gray-50 text-gray-900;
+  background-color: var(--winui-bg-primary);
+  color: var(--winui-text-primary);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* WinUI3 Button Styles */
+.btn-winui {
+  @apply inline-flex items-center justify-center px-4 py-2 rounded-lg font-medium;
+  @apply transition-all duration-200;
+  @apply min-h-[32px];
+  background-color: var(--winui-accent);
+  color: #ffffff;
+  box-shadow: var(--winui-shadow-sm);
+}
+
+.btn-winui:hover {
+  background-color: var(--winui-accent-hover);
+  box-shadow: var(--winui-shadow-md);
+  transform: translateY(-1px);
+}
+
+.btn-winui:active {
+  background-color: var(--winui-accent-pressed);
+  transform: translateY(0);
+  box-shadow: var(--winui-shadow-sm);
+}
+
+.btn-winui-secondary {
+  @apply inline-flex items-center justify-center px-4 py-2 rounded-lg font-medium;
+  @apply transition-all duration-200;
+  @apply min-h-[32px];
+  background-color: var(--winui-bg-tertiary);
+  color: var(--winui-text-primary);
+  border: 1px solid var(--winui-border);
+}
+
+.btn-winui-secondary:hover {
+  background-color: var(--winui-bg-secondary);
+}
+
+/* WinUI3 Card Styles */
+.card-winui {
+  background-color: var(--winui-surface);
+  border-radius: var(--winui-radius-lg);
+  box-shadow: var(--winui-shadow-md);
+  border: 1px solid var(--winui-border-subtle);
+  transition: all var(--winui-transition);
+}
+
+.card-winui:hover {
+  box-shadow: var(--winui-shadow-lg);
+  transform: translateY(-1px);
+}
+
+/* WinUI3 Input Styles */
+.input-winui {
+  @apply w-full px-3 py-2 rounded-lg border;
+  background-color: var(--winui-surface);
+  border-color: var(--winui-border);
+  color: var(--winui-text-primary);
+  transition: all var(--winui-transition);
+}
+
+.input-winui:focus {
+  outline: none;
+  border-color: var(--winui-accent);
+  box-shadow: 0 0 0 2px rgba(0, 120, 212, 0.1);
+}
+
+.input-winui:hover {
+  border-color: var(--winui-border);
+}
+
+/* WinUI3 Scrollbar */
+::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--winui-bg-tertiary);
+  border-radius: var(--winui-radius-sm);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--winui-border);
+  border-radius: var(--winui-radius-sm);
+  border: 2px solid var(--winui-bg-tertiary);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--winui-text-tertiary);
 }

@@ -67,16 +67,30 @@ class StructuredFormatter(logging.Formatter):
 
         # Recursively sanitize dictionaries
         if isinstance(value, dict):
-            return {k: self._sanitize_value(k, v) for k, v in value.items()}
+            try:
+                return {k: self._sanitize_value(k, v) for k, v in value.items()}
+            except Exception:
+                return str(value)
 
         # Recursively sanitize lists
         if isinstance(value, list):
-            return [
-                self._sanitize_value(f"{key}[{i}]", item)
-                for i, item in enumerate(value)
-            ]
+            try:
+                return [
+                    self._sanitize_value(f"{key}[{i}]", item)
+                    for i, item in enumerate(value)
+                ]
+            except Exception:
+                return str(value)
 
-        return value
+        # For non-serializable types, convert to string
+        try:
+            # Try to serialize common types
+            if isinstance(value, (str, int, float, bool)):
+                return value
+            # For other types, try to convert to string
+            return str(value)
+        except Exception:
+            return "<non-serializable>"
 
     def format(self, record: logging.LogRecord) -> str:
         """Format log record as JSON.
@@ -90,7 +104,7 @@ class StructuredFormatter(logging.Formatter):
         # Base log structure (RFC 5424 inspired)
         log_data: dict[str, Any] = {
             "timestamp": datetime.now(UTC).isoformat(),
-            "severity": self._map_severity(record.levelno),
+            "severity": _map_severity(record.levelno),
             "module": record.module,
             "message": self._sanitize_value("message", record.getMessage()),
         }
@@ -150,9 +164,30 @@ class StructuredFormatter(logging.Formatter):
                 "correlation_id",
                 "sd",
             }:
-                log_data[key] = self._sanitize_value(key, value)
+                try:
+                    log_data[key] = self._sanitize_value(key, value)
+                except Exception:
+                    # If sanitization fails, try to convert to string
+                    try:
+                        log_data[key] = str(value)
+                    except Exception:
+                        # If even string conversion fails, skip this field
+                        pass
 
-        return json.dumps(log_data, ensure_ascii=False)
+        try:
+            return json.dumps(log_data, ensure_ascii=False)
+        except (TypeError, ValueError) as e:
+            # Fallback to simple format if JSON serialization fails
+            return json.dumps(
+                {
+                    "timestamp": datetime.now(UTC).isoformat(),
+                    "severity": _map_severity(record.levelno),
+                    "module": record.module,
+                    "message": str(record.getMessage()),
+                    "error": f"Log formatting failed: {str(e)}",
+                },
+                ensure_ascii=False,
+            )
 
 
 def _map_severity(levelno: int) -> str:

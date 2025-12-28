@@ -1,3 +1,5 @@
+import asyncio
+import logging
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
@@ -9,17 +11,35 @@ from app.models.scan import ScanRequest, ScanResult
 from app.services.scanner import ScannerService, get_scanner_service
 from app.services.websocket import ConnectionManager, get_connection_manager
 
+logger = logging.getLogger(__name__)
+
 router = APIRouter(tags=["scan"])
 
 
 @router.post("/scan/start", response_model=ScanResult, status_code=202)
 async def start_scan(
     request: ScanRequest,
-    admin: Annotated[User, Depends(get_current_admin)],
+    current_user: Annotated[User, Depends(get_current_admin)],
     service: ScannerService = Depends(get_scanner_service),
 ):
-    """Start a network scan (async) - Admin only."""
-    return await service.start_scan(request)
+    """
+    Start a network scan (async).
+
+    Returns immediately with scan_id. Actual scanning happens in background.
+    Monitor progress via WebSocket events or check scan status.
+
+    Requires admin authentication.
+    """
+    try:
+        logger.info(
+            f"Scan request received from {current_user.username}: type={request.type}"
+        )
+        result = await service.start_scan(request)
+        logger.info(f"Scan {result.id} initiated successfully")
+        return result
+    except Exception as e:
+        logger.error(f"Failed to start scan: {e}", exc_info=True)
+        raise
 
 
 @router.websocket("/ws")
@@ -35,13 +55,31 @@ async def websocket_endpoint(
             # Keep connection alive and handle incoming messages if needed
             # For now, we just listen/echo or ignore
             try:
-                await websocket.receive_json()
+                # Add timeout to prevent blocking indefinitely
+                await asyncio.wait_for(websocket.receive_json(), timeout=30.0)
+            except TimeoutError:
+                # Send ping to keep connection alive
+                try:
+                    await websocket.send_json({"event": "ping", "data": {}})
+                except Exception:
+                    # Connection is dead, break loop
+                    break
+            except WebSocketDisconnect:
+                break
             except Exception:
                 # Send standardized error envelope and continue loop
-                await manager.send_error(
-                    websocket,
-                    ErrorCode.WS_BAD_MESSAGE,
-                    detail="Invalid WebSocket message format",
-                )
+                try:
+                    await manager.send_error(
+                        websocket,
+                        ErrorCode.WS_BAD_MESSAGE,
+                        detail="Invalid WebSocket message format",
+                    )
+                except Exception:
+                    # Can't send error, connection is dead
+                    break
     except WebSocketDisconnect:
+        pass
+    except Exception as e:
+        logger.debug(f"WebSocket error: {e}")
+    finally:
         manager.disconnect(websocket)

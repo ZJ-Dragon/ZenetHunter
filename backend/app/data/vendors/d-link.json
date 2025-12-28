@@ -1,0 +1,26 @@
+{
+  "models": {
+    "BC:22:28": [
+      "D-Link Router",
+      "D-Link Modem"
+    ],
+    "A0:A3:F0": [
+      "D-Link Router",
+      "D-Link Modem"
+    ],
+    "BC:0F:9A": [
+      "D-Link Router",
+      "D-Link Modem"
+    ],
+    "74:DA:DA": [
+      "D-Link Router",
+      "D-Link Modem"
+    ],
+    "10:62:EB": [
+      "D-Link Router",
+      "D-Link Modem"
+    ]
+  },
+  "vendor": "D-Link",
+  "description": "D-Link device model lookup by MAC address prefix (auto-updated from IEEE OUI database)"
+}

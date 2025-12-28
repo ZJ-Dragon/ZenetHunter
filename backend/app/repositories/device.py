@@ -1,14 +1,15 @@
 """Device repository for database operations."""
 
-from __future__ import annotations
-
+import json
 from datetime import UTC, datetime
 from typing import Any
 
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.models.attack import AttackStatus
 from app.models.db.device import DeviceModel, DeviceStatusEnum, DeviceTypeEnum
+from app.models.defender import DefenseStatus, DefenseType
 from app.models.device import Device, DeviceStatus, DeviceType
 
 
@@ -18,187 +19,242 @@ class DeviceRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
 
-    async def get_all(self) -> list[Device]:
-        """Get all devices.
-
-        Returns:
-            List of Device models
-        """
-        result = await self.session.execute(select(DeviceModel))
-        models = result.scalars().all()
-        return [self._model_to_domain(model) for model in models]
+    async def create(self, device: Device) -> DeviceModel:
+        """Create a new device in the database."""
+        device_model = DeviceModel(
+            mac=device.mac.lower(),
+            ip=str(device.ip),
+            name=device.name,
+            vendor=device.vendor,
+            model=device.model,
+            type=DeviceTypeEnum(device.type.value),
+            status=DeviceStatusEnum(device.status.value),
+            attack_status=device.attack_status.value,
+            defense_status=device.defense_status.value,
+            active_defense_policy=(
+                device.active_defense_policy.value
+                if device.active_defense_policy
+                else None
+            ),
+            first_seen=device.first_seen,
+            last_seen=device.last_seen,
+            tags=json.dumps(device.tags) if device.tags else None,
+            alias=device.alias,
+        )
+        self.session.add(device_model)
+        await self.session.flush()
+        return device_model
 
     async def get_by_mac(self, mac: str) -> Device | None:
-        """Get device by MAC address.
-
-        Args:
-            mac: MAC address (normalized to lowercase)
-
-        Returns:
-            Device model or None if not found
-        """
-        mac_lower = mac.lower()
+        """Get a device by MAC address."""
         result = await self.session.execute(
-            select(DeviceModel).where(DeviceModel.mac == mac_lower)
+            select(DeviceModel).where(DeviceModel.mac == mac.lower())
         )
         model = result.scalar_one_or_none()
         if model is None:
             return None
-        return self._model_to_domain(model)
+        return self.to_domain_model(model)
 
     async def upsert(self, device: Device) -> Device:
-        """Insert or update device.
+        """Insert or update a device based on MAC address.
 
         Args:
             device: Device model to upsert
 
         Returns:
-            Updated Device model
+            Updated Device domain model
         """
         mac_lower = device.mac.lower()
         result = await self.session.execute(
             select(DeviceModel).where(DeviceModel.mac == mac_lower)
         )
-        model = result.scalar_one_or_none()
+        db_device = result.scalar_one_or_none()
 
-        if model is None:
+        if db_device:
+            # Update existing device
+            db_device.ip = str(device.ip)
+            db_device.name = device.name
+            db_device.vendor = device.vendor
+            db_device.model = device.model
+            db_device.type = DeviceTypeEnum(device.type.value)
+            db_device.status = DeviceStatusEnum(device.status.value)
+            db_device.attack_status = device.attack_status.value
+            db_device.defense_status = device.defense_status.value
+            db_device.active_defense_policy = (
+                device.active_defense_policy.value
+                if device.active_defense_policy
+                else None
+            )
+            db_device.last_seen = device.last_seen
+            db_device.tags = json.dumps(device.tags) if device.tags else None
+            db_device.alias = device.alias
+            # Update first_seen only if it's earlier than current
+            # Ensure both datetimes are timezone-aware before comparison
+            device_first_seen = (
+                device.first_seen.replace(tzinfo=UTC)
+                if device.first_seen.tzinfo is None
+                else device.first_seen
+            )
+            db_first_seen = (
+                db_device.first_seen.replace(tzinfo=UTC)
+                if db_device.first_seen.tzinfo is None
+                else db_device.first_seen
+            )
+            if device_first_seen < db_first_seen:
+                db_device.first_seen = device_first_seen
+        else:
             # Create new device
-            model = DeviceModel(
+            db_device = DeviceModel(
                 mac=mac_lower,
                 ip=str(device.ip),
                 name=device.name,
                 vendor=device.vendor,
-                type=self._domain_type_to_db(device.type),
-                status=self._domain_status_to_db(device.status),
-                attack_status=device.attack_status,
-                defense_status=device.defense_status,
-                active_defense_policy=device.active_defense_policy,
+                model=device.model,
+                type=DeviceTypeEnum(device.type.value),
+                status=DeviceStatusEnum(device.status.value),
+                attack_status=device.attack_status.value,
+                defense_status=device.defense_status.value,
+                active_defense_policy=(
+                    device.active_defense_policy.value
+                    if device.active_defense_policy
+                    else None
+                ),
                 first_seen=device.first_seen,
                 last_seen=device.last_seen,
+                tags=json.dumps(device.tags) if device.tags else None,
+                alias=device.alias,
             )
-            self.session.add(model)
-        else:
-            # Update existing device
-            model.ip = str(device.ip)
-            model.name = device.name
-            model.vendor = device.vendor
-            model.type = self._domain_type_to_db(device.type)
-            model.status = self._domain_status_to_db(device.status)
-            model.attack_status = device.attack_status
-            model.defense_status = device.defense_status
-            model.active_defense_policy = device.active_defense_policy
-            model.last_seen = datetime.now(UTC)
+            self.session.add(db_device)
 
         await self.session.flush()
-        return self._model_to_domain(model)
+        return self.to_domain_model(db_device)
 
-    async def update_status(self, mac: str, status: DeviceStatus) -> Device | None:
-        """Update device status.
+    async def get_all(self) -> list[Device]:
+        """Get all devices."""
+        result = await self.session.execute(select(DeviceModel))
+        models = result.scalars().all()
+        return [self.to_domain_model(model) for model in models]
 
-        Args:
-            mac: MAC address
-            status: New status
+    async def update(self, device: Device) -> Device | None:
+        """Update an existing device."""
+        db_device = await self.session.execute(
+            select(DeviceModel).where(DeviceModel.mac == device.mac.lower())
+        )
+        device_model = db_device.scalar_one_or_none()
+        if not device_model:
+            return None
 
-        Returns:
-            Updated Device model or None if not found
-        """
-        mac_lower = mac.lower()
+        device_model.ip = str(device.ip)
+        device_model.name = device.name
+        device_model.vendor = device.vendor
+        device_model.model = device.model
+        device_model.type = DeviceTypeEnum(device.type.value)
+        device_model.status = DeviceStatusEnum(device.status.value)
+        device_model.attack_status = device.attack_status.value
+        device_model.defense_status = device.defense_status.value
+        device_model.active_defense_policy = (
+            device.active_defense_policy.value if device.active_defense_policy else None
+        )
+        device_model.last_seen = device.last_seen
+        device_model.tags = json.dumps(device.tags) if device.tags else None
+        device_model.alias = device.alias
+
+        await self.session.flush()
+        return self.to_domain_model(device_model)
+
+    async def delete(self, mac: str) -> bool:
+        """Delete a device by MAC address."""
+        result = await self.session.execute(
+            select(DeviceModel).where(DeviceModel.mac == mac.lower())
+        )
+        device_model = result.scalar_one_or_none()
+        if not device_model:
+            return False
+
+        await self.session.delete(device_model)
+        await self.session.flush()
+        return True
+
+    async def clear_all(self) -> int:
+        """Clear all devices from the database."""
+        result = await self.session.execute(select(DeviceModel))
+        devices = result.scalars().all()
+        count = len(devices)
+        for device in devices:
+            await self.session.delete(device)
+        await self.session.flush()
+        return count
+
+    async def update_last_seen(
+        self, mac: str, timestamp: datetime | None = None
+    ) -> None:
+        """Update the last_seen timestamp for a device."""
+        if timestamp is None:
+            timestamp = datetime.now(UTC)
         await self.session.execute(
             update(DeviceModel)
-            .where(DeviceModel.mac == mac_lower)
-            .values(
-                status=self._domain_status_to_db(status), last_seen=datetime.now(UTC)
-            )
+            .where(DeviceModel.mac == mac.lower())
+            .values(last_seen=timestamp)
         )
         await self.session.flush()
-        return await self.get_by_mac(mac_lower)
 
-    async def update_attack_status(self, mac: str, attack_status: Any) -> Device | None:
-        """Update device attack status.
-
-        Args:
-            mac: MAC address
-            attack_status: New attack status
-
-        Returns:
-            Updated Device model or None if not found
-        """
-        mac_lower = mac.lower()
-        await self.session.execute(
+    async def update_attack_status(
+        self, mac: str, status: AttackStatus
+    ) -> DeviceModel | None:
+        """Update attack status for a device."""
+        result = await self.session.execute(
             update(DeviceModel)
-            .where(DeviceModel.mac == mac_lower)
-            .values(attack_status=attack_status, last_seen=datetime.now(UTC))
+            .where(DeviceModel.mac == mac.lower())
+            .values(attack_status=status.value)
+            .returning(DeviceModel)
         )
         await self.session.flush()
-        return await self.get_by_mac(mac_lower)
+        return result.scalar_one_or_none()
 
     async def update_defense_status(
-        self, mac: str, defense_status: Any, policy: Any | None = None
-    ) -> Device | None:
-        """Update device defense status.
-
-        Args:
-            mac: MAC address
-            defense_status: New defense status (enum or string)
-            policy: Active defense policy (optional)
-
-        Returns:
-            Updated Device model or None if not found
-        """
-        mac_lower = mac.lower()
-        # Handle enum or string
-        defense_status_value = (
-            defense_status.value if hasattr(defense_status, "value") else defense_status
-        )
-        values = {
-            "defense_status": defense_status,
-            "last_seen": datetime.now(UTC),
-        }
+        self, mac: str, status: DefenseStatus, policy: DefenseType | None = None
+    ) -> DeviceModel | None:
+        """Update defense status and policy for a device."""
+        update_values: dict[str, Any] = {"defense_status": status.value}
         if policy is not None:
-            values["active_defense_policy"] = policy
-        elif defense_status_value == "inactive":
-            values["active_defense_policy"] = None
+            update_values["active_defense_policy"] = policy.value
+        elif status == DefenseStatus.INACTIVE:
+            update_values["active_defense_policy"] = None
 
-        await self.session.execute(
-            update(DeviceModel).where(DeviceModel.mac == mac_lower).values(**values)
+        result = await self.session.execute(
+            update(DeviceModel)
+            .where(DeviceModel.mac == mac.lower())
+            .values(**update_values)
+            .returning(DeviceModel)
         )
         await self.session.flush()
-        return await self.get_by_mac(mac_lower)
+        return result.scalar_one_or_none()
 
-    def _model_to_domain(self, model: DeviceModel) -> Device:
-        """Convert ORM model to domain model."""
+    def to_domain_model(self, device_model: DeviceModel) -> Device:
+        """Convert database model to domain model."""
         return Device(
-            mac=model.mac,
-            ip=model.ip,
-            name=model.name,
-            vendor=model.vendor,
-            type=self._db_type_to_domain(model.type),
-            status=self._db_status_to_domain(model.status),
-            attack_status=model.attack_status,
-            defense_status=model.defense_status,
-            active_defense_policy=model.active_defense_policy,
-            first_seen=model.first_seen,
-            last_seen=model.last_seen,
+            mac=device_model.mac,
+            ip=device_model.ip,
+            name=device_model.name,
+            vendor=device_model.vendor,
+            model=device_model.model,
+            type=DeviceType(device_model.type.value),
+            status=DeviceStatus(device_model.status.value),
+            attack_status=AttackStatus(device_model.attack_status),
+            defense_status=DefenseStatus(device_model.defense_status),
+            active_defense_policy=(
+                DefenseType(device_model.active_defense_policy)
+                if device_model.active_defense_policy
+                else None
+            ),
+            first_seen=device_model.first_seen,
+            last_seen=device_model.last_seen,
+            tags=json.loads(device_model.tags) if device_model.tags else [],
+            alias=device_model.alias,
         )
-
-    def _domain_type_to_db(self, domain_type: DeviceType) -> DeviceTypeEnum:
-        """Convert domain DeviceType to DB enum."""
-        return DeviceTypeEnum(domain_type.value)
-
-    def _db_type_to_domain(self, db_type: DeviceTypeEnum) -> DeviceType:
-        """Convert DB enum to domain DeviceType."""
-        return DeviceType(db_type.value)
-
-    def _domain_status_to_db(self, domain_status: DeviceStatus) -> DeviceStatusEnum:
-        """Convert domain DeviceStatus to DB enum."""
-        return DeviceStatusEnum(domain_status.value)
-
-    def _db_status_to_domain(self, db_status: DeviceStatusEnum) -> DeviceStatus:
-        """Convert DB enum to domain DeviceStatus."""
-        return DeviceStatus(db_status.value)
 
 
 # Dependency injection for FastAPI
-async def get_device_repository(session: AsyncSession) -> DeviceRepository:
+def get_device_repository(session: AsyncSession) -> DeviceRepository:
     """Get device repository instance."""
     return DeviceRepository(session)

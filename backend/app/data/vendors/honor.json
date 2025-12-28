@@ -1,0 +1,322 @@
+{
+  "vendor": "Honor",
+  "description": "Honor device model lookup by MAC address prefix (auto-updated from IEEE OUI database)",
+  "models": {
+    "00:1E:10": [
+      "Honor Phone",
+      "Honor Tablet"
+    ],
+    "00:25:9E": [
+      "Honor Router",
+      "Honor Modem"
+    ],
+    "00:46:4B": [
+      "Honor Phone",
+      "Honor Tablet"
+    ],
+    "00:66:4B": [
+      "Honor Router",
+      "Honor ONT"
+    ],
+    "00:E0:FC": [
+      "Honor Phone",
+      "Honor Tablet"
+    ],
+    "04:9E:63": [
+      "Honor Phone",
+      "Honor Tablet"
+    ],
+    "04:C0:6C": [
+      "Honor Router",
+      "Honor Modem"
+    ],
+    "08:19:A6": [
+      "Honor Phone",
+      "Honor Tablet"
+    ],
+    "0C:37:DC": [
+      "Honor Router",
+      "Honor ONT"
+    ],
+    "0C:96:BF": [
+      "Honor Phone",
+      "Honor Tablet"
+    ],
+    "10:47:80": [
+      "Honor Router",
+      "Honor Modem"
+    ],
+    "14:7D:DA": [
+      "Honor Phone",
+      "Honor Tablet"
+    ],
+    "18:3D:A2": [
+      "Honor Router",
+      "Honor ONT"
+    ],
+    "1C:1D:86": [
+      "Honor Phone",
+      "Honor Tablet"
+    ],
+    "20:08:ED": [
+      "Honor Router",
+      "Honor Modem"
+    ],
+    "24:69:A5": [
+      "Honor Phone",
+      "Honor Tablet"
+    ],
+    "28:6E:D4": [
+      "Honor Router",
+      "Honor ONT"
+    ],
+    "2C:55:D3": [
+      "Honor Phone",
+      "Honor Tablet"
+    ],
+    "30:45:11": [
+      "Honor Router",
+      "Honor Modem"
+    ],
+    "34:6B:D3": [
+      "Honor Phone",
+      "Honor Tablet"
+    ],
+    "38:46:08": [
+      "Honor Router",
+      "Honor ONT"
+    ],
+    "3C:5A:B4": [
+      "Honor Phone",
+      "Honor Tablet"
+    ],
+    "40:4E:36": [
+      "Honor Router",
+      "Honor Modem"
+    ],
+    "44:6D:57": [
+      "Honor Phone",
+      "Honor Tablet"
+    ],
+    "48:7A:DA": [
+      "Honor Router",
+      "Honor ONT"
+    ],
+    "4C:1F:CC": [
+      "Honor Phone",
+      "Honor Tablet"
+    ],
+    "50:2D:A2": [
+      "Honor Router",
+      "Honor Modem"
+    ],
+    "54:89:98": [
+      "Honor Phone",
+      "Honor Tablet"
+    ],
+    "58:2A:F7": [
+      "Honor Router",
+      "Honor ONT"
+    ],
+    "5C:7D:5E": [
+      "Honor Phone",
+      "Honor Tablet"
+    ],
+    "60:DE:44": [
+      "Honor Router",
+      "Honor Modem"
+    ],
+    "64:16:66": [
+      "Honor Phone",
+      "Honor Tablet"
+    ],
+    "68:3E:34": [
+      "Honor Router",
+      "Honor ONT"
+    ],
+    "6C:9C:ED": [
+      "Honor Phone",
+      "Honor Tablet"
+    ],
+    "70:48:0F": [
+      "Honor Router",
+      "Honor Modem"
+    ],
+    "74:45:CE": [
+      "Honor Phone",
+      "Honor Tablet"
+    ],
+    "78:1D:BA": [
+      "Honor Router",
+      "Honor ONT"
+    ],
+    "7C:60:97": [
+      "Honor Phone",
+      "Honor Tablet"
+    ],
+    "80:71:7F": [
+      "Honor Router",
+      "Honor Modem"
+    ],
+    "84:7D:50": [
+      "Honor Phone",
+      "Honor Tablet"
+    ],
+    "88:53:D4": [
+      "Honor Router",
+      "Honor ONT"
+    ],
+    "8C:73:6E": [
+      "Honor Phone",
+      "Honor Tablet"
+    ],
+    "90:4C:E2": [
+      "Honor Router",
+      "Honor Modem"
+    ],
+    "94:57:A5": [
+      "Honor Phone",
+      "Honor Tablet"
+    ],
+    "98:2D:68": [
+      "Honor Router",
+      "Honor ONT"
+    ],
+    "9C:28:BF": [
+      "Honor Phone",
+      "Honor Tablet"
+    ],
+    "A0:4E:04": [
+      "Honor Router",
+      "Honor Modem"
+    ],
+    "A4:50:46": [
+      "Honor Phone",
+      "Honor Tablet"
+    ],
+    "A8:96:8A": [
+      "Honor Router",
+      "Honor ONT"
+    ],
+    "AC:E2:D3": [
+      "Honor Phone",
+      "Honor Tablet"
+    ],
+    "B0:5B:67": [
+      "Honor Router",
+      "Honor Modem"
+    ],
+    "B4:0B:44": [
+      "Honor Phone",
+      "Honor Tablet"
+    ],
+    "B8:31:B5": [
+      "Honor Router",
+      "Honor ONT"
+    ],
+    "BC:76:5E": [
+      "Honor Phone",
+      "Honor Tablet"
+    ],
+    "C0:25:06": [
+      "Honor Router",
+      "Honor Modem"
+    ],
+    "C4:64:13": [
+      "Honor Phone",
+      "Honor Tablet"
+    ],
+    "C8:94:02": [
+      "Honor Router",
+      "Honor ONT"
+    ],
+    "CC:53:B5": [
+      "Honor Phone",
+      "Honor Tablet"
+    ],
+    "D0:27:88": [
+      "Honor Router",
+      "Honor Modem"
+    ],
+    "D4:87:D8": [
+      "Honor Phone",
+      "Honor Tablet"
+    ],
+    "D8:96:95": [
+      "Honor Router",
+      "Honor ONT"
+    ],
+    "DC:CE:C1": [
+      "Honor Phone",
+      "Honor Tablet"
+    ],
+    "E0:19:1D": [
+      "Honor Router",
+      "Honor Modem"
+    ],
+    "E4:70:B8": [
+      "Honor Phone",
+      "Honor Tablet"
+    ],
+    "E8:BD:D1": [
+      "Honor Router",
+      "Honor ONT"
+    ],
+    "EC:23:3D": [
+      "Honor Phone",
+      "Honor Tablet"
+    ],
+    "F0:98:9D": [
+      "Honor Router",
+      "Honor Modem"
+    ],
+    "F4:55:9C": [
+      "Honor Phone",
+      "Honor Tablet"
+    ],
+    "F8:4A:BF": [
+      "Honor Router",
+      "Honor ONT"
+    ],
+    "FC:48:EF": [
+      "Honor Phone",
+      "Honor Tablet"
+    ],
+    "0C:B9:83": [
+      "Honor Phone",
+      "Honor Tablet"
+    ],
+    "2C:B3:01": [
+      "Honor Phone",
+      "Honor Tablet"
+    ],
+    "40:D4:F6": [
+      "Honor Phone",
+      "Honor Tablet"
+    ],
+    "68:A7:B4": [
+      "Honor Phone",
+      "Honor Tablet"
+    ],
+    "08:E0:21": [
+      "Honor Phone",
+      "Honor Tablet"
+    ],
+    "90:FF:D6": [
+      "Honor Phone",
+      "Honor Tablet"
+    ],
+    "C0:28:0B": [
+      "Honor Phone",
+      "Honor Tablet"
+    ],
+    "9C:EA:97": [
+      "Honor Phone",
+      "Honor Tablet"
+    ],
+    "C8:9B:AD": [
+      "Honor Phone",
+      "Honor Tablet"
+    ]
+  }
+}

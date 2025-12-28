@@ -1,0 +1,1241 @@
+{
+  "vendor": "Huawei",
+  "description": "Huawei device model lookup by MAC address prefix (auto-updated from IEEE OUI database)",
+  "models": {
+    "00:1E:10": [
+      "Huawei (various)"
+    ],
+    "00:25:9E": [
+      "Huawei Router",
+      "Huawei Modem"
+    ],
+    "00:46:4B": [
+      "Huawei Phone",
+      "Huawei Honor"
+    ],
+    "00:66:4B": [
+      "Huawei Tablet",
+      "Huawei MediaPad"
+    ],
+    "00:E0:FC": [
+      "Huawei Router",
+      "Huawei ONT"
+    ],
+    "04:9E:63": [
+      "Huawei Phone",
+      "Huawei Honor"
+    ],
+    "04:C0:6C": [
+      "Huawei Tablet",
+      "Huawei MediaPad"
+    ],
+    "08:19:A6": [
+      "Huawei Router",
+      "Huawei Modem"
+    ],
+    "0C:37:DC": [
+      "Huawei Phone",
+      "Huawei Honor"
+    ],
+    "0C:96:BF": [
+      "Huawei Tablet",
+      "Huawei MediaPad"
+    ],
+    "10:47:80": [
+      "Huawei Router",
+      "Huawei ONT"
+    ],
+    "14:7D:DA": [
+      "Huawei Phone",
+      "Huawei Honor"
+    ],
+    "18:3D:A2": [
+      "Huawei Tablet",
+      "Huawei MediaPad"
+    ],
+    "1C:1D:86": [
+      "Huawei Router",
+      "Huawei Modem"
+    ],
+    "20:08:ED": [
+      "Huawei Phone",
+      "Huawei Honor"
+    ],
+    "24:69:A5": [
+      "Huawei Tablet",
+      "Huawei MediaPad"
+    ],
+    "28:6E:D4": [
+      "Huawei Router",
+      "Huawei ONT"
+    ],
+    "2C:55:D3": [
+      "Huawei Phone",
+      "Huawei Honor"
+    ],
+    "30:45:11": [
+      "Huawei Tablet",
+      "Huawei MediaPad"
+    ],
+    "34:6B:D3": [
+      "Huawei Router",
+      "Huawei Modem"
+    ],
+    "38:46:08": [
+      "Huawei Phone",
+      "Huawei Honor"
+    ],
+    "3C:5A:B4": [
+      "Huawei Tablet",
+      "Huawei MediaPad"
+    ],
+    "40:4E:36": [
+      "Huawei Router",
+      "Huawei ONT"
+    ],
+    "44:6D:57": [
+      "Huawei Phone",
+      "Huawei Honor"
+    ],
+    "48:7A:DA": [
+      "Huawei Tablet",
+      "Huawei MediaPad"
+    ],
+    "4C:1F:CC": [
+      "Huawei Router",
+      "Huawei Modem"
+    ],
+    "50:2D:A2": [
+      "Huawei Phone",
+      "Huawei Honor"
+    ],
+    "54:89:98": [
+      "Huawei Tablet",
+      "Huawei MediaPad"
+    ],
+    "58:2A:F7": [
+      "Huawei Router",
+      "Huawei ONT"
+    ],
+    "5C:7D:5E": [
+      "Huawei Phone",
+      "Huawei Honor"
+    ],
+    "60:DE:44": [
+      "Huawei Tablet",
+      "Huawei MediaPad"
+    ],
+    "64:16:66": [
+      "Huawei Router",
+      "Huawei Modem"
+    ],
+    "68:3E:34": [
+      "Huawei Phone",
+      "Huawei Honor"
+    ],
+    "6C:9C:ED": [
+      "Huawei Tablet",
+      "Huawei MediaPad"
+    ],
+    "70:48:0F": [
+      "Huawei Router",
+      "Huawei ONT"
+    ],
+    "74:45:CE": [
+      "Huawei Phone",
+      "Huawei Honor"
+    ],
+    "78:1D:BA": [
+      "Huawei Tablet",
+      "Huawei MediaPad"
+    ],
+    "7C:60:97": [
+      "Huawei Router",
+      "Huawei Modem"
+    ],
+    "80:71:7F": [
+      "Huawei Phone",
+      "Huawei Honor"
+    ],
+    "84:7D:50": [
+      "Huawei Tablet",
+      "Huawei MediaPad"
+    ],
+    "88:53:D4": [
+      "Huawei Router",
+      "Huawei ONT"
+    ],
+    "8C:73:6E": [
+      "Huawei Phone",
+      "Huawei Honor"
+    ],
+    "90:4C:E2": [
+      "Huawei Tablet",
+      "Huawei MediaPad"
+    ],
+    "94:57:A5": [
+      "Huawei Router",
+      "Huawei Modem"
+    ],
+    "98:2D:68": [
+      "Huawei Phone",
+      "Huawei Honor"
+    ],
+    "9C:28:BF": [
+      "Huawei Tablet",
+      "Huawei MediaPad"
+    ],
+    "A0:4E:04": [
+      "Huawei Router",
+      "Huawei ONT"
+    ],
+    "A4:50:46": [
+      "Huawei Phone",
+      "Huawei Honor"
+    ],
+    "A8:96:8A": [
+      "Huawei Tablet",
+      "Huawei MediaPad"
+    ],
+    "AC:E2:D3": [
+      "Huawei Router",
+      "Huawei Modem"
+    ],
+    "B0:5B:67": [
+      "Huawei Phone",
+      "Huawei Honor"
+    ],
+    "B4:0B:44": [
+      "Huawei Tablet",
+      "Huawei MediaPad"
+    ],
+    "B8:31:B5": [
+      "Huawei Router",
+      "Huawei ONT"
+    ],
+    "BC:76:5E": [
+      "Huawei Phone",
+      "Huawei Honor"
+    ],
+    "C0:25:06": [
+      "Huawei Tablet",
+      "Huawei MediaPad"
+    ],
+    "C4:64:13": [
+      "Huawei Router",
+      "Huawei Modem"
+    ],
+    "C8:94:02": [
+      "Huawei Phone",
+      "Huawei Honor"
+    ],
+    "CC:53:B5": [
+      "Huawei Tablet",
+      "Huawei MediaPad"
+    ],
+    "D0:27:88": [
+      "Huawei Router",
+      "Huawei ONT"
+    ],
+    "D4:87:D8": [
+      "Huawei Phone",
+      "Huawei Honor"
+    ],
+    "D8:96:95": [
+      "Huawei Tablet",
+      "Huawei MediaPad"
+    ],
+    "DC:CE:C1": [
+      "Huawei Router",
+      "Huawei Modem"
+    ],
+    "E0:19:1D": [
+      "Huawei Phone",
+      "Huawei Honor"
+    ],
+    "E4:70:B8": [
+      "Huawei Tablet",
+      "Huawei MediaPad"
+    ],
+    "E8:BD:D1": [
+      "Huawei Router",
+      "Huawei ONT"
+    ],
+    "EC:23:3D": [
+      "Huawei Phone",
+      "Huawei Honor"
+    ],
+    "F0:98:9D": [
+      "Huawei Tablet",
+      "Huawei MediaPad"
+    ],
+    "F4:55:9C": [
+      "Huawei Router",
+      "Huawei Modem"
+    ],
+    "F8:4A:BF": [
+      "Huawei Phone",
+      "Huawei Honor"
+    ],
+    "C2:47:B9": [
+      "Huawei Phone",
+      "Huawei Mate"
+    ],
+    "FC:48:EF": [
+      "Huawei Tablet",
+      "Huawei MediaPad"
+    ],
+    "E0:06:30": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "D8:DA:F1": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "54:44:3B": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "5C:70:75": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "78:2D:AD": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "D0:61:58": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "24:4B:F1": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "F0:A0:B1": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "40:4F:42": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "AC:90:73": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "FC:1D:3A": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "E4:BE:FB": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "58:F8:D7": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "9C:DB:AF": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "0C:2E:57": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "E8:D7:75": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "94:0E:E7": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "A8:B2:71": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "0C:FC:18": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "F8:DE:73": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "EC:1A:02": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "C0:4E:8A": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "2C:94:52": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "60:01:B1": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "EC:A6:2F": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "80:3C:20": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "A4:DD:58": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "AC:51:AB": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "48:CD:D3": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "24:EB:ED": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "B0:A4:F0": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "C0:06:0C": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "F8:28:C9": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "FC:11:93": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "84:15:D3": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "D4:94:00": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "60:4D:E1": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "70:4E:6B": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "60:3D:29": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "54:C4:80": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "E8:F9:D4": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "B0:C7:87": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "0C:4F:9B": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "48:2F:D7": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "AC:5E:14": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "20:DF:73": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "48:12:8F": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "08:9E:84": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "CC:BC:E3": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "3C:93:F4": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "24:46:E4": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "68:1B:EF": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "1C:3C:D4": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "F4:E4:51": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "F8:4C:DA": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "F4:FB:B8": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "A0:70:B7": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "10:A4:DA": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "F0:25:8E": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "9C:74:6F": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "38:20:28": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "E4:77:27": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "C4:E2:87": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "78:CF:2F": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "A8:3B:5C": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "48:4C:29": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "C4:D4:38": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "14:AB:02": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "D4:4F:67": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "B4:FF:98": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "F0:F7:E7": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "00:61:51": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "BC:76:C5": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "E4:D3:73": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "C0:BC:9A": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "FC:73:FB": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "90:3F:EA": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "20:AB:48": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "CC:D7:3C": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "3C:30:6F": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "80:E1:BF": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "48:2C:D0": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "68:E2:09": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "F4:B7:8D": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "A4:16:E7": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "B4:09:31": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "94:E7:EA": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "2C:1A:01": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "6C:16:32": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "70:2F:35": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "78:17:BE": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "F0:3F:95": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "18:56:44": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "9C:69:D1": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "30:FB:B8": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "84:46:FE": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "D8:29:18": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "44:D7:91": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "D4:6B:A6": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "CC:05:77": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "D4:62:EA": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "54:BA:D6": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "24:16:6D": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "94:0B:19": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "70:C7:F2": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "88:F5:6E": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "C8:C2:FA": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "CC:64:A6": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "F8:9A:78": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "88:F8:72": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "EC:56:23": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "18:02:2D": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "48:F8:DB": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "80:7D:14": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "20:28:3E": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "88:10:8F": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "F4:63:1F": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "A4:9B:4F": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "34:2E:B6": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "AC:92:32": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "8C:6D:77": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "14:57:9F": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "B4:43:26": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "B0:EB:57": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "74:C1:4F": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "F8:98:EF": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "58:F9:87": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "A8:F5:AC": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "58:BA:D4": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "00:BE:3B": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "7C:A1:77": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "24:2E:02": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "A4:93:3F": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "F0:0F:EC": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "AC:07:5F": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "10:44:00": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "B0:E1:7E": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "E4:A7:C5": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "F8:6E:EE": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "78:62:56": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "B0:55:08": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "3C:67:8C": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "28:A6:DB": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "14:A0:F8": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "40:7D:0F": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "68:CC:6E": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "D8:C7:71": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "80:D4:A5": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "04:B0:E7": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "44:6A:2E": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "50:01:D9": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "48:7B:6B": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "88:3F:D3": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "18:D2:76": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "70:66:B9": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "C4:A1:AE": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "38:FC:34": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "3C:F6:92": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "08:1A:FD": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "C0:BF:AC": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "44:27:2E": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "E8:FF:98": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "24:15:51": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "58:95:7E": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "AC:31:84": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "50:3F:50": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "0C:BE:F1": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "AC:93:6A": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "38:A4:4B": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "38:22:F4": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "A0:42:D1": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "58:87:9F": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "50:89:D1": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "3C:A9:16": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "9C:56:36": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "50:4B:9E": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "04:7A:AE": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "50:78:B0": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "E4:07:2B": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "78:06:C9": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "E8:A6:CA": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "CC:FA:66": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "24:A7:99": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "7C:3E:74": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "F8:97:53": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "58:94:AE": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "B0:3A:CE": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "78:B5:54": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "68:9E:6A": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "28:2B:96": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "E8:FD:35": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "EC:C5:D2": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "24:45:6B": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "48:38:71": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "28:D3:EA": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "A8:F2:66": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "3C:9B:C6": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "54:F6:07": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "9C:82:3F": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "04:49:5D": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "F0:FE:E7": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "54:21:1D": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "24:64:9F": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "0C:17:73": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "E8:1E:92": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "88:8E:68": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "00:8A:55": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "64:A2:8A": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "AC:47:1B": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "10:71:00": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "90:80:8F": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "84:54:DF": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "5C:D8:9E": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "24:1A:E6": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "24:E9:CA": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "94:08:C7": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "C8:CA:63": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "94:37:F7": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "10:5D:DC": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "DC:73:85": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "54:55:D5": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "A0:DE:0F": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "F4:87:C5": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "94:E4:BA": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "34:71:46": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "2C:C5:46": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "0C:83:9A": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "E0:E0:FC": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "74:22:BB": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "0C:E4:A0": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "BC:1A:E4": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "74:0A:E1": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "B4:A8:98": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "E0:40:07": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "D8:8A:DC": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "10:E9:53": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "10:32:7E": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ],
+    "64:F8:1C": [
+      "Huawei Phone",
+      "Huawei Tablet"
+    ]
+  }
+}

@@ -133,8 +133,7 @@ class DefenderService:
             if mac.lower() != "global":
                 # Global policies are usually interface-based, not MAC-based
                 logger.warning(
-                    f"{request.policy} is a global policy, "
-                    "but applied to specific MAC."
+                    f"{request.policy} is a global policy, but applied to specific MAC."
                 )
 
             if request.policy == DefenseType.ARP_DAI:

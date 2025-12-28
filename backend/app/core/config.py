@@ -146,14 +146,12 @@ if _HAVE_PYDANTIC_SETTINGS:
             cors_env_set = os.getenv("CORS_ALLOW_ORIGINS") or os.getenv("CORS_ORIGINS")
             if not cors_env_set:
                 if env == "development":
-                    # Development: allow common dev ports
+                    # Development: allow React frontend (Vite dev server)
                     default_origins = _split_csv(_DEFAULT_CORS)
                     if not self.cors_origins or self.cors_origins == default_origins:
                         self.cors_origins = [
-                            "http://localhost:5173",
-                            "http://localhost:3000",
-                            "http://127.0.0.1:5173",
-                            "http://127.0.0.1:3000",
+                            "http://localhost:5173",  # Vite dev server (React frontend)
+                            "http://127.0.0.1:5173",  # Vite dev server (alternative)
                         ]
                 elif env == "production":
                     # Production: should be explicitly set, but default to empty

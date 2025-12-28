@@ -25,11 +25,11 @@ export const SetupWizard: React.FC = () => {
       setLoading(true);
       try {
         await configService.setup(formData);
-        toast.success('Setup completed successfully!');
+        toast.success('Setup completed successfully! Please login with your credentials.');
         navigate('/login');
       } catch (error) {
         console.error(error);
-        toast.error('Failed to complete setup');
+        toast.error('Failed to complete setup. Please try again.');
       } finally {
         setLoading(false);
       }
@@ -41,16 +41,34 @@ export const SetupWizard: React.FC = () => {
       case 0:
         return (
           <div className="space-y-6">
-            <h4 className="font-medium text-gray-900">Set Admin Password</h4>
+            <h4 className="font-medium text-gray-900">Admin Account Setup</h4>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Password</label>
+              <label className="block text-sm font-medium text-gray-700">Admin Username</label>
+              <input
+                type="text"
+                defaultValue="admin"
+                disabled
+                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm bg-gray-50 sm:text-sm"
+              />
+              <p className="mt-1 text-xs text-gray-500">Default admin username (cannot be changed in MVP)</p>
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700">Admin Password</label>
               <input
                 type="password"
                 className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-brand-500 focus:border-brand-500 sm:text-sm"
                 value={formData.admin_password}
                 onChange={(e) => setFormData({ ...formData, admin_password: e.target.value })}
+                placeholder="Enter a strong password"
+                required
               />
-              <p className="mt-2 text-sm text-gray-500">Secure your ZenetHunter instance.</p>
+              <p className="mt-2 text-sm text-gray-500">
+                Create a secure password for the admin account.
+                <br />
+                <span className="text-xs text-gray-400">
+                  Note: In MVP, password setup is logged but not yet enforced. Default password is "zenethunter".
+                </span>
+              </p>
             </div>
           </div>
         );

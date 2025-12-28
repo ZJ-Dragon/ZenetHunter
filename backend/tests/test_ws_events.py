@@ -18,10 +18,18 @@ def test_ws_events_device_added():
         }
         client.post("/api/devices", json=device_data)
 
-        # Expect event
-        data = websocket.receive_json()
-        assert data["event"] == "deviceAdded"
-        assert data["data"]["mac"] == device_data["mac"]
+        # Expect event (skip ping messages that may come before the actual event)
+        max_attempts = 10
+        for _ in range(max_attempts):
+            data = websocket.receive_json()
+            if data["event"] == "deviceAdded":
+                assert data["data"]["mac"] == device_data["mac"]
+                break
+            elif data["event"] != "ping":
+                # If we receive a non-ping event that's not what we expect, fail
+                raise AssertionError(f"Unexpected event: {data['event']}")
+        else:
+            raise AssertionError("Did not receive deviceAdded event")
 
 
 def test_ws_events_device_status_changed():
@@ -40,10 +48,20 @@ def test_ws_events_device_status_changed():
         device_data["status"] = "offline"
         client.post("/api/devices", json=device_data)
 
-        # Expect event
-        data = websocket.receive_json()
-        assert data["event"] == "deviceStatusChanged"
-        assert data["data"]["status"] == "offline"
+        # Expect event (skip ping messages that may come before the actual event)
+        max_attempts = 10
+        for _ in range(max_attempts):
+            data = websocket.receive_json()
+            if data["event"] == "deviceStatusChanged":
+                # Data structure: {"event": "deviceStatusChanged",
+                # "data": {"mac": ..., "status": ..., "device": ...}}
+                assert data["data"]["status"] == "offline"
+                break
+            elif data["event"] != "ping":
+                # If we receive a non-ping event that's not what we expect, fail
+                raise AssertionError(f"Unexpected event: {data['event']}")
+        else:
+            raise AssertionError("Did not receive deviceStatusChanged event")
 
 
 def test_ws_events_log_added():
@@ -56,7 +74,15 @@ def test_ws_events_log_added():
         }
         client.post("/api/logs", json=log_data)
 
-        # Expect event
-        data = websocket.receive_json()
-        assert data["event"] == "logAdded"
-        assert data["data"]["message"] == "Test Log Event"
+        # Expect event (skip ping messages that may come before the actual event)
+        max_attempts = 10
+        for _ in range(max_attempts):
+            data = websocket.receive_json()
+            if data["event"] == "logAdded":
+                assert data["data"]["message"] == "Test Log Event"
+                break
+            elif data["event"] != "ping":
+                # If we receive a non-ping event that's not what we expect, fail
+                raise AssertionError(f"Unexpected event: {data['event']}")
+        else:
+            raise AssertionError("Did not receive logAdded event")

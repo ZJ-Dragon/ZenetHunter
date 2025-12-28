@@ -3,19 +3,16 @@ import { Login } from './pages/Login';
 import { NotFound } from './pages/NotFound';
 import { DeviceList } from './pages/DeviceList';
 import { Topology } from './pages/Topology';
+import { AttackDashboard } from './pages/AttackDashboard';
+import { Logs } from './pages/Logs';
 import { SetupWizard } from './pages/SetupWizard';
+import { Dashboard } from './pages/Dashboard';
+import { Settings } from './pages/Settings';
 import { AppShell } from './components/layout/AppShell';
 import { RequireAuth } from './components/auth/RequireAuth';
-import { OOBEGuard } from './components/auth/OOBEGuard';
+import { InitialRouteGuard } from './components/auth/InitialRouteGuard';
 
-// Placeholder for Dashboard
-const Dashboard = () => (
-  <div>
-    <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-    <p className="mt-2 text-gray-600">Welcome to ZenetHunter. Select an option from the sidebar.</p>
-  </div>
-);
-
+// Router Configuration
 export const router = createBrowserRouter([
   {
     path: '/setup',
@@ -28,11 +25,11 @@ export const router = createBrowserRouter([
   {
     path: '/',
     element: (
-      <RequireAuth>
-        <OOBEGuard>
+      <InitialRouteGuard>
+        <RequireAuth>
           <AppShell />
-        </OOBEGuard>
-      </RequireAuth>
+        </RequireAuth>
+      </InitialRouteGuard>
     ),
     errorElement: <NotFound />,
     children: [
@@ -50,11 +47,15 @@ export const router = createBrowserRouter([
       },
       {
         path: 'attacks',
-        element: <div>Interference Page (Coming Soon)</div>,
+        element: <AttackDashboard />,
+      },
+      {
+        path: 'logs',
+        element: <Logs />,
       },
       {
         path: 'settings',
-        element: <div>Settings Page (Coming Soon)</div>,
+        element: <Settings />,
       },
     ],
   },

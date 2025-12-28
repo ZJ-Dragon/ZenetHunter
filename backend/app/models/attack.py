@@ -4,8 +4,18 @@ from pydantic import BaseModel, ConfigDict, Field
 
 
 class AttackType(str, Enum):
-    KICK = "kick"  # Deauth/Disassociate
-    BLOCK = "block"  # ARP Spoofing / Ban
+    """Available attack/interference types for active defense."""
+
+    KICK = "kick"  # WiFi Deauthentication/Disassociation
+    BLOCK = "block"  # ARP Spoofing / Man-in-the-Middle
+    DHCP_SPOOF = "dhcp_spoof"  # DHCP Spoofing (redirect to controlled server)
+    DNS_SPOOF = "dns_spoof"  # DNS Spoofing (redirect DNS queries)
+    ICMP_REDIRECT = "icmp_redirect"  # ICMP Redirect (route manipulation)
+    PORT_SCAN = "port_scan"  # Port Scanning (reconnaissance)
+    TRAFFIC_SHAPE = "traffic_shape"  # Traffic Shaping (bandwidth limiting)
+    MAC_FLOOD = "mac_flood"  # MAC Flooding (switch table exhaustion)
+    VLAN_HOP = "vlan_hop"  # VLAN Hopping (if applicable)
+    BEACON_FLOOD = "beacon_flood"  # WiFi Beacon Flood (AP confusion)
 
 
 class AttackStatus(str, Enum):

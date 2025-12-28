@@ -5,14 +5,30 @@ import pytest
 from app.core.engine.defense_factory import get_defense_engine
 from app.core.engine.dummy_defense import DummyDefenseEngine
 from app.core.engine.linux_defense import LinuxDefenseEngine
+from app.core.platform.detect import Platform, PlatformFeatures
 from app.models.defender import DefenseType
 
 
 @pytest.mark.asyncio
 async def test_defense_factory_root():
-    with patch("os.geteuid", return_value=0):
-        engine = get_defense_engine()
-        assert isinstance(engine, LinuxDefenseEngine)
+
+    # Create a mock PlatformFeatures with root=True and Linux platform
+    mock_features = MagicMock(spec=PlatformFeatures)
+    mock_features.is_root = True
+    mock_features.platform = Platform.LINUX
+    mock_features.has_pfctl = False
+    mock_features.has_netsh = False
+
+    with patch(
+        "app.core.engine.defense_factory.get_platform_features",
+        return_value=mock_features,
+    ):
+        # Also need to mock is_linux() to return True
+        with patch("app.core.engine.defense_factory.is_linux", return_value=True):
+            engine = get_defense_engine()
+            assert isinstance(
+                engine, LinuxDefenseEngine
+            ), f"Expected LinuxDefenseEngine, got {type(engine).__name__}"
 
 
 @pytest.mark.asyncio

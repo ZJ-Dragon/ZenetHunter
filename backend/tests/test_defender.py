@@ -9,8 +9,9 @@ def test_get_policies(client: TestClient):
     data = response.json()
     assert isinstance(data, list)
     assert len(data) >= 2
-    assert any(p["id"] == DefenseType.QUARANTINE for p in data)
-    assert any(p["id"] == DefenseType.BLOCK_WAN for p in data)
+    # FastAPI serializes str Enum as string value
+    assert any(p["id"] == DefenseType.QUARANTINE.value for p in data)
+    assert any(p["id"] == DefenseType.BLOCK_WAN.value for p in data)
 
 
 def test_apply_defense_device_not_found(client: TestClient):
@@ -41,23 +42,28 @@ def test_apply_and_stop_defense(client: TestClient):
     assert response.status_code == 202
     data = response.json()
     assert data["device_mac"] == mac
-    assert data["status"] == DefenseStatus.ACTIVE
-    assert data["active_policy"] == DefenseType.BLOCK_WAN
+    # FastAPI serializes str Enum as string value
+    assert data["status"] == DefenseStatus.ACTIVE.value
+    assert data["active_policy"] == DefenseType.BLOCK_WAN.value
 
     # 3. Verify state updated
     dev_response = client.get(f"/api/devices/{mac}")
     assert dev_response.status_code == 200
     dev_data = dev_response.json()
-    assert dev_data["defense_status"] == DefenseStatus.ACTIVE
-    assert dev_data["active_defense_policy"] == DefenseType.BLOCK_WAN
+    # FastAPI serializes str Enum as string value
+    assert dev_data["defense_status"] == DefenseStatus.ACTIVE.value
+    assert dev_data["active_defense_policy"] == DefenseType.BLOCK_WAN.value
 
     # 4. Stop defense
     stop_response = client.post(f"/api/devices/{mac}/defense/stop")
     assert stop_response.status_code == 200
     stop_data = stop_response.json()
-    assert stop_data["status"] == DefenseStatus.INACTIVE
+    # FastAPI serializes str Enum as string value
+    assert stop_data["status"] == DefenseStatus.INACTIVE.value
 
     # 5. Verify state updated again
     dev_response = client.get(f"/api/devices/{mac}")
-    assert dev_response.json()["defense_status"] == DefenseStatus.INACTIVE
-    assert dev_response.json()["active_defense_policy"] is None
+    dev_data = dev_response.json()
+    # FastAPI serializes str Enum as string value
+    assert dev_data["defense_status"] == DefenseStatus.INACTIVE.value
+    assert dev_data["active_defense_policy"] is None
