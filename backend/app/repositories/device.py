@@ -170,6 +170,12 @@ class DeviceRepository:
 
 
 # Dependency injection for FastAPI
+def get_device_repository(session: AsyncSession) -> DeviceRepository:
+    """Get device repository instance."""
+    return DeviceRepository(session)
+
+
+# Dependency injection for FastAPI
 async def get_device_repository(session: AsyncSession) -> DeviceRepository:
     """Get device repository instance."""
     return DeviceRepository(session)
