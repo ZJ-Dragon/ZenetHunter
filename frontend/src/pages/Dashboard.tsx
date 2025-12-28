@@ -11,7 +11,6 @@ import {
   Activity,
   RefreshCw,
   TrendingUp,
-  Users,
   AlertTriangle,
   CheckCircle,
   Clock,

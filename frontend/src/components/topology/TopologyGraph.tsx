@@ -132,7 +132,7 @@ export const TopologyGraph: React.FC<TopologyGraphProps> = ({ data, onNodeClick 
   }, [hoveredNode]);
 
   // Enhanced link painting
-  const linkPaint = useCallback((link: any, ctx: CanvasRenderingContext2D, globalScale: number) => {
+  const linkPaint = useCallback((link: { source: TopologyNode & { x: number; y: number }; target: TopologyNode & { x: number; y: number } }, ctx: CanvasRenderingContext2D, globalScale: number) => {
     const source = link.source as TopologyNode & { x: number; y: number };
     const target = link.target as TopologyNode & { x: number; y: number };
 

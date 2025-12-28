@@ -4,7 +4,6 @@ import { TopologyNode } from '../../types/topology';
 import { DeviceStatus } from '../../types/device';
 import { AttackControl } from '../actions/AttackControl';
 import { SchedulerControl } from '../actions/SchedulerControl';
-import { clsx } from 'clsx';
 
 interface NodeDrawerProps {
   node: TopologyNode | null;

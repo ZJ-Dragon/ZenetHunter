@@ -13,7 +13,7 @@ interface InitialRouteGuardProps {
  * If system is configured but user is not authenticated, allows RequireAuth to handle redirect.
  */
 export const InitialRouteGuard: React.FC<InitialRouteGuardProps> = ({ children }) => {
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  const { isLoading: authLoading } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [isChecking, setIsChecking] = useState(true);

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from 'react';
-import { configService } from '../lib/services/config';
 import { logsService } from '../lib/services/logs';
 import { Settings as SettingsIcon, Moon, Sun, Monitor, Server, Save, RefreshCw } from 'lucide-react';
 import { clsx } from 'clsx';
@@ -10,7 +9,20 @@ type Platform = 'windows' | 'macos' | 'linux';
 export const Settings: React.FC = () => {
   const [theme, setTheme] = useState<Theme>('system');
   const [platform, setPlatform] = useState<Platform>('linux');
-  const [systemInfo, setSystemInfo] = useState<any>(null);
+  const [systemInfo, setSystemInfo] = useState<{
+    platform?: string;
+    platform_name?: string;
+    python_version?: string;
+    app_version?: string;
+    app_env?: string;
+    database_url?: string;
+    docker?: boolean;
+    capabilities?: {
+      scapy_available?: boolean;
+      root_permissions?: boolean;
+      network_scan_available?: boolean;
+    };
+  } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -33,8 +45,7 @@ export const Settings: React.FC = () => {
 
     // Fetch system info
     fetchSystemInfo();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [fetchSystemInfo]);
 
   // Listen for system theme changes when using system theme
   useEffect(() => {
@@ -56,7 +67,7 @@ export const Settings: React.FC = () => {
     };
   }, [theme]);
 
-  const fetchSystemInfo = async () => {
+  const fetchSystemInfo = useCallback(async () => {
     try {
       const info = await logsService.getSystemInfo();
       setSystemInfo(info);
@@ -77,7 +88,7 @@ export const Settings: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
   const applyTheme = (newTheme: Theme) => {
     const root = document.documentElement;

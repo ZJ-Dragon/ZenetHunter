@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import { scanService } from '../../lib/services/scan';
@@ -15,7 +15,7 @@ export const ScanButton: React.FC<{ className?: string }> = ({ className }) => {
   const currentScanIdRef = useRef<string | null>(null);
 
   // Listen for scan completion events
-  useWebSocketEvent(WSEventType.SCAN_COMPLETED, (data: any) => {
+  useWebSocketEvent(WSEventType.SCAN_COMPLETED, (data: { id: string; status: string; error?: string; error_type?: string; devices_found?: number }) => {
     if (currentScanIdRef.current && data.id === currentScanIdRef.current) {
       setIsScanning(false);
       currentScanIdRef.current = null;
@@ -54,20 +54,29 @@ export const ScanButton: React.FC<{ className?: string }> = ({ className }) => {
       currentScanIdRef.current = result.id;
       toast.success(`Scan initiated (ID: ${result.id.substring(0, 8)}...)`, { id: toastId, duration: 3000 });
       // Keep scanning state true until WebSocket event arrives
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Scan failed:', error);
-      let errorMessage = error?.response?.data?.detail || error?.message || 'Unknown error';
-      const errorCode = error?.response?.data?.error_code || error?.response?.status;
+      let errorMessage = 'Unknown error';
+      let errorCode: string | number | undefined;
+
+      // Handle axios error format
+      if (error && typeof error === 'object' && 'response' in error) {
+        const axiosError = error as { response?: { data?: { detail?: string; error_code?: string }; status?: number }; message?: string };
+        errorMessage = axiosError.response?.data?.detail || axiosError.message || 'Unknown error';
+        errorCode = axiosError.response?.data?.error_code || axiosError.response?.status;
+      } else if (error instanceof Error) {
+        errorMessage = error.message;
+      }
 
       // Provide user-friendly error messages
-      if (error?.response?.status === 401 || errorMessage.toLowerCase().includes('credentials') || errorMessage.toLowerCase().includes('unauthorized')) {
+      if (errorCode === 401 || errorMessage.toLowerCase().includes('credentials') || errorMessage.toLowerCase().includes('unauthorized')) {
         errorMessage = '认证失败：请先登录。如果已登录，请重新登录以刷新 token。';
         // Clear invalid token and redirect to login
         localStorage.removeItem('token');
         window.location.href = '/login';
       } else if (errorMessage.toLowerCase().includes('network') || errorMessage.toLowerCase().includes('network error')) {
         errorMessage = 'Network Error: Please check Docker configuration. Network scanning requires host network mode and NET_RAW/NET_ADMIN capabilities. See README for details.';
-      } else if (error?.code === 'ECONNREFUSED' || error?.message?.includes('Failed to fetch')) {
+      } else if (error && typeof error === 'object' && 'code' in error && (error.code === 'ECONNREFUSED' || (error.message && String(error.message).includes('Failed to fetch')))) {
         errorMessage = 'Connection Error: Cannot reach backend server. Please check if the backend is running.';
       }
 

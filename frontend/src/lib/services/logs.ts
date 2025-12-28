@@ -8,7 +8,7 @@ export interface SystemLog {
   message: string;
   correlation_id?: string;
   device_mac?: string;
-  context?: Record<string, any>;
+  context?: Record<string, unknown>;
 }
 
 export interface SystemInfo {
