@@ -110,7 +110,7 @@ class DeviceRepository:
                 ),
                 first_seen=device.first_seen,
                 last_seen=device.last_seen,
-                tags=device.tags or [],
+                tags=json.dumps(device.tags) if device.tags else None,
                 alias=device.alias,
             )
             self.session.add(db_device)
@@ -145,7 +145,7 @@ class DeviceRepository:
             device.active_defense_policy.value if device.active_defense_policy else None
         )
         device_model.last_seen = device.last_seen
-        device_model.tags = device.tags or []
+        device_model.tags = json.dumps(device.tags) if device.tags else None
         device_model.alias = device.alias
 
         await self.session.flush()
