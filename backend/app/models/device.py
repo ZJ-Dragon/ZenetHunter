@@ -61,8 +61,6 @@ class Device(BaseModel):
     tags: list[str] | None = Field(
         default_factory=list, description="Tags associated with the device"
     )
-    alias: str | None = Field(
-        None, description="User-friendly alias for the device"
-    )
+    alias: str | None = Field(None, description="User-friendly alias for the device")
 
     model_config = ConfigDict(from_attributes=True)
