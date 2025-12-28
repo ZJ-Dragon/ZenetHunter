@@ -167,3 +167,9 @@ class DeviceRepository:
             tags=device_model.tags or [],
             alias=device_model.alias,
         )
+
+
+# Dependency injection for FastAPI
+async def get_device_repository(session: AsyncSession) -> DeviceRepository:
+    """Get device repository instance."""
+    return DeviceRepository(session)
