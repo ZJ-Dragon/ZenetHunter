@@ -190,6 +190,9 @@ nohup.out
 *.sqlite
 *.sqlite3
 
+# Cache cleanup scripts (keep in repo, but ignore any generated files)
+# clean-cache.py, clean-cache.sh, clean-cache.bat are tracked
+
 # OS/editor swaps
 *.swp
 *.swo
