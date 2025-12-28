@@ -1,8 +1,12 @@
 from datetime import UTC, datetime
 
+from typing import Annotated
+
 from fastapi import APIRouter, Depends, Path, status
 from pydantic import BaseModel, Field
+from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.database import get_db
 from app.core.exceptions import AppError, ErrorCode
 from app.core.security import get_current_user
 from app.models.auth import User
@@ -13,6 +17,7 @@ from app.models.defender import (
     DefenseStatus,
 )
 from app.models.scheduler import StrategyIdentifier
+from app.repositories.device import DeviceRepository
 from app.services.defender import DefenderService
 from app.services.policy_selector import PolicySelector, get_policy_selector
 from app.services.state import get_state_manager
@@ -69,12 +74,19 @@ async def apply_defense(
         pattern=r"^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$",
     ),
     service: DefenderService = Depends(get_defender_service),
+    db: AsyncSession = Depends(get_db),
 ) -> DefenseResponse:
     """
     Start or update a defense mechanism on a specific device.
     This action is asynchronous and may take time to fully propagate.
     """
     await service.apply_defense(mac, request)
+    
+    # Update device defense status in database
+    repo = DeviceRepository(db)
+    await repo.update_defense_status(mac, DefenseStatus.ACTIVE, request.policy)
+    await db.commit()
+    
     return DefenseResponse(
         device_mac=mac,
         status=DefenseStatus.ACTIVE,
@@ -95,9 +107,16 @@ async def stop_defense(
         pattern=r"^([0-9A-Fa-f]{2}[:-]){5}([0-9A-Fa-f]{2})$",
     ),
     service: DefenderService = Depends(get_defender_service),
+    db: AsyncSession = Depends(get_db),
 ) -> DefenseResponse:
     """Stop any active defense mechanism on a specific device."""
     await service.stop_defense(mac)
+    
+    # Update device defense status in database
+    repo = DeviceRepository(db)
+    await repo.update_defense_status(mac, DefenseStatus.INACTIVE, None)
+    await db.commit()
+    
     return DefenseResponse(
         device_mac=mac,
         status=DefenseStatus.INACTIVE,
