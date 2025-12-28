@@ -152,7 +152,10 @@ class DeviceRepository:
 
     async def delete(self, mac: str) -> bool:
         """Delete a device by MAC address."""
-        device_model = await self.get_by_mac(mac)
+        result = await self.session.execute(
+            select(DeviceModel).where(DeviceModel.mac == mac.lower())
+        )
+        device_model = result.scalar_one_or_none()
         if not device_model:
             return False
 
