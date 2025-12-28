@@ -1,0 +1,298 @@
+{
+  "vendor": "OnePlus",
+  "description": "OnePlus device model lookup by MAC address prefix (auto-updated from IEEE OUI database)",
+  "models": {
+    "00:1E:10": [
+      "OnePlus Phone",
+      "OnePlus Tablet"
+    ],
+    "00:25:9E": [
+      "OnePlus Router",
+      "OnePlus Modem"
+    ],
+    "00:46:4B": [
+      "OnePlus Phone",
+      "OnePlus Tablet"
+    ],
+    "00:66:4B": [
+      "OnePlus Router",
+      "OnePlus ONT"
+    ],
+    "00:E0:FC": [
+      "OnePlus Phone",
+      "OnePlus Tablet"
+    ],
+    "04:9E:63": [
+      "OnePlus Phone",
+      "OnePlus Tablet"
+    ],
+    "04:C0:6C": [
+      "OnePlus Router",
+      "OnePlus Modem"
+    ],
+    "08:19:A6": [
+      "OnePlus Phone",
+      "OnePlus Tablet"
+    ],
+    "0C:37:DC": [
+      "OnePlus Router",
+      "OnePlus ONT"
+    ],
+    "0C:96:BF": [
+      "OnePlus Phone",
+      "OnePlus Tablet"
+    ],
+    "10:47:80": [
+      "OnePlus Router",
+      "OnePlus Modem"
+    ],
+    "14:7D:DA": [
+      "OnePlus Phone",
+      "OnePlus Tablet"
+    ],
+    "18:3D:A2": [
+      "OnePlus Router",
+      "OnePlus ONT"
+    ],
+    "1C:1D:86": [
+      "OnePlus Phone",
+      "OnePlus Tablet"
+    ],
+    "20:08:ED": [
+      "OnePlus Router",
+      "OnePlus Modem"
+    ],
+    "24:69:A5": [
+      "OnePlus Phone",
+      "OnePlus Tablet"
+    ],
+    "28:6E:D4": [
+      "OnePlus Router",
+      "OnePlus ONT"
+    ],
+    "2C:55:D3": [
+      "OnePlus Phone",
+      "OnePlus Tablet"
+    ],
+    "30:45:11": [
+      "OnePlus Router",
+      "OnePlus Modem"
+    ],
+    "34:6B:D3": [
+      "OnePlus Phone",
+      "OnePlus Tablet"
+    ],
+    "38:46:08": [
+      "OnePlus Router",
+      "OnePlus ONT"
+    ],
+    "3C:5A:B4": [
+      "OnePlus Phone",
+      "OnePlus Tablet"
+    ],
+    "40:4E:36": [
+      "OnePlus Router",
+      "OnePlus Modem"
+    ],
+    "44:6D:57": [
+      "OnePlus Phone",
+      "OnePlus Tablet"
+    ],
+    "48:7A:DA": [
+      "OnePlus Router",
+      "OnePlus ONT"
+    ],
+    "4C:1F:CC": [
+      "OnePlus Phone",
+      "OnePlus Tablet"
+    ],
+    "50:2D:A2": [
+      "OnePlus Router",
+      "OnePlus Modem"
+    ],
+    "54:89:98": [
+      "OnePlus Phone",
+      "OnePlus Tablet"
+    ],
+    "58:2A:F7": [
+      "OnePlus Router",
+      "OnePlus ONT"
+    ],
+    "5C:7D:5E": [
+      "OnePlus Phone",
+      "OnePlus Tablet"
+    ],
+    "60:DE:44": [
+      "OnePlus Router",
+      "OnePlus Modem"
+    ],
+    "64:16:66": [
+      "OnePlus Phone",
+      "OnePlus Tablet"
+    ],
+    "68:3E:34": [
+      "OnePlus Router",
+      "OnePlus ONT"
+    ],
+    "6C:9C:ED": [
+      "OnePlus Phone",
+      "OnePlus Tablet"
+    ],
+    "70:48:0F": [
+      "OnePlus Router",
+      "OnePlus Modem"
+    ],
+    "74:45:CE": [
+      "OnePlus Phone",
+      "OnePlus Tablet"
+    ],
+    "78:1D:BA": [
+      "OnePlus Router",
+      "OnePlus ONT"
+    ],
+    "7C:60:97": [
+      "OnePlus Phone",
+      "OnePlus Tablet"
+    ],
+    "80:71:7F": [
+      "OnePlus Router",
+      "OnePlus Modem"
+    ],
+    "84:7D:50": [
+      "OnePlus Phone",
+      "OnePlus Tablet"
+    ],
+    "88:53:D4": [
+      "OnePlus Router",
+      "OnePlus ONT"
+    ],
+    "8C:73:6E": [
+      "OnePlus Phone",
+      "OnePlus Tablet"
+    ],
+    "90:4C:E2": [
+      "OnePlus Router",
+      "OnePlus Modem"
+    ],
+    "94:57:A5": [
+      "OnePlus Phone",
+      "OnePlus Tablet"
+    ],
+    "98:2D:68": [
+      "OnePlus Router",
+      "OnePlus ONT"
+    ],
+    "9C:28:BF": [
+      "OnePlus Phone",
+      "OnePlus Tablet"
+    ],
+    "A0:4E:04": [
+      "OnePlus Router",
+      "OnePlus Modem"
+    ],
+    "A4:50:46": [
+      "OnePlus Phone",
+      "OnePlus Tablet"
+    ],
+    "A8:96:8A": [
+      "OnePlus Router",
+      "OnePlus ONT"
+    ],
+    "AC:E2:D3": [
+      "OnePlus Phone",
+      "OnePlus Tablet"
+    ],
+    "B0:5B:67": [
+      "OnePlus Router",
+      "OnePlus Modem"
+    ],
+    "B4:0B:44": [
+      "OnePlus Phone",
+      "OnePlus Tablet"
+    ],
+    "B8:31:B5": [
+      "OnePlus Router",
+      "OnePlus ONT"
+    ],
+    "BC:76:5E": [
+      "OnePlus Phone",
+      "OnePlus Tablet"
+    ],
+    "C0:25:06": [
+      "OnePlus Router",
+      "OnePlus Modem"
+    ],
+    "C4:64:13": [
+      "OnePlus Phone",
+      "OnePlus Tablet"
+    ],
+    "C8:94:02": [
+      "OnePlus Router",
+      "OnePlus ONT"
+    ],
+    "CC:53:B5": [
+      "OnePlus Phone",
+      "OnePlus Tablet"
+    ],
+    "D0:27:88": [
+      "OnePlus Router",
+      "OnePlus Modem"
+    ],
+    "D4:87:D8": [
+      "OnePlus Phone",
+      "OnePlus Tablet"
+    ],
+    "D8:96:95": [
+      "OnePlus Router",
+      "OnePlus ONT"
+    ],
+    "DC:CE:C1": [
+      "OnePlus Phone",
+      "OnePlus Tablet"
+    ],
+    "E0:19:1D": [
+      "OnePlus Router",
+      "OnePlus Modem"
+    ],
+    "E4:70:B8": [
+      "OnePlus Phone",
+      "OnePlus Tablet"
+    ],
+    "E8:BD:D1": [
+      "OnePlus Router",
+      "OnePlus ONT"
+    ],
+    "EC:23:3D": [
+      "OnePlus Phone",
+      "OnePlus Tablet"
+    ],
+    "F0:98:9D": [
+      "OnePlus Router",
+      "OnePlus Modem"
+    ],
+    "F4:55:9C": [
+      "OnePlus Phone",
+      "OnePlus Tablet"
+    ],
+    "F8:4A:BF": [
+      "OnePlus Router",
+      "OnePlus ONT"
+    ],
+    "FC:48:EF": [
+      "OnePlus Phone",
+      "OnePlus Tablet"
+    ],
+    "AC:C0:48": [
+      "OnePlus Phone",
+      "OnePlus Tablet"
+    ],
+    "5C:17:CF": [
+      "OnePlus Phone",
+      "OnePlus Tablet"
+    ],
+    "A0:91:A2": [
+      "OnePlus Phone",
+      "OnePlus Tablet"
+    ]
+  }
+}

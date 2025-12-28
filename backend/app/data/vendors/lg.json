@@ -1,0 +1,794 @@
+{
+  "vendor": "LG",
+  "description": "LG device model lookup by MAC address prefix (auto-updated from IEEE OUI database)",
+  "models": {
+    "00:1E:75": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "00:1F:E3": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "00:26:E2": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "00:50:7F": [
+      "LG Router",
+      "LG Modem"
+    ],
+    "00:90:0B": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "00:B0:D0": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "00:C0:9F": [
+      "LG Router",
+      "LG Modem"
+    ],
+    "00:E0:4C": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "00:F4:6F": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "04:0C:CE": [
+      "LG Router",
+      "LG Modem"
+    ],
+    "04:15:52": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "04:1E:64": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "04:26:65": [
+      "LG Router",
+      "LG Modem"
+    ],
+    "04:4C:A8": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "04:52:F3": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "04:5A:95": [
+      "LG Router",
+      "LG Modem"
+    ],
+    "04:69:F8": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "04:7D:7B": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "04:88:E2": [
+      "LG Router",
+      "LG Modem"
+    ],
+    "04:8D:38": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "04:92:26": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "04:98:F3": [
+      "LG Router",
+      "LG Modem"
+    ],
+    "04:9F:CA": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "04:A3:16": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "04:B1:67": [
+      "LG Router",
+      "LG Modem"
+    ],
+    "04:B4:29": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "04:B7:8A": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "04:BB:58": [
+      "LG Router",
+      "LG Modem"
+    ],
+    "04:BE:71": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "04:C0:6C": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "04:C1:37": [
+      "LG Router",
+      "LG Modem"
+    ],
+    "04:C2:05": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "04:C5:A4": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "04:C8:07": [
+      "LG Router",
+      "LG Modem"
+    ],
+    "04:CB:88": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "04:CE:14": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "04:D1:9A": [
+      "LG Router",
+      "LG Modem"
+    ],
+    "04:D4:C4": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "04:D7:8F": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "04:DB:56": [
+      "LG Router",
+      "LG Modem"
+    ],
+    "04:DD:4C": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "04:DF:69": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "04:E1:36": [
+      "LG Router",
+      "LG Modem"
+    ],
+    "04:E3:29": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "04:E5:99": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "04:E7:09": [
+      "LG Router",
+      "LG Modem"
+    ],
+    "04:E9:E5": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "04:EC:BB": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "04:EF:44": [
+      "LG Router",
+      "LG Modem"
+    ],
+    "04:F1:3E": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "04:F4:BC": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "04:F7:E4": [
+      "LG Router",
+      "LG Modem"
+    ],
+    "04:FA:83": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "04:FC:32": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "04:FE:7F": [
+      "LG Router",
+      "LG Modem"
+    ],
+    "08:00:07": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "08:66:98": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "08:74:02": [
+      "LG Router",
+      "LG Modem"
+    ],
+    "08:9E:01": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "08:A1:84": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "08:BE:AC": [
+      "LG Router",
+      "LG Modem"
+    ],
+    "0C:3E:9F": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "0C:4D:E9": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "0C:74:C2": [
+      "LG Router",
+      "LG Modem"
+    ],
+    "0C:8B:FD": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "0C:BC:9F": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "0C:D7:46": [
+      "LG Router",
+      "LG Modem"
+    ],
+    "0C:DD:24": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "0C:E0:E4": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "0C:F3:EE": [
+      "LG Router",
+      "LG Modem"
+    ],
+    "0C:F9:C0": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "10:93:E9": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "10:DD:B1": [
+      "LG Router",
+      "LG Modem"
+    ],
+    "14:10:9F": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "14:7D:DA": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "14:88:A6": [
+      "LG Router",
+      "LG Modem"
+    ],
+    "14:CF:92": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "14:DB:85": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "14:ED:BB": [
+      "LG Router",
+      "LG Modem"
+    ],
+    "14:F6:D8": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "18:20:32": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "18:65:90": [
+      "LG Router",
+      "LG Modem"
+    ],
+    "18:81:0E": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "18:AF:61": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "1C:1A:C0": [
+      "LG Router",
+      "LG Modem"
+    ],
+    "1C:AB:A7": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "1C:E6:2B": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "1C:F2:9A": [
+      "LG Router",
+      "LG Modem"
+    ],
+    "20:78:F0": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "20:9B:CD": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "20:C9:D0": [
+      "LG Router",
+      "LG Modem"
+    ],
+    "20:EE:28": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "24:1E:EB": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "24:5B:A7": [
+      "LG Router",
+      "LG Modem"
+    ],
+    "24:AB:81": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "24:DF:6A": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "28:37:37": [
+      "LG Router",
+      "LG Modem"
+    ],
+    "28:6F:7F": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "28:CF:DA": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "28:E0:2C": [
+      "LG Router",
+      "LG Modem"
+    ],
+    "2C:1F:23": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "2C:33:7A": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "2C:41:38": [
+      "LG Router",
+      "LG Modem"
+    ],
+    "2C:6E:85": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "30:90:AB": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "30:D9:D9": [
+      "LG Router",
+      "LG Modem"
+    ],
+    "34:15:9E": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "34:51:C9": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "34:A3:95": [
+      "LG Router",
+      "LG Modem"
+    ],
+    "38:CA:DA": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "3C:07:54": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "3C:15:C2": [
+      "LG Router",
+      "LG Modem"
+    ],
+    "40:33:1A": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "40:4E:36": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "40:6C:8F": [
+      "LG Router",
+      "LG Modem"
+    ],
+    "40:A6:D9": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "44:4C:0C": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "44:FB:42": [
+      "LG Router",
+      "LG Modem"
+    ],
+    "48:43:7C": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "48:BF:6B": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "4C:8D:79": [
+      "LG Router",
+      "LG Modem"
+    ],
+    "50:EA:D6": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "54:26:96": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "54:72:4F": [
+      "LG Router",
+      "LG Modem"
+    ],
+    "58:55:CA": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "5C:59:48": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "5C:8D:4E": [
+      "LG Router",
+      "LG Modem"
+    ],
+    "5C:95:AE": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "60:33:4B": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "60:90:84": [
+      "LG Router",
+      "LG Modem"
+    ],
+    "64:A3:CB": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "68:AB:1E": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "6C:40:08": [
+      "LG Router",
+      "LG Modem"
+    ],
+    "70:48:0F": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "70:56:81": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "74:E2:F5": [
+      "LG Router",
+      "LG Modem"
+    ],
+    "78:4F:43": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "7C:6D:62": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "7C:D1:C3": [
+      "LG Router",
+      "LG Modem"
+    ],
+    "80:E6:50": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "84:38:35": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "84:FC:FE": [
+      "LG Router",
+      "LG Modem"
+    ],
+    "88:63:DF": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "8C:85:90": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "90:72:40": [
+      "LG Router",
+      "LG Modem"
+    ],
+    "94:E9:6A": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "98:01:A7": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "9C:84:BF": [
+      "LG Router",
+      "LG Modem"
+    ],
+    "A0:99:9B": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "A4:5E:60": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "A4:C1:38": [
+      "LG Router",
+      "LG Modem"
+    ],
+    "A8:60:B6": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "AC:1F:74": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "AC:DE:48": [
+      "LG Router",
+      "LG Modem"
+    ],
+    "B0:65:BD": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "B4:F0:AB": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "B8:53:AC": [
+      "LG Router",
+      "LG Modem"
+    ],
+    "BC:3B:AF": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "C0:25:E9": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "C4:2C:03": [
+      "LG Router",
+      "LG Modem"
+    ],
+    "C8:1E:E7": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "CC:08:E0": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "D0:03:4B": [
+      "LG Router",
+      "LG Modem"
+    ],
+    "D4:9A:20": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "D8:30:62": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "D8:A2:5E": [
+      "LG Router",
+      "LG Modem"
+    ],
+    "DC:A9:04": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "E0:AC:CB": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "E4:CE:8F": [
+      "LG Router",
+      "LG Modem"
+    ],
+    "E8:40:40": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "EC:35:86": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "F0:18:98": [
+      "LG Router",
+      "LG Modem"
+    ],
+    "F0:DB:E2": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "F4:F1:5A": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "F8:1E:DF": [
+      "LG Router",
+      "LG Modem"
+    ],
+    "FC:25:3F": [
+      "LG Smart TV",
+      "LG Monitor"
+    ],
+    "AC:5A:F0": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "B0:37:95": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "58:FD:B1": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "20:17:42": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "78:5D:C8": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "38:8C:50": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "4C:BA:D7": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "64:CB:E9": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "F8:B9:5A": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "C4:36:6C": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "1C:08:C1": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "CC:88:26": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "2C:2B:F9": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "A0:6F:AA": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "A0:4F:85": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "7C:F3:1B": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "AC:F6:F7": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "64:C2:DE": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "00:57:C1": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "DC:0B:34": [
+      "LG Phone",
+      "LG Tablet"
+    ],
+    "A4:94:26": [
+      "LG Phone",
+      "LG Tablet"
+    ]
+  }
+}

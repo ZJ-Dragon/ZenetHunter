@@ -1,0 +1,1249 @@
+{
+  "vendor": "Apple",
+  "description": "Apple device model lookup by MAC address prefix (auto-updated from IEEE OUI database)",
+  "models": {
+    "00:03:93": [
+      "MacBook",
+      "iMac",
+      "Mac Pro",
+      "Mac mini"
+    ],
+    "00:05:02": [
+      "AirPort Express",
+      "AirPort Extreme",
+      "Time Capsule"
+    ],
+    "00:0A:27": [
+      "VirtualBox (Apple)",
+      "VMware (Apple)"
+    ],
+    "00:0A:95": [
+      "iPhone",
+      "iPad",
+      "iPod touch"
+    ],
+    "00:10:FA": [
+      "Apple TV",
+      "AirPlay devices"
+    ],
+    "00:14:51": [
+      "MacBook Pro",
+      "MacBook Air"
+    ],
+    "00:16:CB": [
+      "iPhone 3G",
+      "iPhone 3GS"
+    ],
+    "00:17:F2": [
+      "iPhone 4",
+      "iPhone 4S"
+    ],
+    "00:1E:C2": [
+      "iPhone 5",
+      "iPhone 5C",
+      "iPhone 5S"
+    ],
+    "00:23:12": [
+      "iPhone 6",
+      "iPhone 6 Plus"
+    ],
+    "00:23:DF": [
+      "iPhone 6S",
+      "iPhone 6S Plus"
+    ],
+    "00:25:00": [
+      "iPhone 7",
+      "iPhone 7 Plus"
+    ],
+    "00:25:4B": [
+      "iPhone 8",
+      "iPhone 8 Plus",
+      "iPhone X"
+    ],
+    "00:26:4A": [
+      "iPhone XS",
+      "iPhone XS Max",
+      "iPhone XR"
+    ],
+    "00:26:BB": [
+      "iPhone 11",
+      "iPhone 11 Pro",
+      "iPhone 11 Pro Max"
+    ],
+    "00:27:10": [
+      "iPhone 12",
+      "iPhone 12 mini",
+      "iPhone 12 Pro",
+      "iPhone 12 Pro Max"
+    ],
+    "00:27:74": [
+      "iPhone 13",
+      "iPhone 13 mini",
+      "iPhone 13 Pro",
+      "iPhone 13 Pro Max"
+    ],
+    "00:28:00": [
+      "iPhone 14",
+      "iPhone 14 Plus",
+      "iPhone 14 Pro",
+      "iPhone 14 Pro Max"
+    ],
+    "00:28:8A": [
+      "iPhone 15",
+      "iPhone 15 Plus",
+      "iPhone 15 Pro",
+      "iPhone 15 Pro Max"
+    ],
+    "00:50:E4": [
+      "iPad",
+      "iPad 2",
+      "iPad 3",
+      "iPad 4"
+    ],
+    "00:56:CD": [
+      "iPad Air",
+      "iPad Air 2"
+    ],
+    "00:5B:94": [
+      "iPad Pro"
+    ],
+    "00:5F:5E": [
+      "iPad mini",
+      "iPad mini 2",
+      "iPad mini 3",
+      "iPad mini 4"
+    ],
+    "00:60:1D": [
+      "Apple Watch"
+    ],
+    "00:6C:8D": [
+      "AirPods",
+      "AirPods Pro",
+      "AirPods Max"
+    ],
+    "00:7C:2D": [
+      "HomePod",
+      "HomePod mini"
+    ],
+    "00:88:65": [
+      "Mac Studio",
+      "Mac Pro (2019+)"
+    ],
+    "00:8E:F2": [
+      "MacBook Pro (M1/M2/M3)"
+    ],
+    "00:90:72": [
+      "iMac (M1/M2/M3)"
+    ],
+    "00:92:27": [
+      "Mac mini (M1/M2/M3)"
+    ],
+    "00:94:8B": [
+      "MacBook Air (M1/M2/M3)"
+    ],
+    "00:98:00": [
+      "Apple TV 4K",
+      "Apple TV HD"
+    ],
+    "00:9E:C7": [
+      "AirTag"
+    ],
+    "00:A0:40": [
+      "Beats headphones",
+      "Beats earbuds"
+    ],
+    "00:C6:10": [
+      "Apple Pencil"
+    ],
+    "00:CD:FE": [
+      "Magic Mouse",
+      "Magic Trackpad",
+      "Magic Keyboard"
+    ],
+    "00:D0:2D": [
+      "Apple Watch Series 3+"
+    ],
+    "00:DB:70": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "00:DE:AD": [
+      "Apple Developer devices"
+    ],
+    "00:E0:18": [
+      "Mac Pro (Intel)"
+    ],
+    "00:E0:4C": [
+      "iMac (Intel)"
+    ],
+    "00:E0:4D": [
+      "MacBook (Intel)"
+    ],
+    "00:E0:4E": [
+      "MacBook Pro (Intel)"
+    ],
+    "00:E0:4F": [
+      "MacBook Air (Intel)"
+    ],
+    "00:F4:6F": [
+      "iPad (2017+)",
+      "iPad (8th/9th/10th gen)"
+    ],
+    "00:FA:24": [
+      "Apple TV (4th gen+)"
+    ],
+    "04:0C:CE": [
+      "iPhone",
+      "iPad",
+      "iPod"
+    ],
+    "04:15:52": [
+      "MacBook",
+      "iMac"
+    ],
+    "04:1E:64": [
+      "Apple Watch"
+    ],
+    "04:26:65": [
+      "AirPods"
+    ],
+    "04:4C:A8": [
+      "iPhone",
+      "iPad"
+    ],
+    "04:52:F3": [
+      "MacBook Pro",
+      "MacBook Air"
+    ],
+    "04:5A:95": [
+      "iMac",
+      "Mac mini"
+    ],
+    "04:69:F8": [
+      "Apple TV"
+    ],
+    "04:7D:7B": [
+      "iPad"
+    ],
+    "04:88:E2": [
+      "iPhone"
+    ],
+    "04:8D:38": [
+      "MacBook"
+    ],
+    "04:92:26": [
+      "Apple Watch"
+    ],
+    "04:98:F3": [
+      "AirPods Pro"
+    ],
+    "04:9F:CA": [
+      "HomePod"
+    ],
+    "04:A3:16": [
+      "Mac Studio"
+    ],
+    "04:B1:67": [
+      "iPhone 14+",
+      "iPhone 15+"
+    ],
+    "04:B4:29": [
+      "iPad Pro"
+    ],
+    "04:B7:8A": [
+      "MacBook Pro (M-series)"
+    ],
+    "04:BB:58": [
+      "iMac (M-series)"
+    ],
+    "04:BE:71": [
+      "Mac mini (M-series)"
+    ],
+    "04:C0:6C": [
+      "MacBook Air (M-series)"
+    ],
+    "04:C1:37": [
+      "Apple TV 4K"
+    ],
+    "04:C2:05": [
+      "AirTag"
+    ],
+    "04:C5:A4": [
+      "Beats"
+    ],
+    "04:C8:07": [
+      "Apple Pencil"
+    ],
+    "04:CB:88": [
+      "Magic accessories"
+    ],
+    "04:CE:14": [
+      "Apple Watch Series 6+"
+    ],
+    "04:D1:9A": [
+      "iPhone SE"
+    ],
+    "04:D4:C4": [
+      "iPad Air"
+    ],
+    "04:D7:8F": [
+      "iPad mini"
+    ],
+    "04:DB:56": [
+      "Mac Pro"
+    ],
+    "04:DD:4C": [
+      "iMac Pro"
+    ],
+    "04:DF:69": [
+      "MacBook (12-inch)"
+    ],
+    "04:E1:36": [
+      "MacBook Pro (13-inch)"
+    ],
+    "04:E3:29": [
+      "MacBook Pro (15-inch/16-inch)"
+    ],
+    "04:E5:99": [
+      "MacBook Air (13-inch)"
+    ],
+    "04:E7:09": [
+      "MacBook Air (11-inch)"
+    ],
+    "04:E9:E5": [
+      "iPad"
+    ],
+    "04:EC:BB": [
+      "Apple TV"
+    ],
+    "04:EF:44": [
+      "HomePod mini"
+    ],
+    "04:F1:3E": [
+      "AirPods Max"
+    ],
+    "04:F4:BC": [
+      "Apple Watch Ultra"
+    ],
+    "04:F7:E4": [
+      "iPhone 13+",
+      "iPhone 14+",
+      "iPhone 15+"
+    ],
+    "04:FA:83": [
+      "iPad Pro (M1/M2)"
+    ],
+    "04:FC:32": [
+      "Mac Studio"
+    ],
+    "04:FE:7F": [
+      "Mac Pro (2019+)"
+    ],
+    "08:00:07": [
+      "Apple (various)"
+    ],
+    "08:66:98": [
+      "iPhone",
+      "iPad"
+    ],
+    "08:74:02": [
+      "MacBook",
+      "iMac"
+    ],
+    "08:9E:01": [
+      "Apple Watch"
+    ],
+    "08:A1:84": [
+      "AirPods"
+    ],
+    "08:BE:AC": [
+      "iPhone",
+      "iPad"
+    ],
+    "0C:3E:9F": [
+      "MacBook Pro"
+    ],
+    "0C:4D:E9": [
+      "iMac"
+    ],
+    "0C:74:C2": [
+      "MacBook Air"
+    ],
+    "0C:8B:FD": [
+      "iPad"
+    ],
+    "0C:BC:9F": [
+      "Apple TV"
+    ],
+    "0C:D7:46": [
+      "HomePod"
+    ],
+    "0C:DD:24": [
+      "Mac Studio"
+    ],
+    "0C:E0:E4": [
+      "iPhone"
+    ],
+    "0C:F3:EE": [
+      "Apple Watch"
+    ],
+    "0C:F9:C0": [
+      "AirPods Pro"
+    ],
+    "10:93:E9": [
+      "MacBook",
+      "iMac"
+    ],
+    "10:DD:B1": [
+      "iPhone",
+      "iPad"
+    ],
+    "14:10:9F": [
+      "MacBook Pro"
+    ],
+    "14:7D:DA": [
+      "iMac"
+    ],
+    "14:88:A6": [
+      "MacBook Air"
+    ],
+    "14:CF:92": [
+      "iPad"
+    ],
+    "14:DB:85": [
+      "Apple TV"
+    ],
+    "14:ED:BB": [
+      "HomePod"
+    ],
+    "14:F6:D8": [
+      "Mac Studio"
+    ],
+    "18:20:32": [
+      "iPhone"
+    ],
+    "18:65:90": [
+      "Apple Watch"
+    ],
+    "18:81:0E": [
+      "AirPods"
+    ],
+    "18:AF:61": [
+      "MacBook",
+      "iMac"
+    ],
+    "1C:1A:C0": [
+      "iPhone",
+      "iPad"
+    ],
+    "1C:AB:A7": [
+      "MacBook Pro"
+    ],
+    "1C:E6:2B": [
+      "iMac"
+    ],
+    "1C:F2:9A": [
+      "MacBook Air"
+    ],
+    "20:78:F0": [
+      "iPad"
+    ],
+    "20:9B:CD": [
+      "Apple TV"
+    ],
+    "20:C9:D0": [
+      "HomePod"
+    ],
+    "20:EE:28": [
+      "Mac Studio"
+    ],
+    "24:1E:EB": [
+      "iPhone"
+    ],
+    "24:5B:A7": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "24:AB:81": [
+      "AirPods"
+    ],
+    "24:DF:6A": [
+      "MacBook",
+      "iMac"
+    ],
+    "28:37:37": [
+      "iPhone",
+      "iPad"
+    ],
+    "28:6F:7F": [
+      "MacBook Pro"
+    ],
+    "28:CF:DA": [
+      "iMac"
+    ],
+    "28:E0:2C": [
+      "MacBook Air"
+    ],
+    "2C:1F:23": [
+      "iPad"
+    ],
+    "2C:33:7A": [
+      "Apple TV"
+    ],
+    "2C:41:38": [
+      "HomePod"
+    ],
+    "2C:6E:85": [
+      "Mac Studio"
+    ],
+    "30:90:AB": [
+      "iPhone"
+    ],
+    "30:D9:D9": [
+      "Apple Watch"
+    ],
+    "34:15:9E": [
+      "AirPods"
+    ],
+    "34:51:C9": [
+      "MacBook",
+      "iMac"
+    ],
+    "34:A3:95": [
+      "iPhone",
+      "iPad"
+    ],
+    "38:CA:DA": [
+      "MacBook Pro"
+    ],
+    "3C:07:54": [
+      "iMac"
+    ],
+    "3C:15:C2": [
+      "MacBook Air"
+    ],
+    "40:33:1A": [
+      "iPad"
+    ],
+    "40:4E:36": [
+      "Apple TV"
+    ],
+    "40:6C:8F": [
+      "HomePod"
+    ],
+    "40:A6:D9": [
+      "Mac Studio"
+    ],
+    "44:4C:0C": [
+      "iPhone"
+    ],
+    "44:FB:42": [
+      "Apple Watch"
+    ],
+    "48:43:7C": [
+      "AirPods"
+    ],
+    "48:BF:6B": [
+      "MacBook",
+      "iMac"
+    ],
+    "4C:8D:79": [
+      "iPhone",
+      "iPad"
+    ],
+    "50:EA:D6": [
+      "MacBook Pro"
+    ],
+    "54:26:96": [
+      "iMac"
+    ],
+    "54:72:4F": [
+      "MacBook Air"
+    ],
+    "58:55:CA": [
+      "iPad"
+    ],
+    "5C:59:48": [
+      "Apple TV"
+    ],
+    "5C:8D:4E": [
+      "HomePod"
+    ],
+    "5C:95:AE": [
+      "Mac Studio"
+    ],
+    "60:33:4B": [
+      "iPhone"
+    ],
+    "60:90:84": [
+      "Apple Watch"
+    ],
+    "64:A3:CB": [
+      "AirPods"
+    ],
+    "68:AB:1E": [
+      "MacBook",
+      "iMac"
+    ],
+    "6C:40:08": [
+      "iPhone",
+      "iPad"
+    ],
+    "70:48:0F": [
+      "MacBook Pro"
+    ],
+    "70:56:81": [
+      "iMac"
+    ],
+    "74:E2:F5": [
+      "MacBook Air"
+    ],
+    "78:4F:43": [
+      "iPad"
+    ],
+    "7C:6D:62": [
+      "Apple TV"
+    ],
+    "7C:D1:C3": [
+      "HomePod"
+    ],
+    "80:E6:50": [
+      "Mac Studio"
+    ],
+    "84:38:35": [
+      "iPhone"
+    ],
+    "84:FC:FE": [
+      "Apple Watch"
+    ],
+    "88:63:DF": [
+      "AirPods"
+    ],
+    "8C:85:90": [
+      "MacBook",
+      "iMac"
+    ],
+    "90:72:40": [
+      "iPhone",
+      "iPad"
+    ],
+    "94:E9:6A": [
+      "MacBook Pro"
+    ],
+    "98:01:A7": [
+      "iMac"
+    ],
+    "9C:84:BF": [
+      "MacBook Air"
+    ],
+    "A0:99:9B": [
+      "iPad"
+    ],
+    "A4:5E:60": [
+      "Apple TV"
+    ],
+    "A4:C1:38": [
+      "HomePod"
+    ],
+    "A8:60:B6": [
+      "Mac Studio"
+    ],
+    "AC:1F:74": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "AC:DE:48": [
+      "Apple Watch"
+    ],
+    "B0:65:BD": [
+      "AirPods"
+    ],
+    "B4:F0:AB": [
+      "MacBook",
+      "iMac"
+    ],
+    "B8:53:AC": [
+      "iPhone",
+      "iPad"
+    ],
+    "BC:3B:AF": [
+      "MacBook Pro"
+    ],
+    "C0:25:E9": [
+      "iMac"
+    ],
+    "C4:2C:03": [
+      "MacBook Air"
+    ],
+    "C8:1E:E7": [
+      "iPad"
+    ],
+    "CC:08:E0": [
+      "Apple TV"
+    ],
+    "D0:03:4B": [
+      "HomePod"
+    ],
+    "D4:9A:20": [
+      "Mac Studio"
+    ],
+    "D8:30:62": [
+      "iPhone"
+    ],
+    "D8:A2:5E": [
+      "Apple Watch"
+    ],
+    "DC:A9:04": [
+      "AirPods"
+    ],
+    "E0:AC:CB": [
+      "MacBook",
+      "iMac"
+    ],
+    "E4:CE:8F": [
+      "iPhone",
+      "iPad"
+    ],
+    "E8:40:40": [
+      "MacBook Pro"
+    ],
+    "EC:35:86": [
+      "iMac"
+    ],
+    "F0:18:98": [
+      "MacBook Air"
+    ],
+    "F0:DB:E2": [
+      "iPad"
+    ],
+    "F4:F1:5A": [
+      "Apple TV"
+    ],
+    "F8:1E:DF": [
+      "HomePod"
+    ],
+    "FC:25:3F": [
+      "Mac Studio"
+    ],
+    "F0:EE:7A": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "58:AD:12": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "60:FD:A6": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "80:A9:97": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "34:8C:5E": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "20:15:82": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "40:92:1A": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "10:E2:C9": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "A4:FC:14": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "A8:1A:F1": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "CC:08:FA": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "90:9B:6F": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "74:73:B4": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "30:82:16": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "7C:29:6F": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "40:ED:CF": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "8C:98:6B": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "1C:86:82": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "80:54:E3": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "B8:14:4D": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "EC:28:D3": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "08:65:18": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "2C:57:CE": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "B0:67:B5": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "5C:52:84": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "C0:95:6D": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "3C:39:C8": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "A8:AB:B5": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "58:64:C4": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "B0:3F:64": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "2C:82:17": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "14:2D:4D": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "EC:42:CC": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "B8:21:1C": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "DC:80:84": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "80:65:7C": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "BC:D0:74": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "98:DD:60": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "C0:44:42": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "D4:68:AA": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "F8:C3:CC": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "D8:BE:1F": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "98:50:2E": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "58:0A:D4": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "A4:77:F3": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "08:8E:DC": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "A8:4A:28": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "84:AC:16": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "2C:BC:87": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "C4:12:34": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "3C:A6:F6": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "4C:AB:4F": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "9C:58:3C": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "FC:4E:A4": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "F4:BE:EC": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "54:E6:1B": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "50:1F:C6": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "CC:69:FA": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "10:CE:E9": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "54:09:10": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "9C:FC:28": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "B4:85:E1": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "0C:19:F8": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "B4:56:E3": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "4C:20:B8": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "14:88:E6": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "FC:66:CF": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "AC:1D:06": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "44:A8:FC": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "F8:10:93": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "E8:85:4B": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "28:EC:95": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "E0:2B:96": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "B4:40:A4": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "48:B8:A3": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "F4:DB:E3": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "10:29:59": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "E4:76:84": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "F0:5C:D5": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "70:EA:5A": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "90:81:2A": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "B8:7B:C5": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "40:70:F5": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "B0:35:B5": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "80:0C:67": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "60:8B:0E": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "88:B2:91": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "C4:2A:D0": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "CC:D2:81": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "10:40:F3": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "44:E6:6E": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "C0:E8:62": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "F4:06:16": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "58:6B:14": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "BC:B8:63": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "E4:B2:FB": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "F8:38:80": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "4C:56:9D": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "38:53:9C": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "40:26:19": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "6C:E8:5C": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "10:94:BB": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "F8:6F:C1": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "28:FF:3C": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "F0:99:B6": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "88:E9:FE": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "38:89:2C": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "74:9E:AF": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "94:BF:2D": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "40:CB:C0": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "C4:61:8B": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "08:E6:89": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "DC:56:E7": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "34:08:BC": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "1C:36:BB": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "3C:2E:FF": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "24:F6:77": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "B0:CA:68": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "C8:3C:85": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "54:33:CB": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "A8:5C:2C": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "B8:63:4D": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "A4:E9:75": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "30:35:AD": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "84:41:67": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "98:00:C6": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "70:F0:87": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "6C:19:C0": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "B0:70:2D": [
+      "Apple Phone",
+      "Apple Tablet"
+    ],
+    "2C:33:61": [
+      "Apple Phone",
+      "Apple Tablet"
+    ]
+  }
+}

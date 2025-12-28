@@ -1,0 +1,269 @@
+{
+  "vendor": "Lenovo",
+  "description": "Lenovo device model lookup by MAC address prefix (auto-updated from IEEE OUI database)",
+  "models": {
+    "00:21:CC": [
+      "Lenovo ThinkPad",
+      "Lenovo Laptop"
+    ],
+    "00:23:8B": [
+      "Lenovo IdeaPad",
+      "Lenovo Desktop"
+    ],
+    "00:25:64": [
+      "Lenovo ThinkCentre",
+      "Lenovo All-in-One"
+    ],
+    "00:27:0E": [
+      "Lenovo Yoga",
+      "Lenovo Tablet"
+    ],
+    "00:50:F2": [
+      "Lenovo Router",
+      "Lenovo Modem"
+    ],
+    "00:90:0B": [
+      "Lenovo ThinkPad",
+      "Lenovo Laptop"
+    ],
+    "00:B0:D0": [
+      "Lenovo IdeaPad",
+      "Lenovo Desktop"
+    ],
+    "00:C0:9F": [
+      "Lenovo ThinkCentre",
+      "Lenovo All-in-One"
+    ],
+    "00:E0:4C": [
+      "Lenovo Yoga",
+      "Lenovo Tablet"
+    ],
+    "00:F4:6F": [
+      "Lenovo Router",
+      "Lenovo Modem"
+    ],
+    "04:0C:CE": [
+      "Lenovo ThinkPad",
+      "Lenovo Laptop"
+    ],
+    "04:15:52": [
+      "Lenovo IdeaPad",
+      "Lenovo Desktop"
+    ],
+    "04:1E:64": [
+      "Lenovo ThinkCentre",
+      "Lenovo All-in-One"
+    ],
+    "04:26:65": [
+      "Lenovo Yoga",
+      "Lenovo Tablet"
+    ],
+    "04:4C:A8": [
+      "Lenovo Router",
+      "Lenovo Modem"
+    ],
+    "04:52:F3": [
+      "Lenovo ThinkPad",
+      "Lenovo Laptop"
+    ],
+    "04:5A:95": [
+      "Lenovo IdeaPad",
+      "Lenovo Desktop"
+    ],
+    "04:69:F8": [
+      "Lenovo ThinkCentre",
+      "Lenovo All-in-One"
+    ],
+    "04:7D:7B": [
+      "Lenovo Yoga",
+      "Lenovo Tablet"
+    ],
+    "04:88:E2": [
+      "Lenovo Router",
+      "Lenovo Modem"
+    ],
+    "04:8D:38": [
+      "Lenovo ThinkPad",
+      "Lenovo Laptop"
+    ],
+    "04:92:26": [
+      "Lenovo IdeaPad",
+      "Lenovo Desktop"
+    ],
+    "04:98:F3": [
+      "Lenovo ThinkCentre",
+      "Lenovo All-in-One"
+    ],
+    "04:9F:CA": [
+      "Lenovo Yoga",
+      "Lenovo Tablet"
+    ],
+    "04:A3:16": [
+      "Lenovo Router",
+      "Lenovo Modem"
+    ],
+    "04:B1:67": [
+      "Lenovo ThinkPad",
+      "Lenovo Laptop"
+    ],
+    "04:B4:29": [
+      "Lenovo IdeaPad",
+      "Lenovo Desktop"
+    ],
+    "04:B7:8A": [
+      "Lenovo ThinkCentre",
+      "Lenovo All-in-One"
+    ],
+    "04:BB:58": [
+      "Lenovo Yoga",
+      "Lenovo Tablet"
+    ],
+    "04:BE:71": [
+      "Lenovo Router",
+      "Lenovo Modem"
+    ],
+    "04:C0:6C": [
+      "Lenovo ThinkPad",
+      "Lenovo Laptop"
+    ],
+    "04:C1:37": [
+      "Lenovo IdeaPad",
+      "Lenovo Desktop"
+    ],
+    "04:C2:05": [
+      "Lenovo ThinkCentre",
+      "Lenovo All-in-One"
+    ],
+    "04:C5:A4": [
+      "Lenovo Yoga",
+      "Lenovo Tablet"
+    ],
+    "04:C8:07": [
+      "Lenovo Router",
+      "Lenovo Modem"
+    ],
+    "04:CB:88": [
+      "Lenovo ThinkPad",
+      "Lenovo Laptop"
+    ],
+    "04:CE:14": [
+      "Lenovo IdeaPad",
+      "Lenovo Desktop"
+    ],
+    "04:D1:9A": [
+      "Lenovo ThinkCentre",
+      "Lenovo All-in-One"
+    ],
+    "04:D4:C4": [
+      "Lenovo Yoga",
+      "Lenovo Tablet"
+    ],
+    "04:D7:8F": [
+      "Lenovo Router",
+      "Lenovo Modem"
+    ],
+    "04:DB:56": [
+      "Lenovo ThinkPad",
+      "Lenovo Laptop"
+    ],
+    "04:DD:4C": [
+      "Lenovo IdeaPad",
+      "Lenovo Desktop"
+    ],
+    "04:DF:69": [
+      "Lenovo ThinkCentre",
+      "Lenovo All-in-One"
+    ],
+    "04:E1:36": [
+      "Lenovo Yoga",
+      "Lenovo Tablet"
+    ],
+    "04:E3:29": [
+      "Lenovo Router",
+      "Lenovo Modem"
+    ],
+    "04:E5:99": [
+      "Lenovo ThinkPad",
+      "Lenovo Laptop"
+    ],
+    "04:E7:09": [
+      "Lenovo IdeaPad",
+      "Lenovo Desktop"
+    ],
+    "04:E9:E5": [
+      "Lenovo ThinkCentre",
+      "Lenovo All-in-One"
+    ],
+    "04:EC:BB": [
+      "Lenovo Yoga",
+      "Lenovo Tablet"
+    ],
+    "04:EF:44": [
+      "Lenovo Router",
+      "Lenovo Modem"
+    ],
+    "04:F1:3E": [
+      "Lenovo ThinkPad",
+      "Lenovo Laptop"
+    ],
+    "04:F4:BC": [
+      "Lenovo IdeaPad",
+      "Lenovo Desktop"
+    ],
+    "04:F7:E4": [
+      "Lenovo ThinkCentre",
+      "Lenovo All-in-One"
+    ],
+    "04:FA:83": [
+      "Lenovo Yoga",
+      "Lenovo Tablet"
+    ],
+    "04:FC:32": [
+      "Lenovo Router",
+      "Lenovo Modem"
+    ],
+    "04:FE:7F": [
+      "Lenovo ThinkPad",
+      "Lenovo Laptop"
+    ],
+    "50:16:F4": [
+      "Lenovo Device"
+    ],
+    "C4:A0:52": [
+      "Lenovo Device"
+    ],
+    "C8:58:95": [
+      "Lenovo Device"
+    ],
+    "08:AA:55": [
+      "Lenovo Device"
+    ],
+    "24:46:C8": [
+      "Lenovo Device"
+    ],
+    "60:1D:91": [
+      "Lenovo Device"
+    ],
+    "D4:C9:4B": [
+      "Lenovo Device"
+    ],
+    "DC:BF:E9": [
+      "Lenovo Device"
+    ],
+    "A8:96:75": [
+      "Lenovo Device"
+    ],
+    "F0:D7:AA": [
+      "Lenovo Device"
+    ],
+    "48:C3:5A": [
+      "Lenovo Device"
+    ],
+    "10:C5:95": [
+      "Lenovo Device"
+    ],
+    "A4:11:94": [
+      "Lenovo Device"
+    ]
+  }
+}

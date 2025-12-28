@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import logging
 from datetime import UTC, datetime
 from typing import Any
 
@@ -10,6 +11,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.db.device import DeviceModel, DeviceStatusEnum, DeviceTypeEnum
 from app.models.device import Device, DeviceStatus, DeviceType
+
+logger = logging.getLogger(__name__)
 
 
 class DeviceRepository:
@@ -68,6 +71,7 @@ class DeviceRepository:
                 ip=str(device.ip),
                 name=device.name,
                 vendor=device.vendor,
+                model=device.model,
                 type=self._domain_type_to_db(device.type),
                 status=self._domain_status_to_db(device.status),
                 attack_status=device.attack_status,
@@ -82,6 +86,7 @@ class DeviceRepository:
             model.ip = str(device.ip)
             model.name = device.name
             model.vendor = device.vendor
+            model.model = device.model
             model.type = self._domain_type_to_db(device.type)
             model.status = self._domain_status_to_db(device.status)
             model.attack_status = device.attack_status
@@ -165,6 +170,20 @@ class DeviceRepository:
         await self.session.flush()
         return await self.get_by_mac(mac_lower)
 
+    async def clear_all(self) -> int:
+        """Clear all devices from the database.
+
+        Returns:
+            Number of devices deleted
+        """
+        from sqlalchemy import delete
+        
+        result = await self.session.execute(delete(DeviceModel))
+        await self.session.flush()
+        deleted_count = result.rowcount if result.rowcount is not None else 0
+        logger.info(f"Cleared {deleted_count} devices from database")
+        return deleted_count
+
     def _model_to_domain(self, model: DeviceModel) -> Device:
         """Convert ORM model to domain model."""
         return Device(
@@ -172,6 +191,7 @@ class DeviceRepository:
             ip=model.ip,
             name=model.name,
             vendor=model.vendor,
+            model=model.model,
             type=self._db_type_to_domain(model.type),
             status=self._db_status_to_domain(model.status),
             attack_status=model.attack_status,

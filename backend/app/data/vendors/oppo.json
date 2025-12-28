@@ -1,0 +1,426 @@
+{
+  "vendor": "OPPO",
+  "description": "OPPO device model lookup by MAC address prefix (auto-updated from IEEE OUI database)",
+  "models": {
+    "00:1E:10": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "00:25:9E": [
+      "OPPO Router",
+      "OPPO Modem"
+    ],
+    "00:46:4B": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "00:66:4B": [
+      "OPPO Router",
+      "OPPO ONT"
+    ],
+    "00:E0:FC": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "04:9E:63": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "04:C0:6C": [
+      "OPPO Router",
+      "OPPO Modem"
+    ],
+    "08:19:A6": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "0C:37:DC": [
+      "OPPO Router",
+      "OPPO ONT"
+    ],
+    "0C:96:BF": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "10:47:80": [
+      "OPPO Router",
+      "OPPO Modem"
+    ],
+    "14:7D:DA": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "18:3D:A2": [
+      "OPPO Router",
+      "OPPO ONT"
+    ],
+    "1C:1D:86": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "20:08:ED": [
+      "OPPO Router",
+      "OPPO Modem"
+    ],
+    "24:69:A5": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "28:6E:D4": [
+      "OPPO Router",
+      "OPPO ONT"
+    ],
+    "2C:55:D3": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "30:45:11": [
+      "OPPO Router",
+      "OPPO Modem"
+    ],
+    "34:6B:D3": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "38:46:08": [
+      "OPPO Router",
+      "OPPO ONT"
+    ],
+    "3C:5A:B4": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "40:4E:36": [
+      "OPPO Router",
+      "OPPO Modem"
+    ],
+    "44:6D:57": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "48:7A:DA": [
+      "OPPO Router",
+      "OPPO ONT"
+    ],
+    "4C:1F:CC": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "50:2D:A2": [
+      "OPPO Router",
+      "OPPO Modem"
+    ],
+    "54:89:98": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "58:2A:F7": [
+      "OPPO Router",
+      "OPPO ONT"
+    ],
+    "5C:7D:5E": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "60:DE:44": [
+      "OPPO Router",
+      "OPPO Modem"
+    ],
+    "64:16:66": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "68:3E:34": [
+      "OPPO Router",
+      "OPPO ONT"
+    ],
+    "6C:9C:ED": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "70:48:0F": [
+      "OPPO Router",
+      "OPPO Modem"
+    ],
+    "74:45:CE": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "78:1D:BA": [
+      "OPPO Router",
+      "OPPO ONT"
+    ],
+    "7C:60:97": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "80:71:7F": [
+      "OPPO Router",
+      "OPPO Modem"
+    ],
+    "84:7D:50": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "88:53:D4": [
+      "OPPO Router",
+      "OPPO ONT"
+    ],
+    "8C:73:6E": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "90:4C:E2": [
+      "OPPO Router",
+      "OPPO Modem"
+    ],
+    "94:57:A5": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "98:2D:68": [
+      "OPPO Router",
+      "OPPO ONT"
+    ],
+    "9C:28:BF": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "A0:4E:04": [
+      "OPPO Router",
+      "OPPO Modem"
+    ],
+    "A4:50:46": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "A8:96:8A": [
+      "OPPO Router",
+      "OPPO ONT"
+    ],
+    "AC:E2:D3": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "B0:5B:67": [
+      "OPPO Router",
+      "OPPO Modem"
+    ],
+    "B4:0B:44": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "B8:31:B5": [
+      "OPPO Router",
+      "OPPO ONT"
+    ],
+    "BC:76:5E": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "C0:25:06": [
+      "OPPO Router",
+      "OPPO Modem"
+    ],
+    "C4:64:13": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "C8:94:02": [
+      "OPPO Router",
+      "OPPO ONT"
+    ],
+    "CC:53:B5": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "D0:27:88": [
+      "OPPO Router",
+      "OPPO Modem"
+    ],
+    "D4:87:D8": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "D8:96:95": [
+      "OPPO Router",
+      "OPPO ONT"
+    ],
+    "DC:CE:C1": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "E0:19:1D": [
+      "OPPO Router",
+      "OPPO Modem"
+    ],
+    "E4:70:B8": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "E8:BD:D1": [
+      "OPPO Router",
+      "OPPO ONT"
+    ],
+    "EC:23:3D": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "F0:98:9D": [
+      "OPPO Router",
+      "OPPO Modem"
+    ],
+    "F4:55:9C": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "F8:4A:BF": [
+      "OPPO Router",
+      "OPPO ONT"
+    ],
+    "FC:48:EF": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "E4:40:97": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "DC:B4:CA": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "D4:BA:FA": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "94:97:AE": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "0C:BD:75": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "74:D5:58": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "BC:64:D9": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "BC:E8:FA": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "14:9B:F3": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "2C:FC:8B": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "24:75:3A": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "50:87:4D": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "B4:20:5B": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "4C:50:F1": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "E4:0C:FD": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "58:D6:97": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "14:5E:69": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "24:06:AA": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "E4:33:AE": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "B0:B5:C3": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "F0:67:28": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "B8:C9:B5": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "C4:E3:9F": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "24:79:F3": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "D8:1E:DD": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "C0:2E:25": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "58:C6:F0": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "2C:A9:F0": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "B4:CB:57": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "18:D7:17": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "E4:C4:83": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "08:4A:CF": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "D4:50:3F": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "38:29:5A": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ],
+    "E4:47:90": [
+      "OPPO Phone",
+      "OPPO Tablet"
+    ]
+  }
+}

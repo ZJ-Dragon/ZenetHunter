@@ -1,0 +1,374 @@
+{
+  "vendor": "Vivo",
+  "description": "Vivo device model lookup by MAC address prefix (auto-updated from IEEE OUI database)",
+  "models": {
+    "00:1E:10": [
+      "Vivo Phone",
+      "Vivo Tablet"
+    ],
+    "00:25:9E": [
+      "Vivo Router",
+      "Vivo Modem"
+    ],
+    "00:46:4B": [
+      "Vivo Phone",
+      "Vivo Tablet"
+    ],
+    "00:66:4B": [
+      "Vivo Router",
+      "Vivo ONT"
+    ],
+    "00:E0:FC": [
+      "Vivo Phone",
+      "Vivo Tablet"
+    ],
+    "04:9E:63": [
+      "Vivo Phone",
+      "Vivo Tablet"
+    ],
+    "04:C0:6C": [
+      "Vivo Router",
+      "Vivo Modem"
+    ],
+    "08:19:A6": [
+      "Vivo Phone",
+      "Vivo Tablet"
+    ],
+    "0C:37:DC": [
+      "Vivo Router",
+      "Vivo ONT"
+    ],
+    "0C:96:BF": [
+      "Vivo Phone",
+      "Vivo Tablet"
+    ],
+    "10:47:80": [
+      "Vivo Router",
+      "Vivo Modem"
+    ],
+    "14:7D:DA": [
+      "Vivo Phone",
+      "Vivo Tablet"
+    ],
+    "18:3D:A2": [
+      "Vivo Router",
+      "Vivo ONT"
+    ],
+    "1C:1D:86": [
+      "Vivo Phone",
+      "Vivo Tablet"
+    ],
+    "20:08:ED": [
+      "Vivo Router",
+      "Vivo Modem"
+    ],
+    "24:69:A5": [
+      "Vivo Phone",
+      "Vivo Tablet"
+    ],
+    "28:6E:D4": [
+      "Vivo Router",
+      "Vivo ONT"
+    ],
+    "2C:55:D3": [
+      "Vivo Phone",
+      "Vivo Tablet"
+    ],
+    "30:45:11": [
+      "Vivo Router",
+      "Vivo Modem"
+    ],
+    "34:6B:D3": [
+      "Vivo Phone",
+      "Vivo Tablet"
+    ],
+    "38:46:08": [
+      "Vivo Router",
+      "Vivo ONT"
+    ],
+    "3C:5A:B4": [
+      "Vivo Phone",
+      "Vivo Tablet"
+    ],
+    "40:4E:36": [
+      "Vivo Router",
+      "Vivo Modem"
+    ],
+    "44:6D:57": [
+      "Vivo Phone",
+      "Vivo Tablet"
+    ],
+    "48:7A:DA": [
+      "Vivo Router",
+      "Vivo ONT"
+    ],
+    "4C:1F:CC": [
+      "Vivo Phone",
+      "Vivo Tablet"
+    ],
+    "50:2D:A2": [
+      "Vivo Router",
+      "Vivo Modem"
+    ],
+    "54:89:98": [
+      "Vivo Phone",
+      "Vivo Tablet"
+    ],
+    "58:2A:F7": [
+      "Vivo Router",
+      "Vivo ONT"
+    ],
+    "5C:7D:5E": [
+      "Vivo Phone",
+      "Vivo Tablet"
+    ],
+    "60:DE:44": [
+      "Vivo Router",
+      "Vivo Modem"
+    ],
+    "64:16:66": [
+      "Vivo Phone",
+      "Vivo Tablet"
+    ],
+    "68:3E:34": [
+      "Vivo Router",
+      "Vivo ONT"
+    ],
+    "6C:9C:ED": [
+      "Vivo Phone",
+      "Vivo Tablet"
+    ],
+    "70:48:0F": [
+      "Vivo Router",
+      "Vivo Modem"
+    ],
+    "74:45:CE": [
+      "Vivo Phone",
+      "Vivo Tablet"
+    ],
+    "78:1D:BA": [
+      "Vivo Router",
+      "Vivo ONT"
+    ],
+    "7C:60:97": [
+      "Vivo Phone",
+      "Vivo Tablet"
+    ],
+    "80:71:7F": [
+      "Vivo Router",
+      "Vivo Modem"
+    ],
+    "84:7D:50": [
+      "Vivo Phone",
+      "Vivo Tablet"
+    ],
+    "88:53:D4": [
+      "Vivo Router",
+      "Vivo ONT"
+    ],
+    "8C:73:6E": [
+      "Vivo Phone",
+      "Vivo Tablet"
+    ],
+    "90:4C:E2": [
+      "Vivo Router",
+      "Vivo Modem"
+    ],
+    "94:57:A5": [
+      "Vivo Phone",
+      "Vivo Tablet"
+    ],
+    "98:2D:68": [
+      "Vivo Router",
+      "Vivo ONT"
+    ],
+    "9C:28:BF": [
+      "Vivo Phone",
+      "Vivo Tablet"
+    ],
+    "A0:4E:04": [
+      "Vivo Router",
+      "Vivo Modem"
+    ],
+    "A4:50:46": [
+      "Vivo Phone",
+      "Vivo Tablet"
+    ],
+    "A8:96:8A": [
+      "Vivo Router",
+      "Vivo ONT"
+    ],
+    "AC:E2:D3": [
+      "Vivo Phone",
+      "Vivo Tablet"
+    ],
+    "B0:5B:67": [
+      "Vivo Router",
+      "Vivo Modem"
+    ],
+    "B4:0B:44": [
+      "Vivo Phone",
+      "Vivo Tablet"
+    ],
+    "B8:31:B5": [
+      "Vivo Router",
+      "Vivo ONT"
+    ],
+    "BC:76:5E": [
+      "Vivo Phone",
+      "Vivo Tablet"
+    ],
+    "C0:25:06": [
+      "Vivo Router",
+      "Vivo Modem"
+    ],
+    "C4:64:13": [
+      "Vivo Phone",
+      "Vivo Tablet"
+    ],
+    "C8:94:02": [
+      "Vivo Router",
+      "Vivo ONT"
+    ],
+    "CC:53:B5": [
+      "Vivo Phone",
+      "Vivo Tablet"
+    ],
+    "D0:27:88": [
+      "Vivo Router",
+      "Vivo Modem"
+    ],
+    "D4:87:D8": [
+      "Vivo Phone",
+      "Vivo Tablet"
+    ],
+    "D8:96:95": [
+      "Vivo Router",
+      "Vivo ONT"
+    ],
+    "DC:CE:C1": [
+      "Vivo Phone",
+      "Vivo Tablet"
+    ],
+    "E0:19:1D": [
+      "Vivo Router",
+      "Vivo Modem"
+    ],
+    "E4:70:B8": [
+      "Vivo Phone",
+      "Vivo Tablet"
+    ],
+    "E8:BD:D1": [
+      "Vivo Router",
+      "Vivo ONT"
+    ],
+    "EC:23:3D": [
+      "Vivo Phone",
+      "Vivo Tablet"
+    ],
+    "F0:98:9D": [
+      "Vivo Router",
+      "Vivo Modem"
+    ],
+    "F4:55:9C": [
+      "Vivo Phone",
+      "Vivo Tablet"
+    ],
+    "F8:4A:BF": [
+      "Vivo Router",
+      "Vivo ONT"
+    ],
+    "FC:48:EF": [
+      "Vivo Phone",
+      "Vivo Tablet"
+    ],
+    "64:EC:65": [
+      "Vivo Phone",
+      "Vivo Tablet"
+    ],
+    "6C:D1:99": [
+      "Vivo Phone",
+      "Vivo Tablet"
+    ],
+    "28:BE:43": [
+      "Vivo Phone",
+      "Vivo Tablet"
+    ],
+    "94:31:CB": [
+      "Vivo Phone",
+      "Vivo Tablet"
+    ],
+    "2C:48:81": [
+      "Vivo Phone",
+      "Vivo Tablet"
+    ],
+    "14:DD:9C": [
+      "Vivo Phone",
+      "Vivo Tablet"
+    ],
+    "A0:22:DE": [
+      "Vivo Phone",
+      "Vivo Tablet"
+    ],
+    "20:74:54": [
+      "Vivo Phone",
+      "Vivo Tablet"
+    ],
+    "18:02:AE": [
+      "Vivo Phone",
+      "Vivo Tablet"
+    ],
+    "0C:20:D3": [
+      "Vivo Phone",
+      "Vivo Tablet"
+    ],
+    "08:B3:AF": [
+      "Vivo Phone",
+      "Vivo Tablet"
+    ],
+    "DC:31:D1": [
+      "Vivo Phone",
+      "Vivo Tablet"
+    ],
+    "E0:13:B5": [
+      "Vivo Phone",
+      "Vivo Tablet"
+    ],
+    "88:F7:BF": [
+      "Vivo Phone",
+      "Vivo Tablet"
+    ],
+    "4C:C0:0A": [
+      "Vivo Phone",
+      "Vivo Tablet"
+    ],
+    "9C:E8:2B": [
+      "Vivo Phone",
+      "Vivo Tablet"
+    ],
+    "3C:A6:16": [
+      "Vivo Phone",
+      "Vivo Tablet"
+    ],
+    "F4:B7:B3": [
+      "Vivo Phone",
+      "Vivo Tablet"
+    ],
+    "C4:AB:B2": [
+      "Vivo Phone",
+      "Vivo Tablet"
+    ],
+    "1C:DA:27": [
+      "Vivo Phone",
+      "Vivo Tablet"
+    ],
+    "60:91:F3": [
+      "Vivo Phone",
+      "Vivo Tablet"
+    ],
+    "BC:2F:3D": [
+      "Vivo Phone",
+      "Vivo Tablet"
+    ]
+  }
+}

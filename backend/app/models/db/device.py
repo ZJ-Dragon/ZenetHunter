@@ -45,6 +45,8 @@ class DeviceModel(Base):
     name: Mapped[str | None] = mapped_column(String(255), nullable=True)
     # Vendor (from MAC OUI lookup)
     vendor: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    # Device model (from MAC address lookup)
+    model: Mapped[str | None] = mapped_column(String(255), nullable=True)
     # Device type
     type: Mapped[DeviceTypeEnum] = mapped_column(
         SQLEnum(DeviceTypeEnum), default=DeviceTypeEnum.UNKNOWN, nullable=False

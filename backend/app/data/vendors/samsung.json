@@ -1,0 +1,1169 @@
+{
+  "vendor": "Samsung",
+  "description": "Samsung device model lookup by MAC address prefix (auto-updated from IEEE OUI database)",
+  "models": {
+    "00:00:F0": [
+      "Samsung (various)"
+    ],
+    "00:07:AB": [
+      "Samsung Galaxy S",
+      "Samsung Galaxy Note"
+    ],
+    "00:0C:F1": [
+      "Samsung Smart TV",
+      "Samsung Monitor"
+    ],
+    "00:12:FB": [
+      "Samsung Galaxy Tab"
+    ],
+    "00:15:99": [
+      "Samsung Galaxy Watch"
+    ],
+    "00:16:32": [
+      "Samsung Printer"
+    ],
+    "00:17:C9": [
+      "Samsung Galaxy S2",
+      "Samsung Galaxy S3"
+    ],
+    "00:1E:7D": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "00:23:39": [
+      "Samsung Galaxy S6",
+      "Samsung Galaxy S7"
+    ],
+    "00:25:66": [
+      "Samsung Galaxy S8",
+      "Samsung Galaxy S9"
+    ],
+    "00:26:E2": [
+      "Samsung Galaxy S10",
+      "Samsung Galaxy S20"
+    ],
+    "00:27:19": [
+      "Samsung Galaxy S21",
+      "Samsung Galaxy S22"
+    ],
+    "00:28:00": [
+      "Samsung Galaxy S23",
+      "Samsung Galaxy S24"
+    ],
+    "00:50:56": [
+      "Samsung Smart TV (2015-2017)"
+    ],
+    "00:56:CD": [
+      "Samsung Smart TV (2018-2020)"
+    ],
+    "00:5B:94": [
+      "Samsung Smart TV (2021+)"
+    ],
+    "00:5F:5E": [
+      "Samsung Galaxy Tab S",
+      "Samsung Galaxy Tab A"
+    ],
+    "00:60:1D": [
+      "Samsung Galaxy Watch",
+      "Samsung Galaxy Watch Active"
+    ],
+    "00:6C:8D": [
+      "Samsung Galaxy Buds",
+      "Samsung Galaxy Buds Pro"
+    ],
+    "00:7C:2D": [
+      "Samsung SmartThings Hub"
+    ],
+    "00:88:65": [
+      "Samsung Galaxy Note 8",
+      "Samsung Galaxy Note 9"
+    ],
+    "00:8E:F2": [
+      "Samsung Galaxy Note 10",
+      "Samsung Galaxy Note 20"
+    ],
+    "00:90:72": [
+      "Samsung Galaxy Z Fold",
+      "Samsung Galaxy Z Flip"
+    ],
+    "00:92:27": [
+      "Samsung Galaxy A series"
+    ],
+    "00:94:8B": [
+      "Samsung Galaxy M series"
+    ],
+    "00:98:00": [
+      "Samsung Smart TV QLED"
+    ],
+    "00:9E:C7": [
+      "Samsung Galaxy S21+",
+      "Samsung Galaxy S22+"
+    ],
+    "00:A0:40": [
+      "Samsung Galaxy Buds Live"
+    ],
+    "00:C6:10": [
+      "Samsung Galaxy Watch 4",
+      "Samsung Galaxy Watch 5"
+    ],
+    "00:CD:FE": [
+      "Samsung Smart Monitor"
+    ],
+    "00:D0:2D": [
+      "Samsung Galaxy Tab S7",
+      "Samsung Galaxy Tab S8"
+    ],
+    "00:DB:70": [
+      "Samsung Galaxy Book"
+    ],
+    "00:DE:AD": [
+      "Samsung Developer devices"
+    ],
+    "00:E0:18": [
+      "Samsung Printer (laser)"
+    ],
+    "00:E0:4C": [
+      "Samsung Printer (inkjet)"
+    ],
+    "00:E0:4D": [
+      "Samsung Smart TV (2010-2014)"
+    ],
+    "00:E0:4E": [
+      "Samsung Smart TV (2015-2017)"
+    ],
+    "00:E0:4F": [
+      "Samsung Smart TV (2018+)"
+    ],
+    "00:F4:6F": [
+      "Samsung Galaxy Tab (2017+)"
+    ],
+    "00:FA:24": [
+      "Samsung SmartThings"
+    ],
+    "04:0C:CE": [
+      "Samsung Galaxy S",
+      "Samsung Galaxy Note"
+    ],
+    "04:15:52": [
+      "Samsung Smart TV"
+    ],
+    "04:1E:64": [
+      "Samsung Galaxy Watch"
+    ],
+    "04:26:65": [
+      "Samsung Galaxy Buds"
+    ],
+    "04:4C:A8": [
+      "Samsung Galaxy Tab"
+    ],
+    "04:52:F3": [
+      "Samsung Printer"
+    ],
+    "04:5A:95": [
+      "Samsung Monitor"
+    ],
+    "04:69:F8": [
+      "Samsung SmartThings Hub"
+    ],
+    "04:7D:7B": [
+      "Samsung Galaxy Book"
+    ],
+    "04:88:E2": [
+      "Samsung Galaxy S21+",
+      "Samsung Galaxy S22+"
+    ],
+    "04:8D:38": [
+      "Samsung Galaxy Z Fold",
+      "Samsung Galaxy Z Flip"
+    ],
+    "04:92:26": [
+      "Samsung Galaxy Watch 4+",
+      "Samsung Galaxy Watch 5+"
+    ],
+    "04:98:F3": [
+      "Samsung Galaxy Buds Pro"
+    ],
+    "04:9F:CA": [
+      "Samsung SmartThings"
+    ],
+    "04:A3:16": [
+      "Samsung Galaxy S23+",
+      "Samsung Galaxy S24+"
+    ],
+    "04:B1:67": [
+      "Samsung Galaxy Tab S9"
+    ],
+    "04:B4:29": [
+      "Samsung Smart TV QLED (2021+)"
+    ],
+    "04:B7:8A": [
+      "Samsung Galaxy Book Pro"
+    ],
+    "04:BB:58": [
+      "Samsung Smart Monitor (2021+)"
+    ],
+    "04:BE:71": [
+      "Samsung Printer (2021+)"
+    ],
+    "04:C0:6C": [
+      "Samsung Galaxy A series (2021+)"
+    ],
+    "04:C1:37": [
+      "Samsung Galaxy M series (2021+)"
+    ],
+    "04:C2:05": [
+      "Samsung Galaxy Watch 6"
+    ],
+    "04:C5:A4": [
+      "Samsung Galaxy Buds 2",
+      "Samsung Galaxy Buds 2 Pro"
+    ],
+    "04:C8:07": [
+      "Samsung SmartThings Station"
+    ],
+    "04:CB:88": [
+      "Samsung Galaxy Tab S8+",
+      "Samsung Galaxy Tab S9+"
+    ],
+    "04:CE:14": [
+      "Samsung Galaxy Z Fold 4",
+      "Samsung Galaxy Z Fold 5"
+    ],
+    "04:D1:9A": [
+      "Samsung Galaxy Z Flip 4",
+      "Samsung Galaxy Z Flip 5"
+    ],
+    "04:D4:C4": [
+      "Samsung Galaxy S24 Ultra"
+    ],
+    "04:D7:8F": [
+      "Samsung Galaxy Note 20 Ultra"
+    ],
+    "04:DB:56": [
+      "Samsung Smart TV (2022+)"
+    ],
+    "04:DD:4C": [
+      "Samsung Galaxy Book 2",
+      "Samsung Galaxy Book 3"
+    ],
+    "04:DF:69": [
+      "Samsung Galaxy Watch 6 Classic"
+    ],
+    "04:E1:36": [
+      "Samsung Galaxy Buds FE"
+    ],
+    "04:E3:29": [
+      "Samsung SmartThings Hub (2023+)"
+    ],
+    "04:E5:99": [
+      "Samsung Galaxy Tab S9 Ultra"
+    ],
+    "04:E7:09": [
+      "Samsung Smart Monitor (2023+)"
+    ],
+    "04:E9:E5": [
+      "Samsung Printer (2023+)"
+    ],
+    "04:EC:BB": [
+      "Samsung Galaxy A series (2023+)"
+    ],
+    "04:EF:44": [
+      "Samsung Galaxy M series (2023+)"
+    ],
+    "04:F1:3E": [
+      "Samsung Galaxy Watch 6 (2023+)"
+    ],
+    "04:F4:BC": [
+      "Samsung Galaxy Buds (2023+)"
+    ],
+    "04:F7:E4": [
+      "Samsung SmartThings (2023+)"
+    ],
+    "04:FA:83": [
+      "Samsung Galaxy Tab (2023+)"
+    ],
+    "04:FC:32": [
+      "Samsung Galaxy Z Fold 5",
+      "Samsung Galaxy Z Flip 5"
+    ],
+    "04:FE:7F": [
+      "Samsung Galaxy S24+",
+      "Samsung Galaxy S24 Ultra"
+    ],
+    "08:00:07": [
+      "Samsung (various)"
+    ],
+    "08:66:98": [
+      "Samsung Galaxy S",
+      "Samsung Galaxy Note"
+    ],
+    "08:74:02": [
+      "Samsung Smart TV"
+    ],
+    "08:9E:01": [
+      "Samsung Galaxy Watch"
+    ],
+    "08:A1:84": [
+      "Samsung Galaxy Buds"
+    ],
+    "08:BE:AC": [
+      "Samsung Galaxy Tab"
+    ],
+    "0C:3E:9F": [
+      "Samsung Printer"
+    ],
+    "0C:4D:E9": [
+      "Samsung Monitor"
+    ],
+    "0C:74:C2": [
+      "Samsung SmartThings Hub"
+    ],
+    "0C:8B:FD": [
+      "Samsung Galaxy Book"
+    ],
+    "0C:BC:9F": [
+      "Samsung Smart TV"
+    ],
+    "0C:D7:46": [
+      "Samsung Galaxy Watch"
+    ],
+    "0C:DD:24": [
+      "Samsung Galaxy Buds"
+    ],
+    "0C:E0:E4": [
+      "Samsung Galaxy Tab"
+    ],
+    "0C:F3:EE": [
+      "Samsung Printer"
+    ],
+    "0C:F9:C0": [
+      "Samsung Monitor"
+    ],
+    "10:93:E9": [
+      "Samsung SmartThings"
+    ],
+    "10:DD:B1": [
+      "Samsung Galaxy S",
+      "Samsung Galaxy Note"
+    ],
+    "14:10:9F": [
+      "Samsung Smart TV"
+    ],
+    "14:7D:DA": [
+      "Samsung Galaxy Watch"
+    ],
+    "14:88:A6": [
+      "Samsung Galaxy Buds"
+    ],
+    "14:CF:92": [
+      "Samsung Galaxy Tab"
+    ],
+    "14:DB:85": [
+      "Samsung Printer"
+    ],
+    "14:ED:BB": [
+      "Samsung Monitor"
+    ],
+    "14:F6:D8": [
+      "Samsung SmartThings Hub"
+    ],
+    "18:20:32": [
+      "Samsung Galaxy Book"
+    ],
+    "18:65:90": [
+      "Samsung Smart TV"
+    ],
+    "18:81:0E": [
+      "Samsung Galaxy Watch"
+    ],
+    "18:AF:61": [
+      "Samsung Galaxy Buds"
+    ],
+    "1C:1A:C0": [
+      "Samsung Galaxy Tab"
+    ],
+    "1C:AB:A7": [
+      "Samsung Printer"
+    ],
+    "1C:E6:2B": [
+      "Samsung Monitor"
+    ],
+    "1C:F2:9A": [
+      "Samsung SmartThings"
+    ],
+    "20:78:F0": [
+      "Samsung Galaxy S",
+      "Samsung Galaxy Note"
+    ],
+    "20:9B:CD": [
+      "Samsung Smart TV"
+    ],
+    "20:C9:D0": [
+      "Samsung Galaxy Watch"
+    ],
+    "20:EE:28": [
+      "Samsung Galaxy Buds"
+    ],
+    "24:1E:EB": [
+      "Samsung Galaxy Tab"
+    ],
+    "24:5B:A7": [
+      "Samsung Printer"
+    ],
+    "24:AB:81": [
+      "Samsung Monitor"
+    ],
+    "24:DF:6A": [
+      "Samsung SmartThings Hub"
+    ],
+    "28:37:37": [
+      "Samsung Galaxy Book"
+    ],
+    "28:6F:7F": [
+      "Samsung Smart TV"
+    ],
+    "28:CF:DA": [
+      "Samsung Galaxy Watch"
+    ],
+    "28:E0:2C": [
+      "Samsung Galaxy Buds"
+    ],
+    "2C:1F:23": [
+      "Samsung Galaxy Tab"
+    ],
+    "2C:33:7A": [
+      "Samsung Printer"
+    ],
+    "2C:41:38": [
+      "Samsung Monitor"
+    ],
+    "2C:6E:85": [
+      "Samsung SmartThings"
+    ],
+    "30:90:AB": [
+      "Samsung Galaxy S",
+      "Samsung Galaxy Note"
+    ],
+    "30:D9:D9": [
+      "Samsung Smart TV"
+    ],
+    "34:15:9E": [
+      "Samsung Galaxy Watch"
+    ],
+    "34:51:C9": [
+      "Samsung Galaxy Buds"
+    ],
+    "34:A3:95": [
+      "Samsung Galaxy Tab"
+    ],
+    "38:CA:DA": [
+      "Samsung Printer"
+    ],
+    "3C:07:54": [
+      "Samsung Monitor"
+    ],
+    "3C:15:C2": [
+      "Samsung SmartThings Hub"
+    ],
+    "40:33:1A": [
+      "Samsung Galaxy Book"
+    ],
+    "40:4E:36": [
+      "Samsung Smart TV"
+    ],
+    "40:6C:8F": [
+      "Samsung Galaxy Watch"
+    ],
+    "40:A6:D9": [
+      "Samsung Galaxy Buds"
+    ],
+    "44:4C:0C": [
+      "Samsung Galaxy Tab"
+    ],
+    "44:FB:42": [
+      "Samsung Printer"
+    ],
+    "48:43:7C": [
+      "Samsung Monitor"
+    ],
+    "48:BF:6B": [
+      "Samsung SmartThings"
+    ],
+    "4C:8D:79": [
+      "Samsung Galaxy S",
+      "Samsung Galaxy Note"
+    ],
+    "50:EA:D6": [
+      "Samsung Smart TV"
+    ],
+    "54:26:96": [
+      "Samsung Galaxy Watch"
+    ],
+    "54:72:4F": [
+      "Samsung Galaxy Buds"
+    ],
+    "58:55:CA": [
+      "Samsung Galaxy Tab"
+    ],
+    "5C:59:48": [
+      "Samsung Printer"
+    ],
+    "5C:8D:4E": [
+      "Samsung Monitor"
+    ],
+    "5C:95:AE": [
+      "Samsung SmartThings Hub"
+    ],
+    "60:33:4B": [
+      "Samsung Galaxy Book"
+    ],
+    "60:90:84": [
+      "Samsung Smart TV"
+    ],
+    "64:A3:CB": [
+      "Samsung Galaxy Watch"
+    ],
+    "68:AB:1E": [
+      "Samsung Galaxy Buds"
+    ],
+    "6C:40:08": [
+      "Samsung Galaxy Tab"
+    ],
+    "70:48:0F": [
+      "Samsung Printer"
+    ],
+    "70:56:81": [
+      "Samsung Monitor"
+    ],
+    "74:E2:F5": [
+      "Samsung SmartThings"
+    ],
+    "78:4F:43": [
+      "Samsung Galaxy S",
+      "Samsung Galaxy Note"
+    ],
+    "7C:6D:62": [
+      "Samsung Smart TV"
+    ],
+    "7C:D1:C3": [
+      "Samsung Galaxy Watch"
+    ],
+    "80:E6:50": [
+      "Samsung Galaxy Buds"
+    ],
+    "84:38:35": [
+      "Samsung Galaxy Tab"
+    ],
+    "84:FC:FE": [
+      "Samsung Printer"
+    ],
+    "88:63:DF": [
+      "Samsung Monitor"
+    ],
+    "8C:85:90": [
+      "Samsung SmartThings Hub"
+    ],
+    "90:72:40": [
+      "Samsung Galaxy Book"
+    ],
+    "94:E9:6A": [
+      "Samsung Smart TV"
+    ],
+    "98:01:A7": [
+      "Samsung Galaxy Watch"
+    ],
+    "9C:84:BF": [
+      "Samsung Galaxy Buds"
+    ],
+    "A0:99:9B": [
+      "Samsung Galaxy Tab"
+    ],
+    "A4:5E:60": [
+      "Samsung Printer"
+    ],
+    "A4:C1:38": [
+      "Samsung Monitor"
+    ],
+    "A8:60:B6": [
+      "Samsung SmartThings"
+    ],
+    "AC:1F:74": [
+      "Samsung Galaxy S",
+      "Samsung Galaxy Note"
+    ],
+    "AC:DE:48": [
+      "Samsung Smart TV"
+    ],
+    "B0:65:BD": [
+      "Samsung Galaxy Watch"
+    ],
+    "B4:F0:AB": [
+      "Samsung Galaxy Buds"
+    ],
+    "B8:53:AC": [
+      "Samsung Galaxy Tab"
+    ],
+    "BC:3B:AF": [
+      "Samsung Printer"
+    ],
+    "C0:25:E9": [
+      "Samsung Monitor"
+    ],
+    "C4:2C:03": [
+      "Samsung SmartThings Hub"
+    ],
+    "C8:1E:E7": [
+      "Samsung Galaxy Book"
+    ],
+    "CC:08:E0": [
+      "Samsung Smart TV"
+    ],
+    "D0:03:4B": [
+      "Samsung Galaxy Watch"
+    ],
+    "D4:9A:20": [
+      "Samsung SmartThings"
+    ],
+    "D8:30:62": [
+      "Samsung Galaxy S",
+      "Samsung Galaxy Note"
+    ],
+    "D8:A2:5E": [
+      "Samsung Smart TV"
+    ],
+    "DC:A9:04": [
+      "Samsung Galaxy Watch"
+    ],
+    "E0:AC:CB": [
+      "Samsung Galaxy Buds"
+    ],
+    "E4:CE:8F": [
+      "Samsung Galaxy Tab"
+    ],
+    "E8:40:40": [
+      "Samsung Printer"
+    ],
+    "EC:35:86": [
+      "Samsung Monitor"
+    ],
+    "F0:18:98": [
+      "Samsung SmartThings Hub"
+    ],
+    "F0:DB:E2": [
+      "Samsung Galaxy Book"
+    ],
+    "F4:F1:5A": [
+      "Samsung Smart TV"
+    ],
+    "F8:1E:DF": [
+      "Samsung Galaxy Watch"
+    ],
+    "FC:25:3F": [
+      "Samsung Galaxy Buds"
+    ],
+    "64:1B:2F": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "9C:73:B1": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "38:8A:06": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "48:BC:E1": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "D0:D0:03": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "24:09:35": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "84:22:89": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "80:39:8C": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "98:0D:6F": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "80:19:70": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "30:D5:87": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "1C:AF:4A": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "C8:12:0B": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "38:8F:30": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "DC:CC:E6": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "F0:65:AE": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "BC:45:5B": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "C4:1C:07": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "40:11:C3": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "C4:7D:9F": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "A0:D7:F3": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "A4:C6:9A": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "54:44:A3": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "18:CE:94": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "78:37:16": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "C4:18:E9": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "1C:E5:7F": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "98:B8:BC": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "18:4E:16": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "C0:3D:03": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "54:21:9D": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "04:BD:BF": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "BC:7A:BF": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "60:68:4E": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "80:20:FD": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "B4:CE:40": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "B4:1A:1D": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "F4:FE:FB": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "70:CE:8C": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "0C:2F:B0": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "88:29:9C": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "7C:89:56": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "8C:79:F5": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "D0:03:DF": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "FC:03:9F": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "A4:D9:90": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "3C:57:6C": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "E4:B0:21": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "C0:48:E6": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "08:AE:D6": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "CC:6E:A4": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "A8:16:D0": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "A4:6C:F1": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "9C:E0:63": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "D0:31:69": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "14:9F:3C": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "7C:64:56": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "38:9A:F6": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "E0:AA:96": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "50:77:05": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "90:97:F3": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "7C:1C:68": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "C0:87:EB": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "C8:D7:B0": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "28:39:5E": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "30:96:FB": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "48:27:EA": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "7C:78:7E": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "D4:7A:E2": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "D8:E0:E1": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "F8:3F:51": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "60:A4:D0": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "00:87:01": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "5C:99:60": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "10:1D:C0": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "78:47:1D": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "A0:75:91": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "0C:DF:A4": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "68:EB:AE": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "44:4E:1A": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "E4:7C:F9": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "48:44:F7": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "00:13:77": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "00:24:54": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "E8:11:32": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "50:B7:C3": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "1C:5A:3E": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "A0:21:95": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "F4:D9:FB": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "3C:62:00": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "00:17:D5": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "00:1D:F6": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "00:1D:25": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "F0:6B:CA": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "AC:36:13": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "34:31:11": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "08:FD:0E": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "04:1B:BA": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "88:9B:39": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "E4:32:CB": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "10:D5:42": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "A0:82:1F": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "C0:65:99": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "BC:79:AD": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "4C:3C:16": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "00:73:E0": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "F0:E7:7E": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "F0:08:F1": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "58:C3:8B": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "00:E3:B2": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "30:19:66": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "94:35:0A": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "40:E9:9B": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "30:AB:6A": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "8C:B8:4A": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "08:C5:E1": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "8C:F5:A3": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "BC:8C:CD": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "D0:22:BE": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "EC:9B:F3": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "F4:09:D8": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "5C:A3:9D": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "90:18:7C": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "50:CC:F8": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "00:26:37": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ],
+    "00:21:19": [
+      "Samsung Phone",
+      "Samsung Tablet"
+    ]
+  }
+}

@@ -1,0 +1,54 @@
+{
+  "models": {
+    "68:DD:B7": [
+      "TP-Link Device"
+    ],
+    "14:D8:64": [
+      "TP-Link Device"
+    ],
+    "AC:84:C6": [
+      "TP-Link Device"
+    ],
+    "6C:B1:58": [
+      "TP-Link Device"
+    ],
+    "24:69:68": [
+      "TP-Link Device"
+    ],
+    "34:F7:16": [
+      "TP-Link Device"
+    ],
+    "D8:07:B6": [
+      "TP-Link Device"
+    ],
+    "64:6E:97": [
+      "TP-Link Device"
+    ],
+    "D0:37:45": [
+      "TP-Link Device"
+    ],
+    "60:3A:7C": [
+      "TP-Link Device"
+    ],
+    "54:A7:03": [
+      "TP-Link Device"
+    ],
+    "B0:BE:76": [
+      "TP-Link Device"
+    ],
+    "34:E8:94": [
+      "TP-Link Device"
+    ],
+    "94:D9:B3": [
+      "TP-Link Device"
+    ],
+    "B0:95:8E": [
+      "TP-Link Device"
+    ],
+    "C0:25:E9": [
+      "TP-Link Device"
+    ]
+  },
+  "vendor": "TP-Link",
+  "description": "TP-Link device model lookup by MAC address prefix (auto-updated from IEEE OUI database)"
+}

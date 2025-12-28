@@ -32,6 +32,7 @@ class Device(BaseModel):
     ip: IPvAnyAddress = Field(..., description="IP address of the device")
     name: str | None = Field(None, description="Hostname or alias")
     vendor: str | None = Field(None, description="Device vendor resolved from MAC OUI")
+    model: str | None = Field(None, description="Device model resolved from MAC address")
     type: DeviceType = Field(
         default=DeviceType.UNKNOWN, description="Device type category"
     )
