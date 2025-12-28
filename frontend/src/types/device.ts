@@ -19,6 +19,13 @@ export enum AttackStatus {
   FAILED = 'failed',
 }
 
+export enum DefenseStatus {
+  ACTIVE = 'active',
+  INACTIVE = 'inactive',
+  PENDING = 'pending',
+  ERROR = 'error',
+}
+
 export interface Device {
   mac: string;
   ip: string;
@@ -27,6 +34,8 @@ export interface Device {
   type: DeviceType;
   status: DeviceStatus;
   attack_status: AttackStatus;
+  defense_status: DefenseStatus;
+  active_defense_policy: string | null;
   first_seen: string;
   last_seen: string;
 }
