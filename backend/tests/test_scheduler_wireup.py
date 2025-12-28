@@ -18,7 +18,10 @@ from app.services.state import StateManager
 @pytest.fixture
 def state_manager():
     """Create a fresh StateManager for testing."""
-    return StateManager()
+    manager = StateManager()
+    # Reset state to ensure test isolation (StateManager is a singleton)
+    manager.reset()
+    return manager
 
 
 @pytest.fixture
@@ -151,12 +154,18 @@ async def test_scheduler_flow_with_feedback_update(
 
 
 @pytest.mark.asyncio
-async def test_scheduler_unknown_device(scheduler_service):
+async def test_scheduler_unknown_device(scheduler_service, state_manager):
     """Test scheduler with non-existent device."""
+    # Ensure state is clean (no devices exist)
+    state_manager.clear_devices()
+    # Verify device doesn't exist
+    assert state_manager.get_device("00:00:00:00:00:00") is None
+
     result = await scheduler_service.execute_strategy_flow("00:00:00:00:00:00")
 
     assert result["success"] is False
     assert "error" in result
+    assert "not found" in result["error"].lower()
 
 
 @pytest.mark.asyncio
