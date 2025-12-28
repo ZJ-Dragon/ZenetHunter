@@ -11,15 +11,14 @@ from app.models.defender import DefenseType
 
 @pytest.mark.asyncio
 async def test_defense_factory_root():
-    from app.core.platform.detect import is_linux
-    
+
     # Create a mock PlatformFeatures with root=True and Linux platform
     mock_features = MagicMock(spec=PlatformFeatures)
     mock_features.is_root = True
     mock_features.platform = Platform.LINUX
     mock_features.has_pfctl = False
     mock_features.has_netsh = False
-    
+
     with patch(
         "app.core.engine.defense_factory.get_platform_features",
         return_value=mock_features,
@@ -27,9 +26,9 @@ async def test_defense_factory_root():
         # Also need to mock is_linux() to return True
         with patch("app.core.engine.defense_factory.is_linux", return_value=True):
             engine = get_defense_engine()
-            assert isinstance(engine, LinuxDefenseEngine), (
-                f"Expected LinuxDefenseEngine, got {type(engine).__name__}"
-            )
+            assert isinstance(
+                engine, LinuxDefenseEngine
+            ), f"Expected LinuxDefenseEngine, got {type(engine).__name__}"
 
 
 @pytest.mark.asyncio

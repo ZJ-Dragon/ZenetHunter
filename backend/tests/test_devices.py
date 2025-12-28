@@ -1,6 +1,5 @@
 import asyncio
 
-import pytest
 from fastapi.testclient import TestClient
 
 from app.core.database import get_session_factory

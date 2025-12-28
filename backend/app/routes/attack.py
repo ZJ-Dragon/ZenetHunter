@@ -30,12 +30,12 @@ async def start_attack(
     response = await service.start_attack(mac, request)
     if response.status == "failed":
         raise AppError(ErrorCode.API_BAD_REQUEST, response.message or "Attack failed")
-    
+
     # Update device attack status in database
     repo = DeviceRepository(db)
     await repo.update_attack_status(mac, response.status)
     await db.commit()
-    
+
     return response
 
 
@@ -55,12 +55,12 @@ async def start_attack_alias(
     response = await service.start_attack(mac, request)
     if response.status == "failed":
         raise AppError(ErrorCode.API_BAD_REQUEST, response.message or "Attack failed")
-    
+
     # Update device attack status in database
     repo = DeviceRepository(db)
     await repo.update_attack_status(mac, response.status)
     await db.commit()
-    
+
     return response
 
 
@@ -81,10 +81,10 @@ async def stop_attack(
         raise AppError(
             ErrorCode.CONFIG_NOT_FOUND, response.message or "Device not found"
         )
-    
+
     # Update device attack status in database
     repo = DeviceRepository(db)
     await repo.update_attack_status(mac, response.status)
     await db.commit()
-    
+
     return response
