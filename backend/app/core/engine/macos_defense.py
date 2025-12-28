@@ -15,7 +15,7 @@ logger = logging.getLogger(__name__)
 class MacOSDefenseEngine(DefenseEngine):
     """
     Defense engine for macOS using pfctl (Packet Filter).
-    
+
     macOS uses pfctl for firewall management, which is different from Linux's iptables.
     This engine provides macOS-specific implementations of defense policies.
     """
@@ -41,7 +41,9 @@ class MacOSDefenseEngine(DefenseEngine):
         elif policy == DefenseType.QUARANTINE:
             await self._enable_quarantine(target)
         else:
-            logger.warning(f"[MacOSDefense] Policy {policy} not yet implemented for macOS")
+            logger.warning(
+                f"[MacOSDefense] Policy {policy} not yet implemented for macOS"
+            )
 
     async def remove_policy(
         self, target: str, policy: DefenseType, params: dict[str, Any] | None = None
@@ -54,7 +56,9 @@ class MacOSDefenseEngine(DefenseEngine):
         elif policy == DefenseType.QUARANTINE:
             await self._disable_quarantine(target)
         else:
-            logger.warning(f"[MacOSDefense] Policy {policy} removal not yet implemented for macOS")
+            logger.warning(
+                f"[MacOSDefense] Policy {policy} removal not yet implemented for macOS"
+            )
 
     async def _enable_block_wan(self, mac: str) -> None:
         """Block WAN access for a device using pfctl."""
@@ -65,11 +69,11 @@ class MacOSDefenseEngine(DefenseEngine):
         try:
             # Create pfctl rule to block outbound traffic from MAC
             rule = f"block out quick on any from any to any mac {mac}\n"
-            
+
             # Append to rules file
             with open(self._pf_rules_file, "a") as f:
                 f.write(rule)
-            
+
             # Reload pfctl rules
             await self._reload_pfctl()
             logger.info(f"[MacOSDefense] Blocked WAN access for {mac}")
@@ -81,18 +85,18 @@ class MacOSDefenseEngine(DefenseEngine):
         try:
             # Read current rules
             try:
-                with open(self._pf_rules_file, "r") as f:
+                with open(self._pf_rules_file) as f:
                     lines = f.readlines()
             except FileNotFoundError:
                 return
-            
+
             # Remove rules for this MAC
-            new_lines = [l for l in lines if mac not in l]
-            
+            new_lines = [line for line in lines if mac not in line]
+
             # Write back
             with open(self._pf_rules_file, "w") as f:
                 f.writelines(new_lines)
-            
+
             # Reload pfctl rules
             await self._reload_pfctl()
             logger.info(f"[MacOSDefense] Removed WAN block for {mac}")
@@ -102,18 +106,20 @@ class MacOSDefenseEngine(DefenseEngine):
     async def _enable_quarantine(self, mac: str) -> None:
         """Quarantine a device (block all network access)."""
         if not self.platform_features.has_pfctl:
-            logger.error("[MacOSDefense] pfctl not available. Cannot quarantine device.")
+            logger.error(
+                "[MacOSDefense] pfctl not available. Cannot quarantine device."
+            )
             return
 
         try:
             # Block all traffic from/to this MAC
             rule = f"block quick from any to any mac {mac}\n"
             rule += f"block quick from any mac {mac} to any\n"
-            
+
             # Append to rules file
             with open(self._pf_rules_file, "a") as f:
                 f.write(rule)
-            
+
             # Reload pfctl rules
             await self._reload_pfctl()
             logger.info(f"[MacOSDefense] Quarantined {mac}")
@@ -129,21 +135,29 @@ class MacOSDefenseEngine(DefenseEngine):
         try:
             # Enable pfctl if not enabled
             result = await asyncio.create_subprocess_exec(
-                "pfctl", "-f", self._pf_rules_file,
+                "pfctl",
+                "-f",
+                self._pf_rules_file,
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
             )
             await result.communicate()
-            
+
             if result.returncode != 0:
-                logger.warning("[MacOSDefense] pfctl reload failed. May need root privileges.")
+                logger.warning(
+                    "[MacOSDefense] pfctl reload failed. May need root privileges."
+                )
         except Exception as e:
             logger.error(f"[MacOSDefense] Failed to reload pfctl: {e}")
 
     async def enable_global_protection(self, policy: DefenseType) -> None:
         """Enable a global protection mechanism."""
-        logger.warning(f"[MacOSDefense] Global protection {policy} not yet implemented for macOS")
+        logger.warning(
+            f"[MacOSDefense] Global protection {policy} not yet implemented for macOS"
+        )
 
     async def disable_global_protection(self, policy: DefenseType) -> None:
         """Disable a global protection mechanism."""
-        logger.warning(f"[MacOSDefense] Global protection removal not yet implemented for macOS")
+        logger.warning(
+            "[MacOSDefense] Global protection removal not yet implemented for macOS"
+        )

@@ -63,7 +63,7 @@ export const SetupWizard: React.FC = () => {
                 required
               />
               <p className="mt-2 text-sm text-gray-500">
-                Create a secure password for the admin account. 
+                Create a secure password for the admin account.
                 <br />
                 <span className="text-xs text-gray-400">
                   Note: In MVP, password setup is logged but not yet enforced. Default password is "zenethunter".

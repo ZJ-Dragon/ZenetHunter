@@ -25,14 +25,14 @@ const LogLevelBadge: React.FC<{ level: string }> = ({ level }) => {
     info: { bg: 'rgba(0, 120, 212, 0.1)', text: 'var(--winui-accent)' },
     debug: { bg: 'var(--winui-bg-tertiary)', text: 'var(--winui-text-secondary)' },
   };
-  
+
   const style = badgeStyles[levelLower] || badgeStyles.debug;
-  
+
   return (
-    <span 
+    <span
       className="px-3 py-1 text-xs font-semibold rounded-full"
-      style={{ 
-        backgroundColor: style.bg, 
+      style={{
+        backgroundColor: style.bg,
         color: style.text,
         borderRadius: 'var(--winui-radius-lg)'
       }}
@@ -77,8 +77,8 @@ export const Logs: React.FC = () => {
     return () => clearInterval(interval);
   }, [limit]);
 
-  const filteredLogs = filterLevel === 'all' 
-    ? logs 
+  const filteredLogs = filterLevel === 'all'
+    ? logs
     : logs.filter(log => log.level.toLowerCase() === filterLevel.toLowerCase());
 
   return (
@@ -159,7 +159,7 @@ export const Logs: React.FC = () => {
                 </dd>
               </div>
             </dl>
-            
+
             {/* Capabilities */}
             <div className="mt-6 pt-6" style={{ borderTop: '1px solid var(--winui-border-subtle)' }}>
               <h4 className="text-sm font-semibold mb-4" style={{ color: 'var(--winui-text-primary)' }}>Capabilities</h4>
@@ -242,8 +242,8 @@ export const Logs: React.FC = () => {
             <tbody style={{ backgroundColor: 'var(--winui-surface)' }}>
               {filteredLogs.length > 0 ? (
                 filteredLogs.map((log) => (
-                  <tr 
-                    key={log.id || `${log.timestamp}-${log.message}`} 
+                  <tr
+                    key={log.id || `${log.timestamp}-${log.message}`}
                     className="transition-colors duration-150"
                     style={{ borderBottom: '1px solid var(--winui-border-subtle)' }}
                     onMouseEnter={(e) => {

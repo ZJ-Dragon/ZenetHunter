@@ -10,6 +10,7 @@ logger = logging.getLogger(__name__)
 # Try to import ScapyAttackEngine, but handle ImportError gracefully
 try:
     from app.core.engine.scapy import ScapyAttackEngine
+
     SCAPY_AVAILABLE = True
 except ImportError as e:
     logger.warning(f"ScapyAttackEngine not available: {e}. Using DummyAttackEngine.")
@@ -39,7 +40,9 @@ def get_attack_engine() -> AttackEngine:
                     "Attacks will be simulated."
                 )
         except Exception as e:
-            logger.warning(f"Failed to initialize ScapyAttackEngine: {e}. Using DummyAttackEngine.")
+            logger.warning(
+                f"Failed to initialize ScapyAttackEngine: {e}. Using DummyAttackEngine."
+            )
     else:
         logger.info("Scapy not available. Using DummyAttackEngine for simulation.")
 

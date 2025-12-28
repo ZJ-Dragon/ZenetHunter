@@ -1,6 +1,6 @@
-OUI/MA-L                                                    Organization                                 
-company_id                                                  Organization                                 
-                                                            Address                                      
+OUI/MA-L                                                    Organization
+company_id                                                  Organization
+                                                            Address
 
 28-6F-B9   (hex)		Nokia Shanghai Bell Co., Ltd.
 286FB9     (base 16)		Nokia Shanghai Bell Co., Ltd.
@@ -10,19 +10,19 @@ company_id                                                  Organization
 
 08-EA-44   (hex)		Extreme Networks Headquarters
 08EA44     (base 16)		Extreme Networks Headquarters
-				2121 RDU Center Drive 
+				2121 RDU Center Drive
 				Morrisville  NC  27560
 				US
 
 F4-EA-B5   (hex)		Extreme Networks Headquarters
 F4EAB5     (base 16)		Extreme Networks Headquarters
-				2121 RDU Center Drive 
+				2121 RDU Center Drive
 				Morrisville  NC  27560
 				US
 
 B8-7C-F2   (hex)		Extreme Networks Headquarters
 B87CF2     (base 16)		Extreme Networks Headquarters
-				2121 RDU Center Drive 
+				2121 RDU Center Drive
 				Morrisville  NC  27560
 				US
 
@@ -34,43 +34,43 @@ E0A129     (base 16)		Extreme Networks Headquarters
 
 A8-C6-47   (hex)		Extreme Networks Headquarters
 A8C647     (base 16)		Extreme Networks Headquarters
-				2121 RDU Center Drive 
+				2121 RDU Center Drive
 				Morrisville  NC  27560
 				US
 
 A4-73-AB   (hex)		Extreme Networks Headquarters
 A473AB     (base 16)		Extreme Networks Headquarters
-				2121 RDU Center Drive 
+				2121 RDU Center Drive
 				Morrisville  NC  27560
 				US
 
 0C-9B-78   (hex)		Extreme Networks Headquarters
 0C9B78     (base 16)		Extreme Networks Headquarters
-				2121 RDU Center Drive 
+				2121 RDU Center Drive
 				Morrisville  NC  27560
 				US
 
 A4-C7-F6   (hex)		Extreme Networks Headquarters
 A4C7F6     (base 16)		Extreme Networks Headquarters
-				2121 RDU Center Drive 
+				2121 RDU Center Drive
 				Morrisville  NC  27560
 				US
 
 B4-2D-56   (hex)		Extreme Networks Headquarters
 B42D56     (base 16)		Extreme Networks Headquarters
-				2121 RDU Center Drive 
+				2121 RDU Center Drive
 				Morrisville  NC  27560
 				US
 
 88-7E-25   (hex)		Extreme Networks Headquarters
 887E25     (base 16)		Extreme Networks Headquarters
-				2121 RDU Center Drive 
+				2121 RDU Center Drive
 				Morrisville  NC  27560
 				US
 
 00-19-77   (hex)		Extreme Networks Headquarters
 001977     (base 16)		Extreme Networks Headquarters
-				2121 RDU Center Drive 
+				2121 RDU Center Drive
 				Morrisville  NC  27560
 				US
 
@@ -193,13 +193,13 @@ DCD160     (base 16)		Tianjin Changdatong Technology Co.,LTD
 
 0C-B9-83   (hex)		Honor Device Co., Ltd.
 0CB983     (base 16)		Honor Device Co., Ltd.
-				Suite 3401, Unit A, Building 6, Shum Yip Sky Park, No. 8089, Hongli West Road, Xiangmihu Street, Futian District 
+				Suite 3401, Unit A, Building 6, Shum Yip Sky Park, No. 8089, Hongli West Road, Xiangmihu Street, Futian District
 				Shenzhen   Guangdong  518040
 				CN
 
 2C-B3-01   (hex)		Honor Device Co., Ltd.
 2CB301     (base 16)		Honor Device Co., Ltd.
-				Suite 3401, Unit A, Building 6, Shum Yip Sky Park, No. 8089, Hongli West Road, Xiangmihu Street, Futian District 
+				Suite 3401, Unit A, Building 6, Shum Yip Sky Park, No. 8089, Hongli West Road, Xiangmihu Street, Futian District
 				Shenzhen   Guangdong  518040
 				CN
 
@@ -217,7 +217,7 @@ C88BE8     (base 16)		Masimo Corporation
 
 E4-C7-67   (hex)		Intel Corporate
 E4C767     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3  
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
@@ -313,7 +313,7 @@ FC500C     (base 16)		Sitehop Ltd
 
 A8-81-FE   (hex)		Luxul Tech Co., Ltd
 A881FE     (base 16)		Luxul Tech Co., Ltd
-				9/F, Yihua Commercial Building, No. 16, Jiuyi Road, Licheng District, Quanzhou, Fujian 
+				9/F, Yihua Commercial Building, No. 16, Jiuyi Road, Licheng District, Quanzhou, Fujian
 				Quanzhou  Fujian  362000
 				CN
 
@@ -505,25 +505,25 @@ CC03FA     (base 16)		Vantiva USA LLC
 
 A4-56-CC   (hex)		Vantiva USA LLC
 A456CC     (base 16)		Vantiva USA LLC
-				5030 Sugarloaf Parkway Bldg 6 
+				5030 Sugarloaf Parkway Bldg 6
 				Lawrenceville  GA  30044
 				US
 
 70-03-7E   (hex)		Vantiva USA LLC
 70037E     (base 16)		Vantiva USA LLC
-				5030 Sugarloaf Parkway Bldg 6 
+				5030 Sugarloaf Parkway Bldg 6
 				Lawrenceville  GA  30044
 				US
 
 44-1C-12   (hex)		Vantiva USA LLC
 441C12     (base 16)		Vantiva USA LLC
-				5030 Sugarloaf Parkway Bldg 6 
+				5030 Sugarloaf Parkway Bldg 6
 				Lawrenceville  GA  30044
 				US
 
 5C-76-95   (hex)		Vantiva USA LLC
 5C7695     (base 16)		Vantiva USA LLC
-				5030 Sugarloaf Parkway Bldg 6 
+				5030 Sugarloaf Parkway Bldg 6
 				Lawrenceville  GA  30044
 				US
 
@@ -547,7 +547,7 @@ F8D2AC     (base 16)		Vantiva USA LLC
 
 CC-F3-C8   (hex)		Vantiva USA LLC
 CCF3C8     (base 16)		Vantiva USA LLC
-				5030 Sugarloaf Parkway Bldg 6 
+				5030 Sugarloaf Parkway Bldg 6
 				Lawrenceville   GA  30044
 				US
 
@@ -613,19 +613,19 @@ D0B2C4     (base 16)		Vantiva USA LLC
 
 38-3F-B3   (hex)		Vantiva USA LLC
 383FB3     (base 16)		Vantiva USA LLC
-				5030 Sugarloaf Parkway Bldg 6 
+				5030 Sugarloaf Parkway Bldg 6
 				Lawrenceville  GA  30044
 				US
 
 64-12-36   (hex)		Vantiva USA LLC
 641236     (base 16)		Vantiva USA LLC
-				5030 Sugarloaf Parkway Bldg 6 
+				5030 Sugarloaf Parkway Bldg 6
 				Lawrenceville  GA  30044
 				US
 
 0C-75-D2   (hex)		Hangzhou Hikvision Digital Technology Co.,Ltd.
 0C75D2     (base 16)		Hangzhou Hikvision Digital Technology Co.,Ltd.
-				No.555 Qianmo Road 
+				No.555 Qianmo Road
 				Hangzhou  Zhejiang  310052
 				CN
 
@@ -637,7 +637,7 @@ D87766     (base 16)		Nurivoice Co., Ltd
 
 B8-A7-5E   (hex)		Wuxi Xinjie Electric Co.,Ltd
 B8A75E     (base 16)		Wuxi Xinjie Electric Co.,Ltd
-				No.9 Liu Tang Road, Hu Tai Industrial Park, Binhu District, 
+				No.9 Liu Tang Road, Hu Tai Industrial Park, Binhu District,
 				Wuxi  Jiangsu  320200
 				CN
 
@@ -745,7 +745,7 @@ DCB4CA     (base 16)		GUANGDONG OPPO MOBILE TELECOMMUNICATIONS CORP.,LTD
 
 A0-02-A5   (hex)		Intel Corporate
 A002A5     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3  
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
@@ -793,7 +793,7 @@ C4799F     (base 16)		Haiguang Smart Device Co.,Ltd.
 
 84-28-59   (hex)		Amazon Technologies Inc.
 842859     (base 16)		Amazon Technologies Inc.
-				P.O Box 8102 
+				P.O Box 8102
 				Reno  NV  89507
 				US
 
@@ -841,7 +841,7 @@ C4799F     (base 16)		Haiguang Smart Device Co.,Ltd.
 
 00-16-F6   (hex)		Nevion
 0016F6     (base 16)		Nevion
-				Lysaker Torg 5 
+				Lysaker Torg 5
 				Lysaker    NO-1366
 				NO
 
@@ -919,7 +919,7 @@ B0D888     (base 16)		Panasonic Automotive Systems Co.,Ltd
 
 40-D4-F6   (hex)		Honor Device Co., Ltd.
 40D4F6     (base 16)		Honor Device Co., Ltd.
-				Suite 3401, Unit A, Building 6, Shum Yip Sky Park, No. 8089, Hongli West Road, Xiangmihu Street, Futian District 
+				Suite 3401, Unit A, Building 6, Shum Yip Sky Park, No. 8089, Hongli West Road, Xiangmihu Street, Futian District
 				Shenzhen   Guangdong  518040
 				CN
 
@@ -1003,7 +1003,7 @@ D06158     (base 16)		HUAWEI TECHNOLOGIES CO.,LTD
 
 28-73-F6   (hex)		Amazon Technologies Inc.
 2873F6     (base 16)		Amazon Technologies Inc.
-				P.O Box 8102 
+				P.O Box 8102
 				Reno  NV  89507
 				US
 
@@ -1051,7 +1051,7 @@ D4BAFA     (base 16)		GUANGDONG OPPO MOBILE TELECOMMUNICATIONS CORP.,LTD
 
 E0-CB-1D   (hex)		Amazon Technologies Inc.
 E0CB1D     (base 16)		Amazon Technologies Inc.
-				P.O Box 8102 
+				P.O Box 8102
 				Reno  NV  89507
 				US
 
@@ -1405,7 +1405,7 @@ E0D848     (base 16)		Dell Inc.
 
 58-10-31   (hex)		Hon Hai Precision IND.CO.,LTD
 581031     (base 16)		Hon Hai Precision IND.CO.,LTD
-				No. 66 Chung Shan Road TU-Cheng Industrial district TAIPEI TAIWAN 
+				No. 66 Chung Shan Road TU-Cheng Industrial district TAIPEI TAIWAN
 				TAIPEI  TAIWAN  33859
 				CN
 
@@ -1483,7 +1483,7 @@ C4A1AE     (base 16)		Huawei Device Co., Ltd.
 
 FC-D7-49   (hex)		Amazon Technologies Inc.
 FCD749     (base 16)		Amazon Technologies Inc.
-				P.O Box 8102 
+				P.O Box 8102
 				Reno  NV  89507
 				US
 
@@ -1517,8 +1517,8 @@ E8EBDD     (base 16)		Guangzhou Qingying Acoustics Technology Co., Ltd
 				BeiJing  BeiJing  100193
 				CN
 
-D8-58-C6   (hex)		Katch Asset Tracking Pty Limited 
-D858C6     (base 16)		Katch Asset Tracking Pty Limited 
+D8-58-C6   (hex)		Katch Asset Tracking Pty Limited
+D858C6     (base 16)		Katch Asset Tracking Pty Limited
 				98 Riley St
 				Darlinghurst   NSW  2010
 				AU
@@ -2161,7 +2161,7 @@ A81AF1     (base 16)		Apple, Inc.
 
 08-91-A3   (hex)		Amazon Technologies Inc.
 0891A3     (base 16)		Amazon Technologies Inc.
-				P.O Box 8102 
+				P.O Box 8102
 				Reno  NV  89507
 				US
 
@@ -2359,7 +2359,7 @@ C4A559     (base 16)		IEEE Registration Authority
 
 6C-0C-9A   (hex)		Amazon Technologies Inc.
 6C0C9A     (base 16)		Amazon Technologies Inc.
-				P.O Box 8102 
+				P.O Box 8102
 				Reno  NV  89507
 				US
 
@@ -2575,7 +2575,7 @@ F0221D     (base 16)		IEEE Registration Authority
 
 44-49-88   (hex)		Intel Corporate
 444988     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3  
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
@@ -2635,13 +2635,13 @@ FC9189     (base 16)		Sichuan Tianyi Comheart Telecom Co.,LTD
 
 10-2E-00   (hex)		Intel Corporate
 102E00     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3  
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
 20-3A-43   (hex)		Intel Corporate
 203A43     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3  
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
@@ -2737,7 +2737,7 @@ A83B76     (base 16)		CLOUD NETWORK TECHNOLOGY SINGAPORE PTE. LTD.
 
 40-E1-1C   (hex)		shenzhen Cloud High Communication Technology Co.,Ltd
 40E11C     (base 16)		shenzhen Cloud High Communication Technology Co.,Ltd
-				Room 1908, Building 1, Jinlitong Financial Center Building, No. 1100, Xingye Road, Haiwang Community, Xin'an Street, Bao'an District, Shenzhen, China  
+				Room 1908, Building 1, Jinlitong Financial Center Building, No. 1100, Xingye Road, Haiwang Community, Xin'an Street, Bao'an District, Shenzhen, China
 				Shenzhen    518128
 				CN
 
@@ -2816,7 +2816,7 @@ A80C03     (base 16)		Florawise
 90-DA-F9   (hex)		Siemens Rail Automation SAU
 90DAF9     (base 16)		Siemens Rail Automation SAU
 				Ronda de Europa, 5
-				Tres Cantos    28760 
+				Tres Cantos    28760
 				ES
 
 F8-00-9D   (hex)		INTRACOM DEFENSE S.A.
@@ -2917,7 +2917,7 @@ C82ADD     (base 16)		Google, Inc.
 
 B4-DB-91   (hex)		CELESTICA INC.
 B4DB91     (base 16)		CELESTICA INC.
-				1900-5140 Yonge Street PO Box 42   
+				1900-5140 Yonge Street PO Box 42
 				Toronto  Ontario  M2N 6L7
 				CA
 
@@ -2929,19 +2929,19 @@ C48372     (base 16)		IEEE Registration Authority
 
 C0-A5-E8   (hex)		Intel Corporate
 C0A5E8     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3  
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
 90-65-84   (hex)		Intel Corporate
 906584     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3  
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
 28-C5-D2   (hex)		Intel Corporate
 28C5D2     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3  
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
@@ -3181,13 +3181,13 @@ AC965B     (base 16)		Lucid Motors
 
 08-91-15   (hex)		Amazon Technologies Inc.
 089115     (base 16)		Amazon Technologies Inc.
-				P.O Box 8102 
+				P.O Box 8102
 				Reno  NV  89507
 				US
 
 74-D4-23   (hex)		Amazon Technologies Inc.
 74D423     (base 16)		Amazon Technologies Inc.
-				P.O Box 8102 
+				P.O Box 8102
 				Reno  NV  89507
 				US
 
@@ -3205,7 +3205,7 @@ E04735     (base 16)		Ericsson AB
 
 EC-A1-38   (hex)		Amazon Technologies Inc.
 ECA138     (base 16)		Amazon Technologies Inc.
-				P.O Box 8102 
+				P.O Box 8102
 				Reno  NV  89507
 				US
 
@@ -3373,19 +3373,19 @@ CC29BD     (base 16)		zte corporation
 
 C4-3D-1A   (hex)		Intel Corporate
 C43D1A     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3  
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
 04-E8-B9   (hex)		Intel Corporate
 04E8B9     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3  
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
 E0-2E-0B   (hex)		Intel Corporate
 E02E0B     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3  
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
@@ -3421,19 +3421,19 @@ CC037B     (base 16)		Texas Instruments
 
 58-1C-F8   (hex)		Intel Corporate
 581CF8     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3  
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
 AC-19-8E   (hex)		Intel Corporate
 AC198E     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3  
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
 C8-5E-A9   (hex)		Intel Corporate
 C85EA9     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3  
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
@@ -3559,7 +3559,7 @@ C83A1B     (base 16)		Toshiba TEC Corporation Inc
 
 E0-F7-28   (hex)		Amazon Technologies Inc.
 E0F728     (base 16)		Amazon Technologies Inc.
-				P.O Box 8102 
+				P.O Box 8102
 				Reno  NV  89507
 				US
 
@@ -3679,7 +3679,7 @@ A042D1     (base 16)		Huawei Device Co., Ltd.
 
 68-A7-B4   (hex)		Honor Device Co., Ltd.
 68A7B4     (base 16)		Honor Device Co., Ltd.
-				Suite 3401, Unit A, Building 6, Shum Yip Sky Park, No. 8089, Hongli West Road, Xiangmihu Street, Futian District 
+				Suite 3401, Unit A, Building 6, Shum Yip Sky Park, No. 8089, Hongli West Road, Xiangmihu Street, Futian District
 				Shenzhen   Guangdong  518040
 				CN
 
@@ -3697,7 +3697,7 @@ A4DD58     (base 16)		HUAWEI TECHNOLOGIES CO.,LTD
 
 E8-D8-7E   (hex)		Amazon Technologies Inc.
 E8D87E     (base 16)		Amazon Technologies Inc.
-				P.O Box 8102 
+				P.O Box 8102
 				Reno  NV  89507
 				US
 
@@ -3775,19 +3775,19 @@ C8120B     (base 16)		Samsung Electronics Co.,Ltd
 
 C0-8D-51   (hex)		Amazon Technologies Inc.
 C08D51     (base 16)		Amazon Technologies Inc.
-				P.O Box 8102 
+				P.O Box 8102
 				Reno  NV  89507
 				US
 
 44-B4-B2   (hex)		Amazon Technologies Inc.
 44B4B2     (base 16)		Amazon Technologies Inc.
-				P.O Box 8102 
+				P.O Box 8102
 				Reno  NV  89507
 				US
 
 AC-CC-FC   (hex)		Amazon Technologies Inc.
 ACCCFC     (base 16)		Amazon Technologies Inc.
-				P.O Box 8102 
+				P.O Box 8102
 				Reno  NV  89507
 				US
 
@@ -3841,7 +3841,7 @@ B8211C     (base 16)		Apple, Inc.
 
 00-26-04   (hex)		WorldCast Systems
 002604     (base 16)		WorldCast Systems
-				20 Avenue Neil Armstrong 
+				20 Avenue Neil Armstrong
 				Mérignac    33700
 				FR
 
@@ -3937,7 +3937,7 @@ A04466     (base 16)		Intellics
 
 44-6D-7F   (hex)		Amazon Technologies Inc.
 446D7F     (base 16)		Amazon Technologies Inc.
-				P.O Box 8102 
+				P.O Box 8102
 				Reno    89507
 				US
 
@@ -4003,7 +4003,7 @@ C0C170     (base 16)		Shenzhen SuperElectron Technology Co.,Ltd.
 
 30-2B-DC   (hex)		Top-Unum Electronics Co., LTD
 302BDC     (base 16)		Top-Unum Electronics Co., LTD
-				No. 58, Ln. 137, Jianshan Rd., Yingge Dist., 
+				No. 58, Ln. 137, Jianshan Rd., Yingge Dist.,
 				New Taipei City 239,  Taiwan  239
 				CN
 
@@ -4093,7 +4093,7 @@ C85895     (base 16)		Motorola Mobility LLC, a Lenovo Company
 
 6C-99-9D   (hex)		Amazon Technologies Inc.
 6C999D     (base 16)		Amazon Technologies Inc.
-				P.O Box 8102 
+				P.O Box 8102
 				Reno  NV  89507
 				US
 
@@ -4147,7 +4147,7 @@ B05C16     (base 16)		Fiberhome Telecommunication Technologies Co.,LTD
 
 08-E0-21   (hex)		Honor Device Co., Ltd.
 08E021     (base 16)		Honor Device Co., Ltd.
-				Suite 3401, Unit A, Building 6, Shum Yip Sky Park, No. 8089, Hongli West Road, Xiangmihu Street, Futian District 
+				Suite 3401, Unit A, Building 6, Shum Yip Sky Park, No. 8089, Hongli West Road, Xiangmihu Street, Futian District
 				Shenzhen   Guangdong  518040
 				CN
 
@@ -4169,8 +4169,8 @@ C42728     (base 16)		zte corporation
 				shenzhen  guangdong  518057
 				CN
 
-8C-C7-C3   (hex)		NETLINK ICT 
-8CC7C3     (base 16)		NETLINK ICT 
+8C-C7-C3   (hex)		NETLINK ICT
+8CC7C3     (base 16)		NETLINK ICT
 				Jupitor Jn,Near Time kids Koothattukulam - Piravom Rd
 				Ernakulam  KL  686662
 				IN
@@ -4298,7 +4298,7 @@ B4F267     (base 16)		Compal Broadband Networks, Inc.
 B0-DD-74   (hex)		Heimgard Technologies AS
 B0DD74     (base 16)		Heimgard Technologies AS
 				Dronning Mauds gate 15
-				Oslo   Norway  0250 
+				Oslo   Norway  0250
 				NO
 
 C0-FB-C1   (hex)		ITEL MOBILE LIMITED
@@ -4489,13 +4489,13 @@ E06D18     (base 16)		PIONEERCORPORATION
 
 8C-F8-C5   (hex)		Intel Corporate
 8CF8C5     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3  
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
 A0-59-50   (hex)		Intel Corporate
 A05950     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3  
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
@@ -4603,13 +4603,13 @@ D42C46     (base 16)		BUFFALO.INC
 
 78-04-7A   (hex)		Edge Networks LLC
 78047A     (base 16)		Edge Networks LLC
-				14 Whistler Hill Lane 
+				14 Whistler Hill Lane
 				HUNTINGTON  NY  11743
 				US
 
 B0-3C-DC   (hex)		Intel Corporate
 B03CDC     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3  
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
@@ -4753,7 +4753,7 @@ A4EF15     (base 16)		AltoBeam (China) Inc.
 
 10-A5-1D   (hex)		Intel Corporate
 10A51D     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3  
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
@@ -4765,7 +4765,7 @@ A4EF15     (base 16)		AltoBeam (China) Inc.
 
 50-7C-6F   (hex)		Intel Corporate
 507C6F     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3  
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
@@ -4825,7 +4825,7 @@ F4573E     (base 16)		Fiberhome Telecommunication Technologies Co.,LTD
 
 08-8E-90   (hex)		Intel Corporate
 088E90     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3  
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
@@ -4879,13 +4879,13 @@ B0C787     (base 16)		HUAWEI TECHNOLOGIES CO.,LTD
 
 7C-21-4A   (hex)		Intel Corporate
 7C214A     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3  
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
 50-84-92   (hex)		Intel Corporate
 508492     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3  
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
@@ -4933,19 +4933,19 @@ D8B053     (base 16)		Xiaomi Communications Co Ltd
 
 54-6C-EB   (hex)		Intel Corporate
 546CEB     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3  
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
 00-93-37   (hex)		Intel Corporate
 009337     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3  
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
 58-CE-2A   (hex)		Intel Corporate
 58CE2A     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3  
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
@@ -4981,7 +4981,7 @@ B8208E     (base 16)		Panasonic Connect Co., Ltd.
 
 84-7B-57   (hex)		Intel Corporate
 847B57     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3  
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
@@ -5105,8 +5105,8 @@ D0F121     (base 16)		Xi'an LINKSCI Technology Co., Ltd
 				Shenzhen  GuangDong  518000
 				CN
 
-D0-F5-20   (hex)		KYOCERA Corporation 
-D0F520     (base 16)		KYOCERA Corporation 
+D0-F5-20   (hex)		KYOCERA Corporation
+D0F520     (base 16)		KYOCERA Corporation
 				30 Hoji
 				Kitami,  Hokkaido  099-1595
 				JP
@@ -5149,13 +5149,13 @@ A4C69A     (base 16)		Samsung Electronics Co.,Ltd
 
 8C-B8-7E   (hex)		Intel Corporate
 8CB87E     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3  
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
 70-1A-B8   (hex)		Intel Corporate
 701AB8     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3  
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
@@ -5333,8 +5333,8 @@ E89526     (base 16)		Luxshare Precision Industry CO., LTD.
 				Jiangsu    215324
 				CN
 
-10-41-21   (hex)		TELLESCOM INDUSTRIA E COMERCIO EM TELECOMUNICACAO 
-104121     (base 16)		TELLESCOM INDUSTRIA E COMERCIO EM TELECOMUNICACAO 
+10-41-21   (hex)		TELLESCOM INDUSTRIA E COMERCIO EM TELECOMUNICACAO
+104121     (base 16)		TELLESCOM INDUSTRIA E COMERCIO EM TELECOMUNICACAO
 				Av. Buriti, 1900 – Setor B – Distrito Industrial
 				Manaus  Amazonas  69075-000
 				BR
@@ -5377,7 +5377,7 @@ BC062D     (base 16)		Wacom Co.,Ltd.
 
 40-9C-A6   (hex)		Curvalux
 409CA6     (base 16)		Curvalux
-				Electric Works, 3 Concourse Way,  
+				Electric Works, 3 Concourse Way,
 				Sheffield    S1 2BJ
 				GB
 
@@ -5431,13 +5431,13 @@ FC4265     (base 16)		Zhejiang Tmall Technology Co., Ltd.
 
 B4-E4-54   (hex)		Amazon Technologies Inc.
 B4E454     (base 16)		Amazon Technologies Inc.
-				P.O Box 8102 
+				P.O Box 8102
 				Reno  NV  89507
 				US
 
 0C-43-F9   (hex)		Amazon Technologies Inc.
 0C43F9     (base 16)		Amazon Technologies Inc.
-				P.O Box 8102 
+				P.O Box 8102
 				Reno  NV  89507
 				US
 
@@ -5491,7 +5491,7 @@ E4072B     (base 16)		Huawei Device Co., Ltd.
 
 68-F0-D0   (hex)		SkyBell Technologies Inc.
 68F0D0     (base 16)		SkyBell Technologies Inc.
-				1 Jenner 
+				1 Jenner
 				Irvine  CA  92618
 				US
 
@@ -5569,7 +5569,7 @@ F80C58     (base 16)		Taicang T&W Electronics
 
 F4-26-79   (hex)		Intel Corporate
 F42679     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3  
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
@@ -5659,7 +5659,7 @@ FC58DF     (base 16)		Interphone Service
 
 F4-46-37   (hex)		Intel Corporate
 F44637     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3  
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
@@ -5761,7 +5761,7 @@ CCFA66     (base 16)		Huawei Device Co., Ltd.
 
 A0-E7-0B   (hex)		Intel Corporate
 A0E70B     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3  
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
@@ -5851,7 +5851,7 @@ E40CFD     (base 16)		GUANGDONG OPPO MOBILE TELECOMMUNICATIONS CORP.,LTD
 
 AC-74-B1   (hex)		Intel Corporate
 AC74B1     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3  
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
@@ -5939,9 +5939,9 @@ F8BAE6     (base 16)		Nokia
 				Kanata  Ontario  K2K 2E6
 				CA
 
-BC-EC-A0   (hex)		COMPAL INFORMATION (KUNSHAN) CO., LTD. 
-BCECA0     (base 16)		COMPAL INFORMATION (KUNSHAN) CO., LTD. 
-				NO. 25, THE 3RD Street KUNSHAN EXPORT PROCESSING ZONE 
+BC-EC-A0   (hex)		COMPAL INFORMATION (KUNSHAN) CO., LTD.
+BCECA0     (base 16)		COMPAL INFORMATION (KUNSHAN) CO., LTD.
+				NO. 25, THE 3RD Street KUNSHAN EXPORT PROCESSING ZONE
 				KUNSHAN  SUZHOU  215300
 				CN
 
@@ -5995,13 +5995,13 @@ E44E2D     (base 16)		Cisco Systems, Inc
 
 DC-21-5C   (hex)		Intel Corporate
 DC215C     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3  
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
 C4-23-60   (hex)		Intel Corporate
 C42360     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3  
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
@@ -6013,13 +6013,13 @@ C42360     (base 16)		Intel Corporate
 
 10-3D-1C   (hex)		Intel Corporate
 103D1C     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3  
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
 38-87-D5   (hex)		Intel Corporate
 3887D5     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3  
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
@@ -6055,7 +6055,7 @@ C87B23     (base 16)		Bose Corporation
 
 00-04-7D   (hex)		Motorola Solutions Inc.
 00047D     (base 16)		Motorola Solutions Inc.
-				500 W Monroe Street, Ste 4400 
+				500 W Monroe Street, Ste 4400
 				Chicago  IL  60661-3781
 				US
 
@@ -6071,8 +6071,8 @@ C87B23     (base 16)		Bose Corporation
 				Shanghai  Shanghai  201203
 				CN
 
-C4-91-CF   (hex)		Luxul 
-C491CF     (base 16)		Luxul 
+C4-91-CF   (hex)		Luxul
+C491CF     (base 16)		Luxul
 				12884 Frontrunner Blvd, Suite 201
 				Draper  UT  84020
 				US
@@ -6313,13 +6313,13 @@ ECC5D2     (base 16)		Huawei Device Co., Ltd.
 
 64-6E-E0   (hex)		Intel Corporate
 646EE0     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3  
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
 04-56-E5   (hex)		Intel Corporate
 0456E5     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3  
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
@@ -6379,7 +6379,7 @@ F40223     (base 16)		PAX Computer Technology(Shenzhen) Ltd.
 
 64-79-F0   (hex)		Intel Corporate
 6479F0     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3  
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
@@ -6494,7 +6494,7 @@ CC9C3E     (base 16)		Cisco Meraki
 84-26-7A   (hex)		GUANGDONG TAIDE ZHILIAN TECHNOLOGY CO.,LTD
 84267A     (base 16)		GUANGDONG TAIDE ZHILIAN TECHNOLOGY CO.,LTD
 				Taide Technology Park,Jinfenghuang Industrial District, Fenggang Town,
-				Dongguan  GUANGDONG  523000 
+				Dongguan  GUANGDONG  523000
 				CN
 
 6C-47-60   (hex)		Sunitec Enterprise Co.,Ltd
@@ -6515,8 +6515,8 @@ CC9C3E     (base 16)		Cisco Meraki
 				Tokyo    108-8050
 				JP
 
-48-29-E4   (hex)		AO 
-4829E4     (base 16)		AO 
+48-29-E4   (hex)		AO
+4829E4     (base 16)		AO
 				Prospekt Mira
 				Moscow    129223
 				RU
@@ -6541,13 +6541,13 @@ A45E5A     (base 16)		ACTIVIO Inc.
 
 7C-50-79   (hex)		Intel Corporate
 7C5079     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3  
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
 80-38-FB   (hex)		Intel Corporate
 8038FB     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3  
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
@@ -6583,7 +6583,7 @@ CC69FA     (base 16)		Apple, Inc.
 
 AC-82-47   (hex)		Intel Corporate
 AC8247     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3  
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
@@ -6649,7 +6649,7 @@ E47727     (base 16)		HUAWEI TECHNOLOGIES CO.,LTD
 
 10-51-07   (hex)		Intel Corporate
 105107     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3  
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
@@ -6751,7 +6751,7 @@ E06C4E     (base 16)		Shenzhen TINNO Mobile Technology Corp.
 
 F4-B3-01   (hex)		Intel Corporate
 F4B301     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3  
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
@@ -6823,7 +6823,7 @@ F0FEE7     (base 16)		Huawei Device Co., Ltd.
 
 E8-F4-08   (hex)		Intel Corporate
 E8F408     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3  
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
@@ -7009,7 +7009,7 @@ B04530     (base 16)		SKY UK LIMITED
 
 EC-0D-E4   (hex)		Amazon Technologies Inc.
 EC0DE4     (base 16)		Amazon Technologies Inc.
-				P.O Box 8102 
+				P.O Box 8102
 				Reno  NV  89507
 				US
 
@@ -7021,7 +7021,7 @@ B456E3     (base 16)		Apple, Inc.
 
 84-30-95   (hex)		Hon Hai Precision IND.CO.,LTD
 843095     (base 16)		Hon Hai Precision IND.CO.,LTD
-				No. 66 Chung Shan Road TU-Cheng Industrial district TAIPEI TAIWAN 
+				No. 66 Chung Shan Road TU-Cheng Industrial district TAIPEI TAIWAN
 				TAIPEI  TAIWAN  33859
 				CN
 
@@ -7183,7 +7183,7 @@ C41C9C     (base 16)		JiQiDao
 
 8C-55-BB   (hex)		Songwoo Information & Technology Co., Ltd
 8C55BB     (base 16)		Songwoo Information & Technology Co., Ltd
-				24-9, Jinju-daero 404beon-gil, Jinju-si, Gyeongsangnam-do, Korea 
+				24-9, Jinju-daero 404beon-gil, Jinju-si, Gyeongsangnam-do, Korea
 				Jinju  Gyeongsangnam-do  52826
 				KR
 
@@ -7309,7 +7309,7 @@ F013C1     (base 16)		Hannto Technology Co., Ltd
 
 E8-84-A5   (hex)		Intel Corporate
 E884A5     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3  
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
@@ -7373,8 +7373,8 @@ B82D28     (base 16)		AMPAK Technology,Inc.
 				Hsinchu  Hsinchu,Taiwan R.O.C.  30352
 				TW
 
-A4-13-4E   (hex)		Luxul 
-A4134E     (base 16)		Luxul 
+A4-13-4E   (hex)		Luxul
+A4134E     (base 16)		Luxul
 				14203 Minuteman Drive
 				Draper  UT  84020
 				US
@@ -7387,7 +7387,7 @@ B85F98     (base 16)		Amazon Technologies Inc.
 
 D8-F8-83   (hex)		Intel Corporate
 D8F883     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3  
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
@@ -7417,7 +7417,7 @@ DC774C     (base 16)		Cisco Systems, Inc
 
 FC-44-82   (hex)		Intel Corporate
 FC4482     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3  
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
@@ -7454,7 +7454,7 @@ BC76C5     (base 16)		HUAWEI TECHNOLOGIES CO.,LTD
 00-04-30   (hex)		Netgem
 000430     (base 16)		Netgem
 				27 rue d'Orleans
-				    
+
 				FR
 
 04-46-CF   (hex)		Beijing Venustech Cybervision Co.,Ltd.
@@ -7477,7 +7477,7 @@ B88035     (base 16)		Shenzhen Qihu Intelligent Technology Company Limited
 
 64-B6-23   (hex)		Schrack Seconet Care Communication GmbH
 64B623     (base 16)		Schrack Seconet Care Communication GmbH
-				Eibesbrunnergasse 18 
+				Eibesbrunnergasse 18
 				Vienna    1120
 				AT
 
@@ -7573,7 +7573,7 @@ F4E578     (base 16)		LLC Proizvodstvennaya Kompania TransService
 
 3C-9C-0F   (hex)		Intel Corporate
 3C9C0F     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3 
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
@@ -7609,7 +7609,7 @@ F4E578     (base 16)		LLC Proizvodstvennaya Kompania TransService
 
 5C-44-3E   (hex)		Skullcandy
 5C443E     (base 16)		Skullcandy
-				6301 N. Landmark Dr. 
+				6301 N. Landmark Dr.
 				Park City  UT  84098
 				US
 
@@ -7622,7 +7622,7 @@ F88200     (base 16)		CaptionCall
 00-50-F1   (hex)		Maxlinear, Inc
 0050F1     (base 16)		Maxlinear, Inc
 				94 Em-Hamoshavot Way.
-				Petach-Tikva    
+				Petach-Tikva
 				IL
 
 80-16-05   (hex)		Vodafone Italia S.p.A.
@@ -7675,7 +7675,7 @@ C80AA9     (base 16)		Quanta Computer Inc.
 
 60-EB-69   (hex)		Quanta Computer Inc.
 60EB69     (base 16)		Quanta Computer Inc.
-				211, Wen Hwa 2nd Rd.,Kuei Shan, 
+				211, Wen Hwa 2nd Rd.,Kuei Shan,
 				Tao Yuan    33377
 				TW
 
@@ -7867,7 +7867,7 @@ C03D03     (base 16)		Samsung Electronics Co.,Ltd
 
 D0-C6-37   (hex)		Intel Corporate
 D0C637     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3 
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
@@ -7879,7 +7879,7 @@ D49234     (base 16)		NEC Corporation
 
 38-68-93   (hex)		Intel Corporate
 386893     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3 
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
@@ -7903,13 +7903,13 @@ CCD73C     (base 16)		HUAWEI TECHNOLOGIES CO.,LTD
 
 94-E7-0B   (hex)		Intel Corporate
 94E70B     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3 
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
 04-6C-59   (hex)		Intel Corporate
 046C59     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3 
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
@@ -8209,7 +8209,7 @@ B0B5C3     (base 16)		GUANGDONG OPPO MOBILE TELECOMMUNICATIONS CORP.,LTD
 
 D0-AB-D5   (hex)		Intel Corporate
 D0ABD5     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3 
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
@@ -8353,7 +8353,7 @@ B0E4D5     (base 16)		Google, Inc.
 
 E0-D4-E8   (hex)		Intel Corporate
 E0D4E8     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3 
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
@@ -8389,7 +8389,7 @@ F4DBE3     (base 16)		Apple, Inc.
 
 BC-42-8C   (hex)		ALPSALPINE CO,.LTD
 BC428C     (base 16)		ALPSALPINE CO,.LTD
-				nishida  6-1 
+				nishida  6-1
 				Kakuda-City  Miyagi-Pref  981-1595
 				JP
 
@@ -8437,7 +8437,7 @@ D45EEC     (base 16)		Beijing Xiaomi Electronics Co., Ltd.
 
 74-C9-29   (hex)		Zhejiang Dahua Technology Co., Ltd.
 74C929     (base 16)		Zhejiang Dahua Technology Co., Ltd.
-				No.1199,Waterfront Road 
+				No.1199,Waterfront Road
 				Hangzhou  Zhejiang  310053
 				CN
 
@@ -8653,7 +8653,7 @@ E02AE6     (base 16)		Fiberhome Telecommunication Technologies Co.,LTD
 
 14-F6-D8   (hex)		Intel Corporate
 14F6D8     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3 
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
@@ -8747,9 +8747,9 @@ A428B7     (base 16)		Yangtze Memory Technologies Co., Ltd.
 				State College  PA  16801
 				US
 
-E4-A8-DF   (hex)		COMPAL INFORMATION (KUNSHAN) CO., LTD. 
-E4A8DF     (base 16)		COMPAL INFORMATION (KUNSHAN) CO., LTD. 
-				NO. 25, THE 3RD Street KUNSHAN EXPORT PROCESSING ZONE 
+E4-A8-DF   (hex)		COMPAL INFORMATION (KUNSHAN) CO., LTD.
+E4A8DF     (base 16)		COMPAL INFORMATION (KUNSHAN) CO., LTD.
+				NO. 25, THE 3RD Street KUNSHAN EXPORT PROCESSING ZONE
 				KUNSHAN  SUZHOU  215300
 				CN
 
@@ -8767,7 +8767,7 @@ E4A8DF     (base 16)		COMPAL INFORMATION (KUNSHAN) CO., LTD.
 
 D8-3B-BF   (hex)		Intel Corporate
 D83BBF     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3 
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
@@ -8815,7 +8815,7 @@ E826B6     (base 16)		Companies House to GlucoRx Technologies Ltd.
 
 90-2B-34   (hex)		GIGA-BYTE TECHNOLOGY CO.,LTD.
 902B34     (base 16)		GIGA-BYTE TECHNOLOGY CO.,LTD.
-				Pin-Jen City, 
+				Pin-Jen City,
 				Pin-Jen  Taoyuan  324
 				TW
 
@@ -9061,8 +9061,8 @@ EC9C32     (base 16)		Sichuan AI-Link Technology Co., Ltd.
 
 B8-87-C6   (hex)		Prudential Technology co.,LTD
 B887C6     (base 16)		Prudential Technology co.,LTD
-				UNIT 4,7/F BRIGHT WAY TOWER, NO33 MONG KOK RD, 
-				Hong Kong    999077 
+				UNIT 4,7/F BRIGHT WAY TOWER, NO33 MONG KOK RD,
+				Hong Kong    999077
 				CN
 
 FC-1C-A1   (hex)		Nokia
@@ -9134,7 +9134,7 @@ C4E0DE     (base 16)		Zhengzhou XindaJiean Information Technology Co.,Ltd.
 00-04-C9   (hex)		Micro Electron Co., Ltd.
 0004C9     (base 16)		Micro Electron Co., Ltd.
 				13-1-205 Aobaokakita
-				Suita-city  Osaka  
+				Suita-city  Osaka
 				JP
 
 C4-3A-35   (hex)		FN-LINK TECHNOLOGY LIMITED
@@ -9193,7 +9193,7 @@ C84F0E     (base 16)		Integrated Device Technology (Malaysia) Sdn. Bhd.
 
 6C-1C-71   (hex)		Zhejiang Dahua Technology Co., Ltd.
 6C1C71     (base 16)		Zhejiang Dahua Technology Co., Ltd.
-				No.1199,Waterfront Road 
+				No.1199,Waterfront Road
 				Hangzhou  Zhejiang  310053
 				CN
 
@@ -9391,7 +9391,7 @@ D82918     (base 16)		HUAWEI TECHNOLOGIES CO.,LTD
 
 4C-1D-96   (hex)		Intel Corporate
 4C1D96     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3 
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
@@ -9403,7 +9403,7 @@ BC2392     (base 16)		BYD Precision Manufacture Company Ltd.
 
 94-E6-F7   (hex)		Intel Corporate
 94E6F7     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3 
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
@@ -9625,7 +9625,7 @@ E0EB62     (base 16)		Shanghai Hulu Devices Co., Ltd
 
 48-21-6C   (hex)		China Mobile IOT Company Limited
 48216C     (base 16)		China Mobile IOT Company Limited
-				Building D3,No.8 Yangliu North Road,Yubei District 
+				Building D3,No.8 Yangliu North Road,Yubei District
 				CHONGQING  CHONGQING  401121
 				CN
 
@@ -9710,12 +9710,12 @@ A4AE11     (base 16)		Hon Hai Precision Industry Co., Ltd.
 00-90-52   (hex)		SELCOM ELETTRONICA S.R.L.
 009052     (base 16)		SELCOM ELETTRONICA S.R.L.
 				VIA GRANDI, 5
-				40013 CASTELMAGGIORE BO    
+				40013 CASTELMAGGIORE BO
 				IT
 
 18-71-D5   (hex)		Hazens Automotive Electronics(SZ)Co.,Ltd.
 1871D5     (base 16)		Hazens Automotive Electronics(SZ)Co.,Ltd.
-				C8 Building, Building 13, Zhongxin Innovation Industry City, No.12, Ganli No.6 Road, Ganli Industrial Park, Buji Street, Longgang District 
+				C8 Building, Building 13, Zhongxin Innovation Industry City, No.12, Ganli No.6 Road, Ganli Industrial Park, Buji Street, Longgang District
 				Shenzhen  Guangdong  518100
 				CN
 
@@ -9757,7 +9757,7 @@ D03745     (base 16)		TP-LINK TECHNOLOGIES CO.,LTD.
 
 50-E0-85   (hex)		Intel Corporate
 50E085     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3 
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
@@ -9919,7 +9919,7 @@ C8EAF8     (base 16)		zte corporation
 
 08-ED-ED   (hex)		Zhejiang Dahua Technology Co., Ltd.
 08EDED     (base 16)		Zhejiang Dahua Technology Co., Ltd.
-				No.1199,Waterfront Road 
+				No.1199,Waterfront Road
 				Hangzhou  Zhejiang  310053
 				CN
 
@@ -10015,7 +10015,7 @@ D44DA4     (base 16)		Murata Manufacturing Co., Ltd.
 
 DC-71-96   (hex)		Intel Corporate
 DC7196     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3 
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
@@ -10159,7 +10159,7 @@ EC5623     (base 16)		HUAWEI TECHNOLOGIES CO.,LTD
 
 B8-08-CF   (hex)		Intel Corporate
 B808CF     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3 
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
@@ -10238,7 +10238,7 @@ AC8FF8     (base 16)		Nokia
 60-03-A6   (hex)		Inteno Broadband Technology AB
 6003A6     (base 16)		Inteno Broadband Technology AB
 				Stensätravägen 13
-				Skärholmen  SE  127 39 
+				Skärholmen  SE  127 39
 				SE
 
 44-B2-95   (hex)		Sichuan AI-Link Technology Co., Ltd.
@@ -10271,9 +10271,9 @@ AC8FF8     (base 16)		Nokia
 				Hangzhou  Zhejiang  310052
 				CN
 
-08-97-98   (hex)		COMPAL INFORMATION (KUNSHAN) CO., LTD. 
-089798     (base 16)		COMPAL INFORMATION (KUNSHAN) CO., LTD. 
-				NO. 25, THE 3RD Street KUNSHAN EXPORT PROCESSING ZONE 
+08-97-98   (hex)		COMPAL INFORMATION (KUNSHAN) CO., LTD.
+089798     (base 16)		COMPAL INFORMATION (KUNSHAN) CO., LTD.
+				NO. 25, THE 3RD Street KUNSHAN EXPORT PROCESSING ZONE
 				KUNSHAN  SUZHOU  215300
 				CN
 
@@ -10345,7 +10345,7 @@ B0518E     (base 16)		Holl technology CO.Ltd.
 
 68-17-29   (hex)		Intel Corporate
 681729     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3 
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
@@ -10529,7 +10529,7 @@ E009BF     (base 16)		SHENZHEN TONG BO WEI TECHNOLOGY Co.,LTD
 78-36-07   (hex)		Cermate Technologies Inc.
 783607     (base 16)		Cermate Technologies Inc.
 				7F-1, No 168 Lien-Chen Rd.
-				Chung-Ho Dist  New Taipei City  
+				Chung-Ho Dist  New Taipei City
 				TW
 
 1C-24-EB   (hex)		Burlywood
@@ -10648,7 +10648,7 @@ DC31D1     (base 16)		vivo Mobile Communication Co., Ltd.
 
 D4-3B-04   (hex)		Intel Corporate
 D43B04     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3 
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
@@ -10724,8 +10724,8 @@ FC2BB2     (base 16)		Actiontec Electronics, Inc
 				Santa Clara  CA  95054
 				US
 
-E0-9F-2A   (hex)		Iton Technology Corp. 
-E09F2A     (base 16)		Iton Technology Corp. 
+E0-9F-2A   (hex)		Iton Technology Corp.
+E09F2A     (base 16)		Iton Technology Corp.
 				Room 1302, Block A, Building 4，Huangge Road, Longgang District
 				Shenzhen   Guangdong   518116
 				CN
@@ -10846,7 +10846,7 @@ F00EBF     (base 16)		ZettaHash Inc.
 
 04-EA-56   (hex)		Intel Corporate
 04EA56     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3 
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
@@ -11084,9 +11084,9 @@ B07E11     (base 16)		Texas Instruments
 				Qingdao  Shangdong  266510
 				CN
 
-F4-95-1B   (hex)		Hefei Radio Communication Technology Co., Ltd 
-F4951B     (base 16)		Hefei Radio Communication Technology Co., Ltd 
-				 No.108, YinXing Road, High-tech Development Zone 
+F4-95-1B   (hex)		Hefei Radio Communication Technology Co., Ltd
+F4951B     (base 16)		Hefei Radio Communication Technology Co., Ltd
+				 No.108, YinXing Road, High-tech Development Zone
 				Hefei  Anhui  230088
 				CN
 
@@ -11114,8 +11114,8 @@ A41194     (base 16)		Lenovo
 				SHENZHEN  GUANGDONG  518057
 				CN
 
-BC-93-25   (hex)		Ningbo Joyson Preh Car Connect Co.,Ltd.  
-BC9325     (base 16)		Ningbo Joyson Preh Car Connect Co.,Ltd.  
+BC-93-25   (hex)		Ningbo Joyson Preh Car Connect Co.,Ltd.
+BC9325     (base 16)		Ningbo Joyson Preh Car Connect Co.,Ltd.
 				No. 99, Qingyi Road
 				Ningbo   Zhejiang  315040
 				CN
@@ -11192,8 +11192,8 @@ A4FC77     (base 16)		Mega Well Limited
 				Nagaokakyo-shi  Kyoto  617-8555
 				JP
 
-84-32-6F   (hex)		GUANGZHOU AVA ELECTRONICS TECHNOLOGY CO.,LTD 
-84326F     (base 16)		GUANGZHOU AVA ELECTRONICS TECHNOLOGY CO.,LTD 
+84-32-6F   (hex)		GUANGZHOU AVA ELECTRONICS TECHNOLOGY CO.,LTD
+84326F     (base 16)		GUANGZHOU AVA ELECTRONICS TECHNOLOGY CO.,LTD
 				Science town luogang district guangzhou city branch bead road 232 profit people park 301, building 2
 				guangzhou   guangdong  510000
 				CN
@@ -11308,7 +11308,7 @@ B0AE25     (base 16)		Varikorea
 
 98-3B-8F   (hex)		Intel Corporate
 983B8F     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3 
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
@@ -11408,8 +11408,8 @@ ECC40D     (base 16)		Nintendo Co.,Ltd
 				Rueil Malmaison Cedex  hauts de seine  92848
 				FR
 
-00-B4-F5   (hex)		DongGuan Siyoto Electronics Co., Ltd       
-00B4F5     (base 16)		DongGuan Siyoto Electronics Co., Ltd       
+00-B4-F5   (hex)		DongGuan Siyoto Electronics Co., Ltd
+00B4F5     (base 16)		DongGuan Siyoto Electronics Co., Ltd
 				Hecheng Industrial District, QiaoTou Town
 				DongGuan City  Guangdong  523520
 				CN
@@ -11566,7 +11566,7 @@ CCF0FD     (base 16)		China Mobile (Hangzhou) Information Technology Co., Ltd.
 
 1C-1B-B5   (hex)		Intel Corporate
 1C1BB5     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3 
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
@@ -11633,7 +11633,7 @@ DCF719     (base 16)		Cisco Systems, Inc
 00-60-87   (hex)		KANSAI ELECTRIC CO., LTD.
 006087     (base 16)		KANSAI ELECTRIC CO., LTD.
 				6-14-9 MIDORII, ASAMINAMI-KU
-				HIROSHIMA 731-01    
+				HIROSHIMA 731-01
 				JO
 
 98-AE-71   (hex)		VVDN Technologies Pvt Ltd
@@ -11657,7 +11657,7 @@ AC6E1A     (base 16)		SHENZHEN GONGJIN ELECTRONICS CO.,LT
 00-80-EB   (hex)		COMPCONTROL B.V.
 0080EB     (base 16)		COMPCONTROL B.V.
 				STRATUMSED K31
-				  THE  
+				  THE
 				NL
 
 00-02-EB   (hex)		Pico Communications
@@ -11680,7 +11680,7 @@ AC9232     (base 16)		HUAWEI TECHNOLOGIES CO.,LTD
 
 DC-8B-28   (hex)		Intel Corporate
 DC8B28     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3 
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
@@ -11804,8 +11804,8 @@ FC4AE9     (base 16)		Castlenet Technology Inc.
 				Haidian District  Beijing  100085
 				CN
 
-FC-45-96   (hex)		COMPAL INFORMATION (KUNSHAN) CO., LTD. 
-FC4596     (base 16)		COMPAL INFORMATION (KUNSHAN) CO., LTD. 
+FC-45-96   (hex)		COMPAL INFORMATION (KUNSHAN) CO., LTD.
+FC4596     (base 16)		COMPAL INFORMATION (KUNSHAN) CO., LTD.
 				 NO. 25, THE 3RD Street KUNSHAN EXPORT PROCESSING ZON
 				KUNSHAN  SUZHOU  215300
 				CN
@@ -11816,20 +11816,20 @@ A0E534     (base 16)		Stratec Biomedical AG
 				Birkenfeld  Baden Wuertemberg  75217
 				DE
 
-1C-75-08   (hex)		COMPAL INFORMATION (KUNSHAN) CO., LTD. 
-1C7508     (base 16)		COMPAL INFORMATION (KUNSHAN) CO., LTD. 
-				NO. 25, THE 3RD Street KUNSHAN EXPORT PROCESSING ZONE 
-				KUNSHAN  SUZHOU   215300 
+1C-75-08   (hex)		COMPAL INFORMATION (KUNSHAN) CO., LTD.
+1C7508     (base 16)		COMPAL INFORMATION (KUNSHAN) CO., LTD.
+				NO. 25, THE 3RD Street KUNSHAN EXPORT PROCESSING ZONE
+				KUNSHAN  SUZHOU   215300
 				CN
 
-00-1B-38   (hex)		COMPAL INFORMATION (KUNSHAN) CO., LTD. 
-001B38     (base 16)		COMPAL INFORMATION (KUNSHAN) CO., LTD. 
+00-1B-38   (hex)		COMPAL INFORMATION (KUNSHAN) CO., LTD.
+001B38     (base 16)		COMPAL INFORMATION (KUNSHAN) CO., LTD.
 				NO. 25, THE 3RD AVENUE
 				KUNSHAN CITY  SUZHOU PROVINCE  215300
 				CN
 
-00-23-5A   (hex)		COMPAL INFORMATION (KUNSHAN) CO., LTD. 
-00235A     (base 16)		COMPAL INFORMATION (KUNSHAN) CO., LTD. 
+00-23-5A   (hex)		COMPAL INFORMATION (KUNSHAN) CO., LTD.
+00235A     (base 16)		COMPAL INFORMATION (KUNSHAN) CO., LTD.
 				NO 25, The 3rd street,
 				KuanShan  SUZHOU  215300
 				CN
@@ -11842,7 +11842,7 @@ A0E534     (base 16)		Stratec Biomedical AG
 
 8C-A0-48   (hex)		Beijing NeTopChip Technology Co.,LTD
 8CA048     (base 16)		Beijing NeTopChip Technology Co.,LTD
-				309,Intergration Building Olympic Center, No.1 An Ding Road,Chao Yang District,, 
+				309,Intergration Building Olympic Center, No.1 An Ding Road,Chao Yang District,,
 				Beijing    100029
 				CN
 
@@ -11860,7 +11860,7 @@ D469A5     (base 16)		Miura Systems Ltd.
 
 E0-12-83   (hex)		 Shenzhen Fanzhuo Communication Technology Co., Lt
 E01283     (base 16)		 Shenzhen Fanzhuo Communication Technology Co., Lt
-				 No.1003 Kesi Road, Hi-Tech Park, 
+				 No.1003 Kesi Road, Hi-Tech Park,
 				Shenzhen  Nanshan District  2602-2603
 				CN
 
@@ -11920,7 +11920,7 @@ D47C44     (base 16)		IEEE Registration Authority
 
 30-24-32   (hex)		Intel Corporate
 302432     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3 
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
@@ -12029,7 +12029,7 @@ B44326     (base 16)		HUAWEI TECHNOLOGIES CO.,LTD
 84-17-66   (hex)		WEIFANG GOERTEK ELECTRONICS CO.,LTD
 841766     (base 16)		WEIFANG GOERTEK ELECTRONICS CO.,LTD
 				Gaoxin 2 Road,Free Trade Zone,Weifang,Shandong,261205,P.R.China
-				Wei Fang  Shan Dong  
+				Wei Fang  Shan Dong
 				CN
 
 2C-4D-79   (hex)		WEIFANG GOERTEK ELECTRONICS CO.,LTD
@@ -12131,7 +12131,7 @@ FCA6CD     (base 16)		Fiberhome Telecommunication Technologies Co.,LTD
 A8-5B-6C   (hex)		Robert Bosch Gmbh, CM-CI2
 A85B6C     (base 16)		Robert Bosch Gmbh, CM-CI2
 				Renningen
-				Stuttgart    D-70465 
+				Stuttgart    D-70465
 				DE
 
 C8-B1-EE   (hex)		Qorvo
@@ -12238,7 +12238,7 @@ D4FC13     (base 16)		Fiberhome Telecommunication Technologies Co.,LTD
 
 A0-B0-45   (hex)		Halong Mining
 A0B045     (base 16)		Halong Mining
-				13/F TCL Tower,  No.8 Tai Chung Road 
+				13/F TCL Tower,  No.8 Tai Chung Road
 				Tsuen Wan New Territories    Tsuen Wan New Territories
 				HK
 
@@ -12506,8 +12506,8 @@ F099B6     (base 16)		Apple, Inc.
 				Shenzhen  Guangdong  518000
 				CN
 
-24-29-FE   (hex)		KYOCERA Corporation 
-2429FE     (base 16)		KYOCERA Corporation 
+24-29-FE   (hex)		KYOCERA Corporation
+2429FE     (base 16)		KYOCERA Corporation
 				30 Hoji
 				Kitami,  Hokkaido  099-1595
 				JP
@@ -12629,7 +12629,7 @@ C048E6     (base 16)		Samsung Electronics Co.,Ltd
 88-2E-5A   (hex)		storONE
 882E5A     (base 16)		storONE
 				POB 2660
-				Ra'anana    
+				Ra'anana
 				IL
 
 78-8C-54   (hex)		Ping Communication
@@ -12688,7 +12688,7 @@ C8FAE1     (base 16)		ARQ Digital LLC
 
 50-6C-BE   (hex)		InnosiliconTechnology Ltd
 506CBE     (base 16)		InnosiliconTechnology Ltd
-				WuHan East Lake Wuhan New Technology Development Zone 
+				WuHan East Lake Wuhan New Technology Development Zone
 				Wuhan  Hubei Province  430223
 				CN
 
@@ -12719,7 +12719,7 @@ C8FAE1     (base 16)		ARQ Digital LLC
 8C-F7-10   (hex)		AMPAK Technology, Inc.
 8CF710     (base 16)		AMPAK Technology, Inc.
 				No.1,Jen Ai Road Hsinchu Industrial Park, Hukou
-				Hsinchu  Taiwan ROC.  30352 
+				Hsinchu  Taiwan ROC.  30352
 				TW
 
 30-7B-AC   (hex)		New H3C Technologies Co., Ltd
@@ -12748,7 +12748,7 @@ C8FAE1     (base 16)		ARQ Digital LLC
 
 0C-54-15   (hex)		Intel Corporate
 0C5415     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3 
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
@@ -12868,7 +12868,7 @@ CC4D38     (base 16)		Carnegie Technologies
 
 5C-5F-67   (hex)		Intel Corporate
 5C5F67     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3 
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
@@ -12890,9 +12890,9 @@ CC4D38     (base 16)		Carnegie Technologies
 				NEW DELHI  DELHI  110015
 				IN
 
-98-29-A6   (hex)		COMPAL INFORMATION (KUNSHAN) CO., LTD. 
-9829A6     (base 16)		COMPAL INFORMATION (KUNSHAN) CO., LTD. 
-				NO. 25, THE 3RD Street KUNSHAN EXPORT PROCESSING ZONE 
+98-29-A6   (hex)		COMPAL INFORMATION (KUNSHAN) CO., LTD.
+9829A6     (base 16)		COMPAL INFORMATION (KUNSHAN) CO., LTD.
+				NO. 25, THE 3RD Street KUNSHAN EXPORT PROCESSING ZONE
 				KUNSHAN  SUZHOU  215300
 				CN
 
@@ -13058,8 +13058,8 @@ A09DC1     (base 16)		China Dragon Technology Limited
 				San Diego  CA  92121
 				US
 
-6C-76-60   (hex)		KYOCERA CORPORATION 
-6C7660     (base 16)		KYOCERA CORPORATION 
+6C-76-60   (hex)		KYOCERA CORPORATION
+6C7660     (base 16)		KYOCERA CORPORATION
 				2-1-1 Kagahara
 				Yokohama-shi  Kanagawa  224-8502
 				JP
@@ -13084,7 +13084,7 @@ F41E5E     (base 16)		RtBrick Inc.
 
 C8-D1-2A   (hex)		Comtrend Corporation
 C8D12A     (base 16)		Comtrend Corporation
-				3F-1, 10 Lane 609, Chongxin Road, Section 5, 
+				3F-1, 10 Lane 609, Chongxin Road, Section 5,
 				New Taipei City,  Taiwan  24159
 				TW
 
@@ -13096,7 +13096,7 @@ BCF292     (base 16)		PLANTRONICS, INC.
 
 04-50-DA   (hex)		Qiku Internet Network Scientific (Shenzhen) Co., Ltd
 0450DA     (base 16)		Qiku Internet Network Scientific (Shenzhen) Co., Ltd
-				Building A2, Chi Yuen Technology Park  1001 College Avenue, Nanshan District Shenzhen, Guangdong 
+				Building A2, Chi Yuen Technology Park  1001 College Avenue, Nanshan District Shenzhen, Guangdong
 				 Shenzhen  Guangdong   518000
 				CN
 
@@ -13258,7 +13258,7 @@ ECC06A     (base 16)		PowerChord Group Limited
 
 30-9F-FB   (hex)		Ardomus Networks Corporation
 309FFB     (base 16)		Ardomus Networks Corporation
-				4F,No. 6 Innovation Road II, Hsinchu Science Park  
+				4F,No. 6 Innovation Road II, Hsinchu Science Park
 				Hsinchu    300
 				TW
 
@@ -13270,7 +13270,7 @@ F06E0B     (base 16)		Microsoft Corporation
 
 34-6F-ED   (hex)		Enovation Controls
 346FED     (base 16)		Enovation Controls
-				5311 S. 122nd E. Ave. 
+				5311 S. 122nd E. Ave.
 				Tulsa  OK  74146
 				US
 
@@ -13456,7 +13456,7 @@ F46E24     (base 16)		NEC Personal Computers, Ltd.
 
 88-DA-1A   (hex)		Redpine Signals, Inc.
 88DA1A     (base 16)		Redpine Signals, Inc.
-				Plot 87, Sagar Society 
+				Plot 87, Sagar Society
 				Hyderabad  AP  500034
 				IN
 
@@ -13490,14 +13490,14 @@ E4A7C5     (base 16)		HUAWEI TECHNOLOGIES CO.,LTD
 				Dongguan    523808
 				CN
 
-A0-FE-61   (hex)		Vivint Wireless Inc. 
-A0FE61     (base 16)		Vivint Wireless Inc. 
+A0-FE-61   (hex)		Vivint Wireless Inc.
+A0FE61     (base 16)		Vivint Wireless Inc.
 				4931 N 300 W
 				Provo  UT  84604
 				US
 
-5C-2B-F5   (hex)		Vivint Wireless Inc. 
-5C2BF5     (base 16)		Vivint Wireless Inc. 
+5C-2B-F5   (hex)		Vivint Wireless Inc.
+5C2BF5     (base 16)		Vivint Wireless Inc.
 				4931 N 300 W
 				Provo  UT  84604
 				US
@@ -13586,8 +13586,8 @@ CC5A53     (base 16)		Cisco Systems, Inc
 				tokyo  158  0000
 				JP
 
-24-5F-DF   (hex)		KYOCERA CORPORATION 
-245FDF     (base 16)		KYOCERA CORPORATION 
+24-5F-DF   (hex)		KYOCERA CORPORATION
+245FDF     (base 16)		KYOCERA CORPORATION
 				2-1-1,Kagahara,
 				Yokohama-shi  Kanagawa  224-8502
 				JP
@@ -13756,7 +13756,7 @@ FCE557     (base 16)		Nokia Corporation
 
 E4-70-B8   (hex)		Intel Corporate
 E470B8     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3 
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
@@ -13775,7 +13775,7 @@ D4D2E5     (base 16)		BKAV Corporation
 00-50-B5   (hex)		FICHET SECURITE ELECTRONIQUE
 0050B5     (base 16)		FICHET SECURITE ELECTRONIQUE
 				15-17 AVE. MORANE-SAULNIER
-				    
+
 				FR
 
 00-14-39   (hex)		Blonder Tongue Laboratories, Inc
@@ -13847,7 +13847,7 @@ F86EEE     (base 16)		HUAWEI TECHNOLOGIES CO.,LTD
 00-A0-AC   (hex)		GILAT SATELLITE NETWORKS, LTD.
 00A0AC     (base 16)		GILAT SATELLITE NETWORKS, LTD.
 				24A HABARZEL STREET
-				    
+
 				IL
 
 74-1C-27   (hex)		ITEL MOBILE LIMITED
@@ -13900,7 +13900,7 @@ F86EEE     (base 16)		HUAWEI TECHNOLOGIES CO.,LTD
 
 F8-34-41   (hex)		Intel Corporate
 F83441     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3 
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
@@ -14297,7 +14297,7 @@ DCC8F5     (base 16)		Shanghai UMEinfo CO.,LTD.
 10-D0-7A   (hex)		AMPAK Technology, Inc.
 10D07A     (base 16)		AMPAK Technology, Inc.
 				No.1,Jen Ai Road Hsinchu Industrial Park, Hukou
-				Hsinchu  Taiwan ROC.  30352 
+				Hsinchu  Taiwan ROC.  30352
 				TW
 
 C4-AB-B2   (hex)		vivo Mobile Communication Co., Ltd.
@@ -14465,7 +14465,7 @@ E442A6     (base 16)		Intel Corporate
 E8-C1-D7   (hex)		Philips
 E8C1D7     (base 16)		Philips
 				TussenDiepen 4
-				Drachten  Friesland  9206 AD  
+				Drachten  Friesland  9206 AD
 				NL
 
 C8-F8-6D   (hex)		Alcatel-Lucent Shanghai Bell Co., Ltd
@@ -14582,8 +14582,8 @@ D055B2     (base 16)		Integrated Device Technology (Malaysia) Sdn. Bhd.
 				Dresden    01156
 				DE
 
-CC-82-EB   (hex)		KYOCERA CORPORATION 
-CC82EB     (base 16)		KYOCERA CORPORATION 
+CC-82-EB   (hex)		KYOCERA CORPORATION
+CC82EB     (base 16)		KYOCERA CORPORATION
 				 2-1-1,Kagahara, Tsuzuki-ku,
 				Yokohama-shi  Kanagawa  224-8502
 				JP
@@ -14687,7 +14687,7 @@ E05163     (base 16)		Arcadyan Corporation
 00-10-8E   (hex)		HUGH SYMONS CONCEPT Technologies Ltd.
 00108E     (base 16)		HUGH SYMONS CONCEPT Technologies Ltd.
 				Alder Hills Park
-				Poole, Dorset BM12 4AR    
+				Poole, Dorset BM12 4AR
 				GB
 
 64-1A-22   (hex)		Heliospectra AB
@@ -14704,7 +14704,7 @@ E05163     (base 16)		Arcadyan Corporation
 
 F4-2B-48   (hex)		Ubiqam
 F42B48     (base 16)		Ubiqam
-				15 Gonen 
+				15 Gonen
 				Petah Tiqva    4925915
 				IL
 
@@ -14762,8 +14762,8 @@ A084CB     (base 16)		SonicSensory,Inc.
 				shenzhen  guangdong  518057
 				CN
 
-4C-78-72   (hex)		Cav. Uff. Giacomo Cimberio S.p.A. 
-4C7872     (base 16)		Cav. Uff. Giacomo Cimberio S.p.A. 
+4C-78-72   (hex)		Cav. Uff. Giacomo Cimberio S.p.A.
+4C7872     (base 16)		Cav. Uff. Giacomo Cimberio S.p.A.
 				Via Torchio, 57
 				San Maurizio d'Opaglio  (Novara)  28017
 				IT
@@ -14837,7 +14837,7 @@ F483E1     (base 16)		Shanghai Clouder Semiconductor Co.,Ltd
 00-03-BC   (hex)		COT GmbH
 0003BC     (base 16)		COT GmbH
 				Güterstraße 5
-				    
+
 				DE
 
 7C-10-15   (hex)		Brilliant Home Technology, Inc.
@@ -14849,7 +14849,7 @@ F483E1     (base 16)		Shanghai Clouder Semiconductor Co.,Ltd
 CC-B8-A8   (hex)		AMPAK Technology, Inc.
 CCB8A8     (base 16)		AMPAK Technology, Inc.
 				No.1,Jen Ai Road Hsinchu Industrial Park, Hukou
-				Hsinchu  Taiwan ROC.  30352 
+				Hsinchu  Taiwan ROC.  30352
 				TW
 
 34-04-9E   (hex)		IEEE Registration Authority
@@ -14950,7 +14950,7 @@ C0210D     (base 16)		SHENZHEN RF-LINK TECHNOLOGY CO.,LTD.
 
 00-DB-DF   (hex)		Intel Corporate
 00DBDF     (base 16)		Intel Corporate
-				Lot 8, Jalan Hi-Tech 2/3 
+				Lot 8, Jalan Hi-Tech 2/3
 				Kulim  Kedah  09000
 				MY
 
@@ -15035,7 +15035,7 @@ B47447     (base 16)		CoreOS
 00-08-94   (hex)		InnoVISION Multimedia Ltd.
 000894     (base 16)		InnoVISION Multimedia Ltd.
 				Rm 608, 6/F Tins Enterprises Centre,
-				Kowloon,    
+				Kowloon,
 				HK
 
 50-4B-5B   (hex)		CONTROLtronic GmbH
@@ -15218,7 +15218,7 @@ A8E705     (base 16)		Fiberhome Telecommunication Technologies Co.,LTD
 88-6B-0F   (hex)		Bluegiga Technologies OY
 886B0F     (base 16)		Bluegiga Technologies OY
 				P.O. BOX 120
-				FIN-02631  Espoo  
+				FIN-02631  Espoo
 				FI
 
 AC-84-C9   (hex)		Sagemcom Broadband SAS
@@ -15431,10 +15431,10 @@ A07591     (base 16)		Samsung Electronics Co.,Ltd
 				Gumi  Gyeongbuk  730-350
 				KR
 
-00-23-41   (hex)		Vanderbilt International (SWE) AB 
-002341     (base 16)		Vanderbilt International (SWE) AB 
+00-23-41   (hex)		Vanderbilt International (SWE) AB
+002341     (base 16)		Vanderbilt International (SWE) AB
 				Englundavaegen 7
-				Solna    SE-171 41 
+				Solna    SE-171 41
 				SE
 
 40-7C-7D   (hex)		Nokia
@@ -15731,8 +15731,8 @@ C0F8DA     (base 16)		Hon Hai Precision Ind. Co.,Ltd.
 				Gumi  Gyeongbuk  730-350
 				KR
 
-E4-C1-F1   (hex)		SHENZHEN SPOTMAU INFORMATION TECHNOLIGY CO., Ltd  
-E4C1F1     (base 16)		SHENZHEN SPOTMAU INFORMATION TECHNOLIGY CO., Ltd  
+E4-C1-F1   (hex)		SHENZHEN SPOTMAU INFORMATION TECHNOLIGY CO., Ltd
+E4C1F1     (base 16)		SHENZHEN SPOTMAU INFORMATION TECHNOLIGY CO., Ltd
 				10F, Block D, 5th Building, Shenzhen Software Industrial Base, Haitian 2nd Rd,Nanshan District
 				Shenzhen  Guangdong  518057
 				CN
@@ -15877,7 +15877,7 @@ F008F1     (base 16)		Samsung Electronics Co.,Ltd
 
 00-52-18   (hex)		Wuxi Keboda Electron Co.Ltd
 005218     (base 16)		Wuxi Keboda Electron Co.Ltd
-				No.155 Chunhui Road, Xishan District, 
+				No.155 Chunhui Road, Xishan District,
 				Wuxi  Jiangsu  214101
 				CN
 

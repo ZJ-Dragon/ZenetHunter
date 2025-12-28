@@ -6,13 +6,13 @@ import platform
 import shutil
 import sys
 from enum import Enum
-from typing import Optional
 
 logger = logging.getLogger(__name__)
 
 
 class Platform(str, Enum):
     """Supported platforms."""
+
     LINUX = "linux"
     MACOS = "darwin"
     WINDOWS = "windows"
@@ -57,6 +57,7 @@ class PlatformFeatures:
             # Windows - check for admin
             try:
                 import ctypes
+
                 return ctypes.windll.shell32.IsUserAnAdmin() != 0
             except Exception:
                 return False
@@ -65,6 +66,7 @@ class PlatformFeatures:
         """Check if Scapy is available."""
         try:
             import scapy.all  # noqa: F401
+
             return True
         except ImportError:
             return False
@@ -96,7 +98,9 @@ class PlatformFeatures:
 
     def _check_networksetup(self) -> bool:
         """Check if networksetup (macOS network config) is available."""
-        return self.platform == Platform.MACOS and shutil.which("networksetup") is not None
+        return (
+            self.platform == Platform.MACOS and shutil.which("networksetup") is not None
+        )
 
     def _check_arp(self) -> bool:
         """Check if arp command is available."""
@@ -118,14 +122,18 @@ class PlatformFeatures:
         """Check if Windows Firewall is available."""
         if self.platform != Platform.WINDOWS:
             return False
-        # Check if netsh advfirewall is available (Windows Firewall with Advanced Security)
+        # Check if netsh advfirewall is available
+        # (Windows Firewall with Advanced Security)
         try:
             import subprocess
+
             result = subprocess.run(
                 ["netsh", "advfirewall", "show", "allprofiles"],
                 capture_output=True,
                 timeout=2,
-                creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
+                creationflags=(
+                    subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
+                ),
             )
             return result.returncode == 0
         except Exception:
@@ -136,7 +144,7 @@ class PlatformFeatures:
         # Docker detection works on Linux and macOS
         if self.platform in (Platform.LINUX, Platform.MACOS):
             try:
-                with open("/proc/self/cgroup", "r") as f:
+                with open("/proc/self/cgroup") as f:
                     content = f.read()
                     return "docker" in content or "containerd" in content
             except (FileNotFoundError, PermissionError):
@@ -144,12 +152,13 @@ class PlatformFeatures:
         # Windows: Check for Docker environment variables or container indicators
         elif self.platform == Platform.WINDOWS:
             import os
+
             # Check common Docker environment variables
             if os.getenv("DOCKER_CONTAINER") or os.getenv("container"):
                 return True
             # Check if running in WSL (Windows Subsystem for Linux)
             try:
-                with open("/proc/version", "r") as f:
+                with open("/proc/version") as f:
                     if "microsoft" in f.read().lower():
                         return False  # WSL is not Docker
             except (FileNotFoundError, PermissionError):
@@ -180,7 +189,7 @@ class PlatformFeatures:
 
 
 # Global platform features instance
-_platform_features: Optional[PlatformFeatures] = None
+_platform_features: PlatformFeatures | None = None
 
 
 def get_platform_features() -> PlatformFeatures:

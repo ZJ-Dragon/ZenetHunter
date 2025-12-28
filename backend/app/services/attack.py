@@ -52,20 +52,24 @@ class AttackService:
                 "event": "attackLog",
                 "data": {
                     "level": "info",
-                    "message": f"启动 {request.type} 攻击，目标: {mac}，持续时间: {request.duration}秒",
+                    "message": (
+                        f"启动 {request.type} 攻击，目标: {mac}，"
+                        f"持续时间: {request.duration}秒"
+                    ),
                     "mac": mac,
                     "timestamp": datetime.now(UTC).isoformat(),
                 },
             }
         )
-        
+
         # Start background task and store reference
         task = asyncio.create_task(self._run_attack_task(mac, request))
         self.active_tasks[mac] = task
-        
+
         # Add cleanup callback
         def cleanup_task(t):
             self.active_tasks.pop(mac, None)
+
         task.add_done_callback(cleanup_task)
 
         engine_name = self.engine.__class__.__name__
@@ -116,7 +120,7 @@ class AttackService:
             logger.info(
                 f"Attack {request.type} running on {mac} for {request.duration}s"
             )
-            
+
             # Broadcast attack started log
             await self.ws.broadcast(
                 {
@@ -135,10 +139,13 @@ class AttackService:
             try:
                 await asyncio.wait_for(
                     self.engine.start_attack(mac, request.type, request.duration),
-                    timeout=max_duration
+                    timeout=max_duration,
                 )
-            except asyncio.TimeoutError:
-                logger.warning(f"Attack on {mac} exceeded maximum duration {max_duration}s, forcing stop")
+            except TimeoutError:
+                logger.warning(
+                    f"Attack on {mac} exceeded maximum duration "
+                    f"{max_duration}s, forcing stop"
+                )
                 await self.engine.stop_attack(mac)
                 raise
 

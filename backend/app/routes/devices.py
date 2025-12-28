@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 from app.core.exceptions import AppError, ErrorCode
 from app.models.device import Device
 from app.repositories.device import DeviceRepository
 from app.services.state import StateManager, get_state_manager
-from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/devices", tags=["devices"])
 
@@ -42,8 +42,8 @@ async def update_device(
     repo = DeviceRepository(db)
     updated_device = await repo.upsert(device)
     await db.commit()
-    
+
     # Also update in-memory state for immediate WebSocket notifications
     state.update_device(updated_device)
-    
+
     return updated_device

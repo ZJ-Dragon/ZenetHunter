@@ -29,13 +29,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       api.defaults.headers.common['Authorization'] = `Bearer ${storedToken}`;
     }
     setIsLoading(false);
-    
+
     // Listen for logout events from API interceptor
     const handleLogout = () => {
       logout();
     };
     window.addEventListener('auth:logout', handleLogout);
-    
+
     return () => {
       window.removeEventListener('auth:logout', handleLogout);
     };

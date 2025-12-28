@@ -89,8 +89,8 @@ export const AttackDashboard: React.FC = () => {
         <ul>
           {activeAttacks.length > 0 ? (
             activeAttacks.map((device) => (
-              <li 
-                key={device.mac} 
+              <li
+                key={device.mac}
                 className="px-4 py-4 sm:px-6 transition-colors duration-150"
                 style={{ borderBottom: '1px solid var(--winui-border-subtle)' }}
                 onMouseEnter={(e) => {

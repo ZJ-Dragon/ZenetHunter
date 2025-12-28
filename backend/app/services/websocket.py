@@ -56,7 +56,7 @@ class ConnectionManager:
 
         for dead_conn in disconnected:
             self.disconnect(dead_conn)
-    
+
     async def close_all(self):
         """Close all WebSocket connections gracefully."""
         logger.info(f"Closing {len(self.active_connections)} WebSocket connections...")

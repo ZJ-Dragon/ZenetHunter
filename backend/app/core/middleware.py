@@ -73,10 +73,10 @@ def sanitize_validation_errors(errors: list[dict]) -> list[dict]:
     """
     sanitized: list[dict] = []
     sensitive_fields = {"password", "token", "secret", "key", "authorization"}
-    
+
     for err in errors or []:
         item = dict(err)
-        
+
         # Sanitize sensitive field values
         if "loc" in item:
             field_path = ".".join(str(loc) for loc in item["loc"])
@@ -85,7 +85,7 @@ def sanitize_validation_errors(errors: list[dict]) -> list[dict]:
                 # Mask the input value if present
                 if "input" in item:
                     item["input"] = "****"
-        
+
         # Sanitize ctx (context) dictionary to ensure JSON serialization
         ctx = item.get("ctx")
         if isinstance(ctx, dict):
@@ -99,7 +99,7 @@ def sanitize_validation_errors(errors: list[dict]) -> list[dict]:
                 else:
                     new_ctx[k] = _stringify_value(v)
             item["ctx"] = new_ctx
-            
+
         sanitized.append(item)
     return sanitized
 
@@ -158,7 +158,7 @@ class ErrorHandlerMiddleware(BaseHTTPMiddleware):
                     "correlation_id": correlation_id,
                     "code": app_error.code.value,
                     "component": "api",
-                    "sd": {"errors": sanitized},
+                    "sd": {"errors": sanitize_validation_errors(err.errors())},
                 },
             )
             return self._create_problem_response(
@@ -228,66 +228,3 @@ class ErrorHandlerMiddleware(BaseHTTPMiddleware):
             content=problem_details,
             headers={"X-Correlation-Id": correlation_id},
         )
-
-
-def _stringify_value(value):
-    """Best-effort stringify for potentially non-serializable values.
-
-    - Exceptions → str(exception)
-    - Other basic JSON-serializable types left intact
-    - Fallback to str(value)
-    """
-    try:
-        if isinstance(value, Exception):
-            return str(value)
-        # Primitive types are fine
-        if isinstance(value, (str, int, float, bool)) or value is None:
-            return value
-        # Leave dict/list processing to caller
-        return value
-    except Exception:
-        return str(value)
-
-
-def sanitize_validation_errors(errors: list[dict]) -> list[dict]:
-    """Sanitize pydantic/fastapi validation errors for JSON safety.
-
-    FastAPI's RequestValidationError.errors() returns a list of dicts where
-    each dict may have a "ctx" key containing extra information. Sometimes,
-    validators raise exceptions (e.g., ValueError) and that exception object
-    can be present in ctx, which is not JSON-serializable. This helper maps
-    any Exception values (and other odd values) in ctx to strings.
-
-    Also sanitizes sensitive fields like password, token, etc.
-    """
-    sanitized: list[dict] = []
-    sensitive_fields = {"password", "token", "secret", "key", "authorization"}
-    
-    for err in errors or []:
-        item = dict(err)
-        
-        # Sanitize sensitive field values
-        if "loc" in item:
-            field_path = ".".join(str(loc) for loc in item["loc"])
-            field_lower = field_path.lower()
-            if any(sensitive in field_lower for sensitive in sensitive_fields):
-                # Mask the input value if present
-                if "input" in item:
-                    item["input"] = "****"
-        
-        # Sanitize ctx (context) dictionary to ensure JSON serialization
-        ctx = item.get("ctx")
-        if isinstance(ctx, dict):
-            new_ctx: dict = {}
-            for k, v in ctx.items():
-                if isinstance(v, dict):
-                    # shallow sanitize nested dicts
-                    new_ctx[k] = {kk: _stringify_value(vv) for kk, vv in v.items()}
-                elif isinstance(v, list):
-                    new_ctx[k] = [_stringify_value(x) for x in v]
-                else:
-                    new_ctx[k] = _stringify_value(v)
-            item["ctx"] = new_ctx
-            
-        sanitized.append(item)
-    return sanitized

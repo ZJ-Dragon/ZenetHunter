@@ -32,8 +32,8 @@ const NavItem: React.FC<{ to: string; icon: React.ElementType; children: React.R
         color: isActive ? '#ffffff' : 'var(--winui-text-secondary)',
       }}
     >
-      <Icon 
-        className="mr-3 h-5 w-5" 
+      <Icon
+        className="mr-3 h-5 w-5"
         style={{ color: isActive ? '#ffffff' : 'var(--winui-text-tertiary)' }}
       />
       {children}

@@ -325,7 +325,10 @@ class PolicySelector:
             elif strategy.strategy_id == AttackType.ICMP_REDIRECT:
                 score += 0.1
             # MAC/Beacon flood are more aggressive
-            elif strategy.strategy_id in [AttackType.MAC_FLOOD, AttackType.BEACON_FLOOD]:
+            elif strategy.strategy_id in [
+                AttackType.MAC_FLOOD,
+                AttackType.BEACON_FLOOD,
+            ]:
                 score -= 0.1  # Penalty for aggressive attacks
 
         return min(1.0, max(0.0, score))
@@ -447,67 +450,75 @@ def get_policy_selector() -> PolicySelector:
         Returns:
             List of strategies that were selected and applied
         """
-        logger.info(f"[PolicySelector] Auto-selecting strategies for device {device.mac}")
-        
+        logger.info(
+            f"[PolicySelector] Auto-selecting strategies for device {device.mac}"
+        )
+
         # Get strategy sequence
-        strategies = self.select_strategy_sequence(device, max_strategies=max_strategies)
-        
+        strategies = self.select_strategy_sequence(
+            device, max_strategies=max_strategies
+        )
+
         if not strategies:
-            logger.warning(f"[PolicySelector] No strategies available for device {device.mac}")
+            logger.warning(
+                f"[PolicySelector] No strategies available for device {device.mac}"
+            )
             return []
-        
+
         # Apply strategies (defense first, then attack if needed)
         applied = []
         for strategy in strategies:
             try:
                 if strategy.type == StrategyType.DEFENSE:
                     # Apply defense policy
-                    from app.services.defender import DefenderService, get_defender_service
                     from app.models.defender import DefenseApplyRequest
-                    
+                    from app.services.defender import (
+                        get_defender_service,
+                    )
+
                     defender = get_defender_service()
                     await defender.apply_defense(
-                        device.mac,
-                        DefenseApplyRequest(policy=strategy.strategy_id)
+                        device.mac, DefenseApplyRequest(policy=strategy.strategy_id)
                     )
                     applied.append(strategy)
                     logger.info(
-                        f"[PolicySelector] Applied defense strategy {strategy.strategy_id.value} "
-                        f"to device {device.mac}"
+                        f"[PolicySelector] Applied defense strategy "
+                        f"{strategy.strategy_id.value} to device {device.mac}"
                     )
-                    
+
                 elif strategy.type == StrategyType.ATTACK:
                     # Apply attack (with default duration)
-                    from app.services.attack import AttackService, get_attack_service
                     from app.models.attack import AttackRequest
-                    
+                    from app.services.attack import get_attack_service
+
                     attack_service = get_attack_service()
                     await attack_service.start_attack(
                         device.mac,
                         AttackRequest(
                             type=strategy.strategy_id,
-                            duration=60  # Default 60 seconds
-                        )
+                            duration=60,  # Default 60 seconds
+                        ),
                     )
                     applied.append(strategy)
                     logger.info(
-                        f"[PolicySelector] Applied attack strategy {strategy.strategy_id.value} "
-                        f"to device {device.mac}"
+                        f"[PolicySelector] Applied attack strategy "
+                        f"{strategy.strategy_id.value} to device {device.mac}"
                     )
-                
+
                 # Add small delay between strategies
                 await asyncio.sleep(1)
-                
+
             except Exception as e:
                 logger.error(
-                    f"[PolicySelector] Failed to apply strategy {strategy.strategy_id.value} "
-                    f"to device {device.mac}: {e}",
-                    exc_info=True
+                    f"[PolicySelector] Failed to apply strategy "
+                    f"{strategy.strategy_id.value} to device {device.mac}: {e}",
+                    exc_info=True,
                 )
                 # Continue with next strategy even if one fails
-        
+
         logger.info(
-            f"[PolicySelector] Auto-applied {len(applied)} strategies to device {device.mac}"
+            f"[PolicySelector] Auto-applied {len(applied)} strategies "
+            f"to device {device.mac}"
         )
-        
+
         return applied

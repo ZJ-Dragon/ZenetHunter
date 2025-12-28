@@ -71,11 +71,11 @@ export const Dashboard: React.FC = () => {
     try {
       const data = await deviceService.getDevices();
       setDevices(data);
-      
+
       // Calculate statistics
       const online = data.filter(d => d.status === 'online').length;
       const blocked = data.filter(d => d.status === 'blocked').length;
-      
+
       setStats({
         totalDevices: data.length,
         onlineDevices: online,

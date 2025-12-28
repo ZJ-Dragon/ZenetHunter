@@ -5,7 +5,7 @@ from pydantic import BaseModel, ConfigDict, Field
 
 class AttackType(str, Enum):
     """Available attack/interference types for active defense."""
-    
+
     KICK = "kick"  # WiFi Deauthentication/Disassociation
     BLOCK = "block"  # ARP Spoofing / Man-in-the-Middle
     DHCP_SPOOF = "dhcp_spoof"  # DHCP Spoofing (redirect to controlled server)

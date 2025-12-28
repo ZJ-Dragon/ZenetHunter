@@ -17,7 +17,7 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({ node, onClose }) => {
   const { data: device } = node;
 
   return (
-    <div 
+    <div
       className="fixed inset-y-0 right-0 w-96 transform transition-transform duration-300 ease-out z-50 flex flex-col"
       style={{
         backgroundColor: 'var(--winui-surface)',
@@ -26,9 +26,9 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({ node, onClose }) => {
       }}
     >
       {/* Header */}
-      <div 
+      <div
         className="px-6 py-4 border-b flex items-center justify-between"
-        style={{ 
+        style={{
           borderColor: 'var(--winui-border-subtle)',
           backgroundColor: 'var(--winui-bg-tertiary)'
         }}
@@ -59,7 +59,7 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({ node, onClose }) => {
           <div>
             <h3 className="text-lg font-semibold" style={{ color: 'var(--winui-text-primary)' }}>{device.name || 'Unknown Device'}</h3>
             <p className="text-sm" style={{ color: 'var(--winui-text-secondary)' }}>{device.vendor || 'Unknown Vendor'}</p>
-            <div 
+            <div
               className="mt-2 inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold"
               style={{
                 backgroundColor: device.status === DeviceStatus.ONLINE ? 'rgba(16, 124, 16, 0.1)' :
@@ -122,9 +122,9 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({ node, onClose }) => {
       </div>
 
       {/* Actions */}
-      <div 
+      <div
         className="border-t p-4 flex flex-col space-y-3"
-        style={{ 
+        style={{
           borderColor: 'var(--winui-border-subtle)',
           backgroundColor: 'var(--winui-bg-tertiary)'
         }}

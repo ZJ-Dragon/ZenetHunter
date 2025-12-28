@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 from app.models.topology import NetworkTopology
 from app.repositories.device import DeviceRepository
 from app.services.state import StateManager, get_state_manager
-from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/topology", tags=["topology"])
 
@@ -18,10 +18,10 @@ async def get_topology(
     # Load devices from database to update state
     repo = DeviceRepository(db)
     db_devices = await repo.get_all()
-    
+
     # Sync devices to in-memory state (for topology generation)
     for device in db_devices:
         state.update_device(device)
-    
+
     # Generate topology from state
     return state.get_topology()

@@ -178,13 +178,16 @@ class StructuredFormatter(logging.Formatter):
             return json.dumps(log_data, ensure_ascii=False)
         except (TypeError, ValueError) as e:
             # Fallback to simple format if JSON serialization fails
-            return json.dumps({
-                "timestamp": datetime.now(UTC).isoformat(),
-                "severity": _map_severity(record.levelno),
-                "module": record.module,
-                "message": str(record.getMessage()),
-                "error": f"Log formatting failed: {str(e)}",
-            }, ensure_ascii=False)
+            return json.dumps(
+                {
+                    "timestamp": datetime.now(UTC).isoformat(),
+                    "severity": _map_severity(record.levelno),
+                    "module": record.module,
+                    "message": str(record.getMessage()),
+                    "error": f"Log formatting failed: {str(e)}",
+                },
+                ensure_ascii=False,
+            )
 
 
 def _map_severity(levelno: int) -> str:

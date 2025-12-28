@@ -1,4 +1,3 @@
-import os
 import sys
 from typing import Any
 
@@ -30,11 +29,11 @@ async def add_log(log: SystemLog, state: StateManager = Depends(get_state_manage
 async def get_system_info() -> dict[str, Any]:
     """Get system information for debugging."""
     from app.core.platform.detect import get_platform_features
-    
+
     settings = get_settings()
     platform_features = get_platform_features()
     summary = platform_features.get_summary()
-    
+
     return {
         "platform": summary["platform"],
         "platform_name": summary["platform_name"],

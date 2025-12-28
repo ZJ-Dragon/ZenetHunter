@@ -49,10 +49,10 @@ ZenetHunter 支持多平台，并自动检测：
    python clean-cache.py --all        # 清理所有缓存（包括数据库和虚拟环境）
    python clean-cache.py --db         # 同时清理数据库文件
    python clean-cache.py --venv       # 同时清理虚拟环境
-   
+
    # Shell 脚本（Linux/macOS）
    ./clean-cache.sh [--all] [--db] [--venv]
-   
+
    # 批处理脚本（Windows）
    clean-cache.bat [--all] [--db] [--venv]
    ```
@@ -61,7 +61,7 @@ ZenetHunter 支持多平台，并自动检测：
    ```bash
    # Linux/macOS
    ./start-local.sh
-   
+
    # Windows
    start-local.bat
    ```
@@ -230,7 +230,7 @@ cd deploy
 
 **问题："Failed to start scan: Network Error" 或扫描功能不可用**
 - **当前配置**：默认配置使用 **root 用户** 以获得最佳网络扫描兼容性。
-  
+
   **⚠️ 安全提示**：
   - 后端容器以 **root 用户（UID 0）** 运行以启用网络扫描功能
   - 这会降低容器隔离安全性，但对 Scapy 创建原始套接字是必需的
@@ -239,7 +239,7 @@ cd deploy
     - 直接在主机上运行后端（不使用容器）
     - 使用具有适当隔离的专用网络扫描服务
     - 实施额外的安全措施（防火墙规则、网络分段）
-  
+
 - **当前 Docker 配置**（已应用）：
   ```yaml
   backend:
@@ -249,36 +249,36 @@ cd deploy
       - NET_RAW    # 原始套接字操作
       - NET_ADMIN  # 网络管理
   ```
-  
+
 - **为什么需要 Root**：
   - Scapy 需要创建原始套接字以进行网络数据包注入
   - 原始套接字需要 root 权限或特定的 Linux 能力
   - 即使有 NET_RAW 能力，某些操作仍需要 root
   - Root + host 网络模式提供最可靠的网络扫描体验
-  
+
 - **验证**：检查配置是否正确：
   ```bash
   # 检查是否以 root 运行
   docker exec zh-backend id
   # 应显示：uid=0(root) gid=0(root)
-  
+
   # 检查网络模式
   docker inspect zh-backend | grep NetworkMode
   # 应显示："NetworkMode": "host"
-  
+
   # 检查能力
   docker inspect zh-backend | grep -A 5 "CapAdd"
-  
+
   # 测试扫描功能
   docker logs -f zh-backend
   ```
-  
+
 - **如果扫描仍然失败**：
   1. 确保 Docker 有权限使用主机网络模式
   2. 检查是否有防火墙阻止原始套接字创建
   3. 验证 Scapy 已安装：`docker exec zh-backend python -c "import scapy; print(scapy.__version__)"`
   4. 检查系统日志：`docker logs zh-backend | grep -i "scan\|network\|permission"`
-  
+
 - **安全建议**：
   - 仅在受信任的网络上运行此容器
   - 如需要，使用防火墙规则限制容器网络访问

@@ -2,9 +2,7 @@
 
 import json
 import logging
-import os
 from pathlib import Path
-from typing import Optional
 
 logger = logging.getLogger(__name__)
 
@@ -34,7 +32,7 @@ class DeviceModelLookup:
         # Load all JSON files in the vendors directory
         for json_file in vendors_dir.glob("*.json"):
             try:
-                with open(json_file, "r", encoding="utf-8") as f:
+                with open(json_file, encoding="utf-8") as f:
                     vendor_data = json.load(f)
                     vendor_name = vendor_data.get("vendor", "").lower()
                     if vendor_name:
@@ -51,10 +49,10 @@ class DeviceModelLookup:
     def _extract_oui(self, mac: str) -> str:
         """
         Extract OUI (first 3 octets) from MAC address.
-        
+
         Args:
             mac: MAC address in format XX:XX:XX:XX:XX:XX or XX-XX-XX-XX-XX-XX
-            
+
         Returns:
             OUI in format XX:XX:XX (uppercase)
         """
@@ -66,14 +64,14 @@ class DeviceModelLookup:
             return ":".join(parts[:3])
         return ""
 
-    def lookup_model(self, mac: str, vendor: Optional[str] = None) -> Optional[str]:
+    def lookup_model(self, mac: str, vendor: str | None = None) -> str | None:
         """
         Lookup device model from MAC address.
-        
+
         Args:
             mac: MAC address of the device
             vendor: Optional vendor name (if known, speeds up lookup)
-            
+
         Returns:
             Device model name if found, None otherwise
         """
@@ -97,7 +95,7 @@ class DeviceModelLookup:
                     return None
 
         # Otherwise, search all vendor databases
-        for vendor_name, vendor_data in self.vendor_db.items():
+        for _vendor_name, vendor_data in self.vendor_db.items():
             models = vendor_data.get("models", {})
             if oui in models:
                 model_list = models[oui]
@@ -107,13 +105,13 @@ class DeviceModelLookup:
 
         return None
 
-    def lookup_vendor_and_model(self, mac: str) -> tuple[Optional[str], Optional[str]]:
+    def lookup_vendor_and_model(self, mac: str) -> tuple[str | None, str | None]:
         """
         Lookup both vendor and model from MAC address.
-        
+
         Args:
             mac: MAC address of the device
-            
+
         Returns:
             Tuple of (vendor, model) if found, (None, None) otherwise
         """
@@ -137,7 +135,7 @@ class DeviceModelLookup:
 
 
 # Global singleton instance
-_lookup_instance: Optional[DeviceModelLookup] = None
+_lookup_instance: DeviceModelLookup | None = None
 
 
 def get_device_model_lookup() -> DeviceModelLookup:

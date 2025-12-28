@@ -177,7 +177,7 @@ class DeviceRepository:
             Number of devices deleted
         """
         from sqlalchemy import delete
-        
+
         result = await self.session.execute(delete(DeviceModel))
         await self.session.flush()
         deleted_count = result.rowcount if result.rowcount is not None else 0

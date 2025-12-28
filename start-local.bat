@@ -91,19 +91,19 @@ REM 启动前端服务器（React + Vite，后台运行）
 cd /d "%~dp0"
 if exist "frontend" (
     cd frontend
-    
+
     REM 检查是否已安装依赖
     if not exist "node_modules" (
         echo 安装前端依赖...
         call npm install
     )
-    
+
     REM 启动 Vite 开发服务器（后台运行）
     echo 启动 React 前端服务器...
     start /B npm run dev >nul 2>&1
     timeout /t 2 /nobreak >nul
     echo React 前端服务器已启动 (端口: 5173)
-    
+
     cd /d "%~dp0"
 ) else (
     echo 警告: frontend 目录不存在，跳过前端服务器启动

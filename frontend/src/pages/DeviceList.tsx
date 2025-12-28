@@ -32,10 +32,10 @@ const StatusBadge = ({ status }: { status: DeviceStatus }) => {
   const style = statusStyles[status];
 
   return (
-    <span 
+    <span
       className="px-3 py-1 inline-flex text-xs leading-5 font-semibold rounded-full"
-      style={{ 
-        backgroundColor: style.bg, 
+      style={{
+        backgroundColor: style.bg,
         color: style.text,
         borderRadius: 'var(--winui-radius-lg)'
       }}
@@ -144,10 +144,10 @@ export const DeviceList: React.FC = () => {
             <tbody style={{ backgroundColor: 'var(--winui-surface)' }}>
               {filteredDevices.length > 0 ? (
                 filteredDevices.map((device) => (
-                  <tr 
-                    key={device.mac} 
+                  <tr
+                    key={device.mac}
                     className="transition-colors duration-150"
-                    style={{ 
+                    style={{
                       borderBottom: '1px solid var(--winui-border-subtle)',
                     }}
                     onMouseEnter={(e) => {

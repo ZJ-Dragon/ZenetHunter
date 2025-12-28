@@ -39,7 +39,7 @@ export const Settings: React.FC = () => {
   // Listen for system theme changes when using system theme
   useEffect(() => {
     if (theme !== 'system') return;
-    
+
     const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
     const handleSystemThemeChange = (e: MediaQueryListEvent) => {
       const root = document.documentElement;
@@ -50,7 +50,7 @@ export const Settings: React.FC = () => {
       }
     };
     mediaQuery.addEventListener('change', handleSystemThemeChange);
-    
+
     return () => {
       mediaQuery.removeEventListener('change', handleSystemThemeChange);
     };
@@ -60,7 +60,7 @@ export const Settings: React.FC = () => {
     try {
       const info = await logsService.getSystemInfo();
       setSystemInfo(info);
-      
+
       // Auto-detect platform from system info
       if (info.platform) {
         const platformLower = info.platform.toLowerCase();
@@ -81,7 +81,7 @@ export const Settings: React.FC = () => {
 
   const applyTheme = (newTheme: Theme) => {
     const root = document.documentElement;
-    
+
     if (newTheme === 'system') {
       const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
       if (prefersDark) {
@@ -114,11 +114,11 @@ export const Settings: React.FC = () => {
     try {
       // Save settings to backend (if API exists)
       // await configService.updateConfig({ theme, platform });
-      
+
       // For now, just save to localStorage
       localStorage.setItem('theme', theme);
       localStorage.setItem('platform', platform);
-      
+
       // Show success message
       alert('设置已保存');
     } catch (error) {

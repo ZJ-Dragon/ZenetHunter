@@ -125,19 +125,19 @@ else
     # 进入前端目录
     if [ -d "frontend" ]; then
         cd frontend
-        
+
         # 检查是否已安装依赖
         if [ ! -d "node_modules" ]; then
             echo "安装前端依赖..."
             npm install
         fi
-        
+
         # 启动 Vite 开发服务器（后台运行）
         echo "启动 React 前端服务器..."
         npm run dev > /tmp/zenethunter-frontend.log 2>&1 &
         FRONTEND_PID=$!
         sleep 2
-        
+
         # 检查进程是否还在运行
         if kill -0 $FRONTEND_PID 2>/dev/null; then
             echo "✓ React 前端服务器已启动 (PID: $FRONTEND_PID, 端口: 5173)"
@@ -145,7 +145,7 @@ else
             echo "警告: 前端服务器启动失败，请检查日志: /tmp/zenethunter-frontend.log"
             FRONTEND_PID=""
         fi
-        
+
         cd "$SCRIPT_DIR"
     else
         echo "警告: frontend 目录不存在，跳过前端服务器启动"

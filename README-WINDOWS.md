@@ -52,7 +52,7 @@ uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
 Windows 版本使用 `arp -a` 命令扫描 ARP 表，自动识别网络设备。
 
-**要求**: 
+**要求**:
 - 普通用户权限即可进行 ARP 表扫描
 - 管理员权限用于主动扫描（Scapy）
 
@@ -60,7 +60,7 @@ Windows 版本使用 `arp -a` 命令扫描 ARP 表，自动识别网络设备。
 
 Windows 版本使用 **Windows Firewall with Advanced Security** (netsh advfirewall) 进行网络防御。
 
-**要求**: 
+**要求**:
 - **必须**以管理员身份运行后端服务
 - Windows Firewall 服务必须运行
 
@@ -172,7 +172,7 @@ Windows 上可以使用 Docker Desktop 运行 ZenetHunter：
 docker compose up -d
 ```
 
-**注意**: 
+**注意**:
 - Windows 容器模式需要 Windows Server 2016+ 或 Windows 10/11 Pro/Enterprise
 - Linux 容器模式（推荐）需要启用 WSL2
 

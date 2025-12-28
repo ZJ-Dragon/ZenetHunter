@@ -52,7 +52,8 @@ class LinuxDefenseEngine(DefenseEngine):
             await self._enable_quarantine(target)
         else:
             logger.warning(
-                f"[LinuxDefense] Policy {policy} not supported for specific target implementation yet"
+                f"[LinuxDefense] Policy {policy} not supported "
+                f"for specific target implementation yet"
             )
 
     async def remove_policy(self, target: str, policy: DefenseType) -> None:
@@ -65,7 +66,8 @@ class LinuxDefenseEngine(DefenseEngine):
             await self._disable_quarantine(target)
         else:
             logger.warning(
-                f"[LinuxDefense] Policy {policy} removal not supported for specific target implementation yet"
+                f"[LinuxDefense] Policy {policy} removal not supported "
+                f"for specific target implementation yet"
             )
 
     async def _enable_block_wan(self, mac: str) -> None:

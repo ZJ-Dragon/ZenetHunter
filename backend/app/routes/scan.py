@@ -4,14 +4,14 @@ from typing import Annotated
 
 from fastapi import APIRouter, Depends, WebSocket, WebSocketDisconnect
 
-logger = logging.getLogger(__name__)
-
 from app.core.exceptions import ErrorCode
 from app.core.security import get_current_user
 from app.models.auth import User
 from app.models.scan import ScanRequest, ScanResult
 from app.services.scanner import ScannerService, get_scanner_service
 from app.services.websocket import ConnectionManager, get_connection_manager
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(tags=["scan"])
 
@@ -24,17 +24,16 @@ async def start_scan(
 ):
     """
     Start a network scan (async).
-    
+
     Returns immediately with scan_id. Actual scanning happens in background.
     Monitor progress via WebSocket events or check scan status.
-    
+
     Note: For local HTML frontend, guest users are allowed to scan.
     """
-    import logging
-    logger = logging.getLogger(__name__)
-    
     try:
-        logger.info(f"Scan request received from {current_user.username}: type={request.type}")
+        logger.info(
+            f"Scan request received from {current_user.username}: type={request.type}"
+        )
         result = await service.start_scan(request)
         logger.info(f"Scan {result.id} initiated successfully")
         return result
@@ -58,7 +57,7 @@ async def websocket_endpoint(
             try:
                 # Add timeout to prevent blocking indefinitely
                 await asyncio.wait_for(websocket.receive_json(), timeout=30.0)
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 # Send ping to keep connection alive
                 try:
                     await websocket.send_json({"event": "ping", "data": {}})

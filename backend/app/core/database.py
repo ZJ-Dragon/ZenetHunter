@@ -55,20 +55,23 @@ def get_database_url() -> str:
     # parent.parent.parent = backend
     backend_dir = Path(__file__).parent.parent.parent  # backend/app/core -> backend
     data_dir = backend_dir / "data"
-    
+
     # Create directory with proper permissions
     try:
         data_dir.mkdir(parents=True, exist_ok=True)
         # Ensure directory is writable
         os.chmod(data_dir, 0o755)
     except OSError as e:
-        logger.warning(f"Failed to create data directory {data_dir}: {e}. Using current directory.")
+        logger.warning(
+            f"Failed to create data directory {data_dir}: {e}. Using current directory."
+        )
         data_dir = Path.cwd() / "data"
         data_dir.mkdir(parents=True, exist_ok=True)
-    
+
     # Use absolute path for SQLite to avoid path issues
     db_path = data_dir / "zenethunter.db"
-    # SQLite URL: use absolute path with 4 slashes (3 for protocol + 1 for absolute path)
+    # SQLite URL: use absolute path with 4 slashes
+    # (3 for protocol + 1 for absolute path)
     # aiosqlite requires absolute paths to be specified with 4 slashes
     abs_path = str(db_path.absolute())
     return f"sqlite+aiosqlite:///{abs_path}"
@@ -87,15 +90,14 @@ def get_engine():
         connect_args = {}
         if url.startswith("sqlite"):
             connect_args = {"check_same_thread": False}
-        # Prepare connection args with timeout for PostgreSQL (asyncpg uses 'timeout' not 'connect_timeout')
+        # Prepare connection args with timeout for PostgreSQL
+        # (asyncpg uses 'timeout' not 'connect_timeout')
         elif url.startswith("postgresql") or url.startswith("postgres"):
             connect_args = {
                 "timeout": 10,  # Connection timeout in seconds for asyncpg
-                "server_settings": {
-                    "application_name": "zenethunter_backend"
-                }
+                "server_settings": {"application_name": "zenethunter_backend"},
             }
-        
+
         _engine = create_async_engine(
             url,
             echo=False,  # Set to True for SQL debugging
@@ -104,7 +106,7 @@ def get_engine():
             pool_size=5,  # Connection pool size
             max_overflow=10,  # Max overflow connections
             pool_recycle=3600,  # Recycle connections after 1 hour
-            pool_reset_on_return='commit',  # Reset connection state on return
+            pool_reset_on_return="commit",  # Reset connection state on return
         )
         logger.info(
             f"Database engine created: {url.split('@')[-1] if '@' in url else url}"
@@ -156,7 +158,11 @@ async def init_db() -> None:
     """
     try:
         # Import all models to ensure they are registered with Base.metadata
-        from app.models.db import DeviceModel, EventLogModel, TrustListModel  # noqa: F401
+        from app.models.db import (  # noqa: F401
+            DeviceModel,
+            EventLogModel,
+            TrustListModel,
+        )
     except ImportError as e:
         logger.error(f"Failed to import database models: {e}")
         raise
@@ -166,7 +172,7 @@ async def init_db() -> None:
         async with engine.begin() as conn:
             # Create all tables (if they don't exist)
             await conn.run_sync(Base.metadata.create_all)
-            
+
             # Check if devices table exists and add model column if missing
             # This handles schema migration for existing databases
             db_url = get_database_url()
@@ -174,43 +180,68 @@ async def init_db() -> None:
                 # For SQLite, check if model column exists
                 try:
                     result = await conn.execute(
-                        text("SELECT COUNT(*) as count FROM pragma_table_info('devices') WHERE name = 'model'")
+                        text(
+                            "SELECT COUNT(*) as count FROM "
+                            "pragma_table_info('devices') WHERE name = 'model'"
+                        )
                     )
                     row = result.fetchone()
                     if row and row[0] == 0:
                         # Column doesn't exist, add it
-                        logger.info("Adding 'model' column to devices table (migration)")
+                        logger.info(
+                            "Adding 'model' column to devices table (migration)"
+                        )
                         await conn.execute(
-                            text("ALTER TABLE devices ADD COLUMN model VARCHAR(255) NULL")
+                            text(
+                                "ALTER TABLE devices ADD COLUMN model VARCHAR(255) NULL"
+                            )
                         )
                         await conn.commit()
-                        logger.info("Migration completed: 'model' column added to devices table")
+                        logger.info(
+                            "Migration completed: 'model' column added to devices table"
+                        )
                 except Exception as e:
-                    # Table might not exist yet, which is fine - create_all will handle it
-                    logger.debug(f"Could not check for model column (table may not exist yet): {e}")
+                    # Table might not exist yet, which is fine
+                    # create_all will handle it
+                    logger.debug(
+                        f"Could not check for model column "
+                        f"(table may not exist yet): {e}"
+                    )
             elif db_url.startswith("postgresql"):
                 # For PostgreSQL, check if model column exists
                 try:
                     result = await conn.execute(
-                        text("""
-                            SELECT COUNT(*) as count 
-                            FROM information_schema.columns 
+                        text(
+                            """
+                            SELECT COUNT(*) as count
+                            FROM information_schema.columns
                             WHERE table_name = 'devices' AND column_name = 'model'
-                        """)
+                        """
+                        )
                     )
                     row = result.fetchone()
                     if row and row[0] == 0:
                         # Column doesn't exist, add it
-                        logger.info("Adding 'model' column to devices table (migration)")
+                        logger.info(
+                            "Adding 'model' column to devices table (migration)"
+                        )
                         await conn.execute(
-                            text("ALTER TABLE devices ADD COLUMN model VARCHAR(255) NULL")
+                            text(
+                                "ALTER TABLE devices ADD COLUMN model VARCHAR(255) NULL"
+                            )
                         )
                         await conn.commit()
-                        logger.info("Migration completed: 'model' column added to devices table")
+                        logger.info(
+                            "Migration completed: 'model' column added to devices table"
+                        )
                 except Exception as e:
-                    # Table might not exist yet, which is fine - create_all will handle it
-                    logger.debug(f"Could not check for model column (table may not exist yet): {e}")
-        
+                    # Table might not exist yet, which is fine
+                    # create_all will handle it
+                    logger.debug(
+                        f"Could not check for model column "
+                        f"(table may not exist yet): {e}"
+                    )
+
         logger.info("Database tables created/updated")
     except Exception as e:
         logger.error(f"Failed to create/update database tables: {e}", exc_info=True)

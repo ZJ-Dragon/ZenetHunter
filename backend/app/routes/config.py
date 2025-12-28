@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Body, Depends, status
 
-from app.core.exceptions import AppError, ErrorCode
 from app.core.security import get_current_admin
 from app.models.auth import User
 from app.services.state import StateManager, get_state_manager
@@ -12,13 +11,15 @@ router = APIRouter(prefix="/config", tags=["config"])
 async def get_config_status(state: StateManager = Depends(get_state_manager)):
     """
     Check if system is configured (OOBE check).
-    
-    For MVP: Always returns is_configured=True to allow immediate login with default credentials.
+
+    For MVP: Always returns is_configured=True to allow immediate login
+    with default credentials.
     Users can login with admin/zenethunter without going through setup wizard.
-    
+
     In future: Should check DB for admin user existence to determine if setup is needed.
     """
-    # MVP: Always return configured - users can login with default credentials immediately
+    # MVP: Always return configured - users can login with default
+    # credentials immediately
     # This allows users to bypass setup wizard and use default admin/zenethunter
     return {
         "is_configured": True,
@@ -32,15 +33,17 @@ async def get_platform_config():
     Returns detected platform and available features.
     """
     from app.core.platform.detect import get_platform_features
-    
+
     platform_features = get_platform_features()
     summary = platform_features.get_summary()
-    
+
     return {
         "platform": summary["platform"],
         "platform_name": summary["platform_name"],
         "capabilities": summary["capabilities"],
-        "recommended_platform": "darwin" if summary["platform"] == "darwin" else summary["platform"],
+        "recommended_platform": (
+            "darwin" if summary["platform"] == "darwin" else summary["platform"]
+        ),
     }
 
 
@@ -53,7 +56,7 @@ async def setup_system(
     Initial system setup (OOBE).
     Creates admin account and configures basic settings.
     This endpoint does NOT require authentication (called during initial setup).
-    
+
     For MVP, this is a placeholder - admin account creation will be implemented later.
     Currently accepts setup data but doesn't persist admin credentials.
     Users can still login with default credentials (admin/zenethunter).
@@ -62,11 +65,12 @@ async def setup_system(
     # For now, just accept the setup request
     # The admin_password from data will be used in future to create admin user
     # TODO: Implement admin user creation with password hashing in DB
-    admin_password = data.get("admin_password", "")
-    target_subnets = data.get("target_subnets", [])
-    scan_interval = data.get("scan_interval", 300)
-    default_policy = data.get("default_policy", "monitor")
-    
+    # These variables are kept for future use
+    _ = data.get("admin_password", "")
+    _ = data.get("target_subnets", [])
+    _ = data.get("scan_interval", 300)
+    _ = data.get("default_policy", "monitor")
+
     # Log setup completion (in future, persist to DB)
     # For now, setup is considered complete if this endpoint is called successfully
 

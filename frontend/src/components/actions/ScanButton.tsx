@@ -19,7 +19,7 @@ export const ScanButton: React.FC<{ className?: string }> = ({ className }) => {
     if (currentScanIdRef.current && data.id === currentScanIdRef.current) {
       setIsScanning(false);
       currentScanIdRef.current = null;
-      
+
       if (data.status === 'failed') {
         const errorMsg = data.error || 'Unknown error';
         const errorType = data.error_type || '';
@@ -38,7 +38,7 @@ export const ScanButton: React.FC<{ className?: string }> = ({ className }) => {
 
   const handleScan = async () => {
     if (isScanning) return;
-    
+
     // Check authentication before scanning
     if (!isAuthenticated) {
       toast.error('请先登录以使用扫描功能', { duration: 3000 });
@@ -58,7 +58,7 @@ export const ScanButton: React.FC<{ className?: string }> = ({ className }) => {
       console.error('Scan failed:', error);
       let errorMessage = error?.response?.data?.detail || error?.message || 'Unknown error';
       const errorCode = error?.response?.data?.error_code || error?.response?.status;
-      
+
       // Provide user-friendly error messages
       if (error?.response?.status === 401 || errorMessage.toLowerCase().includes('credentials') || errorMessage.toLowerCase().includes('unauthorized')) {
         errorMessage = '认证失败：请先登录。如果已登录，请重新登录以刷新 token。';
@@ -70,7 +70,7 @@ export const ScanButton: React.FC<{ className?: string }> = ({ className }) => {
       } else if (error?.code === 'ECONNREFUSED' || error?.message?.includes('Failed to fetch')) {
         errorMessage = 'Connection Error: Cannot reach backend server. Please check if the backend is running.';
       }
-      
+
       toast.error(
         `Failed to start scan: ${errorMessage}${errorCode ? ` (${errorCode})` : ''}`,
         { id: toastId, duration: 6000 }
@@ -88,7 +88,7 @@ export const ScanButton: React.FC<{ className?: string }> = ({ className }) => {
         "btn-winui inline-flex items-center px-4 py-2 text-sm font-medium rounded-lg text-white transition-all duration-200 disabled:opacity-75 disabled:cursor-not-allowed",
         className
       )}
-      style={{ 
+      style={{
         backgroundColor: isScanning ? 'var(--winui-accent-hover)' : 'var(--winui-accent)'
       }}
       onMouseEnter={(e) => {

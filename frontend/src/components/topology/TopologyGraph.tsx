@@ -151,8 +151,8 @@ export const TopologyGraph: React.FC<TopologyGraphProps> = ({ data, onNodeClick 
   }, []);
 
   return (
-    <div 
-      ref={containerRef} 
+    <div
+      ref={containerRef}
       className="w-full h-full min-h-[600px] overflow-hidden"
       style={{
         backgroundColor: 'var(--winui-surface)',

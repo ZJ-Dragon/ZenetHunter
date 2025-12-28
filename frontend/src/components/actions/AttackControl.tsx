@@ -110,7 +110,7 @@ export const AttackControl: React.FC<AttackControlProps> = ({ device, className 
 
   const confirmAttack = async () => {
     if (!selectedType) return;
-    
+
     setIsLoading(true);
     setShowMenu(false);
     const metadata = attackTypeMetadata[selectedType];
@@ -158,7 +158,7 @@ export const AttackControl: React.FC<AttackControlProps> = ({ device, className 
           isLoading && "opacity-50 cursor-not-allowed",
           className
         )}
-        style={{ 
+        style={{
           backgroundColor: isLoading ? 'var(--winui-accent)' : '#d13438',
           minHeight: '24px'
         }}
@@ -193,7 +193,7 @@ export const AttackControl: React.FC<AttackControlProps> = ({ device, className 
       </button>
 
       {showMenu && (
-        <div 
+        <div
           className="origin-top-right absolute right-0 mt-2 w-72 rounded-lg z-50"
           style={{
             backgroundColor: 'var(--winui-surface)',
@@ -272,7 +272,7 @@ export const AttackControl: React.FC<AttackControlProps> = ({ device, className 
                     onClick={confirmAttack}
                     disabled={isLoading}
                     className="flex-1 btn-winui text-xs py-2 px-3 rounded-lg text-white"
-                    style={{ 
+                    style={{
                       backgroundColor: '#d13438',
                       minHeight: '28px'
                     }}

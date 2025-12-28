@@ -18,7 +18,7 @@ export const SchedulerControl: React.FC<SchedulerControlProps> = ({ device, clas
     const toastId = toast.loading('AI analyzing strategy...');
     try {
       const result = await schedulerService.executeStrategy(device.mac);
-      
+
       if (result.success) {
         toast.success(`AI applied ${result.strategies_applied} strategies`, { id: toastId });
       } else {

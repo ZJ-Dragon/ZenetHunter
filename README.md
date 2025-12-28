@@ -205,28 +205,28 @@ After starting services, access:
      - Check container status: `docker ps -a | grep zh-backend`
      - View logs: `docker logs zh-backend`
      - Restart: `docker compose restart backend`
-- **Solution**: 
+- **Solution**:
   ```bash
   # Stop all services
   docker compose down
-  
+
   # Start database first
   docker compose up -d db
-  
+
   # Wait for database to be ready (check logs)
   docker logs -f zh-db
-  
+
   # Start backend
   docker compose up -d backend
-  
+
   # Check backend logs
   docker logs -f zh-backend
   ```
 
 **Issue: "Failed to start scan: Network Error" or scan not working**
 - **Current Configuration**: The default configuration uses **root user** for maximum compatibility with network scanning.
-  
-  **⚠️ Security Notice**: 
+
+  **⚠️ Security Notice**:
   - The backend container runs as **root user (UID 0)** to enable network scanning functionality
   - This reduces container isolation security but is necessary for Scapy to create raw sockets
   - Combined with `network_mode: "host"`, the container has full access to the host network
@@ -234,7 +234,7 @@ After starting services, access:
     - Running the backend directly on the host (not in a container)
     - Using a dedicated network scanning service with proper isolation
     - Implementing additional security measures (firewall rules, network segmentation)
-  
+
 - **Current Docker Configuration** (already applied):
   ```yaml
   backend:
@@ -244,36 +244,36 @@ After starting services, access:
       - NET_RAW    # Raw socket operations
       - NET_ADMIN   # Network administration
   ```
-  
+
 - **Why Root is Required**:
   - Scapy needs to create raw sockets for network packet injection
   - Raw sockets require root privileges or specific Linux capabilities
   - Even with NET_RAW capability, some operations still require root
   - Root + host network mode provides the most reliable network scanning experience
-  
+
 - **Verification**: Check if configuration is correct:
   ```bash
   # Check if running as root
   docker exec zh-backend id
   # Should show: uid=0(root) gid=0(root)
-  
+
   # Check network mode
   docker inspect zh-backend | grep NetworkMode
   # Should show: "NetworkMode": "host"
-  
+
   # Check capabilities
   docker inspect zh-backend | grep -A 5 "CapAdd"
-  
+
   # Test scan functionality
   docker logs -f zh-backend
   ```
-  
+
 - **If Scan Still Fails**:
   1. Ensure Docker has permission to use host network mode
   2. Check that no firewall is blocking raw socket creation
   3. Verify Scapy is installed: `docker exec zh-backend python -c "import scapy; print(scapy.__version__)"`
   4. Check system logs: `docker logs zh-backend | grep -i "scan\|network\|permission"`
-  
+
 - **Security Recommendations**:
   - Only run this container on trusted networks
   - Use firewall rules to restrict container network access if needed
