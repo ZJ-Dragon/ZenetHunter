@@ -15,6 +15,21 @@ from app.services.scheduler import SchedulerService
 from app.services.state import StateManager
 
 
+@pytest.fixture(autouse=True)
+def reset_state_manager():
+    """Automatically reset StateManager before and after each test.
+
+    This ensures test isolation since StateManager is a singleton.
+    Note: conftest.py also has a reset_state fixture, but this provides
+    additional cleanup after each test in this module.
+    """
+    manager = StateManager()
+    manager.reset()
+    yield
+    # Clean up after test to prevent state leakage
+    manager.reset()
+
+
 @pytest.fixture
 def state_manager():
     """Create a fresh StateManager for testing."""
@@ -157,9 +172,12 @@ async def test_scheduler_flow_with_feedback_update(
 async def test_scheduler_unknown_device(scheduler_service, state_manager):
     """Test scheduler with non-existent device."""
     # Ensure state is clean (no devices exist)
+    # The autouse fixture resets before test, but explicitly clear devices
     state_manager.clear_devices()
-    # Verify device doesn't exist
+    # Verify device doesn't exist in the state manager used by scheduler
     assert state_manager.get_device("00:00:00:00:00:00") is None
+    # Also verify scheduler's internal state is clean
+    assert scheduler_service.state.get_device("00:00:00:00:00:00") is None
 
     result = await scheduler_service.execute_strategy_flow("00:00:00:00:00:00")
 
