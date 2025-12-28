@@ -63,8 +63,8 @@ coverage.xml
 ############################
 # Node / JavaScript (subset of Node.gitignore)
 ############################
-# Logs
-logs
+# Logs (only ignore logs directory at root, not source code directories)
+/logs
 *.log
 npm-debug.log*
 yarn-debug.log*
