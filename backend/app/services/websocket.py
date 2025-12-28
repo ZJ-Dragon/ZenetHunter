@@ -49,12 +49,26 @@ class ConnectionManager:
         for connection in self.active_connections:
             try:
                 await connection.send_json(message)
-            except Exception:
+            except Exception as e:
                 # If sending fails, assume client is gone
+                logger.debug(f"Failed to send WebSocket message: {e}")
                 disconnected.append(connection)
 
         for dead_conn in disconnected:
             self.disconnect(dead_conn)
+    
+    async def close_all(self):
+        """Close all WebSocket connections gracefully."""
+        logger.info(f"Closing {len(self.active_connections)} WebSocket connections...")
+        connections_to_close = list(self.active_connections)
+        for connection in connections_to_close:
+            try:
+                await connection.close()
+            except Exception as e:
+                logger.debug(f"Error closing WebSocket: {e}")
+            finally:
+                self.disconnect(connection)
+        logger.info("All WebSocket connections closed")
 
     async def send_error(
         self,

@@ -1,5 +1,6 @@
 import asyncio
 import logging
+from datetime import UTC, datetime
 
 from app.core.engine.factory import get_attack_engine
 from app.models.attack import AttackRequest, AttackResponse, AttackStatus
@@ -19,8 +20,8 @@ class AttackService:
         self.state = get_state_manager()
         self.ws = get_connection_manager()
         self.engine = get_attack_engine()
-        # In a real implementation, we'd track active attack tasks here
-        # self.active_tasks: dict[str, asyncio.Task] = {}
+        # Track active attack tasks for cancellation
+        self.active_tasks: dict[str, asyncio.Task] = {}
 
     async def start_attack(self, mac: str, request: AttackRequest) -> AttackResponse:
         """Start an attack on a device."""
@@ -45,8 +46,27 @@ class AttackService:
             }
         )
 
-        # Start background task
-        asyncio.create_task(self._run_attack_task(mac, request))
+        # Broadcast attack log
+        await self.ws.broadcast(
+            {
+                "event": "attackLog",
+                "data": {
+                    "level": "info",
+                    "message": f"启动 {request.type} 攻击，目标: {mac}，持续时间: {request.duration}秒",
+                    "mac": mac,
+                    "timestamp": datetime.now(UTC).isoformat(),
+                },
+            }
+        )
+        
+        # Start background task and store reference
+        task = asyncio.create_task(self._run_attack_task(mac, request))
+        self.active_tasks[mac] = task
+        
+        # Add cleanup callback
+        def cleanup_task(t):
+            self.active_tasks.pop(mac, None)
+        task.add_done_callback(cleanup_task)
 
         engine_name = self.engine.__class__.__name__
         return AttackResponse(
@@ -62,6 +82,17 @@ class AttackService:
             return AttackResponse(
                 device_mac=mac, status=AttackStatus.FAILED, message="Device not found"
             )
+
+        # Cancel task if running
+        if mac in self.active_tasks:
+            task = self.active_tasks[mac]
+            if not task.done():
+                logger.info(f"Cancelling attack task for {mac}")
+                task.cancel()
+                try:
+                    await task
+                except asyncio.CancelledError:
+                    logger.info(f"Attack task for {mac} cancelled successfully")
 
         # Signal engine to stop
         await self.engine.stop_attack(mac)
@@ -85,30 +116,73 @@ class AttackService:
             logger.info(
                 f"Attack {request.type} running on {mac} for {request.duration}s"
             )
-
-            # Start the attack
-            _ = asyncio.create_task(
-                self.engine.start_attack(mac, request.type, request.duration)
+            
+            # Broadcast attack started log
+            await self.ws.broadcast(
+                {
+                    "event": "attackLog",
+                    "data": {
+                        "level": "info",
+                        "message": f"攻击任务已启动: {request.type} on {mac}",
+                        "mac": mac,
+                        "timestamp": datetime.now(UTC).isoformat(),
+                    },
+                }
             )
 
-            # Wait for duration
-            await asyncio.sleep(request.duration)
-
-            # Stop the attack (if it hasn't stopped itself)
-            await self.engine.stop_attack(mac)
-
-            # Automatically stop if still running
-            device = self.state.get_device(mac)
-            if device and device.attack_status == AttackStatus.RUNNING:
-                self.state.update_device_attack_status(mac, AttackStatus.IDLE)
-                await self.ws.broadcast(
-                    {"event": "attackFinished", "data": {"mac": mac, "status": "idle"}}
+            # Start the attack with timeout (max duration + 10 seconds buffer)
+            max_duration = request.duration + 10
+            try:
+                await asyncio.wait_for(
+                    self.engine.start_attack(mac, request.type, request.duration),
+                    timeout=max_duration
                 )
-                logger.info(f"Attack finished on {mac}")
+            except asyncio.TimeoutError:
+                logger.warning(f"Attack on {mac} exceeded maximum duration {max_duration}s, forcing stop")
+                await self.engine.stop_attack(mac)
+                raise
 
+            # If we get here, attack finished naturally
+            await self.ws.broadcast(
+                {
+                    "event": "attackLog",
+                    "data": {
+                        "level": "info",
+                        "message": f"攻击任务完成: {request.type} on {mac}",
+                        "mac": mac,
+                        "timestamp": datetime.now(UTC).isoformat(),
+                    },
+                }
+            )
+
+        except asyncio.CancelledError:
+            logger.info(f"Attack task for {mac} was cancelled")
+            self.state.update_device_attack_status(mac, AttackStatus.STOPPED)
+            await self.ws.broadcast(
+                {
+                    "event": "attackLog",
+                    "data": {
+                        "level": "warning",
+                        "message": "攻击任务已取消",
+                        "mac": mac,
+                        "timestamp": datetime.now(UTC).isoformat(),
+                    },
+                }
+            )
         except Exception as e:
-            logger.error(f"Attack task error: {e}")
+            logger.error(f"Attack task error: {e}", exc_info=True)
             self.state.update_device_attack_status(mac, AttackStatus.FAILED)
+            await self.ws.broadcast(
+                {
+                    "event": "attackLog",
+                    "data": {
+                        "level": "error",
+                        "message": f"攻击任务失败: {str(e)}",
+                        "mac": mac,
+                        "timestamp": datetime.now(UTC).isoformat(),
+                    },
+                }
+            )
 
 
 # Global accessor

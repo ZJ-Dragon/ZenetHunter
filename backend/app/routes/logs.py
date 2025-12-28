@@ -1,5 +1,10 @@
+import os
+import sys
+from typing import Any
+
 from fastapi import APIRouter, Depends, Query
 
+from app.core.config import get_settings
 from app.models.log import SystemLog
 from app.services.state import StateManager, get_state_manager
 
@@ -19,3 +24,25 @@ async def get_logs(
 async def add_log(log: SystemLog, state: StateManager = Depends(get_state_manager)):
     """Add a system log entry."""
     state.add_log(log)
+
+
+@router.get("/system-info")
+async def get_system_info() -> dict[str, Any]:
+    """Get system information for debugging."""
+    from app.core.platform.detect import get_platform_features
+    
+    settings = get_settings()
+    platform_features = get_platform_features()
+    summary = platform_features.get_summary()
+    
+    return {
+        "platform": summary["platform"],
+        "platform_name": summary["platform_name"],
+        "platform_version": summary["platform_version"],
+        "python_version": sys.version.split()[0],
+        "app_version": settings.app_version,
+        "app_env": settings.app_env,
+        "database_url": "***" if settings.database_url else None,  # Hide sensitive info
+        "docker": summary["is_docker"],
+        "capabilities": summary["capabilities"],
+    }

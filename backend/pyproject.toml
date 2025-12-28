@@ -8,7 +8,7 @@ version = "0.1.0"
 description = "ZenetHunter backend service (FastAPI) with API/WS, dispatcher, and state/config."
 requires-python = ">=3.11"
 authors = [{ name = "ZJ-Dragon" }]
-license = { text = "MIT" }
+license = "MIT"  # SPDX license identifier (string format for setuptools>=77.0.0)
 dependencies = [
   "fastapi",
   "uvicorn[standard]",
@@ -17,9 +17,11 @@ dependencies = [
   "pyjwt>=2.8.0",  # For JWT token handling
   "python-multipart>=0.0.6",  # For OAuth2 form data
   "sqlalchemy>=2.0",  # For database ORM
+  "greenlet>=3.0.0",  # Required for SQLAlchemy async operations
   "aiosqlite>=0.19.0",  # For SQLite async support
   "asyncpg>=0.29.0",  # For PostgreSQL async support
   "alembic>=1.13.0",  # For database migrations
+  "scapy>=2.5.0",  # For network packet manipulation (attack/scan engine)
 ]
 
 [project.optional-dependencies]
@@ -32,6 +34,10 @@ dev = [
   "pytest-asyncio",
   "httpx",  # Required for FastAPI TestClient
 ]
+
+[tool.setuptools]
+# Explicitly specify packages to avoid including 'data' directory as a package
+packages = ["app"]
 
 [tool.ruff]
 line-length = 88

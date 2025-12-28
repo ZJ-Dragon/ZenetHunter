@@ -93,6 +93,13 @@ class StateManager:
         with self._data_lock:
             return self._devices.get(mac.lower())
 
+    def clear_devices(self) -> None:
+        """Clear all devices from in-memory state."""
+        with self._data_lock:
+            device_count = len(self._devices)
+            self._devices.clear()
+            logger.info(f"Cleared {device_count} devices from in-memory state")
+
     def update_device(self, device: Device) -> Device:
         """Update or add a device."""
         with self._data_lock:

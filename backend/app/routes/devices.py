@@ -1,22 +1,28 @@
 from fastapi import APIRouter, Depends
 
+from app.core.database import get_db
 from app.core.exceptions import AppError, ErrorCode
 from app.models.device import Device
+from app.repositories.device import DeviceRepository
 from app.services.state import StateManager, get_state_manager
+from sqlalchemy.ext.asyncio import AsyncSession
 
 router = APIRouter(prefix="/devices", tags=["devices"])
 
 
 @router.get("", response_model=list[Device])
-async def list_devices(state: StateManager = Depends(get_state_manager)):
-    """List all tracked devices."""
-    return state.get_all_devices()
+async def list_devices(db: AsyncSession = Depends(get_db)):
+    """List all tracked devices from database."""
+    repo = DeviceRepository(db)
+    devices = await repo.get_all()
+    return devices
 
 
 @router.get("/{mac}", response_model=Device)
-async def get_device(mac: str, state: StateManager = Depends(get_state_manager)):
-    """Get a specific device by MAC address."""
-    device = state.get_device(mac)
+async def get_device(mac: str, db: AsyncSession = Depends(get_db)):
+    """Get a specific device by MAC address from database."""
+    repo = DeviceRepository(db)
+    device = await repo.get_by_mac(mac)
     if not device:
         raise AppError(
             ErrorCode.CONFIG_NOT_FOUND,
@@ -28,7 +34,16 @@ async def get_device(mac: str, state: StateManager = Depends(get_state_manager))
 
 @router.post("", response_model=Device)
 async def update_device(
-    device: Device, state: StateManager = Depends(get_state_manager)
+    device: Device,
+    db: AsyncSession = Depends(get_db),
+    state: StateManager = Depends(get_state_manager),
 ):
     """Update or add a device (Internal/Scanner use)."""
-    return state.update_device(device)
+    repo = DeviceRepository(db)
+    updated_device = await repo.upsert(device)
+    await db.commit()
+    
+    # Also update in-memory state for immediate WebSocket notifications
+    state.update_device(updated_device)
+    
+    return updated_device
