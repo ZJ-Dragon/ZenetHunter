@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useCallback } from 'react';
 import { logsService, SystemLog, SystemInfo } from '../lib/services/logs';
 import { RefreshCw, AlertCircle, Info, AlertTriangle, XCircle, CheckCircle, Terminal, Server } from 'lucide-react';
 import { clsx } from 'clsx';
@@ -49,7 +49,7 @@ export const Logs: React.FC = () => {
   const [filterLevel, setFilterLevel] = useState<string>('all');
   const [limit, setLimit] = useState(100);
 
-  const fetchLogs = async () => {
+  const fetchLogs = useCallback(async () => {
     try {
       const data = await logsService.getLogs(limit);
       setLogs(data);
@@ -58,16 +58,16 @@ export const Logs: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  };
+  }, [limit]);
 
-  const fetchSystemInfo = async () => {
+  const fetchSystemInfo = useCallback(async () => {
     try {
       const info = await logsService.getSystemInfo();
       setSystemInfo(info);
     } catch (error) {
       console.error('Failed to fetch system info:', error);
     }
-  };
+  }, []);
 
   useEffect(() => {
     fetchLogs();
@@ -75,7 +75,7 @@ export const Logs: React.FC = () => {
     // Auto-refresh every 5 seconds
     const interval = setInterval(fetchLogs, 5000);
     return () => clearInterval(interval);
-  }, [limit]);
+  }, [fetchLogs, fetchSystemInfo]);
 
   const filteredLogs = filterLevel === 'all'
     ? logs
