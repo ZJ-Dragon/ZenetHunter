@@ -20,19 +20,28 @@ def reset_state_manager():
     """Automatically reset StateManager before and after each test.
 
     This ensures test isolation since StateManager is a singleton.
+    We force reset the singleton instance to ensure complete isolation.
     Note: conftest.py also has a reset_state fixture, but this provides
     additional cleanup after each test in this module.
     """
+    # Force reset singleton instance for complete isolation
+    StateManager._instance = None
+    StateManager._initialized = False
     manager = StateManager()
     manager.reset()
     yield
     # Clean up after test to prevent state leakage
+    StateManager._instance = None
+    StateManager._initialized = False
     manager.reset()
 
 
 @pytest.fixture
 def state_manager():
     """Create a fresh StateManager for testing."""
+    # Force reset singleton to ensure clean state
+    StateManager._instance = None
+    StateManager._initialized = False
     manager = StateManager()
     # Reset state to ensure test isolation (StateManager is a singleton)
     manager.reset()

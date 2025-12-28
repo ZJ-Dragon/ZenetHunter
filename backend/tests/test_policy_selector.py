@@ -20,7 +20,12 @@ from app.services.state import StateManager
 @pytest.fixture
 def state_manager():
     """Create a fresh StateManager for testing."""
-    return StateManager()
+    # Force reset singleton to ensure clean state
+    StateManager._instance = None
+    StateManager._initialized = False
+    manager = StateManager()
+    manager.reset()
+    return manager
 
 
 @pytest.fixture
