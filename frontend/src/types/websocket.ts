@@ -8,6 +8,7 @@ export enum WSEventType {
   DEVICE_ADDED = 'deviceAdded',
   DEVICE_STATUS_CHANGED = 'deviceStatusChanged',
   DEVICE_UPDATED = 'deviceUpdated',
+  DEVICE_RECOGNITION_UPDATED = 'deviceRecognitionUpdated',
 
   // Scan Events
   SCAN_STARTED = 'scanStarted',

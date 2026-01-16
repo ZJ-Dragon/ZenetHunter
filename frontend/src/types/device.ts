@@ -31,6 +31,7 @@ export interface Device {
   ip: string;
   name: string | null;
   vendor: string | null;
+  model: string | null;
   type: DeviceType;
   status: DeviceStatus;
   attack_status: AttackStatus;
@@ -38,6 +39,22 @@ export interface Device {
   active_defense_policy: string | null;
   first_seen: string;
   last_seen: string;
+  tags: string[] | null;
+  alias: string | null;
+  // Recognition fields
+  vendor_guess: string | null;
+  model_guess: string | null;
+  recognition_confidence: number | null;
+  recognition_evidence: {
+    sources: string[];
+    matched_fields: string[];
+    weights: Record<string, number>;
+    confidence_breakdown?: {
+      oui: number;
+      dhcp: number;
+      combined: number;
+    };
+  } | null;
 }
 
 export interface DeviceFilter {
