@@ -4,14 +4,18 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 from enum import Enum
+from typing import TYPE_CHECKING
 
-from sqlalchemy import DateTime, String, Text
+from sqlalchemy import DateTime, Integer, String, Text
 from sqlalchemy import Enum as SQLEnum
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
 from app.models.attack import AttackStatus
 from app.models.defender import DefenseStatus, DefenseType
+
+if TYPE_CHECKING:
+    from app.models.db.device_fingerprint import DeviceFingerprintModel
 
 
 class DeviceTypeEnum(str, Enum):

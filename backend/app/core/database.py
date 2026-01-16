@@ -288,7 +288,8 @@ async def init_db() -> None:
                             """
                             SELECT COUNT(*) as count
                             FROM information_schema.columns
-                            WHERE table_name = 'devices' AND column_name = 'vendor_guess'
+                            WHERE table_name = 'devices'
+                            AND column_name = 'vendor_guess'
                         """
                         )
                     )

@@ -39,7 +39,8 @@ class RecognitionEngine:
                     if "fingerprint_key" in rule_data:
                         self.local_rules[rule_data["fingerprint_key"]] = rule_data
                         logger.debug(
-                            f"Loaded recognition rule: {rule_data.get('fingerprint_key')}"
+                            f"Loaded recognition rule: "
+                            f"{rule_data.get('fingerprint_key')}"
                         )
             except Exception as e:
                 logger.error(f"Failed to load recognition rule {json_file}: {e}")
