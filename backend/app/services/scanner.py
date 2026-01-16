@@ -9,7 +9,12 @@ from app.core.database import get_session_factory
 from app.models.device import Device, DeviceStatus, DeviceType
 from app.models.scan import ScanRequest, ScanResult, ScanStatus
 from app.repositories.device import DeviceRepository
+from app.repositories.device_fingerprint import (
+    DeviceFingerprintRepository,
+)
 from app.services.device_model_lookup import get_device_model_lookup
+from app.services.fingerprint_collector import get_fingerprint_collector
+from app.services.recognition_engine import get_recognition_engine
 from app.services.state import get_state_manager
 from app.services.websocket import get_connection_manager
 
@@ -27,6 +32,8 @@ class ScannerService:
         self.state_manager = get_state_manager()
         self.active_tasks: dict[str, asyncio.Task] = {}  # Track active scan tasks
         self.model_lookup = get_device_model_lookup()  # Device model lookup service
+        self.fingerprint_collector = get_fingerprint_collector()
+        self.recognition_engine = get_recognition_engine()
         try:
             from app.core.engine.factory import get_attack_engine
 
@@ -260,6 +267,7 @@ class ScannerService:
             async with session_factory() as session:
                 try:
                     repo = DeviceRepository(session)
+                    fp_repo = DeviceFingerprintRepository(session)
 
                     for ip, mac, _interface in arp_devices:
                         # Check if device already exists
@@ -336,6 +344,72 @@ class ScannerService:
 
                             logger.info(f"Discovered new device: {mac} ({ip})")
                             discovered_devices.append(device)
+
+                        # Perform device recognition (multi-signal)
+                        try:
+                            # Collect fingerprint signals
+                            fingerprint = (
+                                await self.fingerprint_collector.collect_from_device(
+                                    device_ip=str(ip),
+                                    device_mac=mac,
+                                    device_name=device.name,
+                                )
+                            )
+
+                            # Run recognition engine
+                            recognition_result = (
+                                self.recognition_engine.recognize_device(
+                                    mac=mac,
+                                    fingerprint=fingerprint,
+                                    existing_vendor=device.vendor,
+                                )
+                            )
+
+                            # Update device with recognition results
+                            device.vendor_guess = recognition_result.get(
+                                "best_guess_vendor"
+                            )
+                            device.model_guess = recognition_result.get(
+                                "best_guess_model"
+                            )
+                            device.recognition_confidence = recognition_result.get(
+                                "confidence"
+                            )
+                            device.recognition_evidence = recognition_result.get(
+                                "evidence"
+                            )
+
+                            # Save fingerprint to database
+                            fingerprint_data = {
+                                **fingerprint,
+                                **recognition_result,
+                            }
+                            await fp_repo.upsert(mac, fingerprint_data)
+
+                            # Update device in database with recognition fields
+                            device = await repo.upsert(device)
+
+                            # Broadcast recognition update event
+                            if recognition_result.get("confidence", 0) > 0:
+                                await self.ws_manager.broadcast(
+                                    {
+                                        "event": "deviceRecognitionUpdated",
+                                        "data": {
+                                            "mac": mac,
+                                            "vendor_guess": device.vendor_guess,
+                                            "model_guess": device.model_guess,
+                                            "confidence": device.recognition_confidence,
+                                            "evidence": device.recognition_evidence,
+                                            "timestamp": datetime.now(UTC).isoformat(),
+                                        },
+                                    }
+                                )
+                        except Exception as e:
+                            logger.warning(
+                                f"Device recognition failed for {mac}: {e}",
+                                exc_info=True,
+                            )
+                            # Continue even if recognition fails
 
                         # Also update in-memory state for immediate UI updates
                         self.state_manager.update_device(device)
