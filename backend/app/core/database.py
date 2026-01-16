@@ -208,22 +208,45 @@ async def init_db() -> None:
                         f"Could not check for model column "
                         f"(table may not exist yet): {e}"
                     )
-                # Check if device_fingerprints table exists
+                # Check if recognition fields exist in devices table
                 try:
                     result = await conn.execute(
                         text(
-                            "SELECT COUNT(*) as count FROM sqlite_master "
-                            "WHERE type='table' AND name='device_fingerprints'"
+                            "SELECT COUNT(*) as count FROM "
+                            "pragma_table_info('devices') WHERE name = 'vendor_guess'"
                         )
                     )
                     row = result.fetchone()
                     if row and row[0] == 0:
-                        # Table doesn't exist, will be created by create_all
                         logger.info(
-                            "device_fingerprints table will be created by create_all"
+                            "Adding recognition columns to devices table (migration)"
+                        )
+                        await conn.execute(
+                            text(
+                                "ALTER TABLE devices ADD COLUMN vendor_guess VARCHAR(255) NULL"
+                            )
+                        )
+                        await conn.execute(
+                            text(
+                                "ALTER TABLE devices ADD COLUMN model_guess VARCHAR(255) NULL"
+                            )
+                        )
+                        await conn.execute(
+                            text(
+                                "ALTER TABLE devices ADD COLUMN recognition_confidence INTEGER NULL"
+                            )
+                        )
+                        await conn.execute(
+                            text(
+                                "ALTER TABLE devices ADD COLUMN recognition_evidence TEXT NULL"
+                            )
+                        )
+                        await conn.commit()
+                        logger.info(
+                            "Migration completed: recognition columns added to devices table"
                         )
                 except Exception as e:
-                    logger.debug(f"Could not check for device_fingerprints table: {e}")
+                    logger.debug(f"Could not check/add recognition columns: {e}")
             elif db_url.startswith("postgresql"):
                 # For PostgreSQL, check if model column exists
                 try:
@@ -258,25 +281,48 @@ async def init_db() -> None:
                         f"Could not check for model column "
                         f"(table may not exist yet): {e}"
                     )
-                # Check if device_fingerprints table exists
+                # Check if recognition fields exist in devices table
                 try:
                     result = await conn.execute(
                         text(
                             """
                             SELECT COUNT(*) as count
-                            FROM information_schema.tables
-                            WHERE table_name = 'device_fingerprints'
+                            FROM information_schema.columns
+                            WHERE table_name = 'devices' AND column_name = 'vendor_guess'
                         """
                         )
                     )
                     row = result.fetchone()
                     if row and row[0] == 0:
-                        # Table doesn't exist, will be created by create_all
                         logger.info(
-                            "device_fingerprints table will be created by create_all"
+                            "Adding recognition columns to devices table (migration)"
+                        )
+                        await conn.execute(
+                            text(
+                                "ALTER TABLE devices ADD COLUMN vendor_guess VARCHAR(255) NULL"
+                            )
+                        )
+                        await conn.execute(
+                            text(
+                                "ALTER TABLE devices ADD COLUMN model_guess VARCHAR(255) NULL"
+                            )
+                        )
+                        await conn.execute(
+                            text(
+                                "ALTER TABLE devices ADD COLUMN recognition_confidence INTEGER NULL"
+                            )
+                        )
+                        await conn.execute(
+                            text(
+                                "ALTER TABLE devices ADD COLUMN recognition_evidence TEXT NULL"
+                            )
+                        )
+                        await conn.commit()
+                        logger.info(
+                            "Migration completed: recognition columns added to devices table"
                         )
                 except Exception as e:
-                    logger.debug(f"Could not check for device_fingerprints table: {e}")
+                    logger.debug(f"Could not check/add recognition columns: {e}")
 
         logger.info("Database tables created/updated")
     except Exception as e:

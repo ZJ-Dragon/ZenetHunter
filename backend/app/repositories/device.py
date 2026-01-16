@@ -88,6 +88,14 @@ class DeviceRepository:
             db_device.last_seen = device.last_seen
             db_device.tags = json.dumps(device.tags) if device.tags else None
             db_device.alias = device.alias
+            db_device.vendor_guess = device.vendor_guess
+            db_device.model_guess = device.model_guess
+            db_device.recognition_confidence = device.recognition_confidence
+            db_device.recognition_evidence = (
+                json.dumps(device.recognition_evidence)
+                if device.recognition_evidence
+                else None
+            )
             # Update first_seen only if it's earlier than current
             # Ensure both datetimes are timezone-aware before comparison
             device_first_seen = (
@@ -123,6 +131,14 @@ class DeviceRepository:
                 last_seen=device.last_seen,
                 tags=json.dumps(device.tags) if device.tags else None,
                 alias=device.alias,
+                vendor_guess=device.vendor_guess,
+                model_guess=device.model_guess,
+                recognition_confidence=device.recognition_confidence,
+                recognition_evidence=(
+                    json.dumps(device.recognition_evidence)
+                    if device.recognition_evidence
+                    else None
+                ),
             )
             self.session.add(db_device)
 
@@ -251,6 +267,16 @@ class DeviceRepository:
             last_seen=device_model.last_seen,
             tags=json.loads(device_model.tags) if device_model.tags else [],
             alias=device_model.alias,
+            vendor_guess=getattr(device_model, "vendor_guess", None),
+            model_guess=getattr(device_model, "model_guess", None),
+            recognition_confidence=getattr(
+                device_model, "recognition_confidence", None
+            ),
+            recognition_evidence=(
+                json.loads(device_model.recognition_evidence)
+                if getattr(device_model, "recognition_evidence", None)
+                else None
+            ),
         )
 
 

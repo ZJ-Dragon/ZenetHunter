@@ -82,9 +82,18 @@ class DeviceModel(Base):
     alias: Mapped[str | None] = mapped_column(
         String(255), nullable=True
     )  # User-friendly alias
+    # Recognition fields (denormalized from fingerprint for quick access)
+    vendor_guess: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    model_guess: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    recognition_confidence: Mapped[int | None] = mapped_column(
+        Integer, nullable=True
+    )  # 0-100
+    recognition_evidence: Mapped[str | None] = mapped_column(
+        Text, nullable=True
+    )  # JSON
 
     # Relationship to fingerprint (optional)
-    fingerprint: Mapped["DeviceFingerprintModel | None"] = relationship(
+    fingerprint: Mapped[DeviceFingerprintModel | None] = relationship(
         "DeviceFingerprintModel",
         back_populates="device",
         uselist=False,

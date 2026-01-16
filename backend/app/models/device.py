@@ -1,5 +1,6 @@
 from datetime import UTC, datetime
 from enum import Enum
+from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field, IPvAnyAddress
 
@@ -62,5 +63,18 @@ class Device(BaseModel):
         default_factory=list, description="Tags associated with the device"
     )
     alias: str | None = Field(None, description="User-friendly alias for the device")
+    # Recognition fields
+    vendor_guess: str | None = Field(
+        None, description="Vendor guess from multi-signal recognition"
+    )
+    model_guess: str | None = Field(
+        None, description="Model guess from multi-signal recognition"
+    )
+    recognition_confidence: int | None = Field(
+        None, ge=0, le=100, description="Recognition confidence score (0-100)"
+    )
+    recognition_evidence: dict[str, Any] | None = Field(
+        None, description="Recognition evidence (matched fields, sources, weights)"
+    )
 
     model_config = ConfigDict(from_attributes=True)
