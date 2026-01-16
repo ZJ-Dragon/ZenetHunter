@@ -159,6 +159,7 @@ async def init_db() -> None:
     try:
         # Import all models to ensure they are registered with Base.metadata
         from app.models.db import (  # noqa: F401
+            DeviceFingerprintModel,
             DeviceModel,
             EventLogModel,
             TrustListModel,
@@ -207,6 +208,22 @@ async def init_db() -> None:
                         f"Could not check for model column "
                         f"(table may not exist yet): {e}"
                     )
+                # Check if device_fingerprints table exists
+                try:
+                    result = await conn.execute(
+                        text(
+                            "SELECT COUNT(*) as count FROM sqlite_master "
+                            "WHERE type='table' AND name='device_fingerprints'"
+                        )
+                    )
+                    row = result.fetchone()
+                    if row and row[0] == 0:
+                        # Table doesn't exist, will be created by create_all
+                        logger.info(
+                            "device_fingerprints table will be created by create_all"
+                        )
+                except Exception as e:
+                    logger.debug(f"Could not check for device_fingerprints table: {e}")
             elif db_url.startswith("postgresql"):
                 # For PostgreSQL, check if model column exists
                 try:
@@ -241,6 +258,25 @@ async def init_db() -> None:
                         f"Could not check for model column "
                         f"(table may not exist yet): {e}"
                     )
+                # Check if device_fingerprints table exists
+                try:
+                    result = await conn.execute(
+                        text(
+                            """
+                            SELECT COUNT(*) as count
+                            FROM information_schema.tables
+                            WHERE table_name = 'device_fingerprints'
+                        """
+                        )
+                    )
+                    row = result.fetchone()
+                    if row and row[0] == 0:
+                        # Table doesn't exist, will be created by create_all
+                        logger.info(
+                            "device_fingerprints table will be created by create_all"
+                        )
+                except Exception as e:
+                    logger.debug(f"Could not check for device_fingerprints table: {e}")
 
         logger.info("Database tables created/updated")
     except Exception as e:

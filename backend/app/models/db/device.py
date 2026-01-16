@@ -82,3 +82,11 @@ class DeviceModel(Base):
     alias: Mapped[str | None] = mapped_column(
         String(255), nullable=True
     )  # User-friendly alias
+
+    # Relationship to fingerprint (optional)
+    fingerprint: Mapped["DeviceFingerprintModel | None"] = relationship(
+        "DeviceFingerprintModel",
+        back_populates="device",
+        uselist=False,
+        cascade="all, delete-orphan",
+    )
