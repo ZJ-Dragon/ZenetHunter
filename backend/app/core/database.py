@@ -300,27 +300,32 @@ async def init_db() -> None:
                         )
                         await conn.execute(
                             text(
-                                "ALTER TABLE devices ADD COLUMN vendor_guess VARCHAR(255) NULL"
+                                "ALTER TABLE devices "
+                                "ADD COLUMN vendor_guess VARCHAR(255) NULL"
                             )
                         )
                         await conn.execute(
                             text(
-                                "ALTER TABLE devices ADD COLUMN model_guess VARCHAR(255) NULL"
+                                "ALTER TABLE devices "
+                                "ADD COLUMN model_guess VARCHAR(255) NULL"
                             )
                         )
                         await conn.execute(
                             text(
-                                "ALTER TABLE devices ADD COLUMN recognition_confidence INTEGER NULL"
+                                "ALTER TABLE devices "
+                                "ADD COLUMN recognition_confidence INTEGER NULL"
                             )
                         )
                         await conn.execute(
                             text(
-                                "ALTER TABLE devices ADD COLUMN recognition_evidence TEXT NULL"
+                                "ALTER TABLE devices "
+                                "ADD COLUMN recognition_evidence TEXT NULL"
                             )
                         )
                         await conn.commit()
                         logger.info(
-                            "Migration completed: recognition columns added to devices table"
+                            "Migration completed: "
+                            "recognition columns added to devices table"
                         )
                 except Exception as e:
                     logger.debug(f"Could not check/add recognition columns: {e}")
