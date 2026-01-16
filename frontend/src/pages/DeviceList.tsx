@@ -4,8 +4,10 @@ import { deviceService } from '../lib/services/device';
 import { AttackControl } from '../components/actions/AttackControl';
 import { SchedulerControl } from '../components/actions/SchedulerControl';
 import { ScanButton } from '../components/actions/ScanButton';
-import { Search, Filter, RefreshCw, Laptop, Smartphone, Router, Shield, Wifi } from 'lucide-react';
+import { Search, Filter, RefreshCw, Laptop, Smartphone, Router, Shield, Wifi, CheckCircle, AlertCircle } from 'lucide-react';
 import { clsx } from 'clsx';
+import { useWebSocketEvent } from '../contexts/WebSocketContext';
+import { WSEventType } from '../types/websocket';
 
 const DeviceIcon = ({ type }: { type: DeviceType }) => {
   switch (type) {
@@ -67,13 +69,24 @@ export const DeviceList: React.FC = () => {
     fetchDevices();
   }, []);
 
+  // Listen for device recognition updates
+  useWebSocketEvent(WSEventType.DEVICE_RECOGNITION_UPDATED, () => {
+    fetchDevices();
+  });
+
+  useWebSocketEvent(WSEventType.DEVICE_ADDED, () => {
+    fetchDevices();
+  });
+
   const filteredDevices = useMemo(() => {
     return devices.filter((device) => {
       const matchesSearch =
         device.name?.toLowerCase().includes(search.toLowerCase()) ||
         device.ip.includes(search) ||
         device.mac.toLowerCase().includes(search.toLowerCase()) ||
-        device.vendor?.toLowerCase().includes(search.toLowerCase());
+        device.vendor?.toLowerCase().includes(search.toLowerCase()) ||
+        device.vendor_guess?.toLowerCase().includes(search.toLowerCase()) ||
+        device.model_guess?.toLowerCase().includes(search.toLowerCase());
 
       const matchesStatus = filterStatus === 'all' || device.status === filterStatus;
 
@@ -163,8 +176,42 @@ export const DeviceList: React.FC = () => {
                           <DeviceIcon type={device.type} />
                         </div>
                         <div className="ml-4">
-                          <div className="text-sm font-medium" style={{ color: 'var(--winui-text-primary)' }}>{device.name || 'Unknown Device'}</div>
-                          <div className="text-sm" style={{ color: 'var(--winui-text-secondary)' }}>{device.vendor || 'Unknown Vendor'}</div>
+                          <div className="text-sm font-medium" style={{ color: 'var(--winui-text-primary)' }}>
+                            {device.name || device.vendor_guess || 'Unknown Device'}
+                          </div>
+                          <div className="text-sm flex items-center gap-2" style={{ color: 'var(--winui-text-secondary)' }}>
+                            {device.vendor_guess || device.vendor || 'Unknown Vendor'}
+                            {device.model_guess && (
+                              <span className="text-xs" style={{ color: 'var(--winui-text-tertiary)' }}>
+                                • {device.model_guess}
+                              </span>
+                            )}
+                            {device.recognition_confidence !== null && device.recognition_confidence > 0 && (
+                              <span
+                                className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded"
+                                style={{
+                                  backgroundColor: device.recognition_confidence >= 70
+                                    ? 'rgba(16, 124, 16, 0.1)'
+                                    : device.recognition_confidence >= 40
+                                    ? 'rgba(245, 158, 11, 0.1)'
+                                    : 'rgba(107, 114, 128, 0.1)',
+                                  color: device.recognition_confidence >= 70
+                                    ? '#107c10'
+                                    : device.recognition_confidence >= 40
+                                    ? '#f59e0b'
+                                    : '#6b7280',
+                                }}
+                                title={`Recognition confidence: ${device.recognition_confidence}%`}
+                              >
+                                {device.recognition_confidence >= 70 ? (
+                                  <CheckCircle className="h-3 w-3" />
+                                ) : (
+                                  <AlertCircle className="h-3 w-3" />
+                                )}
+                                {device.recognition_confidence}%
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </td>

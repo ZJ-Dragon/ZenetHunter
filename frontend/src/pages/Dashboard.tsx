@@ -102,6 +102,10 @@ export const Dashboard: React.FC = () => {
     fetchDevices();
   });
 
+  useWebSocketEvent(WSEventType.DEVICE_RECOGNITION_UPDATED, () => {
+    fetchDevices();
+  });
+
   // Get recent devices (last 5)
   const recentDevices = devices
     .sort((a, b) => new Date(b.last_seen).getTime() - new Date(a.last_seen).getTime())
@@ -233,7 +237,8 @@ export const Dashboard: React.FC = () => {
                         {device.name || device.mac}
                       </p>
                       <p className="text-xs" style={{ color: 'var(--winui-text-secondary)' }}>
-                        {device.ip} • {device.vendor || 'Unknown'}
+                        {device.ip} • {device.vendor_guess || device.vendor || 'Unknown'}
+                        {device.model_guess && ` • ${device.model_guess}`}
                       </p>
                     </div>
                   </div>
