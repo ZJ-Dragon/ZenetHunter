@@ -8,7 +8,6 @@ from typing import Any
 
 from app.core.config import get_settings
 from app.services.scanner.capabilities import get_scanner_capabilities
-from app.services.scanner.discovery.arp_sweep import get_arp_sweep
 
 logger = logging.getLogger(__name__)
 
@@ -91,28 +90,10 @@ class ScanPipeline:
         method = self.capabilities.get_recommended_discovery_method()
 
         if method == "arp_sweep" and self.capabilities.can_arp_sweep():
-            logger.info("ARP sweep discovery selected")
-            arp_sweep = get_arp_sweep()
-            for subnet_str in target_subnets:
-                try:
-                    sweep_results = await arp_sweep.sweep_subnet(
-                        subnet_str,
-                        timeout=self.settings.scan_timeout_sec,
-                        concurrency=self.settings.scan_concurrency,
-                    )
-                    for result in sweep_results:
-                        all_results.append(
-                            DiscoveryResult(
-                                ip=result["ip"],
-                                mac=result.get("mac"),
-                                interface=result.get("interface", "unknown"),
-                                partial=result.get("mac") is None,
-                            )
-                        )
-                except Exception as e:
-                    logger.error(
-                        f"ARP sweep failed for {subnet_str}: {e}", exc_info=True
-                    )
+            # ARP sweep will be implemented in next task
+            logger.info("ARP sweep discovery selected (implementation pending)")
+            # Placeholder: will be replaced with actual ARP sweep
+            all_results = []
         elif method == "icmp_sweep" and self.capabilities.can_icmp_ping():
             # ICMP ping sweep will be implemented later
             logger.info("ICMP sweep discovery selected (implementation pending)")

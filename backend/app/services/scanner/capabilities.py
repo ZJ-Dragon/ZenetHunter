@@ -3,7 +3,7 @@
 import logging
 import os
 import sys
-from typing import NamedTuple
+from typing import Any, NamedTuple
 
 logger = logging.getLogger(__name__)
 
@@ -125,3 +125,64 @@ def _is_windows_admin() -> bool:
         return ctypes.windll.shell32.IsUserAnAdmin() != 0
     except Exception:
         return False
+
+
+class ScannerCapabilities:
+    """Wrapper class for ScanCapabilities with convenience methods."""
+
+    def __init__(self, caps: ScanCapabilities):
+        self.caps = caps
+
+    def can_arp_sweep(self) -> bool:
+        """Check if ARP sweep is available."""
+        return self.caps.can_arp_sweep
+
+    def can_icmp_ping(self) -> bool:
+        """Check if ICMP ping is available."""
+        return self.caps.can_icmp_ping
+
+    def can_tcp_probe(self) -> bool:
+        """Check if TCP probe is available."""
+        return self.caps.can_tcp_probe
+
+    def can_mdns(self) -> bool:
+        """Check if mDNS is available."""
+        return self.caps.can_mdns
+
+    def can_ssdp(self) -> bool:
+        """Check if SSDP is available."""
+        return self.caps.can_ssdp
+
+    def can_nbns(self) -> bool:
+        """Check if NBNS is available."""
+        return self.caps.can_nbns
+
+    def can_snmp(self) -> bool:
+        """Check if SNMP is available."""
+        return self.caps.can_snmp
+
+    def get_recommended_discovery_method(self) -> str:
+        """Get recommended discovery method based on capabilities."""
+        if self.caps.can_arp_sweep:
+            return "arp_sweep"
+        elif self.caps.can_icmp_ping:
+            return "icmp_sweep"
+        else:
+            return "tcp_probe"
+
+    def __getattr__(self, name: str) -> Any:
+        """Delegate attribute access to underlying ScanCapabilities."""
+        return getattr(self.caps, name)
+
+
+# Global singleton instance
+_capabilities_instance: ScannerCapabilities | None = None
+
+
+def get_scanner_capabilities() -> ScannerCapabilities:
+    """Get the global ScannerCapabilities instance."""
+    global _capabilities_instance
+    if _capabilities_instance is None:
+        caps = detect_scan_capabilities()
+        _capabilities_instance = ScannerCapabilities(caps)
+    return _capabilities_instance
