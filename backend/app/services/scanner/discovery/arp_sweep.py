@@ -3,6 +3,7 @@
 import asyncio
 import ipaddress
 import logging
+import socket
 
 logger = logging.getLogger(__name__)
 
@@ -51,7 +52,8 @@ class ARPSweep:
 
         # Try Scapy first (preferred if available)
         try:
-            from scapy.all import ARP, Ether, get_if_addr, get_if_hwaddr, srp
+            # Check if Scapy is available (imports are done in _sweep_with_scapy)
+            import scapy.all  # noqa: F401
 
             results = await self._sweep_with_scapy(ip_targets, interface)
             return results
