@@ -107,20 +107,47 @@ if _HAVE_PYDANTIC_SETTINGS:
             default=300, validation_alias="WEBHOOK_TOLERANCE_SEC"
         )
 
-        # Scanning configuration
-        scan_range: str = Field(default="192.168.1.0/24", validation_alias="SCAN_RANGE")
-        scan_timeout_sec: int = Field(default=30, validation_alias="SCAN_TIMEOUT_SEC")
-        scan_concurrency: int = Field(default=50, validation_alias="SCAN_CONCURRENCY")
-        scan_interval_sec: int | None = Field(
-            default=None, validation_alias="SCAN_INTERVAL_SEC"
+        # Active Scanning Configuration
+        scan_range: str = Field(
+            default="192.168.1.0/24",
+            validation_alias="SCAN_RANGE",
+            description="CIDR range for network scanning",
         )
-        # Feature flags for enrichment
-        feature_mdns: bool = Field(default=True, validation_alias="FEATURE_MDNS")
-        feature_ssdp: bool = Field(default=True, validation_alias="FEATURE_SSDP")
-        feature_nbns: bool = Field(default=False, validation_alias="FEATURE_NBNS")
-        feature_snmp: bool = Field(default=False, validation_alias="FEATURE_SNMP")
+        scan_timeout_sec: int = Field(
+            default=30, validation_alias="SCAN_TIMEOUT_SEC", description="Scan timeout"
+        )
+        scan_concurrency: int = Field(
+            default=10,
+            validation_alias="SCAN_CONCURRENCY",
+            description="Max concurrent probes",
+        )
+        scan_interval_sec: int | None = Field(
+            default=None,
+            validation_alias="SCAN_INTERVAL_SEC",
+            description="Interval for periodic scans (None = manual only)",
+        )
+
+        # Feature Flags for Enrichment
+        feature_mdns: bool = Field(
+            default=True, validation_alias="FEATURE_MDNS", description="Enable mDNS"
+        )
+        feature_ssdp: bool = Field(
+            default=True, validation_alias="FEATURE_SSDP", description="Enable SSDP"
+        )
+        feature_nbns: bool = Field(
+            default=False,
+            validation_alias="FEATURE_NBNS",
+            description="Enable NBNS (Windows)",
+        )
+        feature_snmp: bool = Field(
+            default=False,
+            validation_alias="FEATURE_SNMP",
+            description="Enable SNMP (requires credentials)",
+        )
         feature_fingerbank: bool = Field(
-            default=False, validation_alias="FEATURE_FINGERBANK"
+            default=False,
+            validation_alias="FEATURE_FINGERBANK",
+            description="Enable Fingerbank API (external, default off)",
         )
 
         # CORS: comma‑separated list → list[str]
@@ -274,14 +301,7 @@ else:
             default_factory=lambda: os.getenv("ROUTER_PASSWORD")
         )
 
-        # Integration: Webhook verification (fallback)
-        webhook_secret: str = Field(
-            default_factory=lambda: os.getenv("WEBHOOK_SECRET", "dev-webhook-secret")
-        )
-        webhook_tolerance_sec: int = Field(
-            default_factory=lambda: int(os.getenv("WEBHOOK_TOLERANCE_SEC", "300"))
-        )
-        # Scanning configuration
+        # Active Scanning Configuration (fallback)
         scan_range: str = Field(
             default_factory=lambda: os.getenv("SCAN_RANGE", "192.168.1.0/24")
         )
@@ -289,7 +309,7 @@ else:
             default_factory=lambda: int(os.getenv("SCAN_TIMEOUT_SEC", "30"))
         )
         scan_concurrency: int = Field(
-            default_factory=lambda: int(os.getenv("SCAN_CONCURRENCY", "50"))
+            default_factory=lambda: int(os.getenv("SCAN_CONCURRENCY", "10"))
         )
         scan_interval_sec: int | None = Field(
             default_factory=lambda: (
@@ -298,6 +318,8 @@ else:
                 else None
             )
         )
+
+        # Feature Flags for Enrichment (fallback)
         feature_mdns: bool = Field(
             default_factory=lambda: os.getenv("FEATURE_MDNS", "true").lower() == "true"
         )
@@ -305,19 +327,22 @@ else:
             default_factory=lambda: os.getenv("FEATURE_SSDP", "true").lower() == "true"
         )
         feature_nbns: bool = Field(
-            default_factory=lambda: (
-                os.getenv("FEATURE_NBNS", "false").lower() == "true"
-            )
+            default_factory=lambda: os.getenv("FEATURE_NBNS", "false").lower() == "true"
         )
         feature_snmp: bool = Field(
-            default_factory=lambda: (
-                os.getenv("FEATURE_SNMP", "false").lower() == "true"
-            )
+            default_factory=lambda: os.getenv("FEATURE_SNMP", "false").lower() == "true"
         )
         feature_fingerbank: bool = Field(
-            default_factory=lambda: (
-                os.getenv("FEATURE_FINGERBANK", "false").lower() == "true"
-            )
+            default_factory=lambda: os.getenv("FEATURE_FINGERBANK", "false").lower()
+            == "true"
+        )
+
+        # Integration: Webhook verification (fallback)
+        webhook_secret: str = Field(
+            default_factory=lambda: os.getenv("WEBHOOK_SECRET", "dev-webhook-secret")
+        )
+        webhook_tolerance_sec: int = Field(
+            default_factory=lambda: int(os.getenv("WEBHOOK_TOLERANCE_SEC", "300"))
         )
 
         @property
