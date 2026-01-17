@@ -119,26 +119,38 @@ class ScannerService:
         """
         logger.info("Clearing old device list before starting new scan...")
         try:
-            session_factory = get_session_factory()
-            async with session_factory() as session:
-                repo = DeviceRepository(session)
-                deleted_count = await repo.clear_all()
-                await session.commit()
-                logger.info(f"Cleared {deleted_count} old devices from database")
+            # Add timeout to prevent blocking
+            async with asyncio.timeout(10.0):
+                session_factory = get_session_factory()
+                async with session_factory() as session:
+                    repo = DeviceRepository(session)
+                    deleted_count = await repo.clear_all()
+                    await session.commit()
+                    logger.info(f"Cleared {deleted_count} old devices from database")
 
-                # Clear in-memory state as well
-                self.state_manager.clear_devices()
+                    # Clear in-memory state as well
+                    self.state_manager.clear_devices()
 
-                # Broadcast device list cleared event
-                await self.ws_manager.broadcast(
-                    {
-                        "event": "deviceListCleared",
-                        "data": {
-                            "deleted_count": deleted_count,
-                            "timestamp": datetime.now(UTC).isoformat(),
-                        },
-                    }
-                )
+                    # Broadcast device list cleared event (non-blocking)
+                    try:
+                        await asyncio.wait_for(
+                            self.ws_manager.broadcast(
+                                {
+                                    "event": "deviceListCleared",
+                                    "data": {
+                                        "deleted_count": deleted_count,
+                                        "timestamp": datetime.now(UTC).isoformat(),
+                                    },
+                                }
+                            ),
+                            timeout=2.0,
+                        )
+                    except TimeoutError:
+                        logger.warning("WebSocket broadcast timed out, continuing...")
+        except TimeoutError:
+            logger.error(
+                "Device cache clearing timed out after 10s, continuing anyway..."
+            )
         except Exception as e:
             logger.error(f"Failed to clear device cache: {e}", exc_info=True)
             # Don't fail the scan if cache clearing fails, just log the error

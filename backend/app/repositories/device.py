@@ -193,11 +193,14 @@ class DeviceRepository:
 
     async def clear_all(self) -> int:
         """Clear all devices from the database."""
+        from sqlalchemy import delete
+
+        # Count devices before deletion
         result = await self.session.execute(select(DeviceModel))
-        devices = result.scalars().all()
-        count = len(devices)
-        for device in devices:
-            await self.session.delete(device)
+        count = len(result.scalars().all())
+
+        # Use bulk delete for efficiency
+        await self.session.execute(delete(DeviceModel))
         await self.session.flush()
         return count
 
