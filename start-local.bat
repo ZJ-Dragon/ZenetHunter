@@ -50,12 +50,29 @@ if "%DATABASE_URL%"=="" (
     set DATABASE_URL=sqlite+aiosqlite:///./data/zenethunter.db
 )
 
+REM 检测管理员权限
+set IS_ADMIN=false
+net session >nul 2>&1
+if %errorlevel% == 0 (
+    set IS_ADMIN=true
+    echo.
+    echo ✓ 检测到管理员权限，将使用最高权限启动后端服务
+    echo   这将启用所有网络扫描功能（ARP sweep、ICMP ping 等）
+) else (
+    echo.
+    echo 提示: 当前未使用管理员权限运行
+    echo 提示: 某些网络功能（如 ARP sweep）可能需要管理员权限
+    echo 提示: 如需管理员权限运行，请右键点击命令提示符，选择"以管理员身份运行"
+)
+
 REM 检测操作系统
 echo.
 echo 检测到操作系统: Windows
 echo ✓ Windows 检测到，使用 Windows 优化配置
-echo 提示: 某些网络功能可能需要管理员权限
-echo 提示: 如需管理员权限运行，请右键点击命令提示符，选择"以管理员身份运行"
+if "%IS_ADMIN%"=="false" (
+    echo 提示: 某些网络功能可能需要管理员权限
+    echo 提示: 如需管理员权限运行，请右键点击命令提示符，选择"以管理员身份运行"
+)
 echo.
 
 REM 获取本地 IP 地址
@@ -112,7 +129,19 @@ if exist "frontend" (
 
 REM 启动后端（前台运行）
 cd backend
-uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+REM 如果检测到管理员权限，使用最高权限启动
+if "%IS_ADMIN%"=="true" (
+    echo.
+    echo 使用管理员权限启动后端服务...
+    echo 警告: 正在以管理员权限运行，请确保系统安全
+    echo.
+    REM 已经是管理员，直接运行
+    uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+) else (
+    REM 普通权限运行
+    uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+)
 
 REM 清理：停止前端服务器（如果后端停止）
 cd /d "%~dp0"

@@ -68,13 +68,31 @@ export LOG_LEVEL=info
 # CORS: 允许 React 前端（Vite 开发服务器端口 5173）和 localhost:8000（后端）
 export CORS_ALLOW_ORIGINS="null,http://localhost:8000,http://localhost:5173,http://127.0.0.1:5173"
 
+# 检测 root 权限
+IS_ROOT=false
+if [ "$EUID" -eq 0 ] || [ "$(id -u)" -eq 0 ]; then
+    IS_ROOT=true
+    echo "✓ 检测到 root 权限，将使用最高权限启动后端服务"
+    echo "  这将启用所有网络扫描功能（ARP sweep、ICMP ping 等）"
+else
+    echo "提示: 当前未使用 root 权限运行"
+    echo "提示: 某些网络功能（如 ARP sweep）可能需要 root 权限"
+    echo "提示: 如需 root 权限运行: sudo $0"
+fi
+
 # macOS 特定设置（默认使用 macOS 脚本）
 if [ "$OS_TYPE" = "Darwin" ]; then
     echo "✓ macOS 检测到，使用 macOS 优化配置"
-    echo "提示: 某些网络功能可能需要管理员权限 (sudo)"
-    echo "提示: 如需 root 权限运行: sudo python -m uvicorn app.main:app --host 0.0.0.0 --port 8000"
+    if [ "$IS_ROOT" = false ]; then
+        echo "提示: 某些网络功能可能需要管理员权限 (sudo)"
+        echo "提示: 如需 root 权限运行: sudo $0"
+    fi
 else
     echo "提示: 当前系统为 $OS_TYPE，将使用 Linux 配置"
+    if [ "$IS_ROOT" = false ]; then
+        echo "提示: 某些网络功能可能需要 root 权限或 NET_RAW capability"
+        echo "提示: 如需 root 权限运行: sudo $0"
+    fi
 fi
 
 # 获取本地 IP 地址
@@ -170,4 +188,16 @@ trap cleanup SIGINT SIGTERM EXIT
 
 # 启动后端（前台运行）
 cd backend
-uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+
+# 如果检测到 root 权限，使用最高权限启动
+if [ "$IS_ROOT" = true ]; then
+    echo ""
+    echo "使用 root 权限启动后端服务..."
+    echo "警告: 正在以 root 权限运行，请确保系统安全"
+    echo ""
+    # 已经是 root，直接运行（不需要 sudo）
+    uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+else
+    # 普通权限运行
+    uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+fi
