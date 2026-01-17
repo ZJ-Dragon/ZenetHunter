@@ -115,7 +115,7 @@ class ARPSweep:
                     )
 
                     if answered:
-                        for sent, received in answered:
+                        for _sent, received in answered:
                             mac = received.hwsrc
                             return (ip, mac, interface or "unknown")
                     return None
