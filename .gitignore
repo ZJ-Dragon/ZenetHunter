@@ -212,3 +212,7 @@ nohup.out
 /docs/secrets/branches/
 /PROJECT_SUMMARY.md
 /.idea/compiler.xml
+
+# Temp files
+backend/=3.0.0
+backend/data/zenethunter.db
