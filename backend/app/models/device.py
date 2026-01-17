@@ -4,8 +4,7 @@ from typing import Any
 
 from pydantic import BaseModel, ConfigDict, Field, IPvAnyAddress
 
-from app.models.attack import AttackStatus
-from app.models.defender import DefenseStatus, DefenseType
+from app.models.attack import ActiveDefenseStatus
 
 
 class DeviceType(str, Enum):
@@ -42,14 +41,9 @@ class Device(BaseModel):
     status: DeviceStatus = Field(
         default=DeviceStatus.ONLINE, description="Current connection status"
     )
-    attack_status: AttackStatus = Field(
-        default=AttackStatus.IDLE, description="Current attack status"
-    )
-    defense_status: DefenseStatus = Field(
-        default=DefenseStatus.INACTIVE, description="Current defense status"
-    )
-    active_defense_policy: DefenseType | None = Field(
-        default=None, description="Currently active defense policy"
+    active_defense_status: ActiveDefenseStatus = Field(
+        default=ActiveDefenseStatus.IDLE,
+        description="Current active defense operation status"
     )
     first_seen: datetime = Field(
         default_factory=lambda: datetime.now(UTC),

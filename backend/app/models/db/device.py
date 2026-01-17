@@ -11,8 +11,7 @@ from sqlalchemy import Enum as SQLEnum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
-from app.models.attack import AttackStatus
-from app.models.defender import DefenseStatus, DefenseType
+from app.models.attack import ActiveDefenseStatus
 
 if TYPE_CHECKING:
     from app.models.db.device_fingerprint import DeviceFingerprintModel
@@ -59,17 +58,9 @@ class DeviceModel(Base):
     status: Mapped[DeviceStatusEnum] = mapped_column(
         SQLEnum(DeviceStatusEnum), default=DeviceStatusEnum.ONLINE, nullable=False
     )
-    # Attack status
-    attack_status: Mapped[AttackStatus] = mapped_column(
-        SQLEnum(AttackStatus), default=AttackStatus.IDLE, nullable=False
-    )
-    # Defense status
-    defense_status: Mapped[DefenseStatus] = mapped_column(
-        SQLEnum(DefenseStatus), default=DefenseStatus.INACTIVE, nullable=False
-    )
-    # Active defense policy
-    active_defense_policy: Mapped[DefenseType | None] = mapped_column(
-        SQLEnum(DefenseType), nullable=True
+    # Active defense operation status
+    active_defense_status: Mapped[ActiveDefenseStatus] = mapped_column(
+        SQLEnum(ActiveDefenseStatus), default=ActiveDefenseStatus.IDLE, nullable=False
     )
     # Timestamps
     first_seen: Mapped[datetime] = mapped_column(
