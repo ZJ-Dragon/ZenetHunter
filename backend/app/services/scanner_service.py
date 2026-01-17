@@ -254,19 +254,8 @@ class ScannerService:
                 logger.info(f"Scan {scan_id} was cancelled, aborting discovery")
                 return
 
-            # Import from scanner/ directory using importlib
-            # (avoiding conflict with scanner.py module)
-            import importlib.util
-            from pathlib import Path
-
-            scanner_dir = Path(__file__).parent / "scanner"
-            pipeline_path = scanner_dir / "pipeline.py"
-            spec = importlib.util.spec_from_file_location(
-                "app.services.scanner.pipeline", pipeline_path
-            )
-            pipeline_module = importlib.util.module_from_spec(spec)
-            spec.loader.exec_module(pipeline_module)
-            ScanPipeline = pipeline_module.ScanPipeline
+            # Import from scanner/ directory (no conflict now that scanner.py is renamed)
+            from app.services.scanner.pipeline import ScanPipeline
 
             pipeline = ScanPipeline()
             discovery_results, enrichment_results = await pipeline.run_full_scan(
