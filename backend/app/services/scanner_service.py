@@ -119,7 +119,7 @@ class ScannerService:
         """
         logger.info("Clearing old device list before starting new scan...")
         try:
-            # Add timeout to prevent blocking
+            # Add timeout to prevent blocking (requires Python 3.11+)
             async with asyncio.timeout(10.0):
                 session_factory = get_session_factory()
                 async with session_factory() as session:
