@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { logsService } from '../lib/services/logs';
-import { Settings as SettingsIcon, Moon, Sun, Monitor, Server, Save, RefreshCw } from 'lucide-react';
+import { logsService, ScanConfig } from '../lib/services/logs';
+import { Settings as SettingsIcon, Moon, Sun, Monitor, Server, Save, RefreshCw, Network } from 'lucide-react';
 import { clsx } from 'clsx';
 
 type Theme = 'light' | 'dark' | 'system';
@@ -23,6 +23,7 @@ export const Settings: React.FC = () => {
       network_scan_available?: boolean;
     };
   } | null>(null);
+  const [scanConfig, setScanConfig] = useState<ScanConfig | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -49,6 +50,15 @@ export const Settings: React.FC = () => {
     }
   }, []);
 
+  const fetchScanConfig = useCallback(async () => {
+    try {
+      const config = await logsService.getScanConfig();
+      setScanConfig(config);
+    } catch (error) {
+      console.error('Failed to fetch scan config:', error);
+    }
+  }, []);
+
   useEffect(() => {
     // Load theme from localStorage
     const savedTheme = localStorage.getItem('theme') as Theme;
@@ -66,9 +76,10 @@ export const Settings: React.FC = () => {
       setPlatform(savedPlatform);
     }
 
-    // Fetch system info
+    // Fetch system info and scan config
     fetchSystemInfo();
-  }, [fetchSystemInfo]);
+    fetchScanConfig();
+  }, [fetchSystemInfo, fetchScanConfig]);
 
   // Listen for system theme changes when using system theme
   useEffect(() => {
@@ -240,6 +251,112 @@ export const Settings: React.FC = () => {
           </div>
         </div>
       </div>
+
+      {/* Scan Configuration */}
+      {scanConfig && (
+        <div className="card-winui p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold flex items-center gap-2" style={{ color: 'var(--winui-text-primary)' }}>
+              <Network className="h-5 w-5" style={{ color: 'var(--winui-accent)' }} />
+              扫描配置
+            </h2>
+            <button
+              onClick={fetchScanConfig}
+              className="btn-winui-secondary inline-flex items-center"
+            >
+              <RefreshCw className={clsx("h-4 w-4 mr-2", isLoading && "animate-spin")} />
+              刷新
+            </button>
+          </div>
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2">
+              <div>
+                <dt className="text-sm font-medium mb-1" style={{ color: 'var(--winui-text-secondary)' }}>扫描网段</dt>
+                <dd className="text-sm font-mono" style={{ color: 'var(--winui-text-primary)' }}>
+                  {scanConfig.scan_range}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-sm font-medium mb-1" style={{ color: 'var(--winui-text-secondary)' }}>超时时间</dt>
+                <dd className="text-sm" style={{ color: 'var(--winui-text-primary)' }}>
+                  {scanConfig.scan_timeout_sec} 秒
+                </dd>
+              </div>
+              <div>
+                <dt className="text-sm font-medium mb-1" style={{ color: 'var(--winui-text-secondary)' }}>并发数</dt>
+                <dd className="text-sm" style={{ color: 'var(--winui-text-primary)' }}>
+                  {scanConfig.scan_concurrency}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-sm font-medium mb-1" style={{ color: 'var(--winui-text-secondary)' }}>扫描间隔</dt>
+                <dd className="text-sm" style={{ color: 'var(--winui-text-primary)' }}>
+                  {scanConfig.scan_interval_sec ? `${scanConfig.scan_interval_sec} 秒` : '手动扫描'}
+                </dd>
+              </div>
+            </div>
+
+            <div className="mt-6 pt-6" style={{ borderTop: '1px solid var(--winui-border-subtle)' }}>
+              <h4 className="text-sm font-semibold mb-4" style={{ color: 'var(--winui-text-primary)' }}>功能开关</h4>
+              <dl className="grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="flex items-center justify-between">
+                  <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>mDNS</dt>
+                  <dd className="text-sm">
+                    {scanConfig.features.mdns ? (
+                      <span className="text-green-600">✓ 启用</span>
+                    ) : (
+                      <span className="text-gray-500">✗ 禁用</span>
+                    )}
+                  </dd>
+                </div>
+                <div className="flex items-center justify-between">
+                  <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>SSDP</dt>
+                  <dd className="text-sm">
+                    {scanConfig.features.ssdp ? (
+                      <span className="text-green-600">✓ 启用</span>
+                    ) : (
+                      <span className="text-gray-500">✗ 禁用</span>
+                    )}
+                  </dd>
+                </div>
+                <div className="flex items-center justify-between">
+                  <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>NBNS</dt>
+                  <dd className="text-sm">
+                    {scanConfig.features.nbns ? (
+                      <span className="text-green-600">✓ 启用</span>
+                    ) : (
+                      <span className="text-gray-500">✗ 禁用</span>
+                    )}
+                  </dd>
+                </div>
+                <div className="flex items-center justify-between">
+                  <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>SNMP</dt>
+                  <dd className="text-sm">
+                    {scanConfig.features.snmp ? (
+                      <span className="text-green-600">✓ 启用</span>
+                    ) : (
+                      <span className="text-gray-500">✗ 禁用</span>
+                    )}
+                  </dd>
+                </div>
+                <div className="flex items-center justify-between">
+                  <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>Fingerbank</dt>
+                  <dd className="text-sm">
+                    {scanConfig.features.fingerbank ? (
+                      <span className="text-green-600">✓ 启用</span>
+                    ) : (
+                      <span className="text-gray-500">✗ 禁用</span>
+                    )}
+                  </dd>
+                </div>
+              </dl>
+              <p className="mt-4 text-xs" style={{ color: 'var(--winui-text-tertiary)' }}>
+                配置通过环境变量设置，修改配置需要重启后端服务
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* System Information */}
       {systemInfo && (

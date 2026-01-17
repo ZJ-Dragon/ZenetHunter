@@ -47,6 +47,33 @@ async def get_platform_config():
     }
 
 
+@router.get("/scan")
+async def get_scan_config():
+    """
+    Get scan configuration settings.
+    Returns current scan settings and feature flags.
+    Note: Configuration is read from environment variables,
+    this endpoint is read-only for display purposes.
+    """
+    from app.core.config import get_settings
+
+    settings = get_settings()
+
+    return {
+        "scan_range": settings.scan_range,
+        "scan_timeout_sec": settings.scan_timeout_sec,
+        "scan_concurrency": settings.scan_concurrency,
+        "scan_interval_sec": settings.scan_interval_sec,
+        "features": {
+            "mdns": settings.feature_mdns,
+            "ssdp": settings.feature_ssdp,
+            "nbns": settings.feature_nbns,
+            "snmp": settings.feature_snmp,
+            "fingerbank": settings.feature_fingerbank,
+        },
+    }
+
+
 @router.post("/setup", status_code=status.HTTP_204_NO_CONTENT)
 async def setup_system(
     data: dict = Body(...),

@@ -25,6 +25,20 @@ export interface SystemInfo {
   };
 }
 
+export interface ScanConfig {
+  scan_range: string;
+  scan_timeout_sec: number;
+  scan_concurrency: number;
+  scan_interval_sec: number | null;
+  features: {
+    mdns: boolean;
+    ssdp: boolean;
+    nbns: boolean;
+    snmp: boolean;
+    fingerbank: boolean;
+  };
+}
+
 export const logsService = {
   getLogs: async (limit: number = 100): Promise<SystemLog[]> => {
     const response = await api.get<SystemLog[]>('/logs', {
@@ -35,6 +49,11 @@ export const logsService = {
 
   getSystemInfo: async (): Promise<SystemInfo> => {
     const response = await api.get<SystemInfo>('/logs/system-info');
+    return response.data;
+  },
+
+  getScanConfig: async (): Promise<ScanConfig> => {
+    const response = await api.get<ScanConfig>('/config/scan');
     return response.data;
   },
 };
