@@ -1,196 +1,178 @@
-"""ARP sweep discovery module for active device probing."""
+"""Active ARP sweep for device discovery (Stage A)."""
 
 import asyncio
 import ipaddress
 import logging
-import sys
-from typing import Any
-
-from app.core.config import get_settings
-from app.services.scanner.capabilities import get_scanner_capabilities
+import socket
 
 logger = logging.getLogger(__name__)
 
 
 class ARPSweep:
-    """Active ARP sweep for device discovery."""
+    """Active ARP sweep using raw sockets or Scapy."""
 
-    def __init__(self):
-        self.capabilities = get_scanner_capabilities()
-        self.settings = get_settings()
-
-    async def sweep_subnet(
-        self, subnet: str, timeout: float | None = None, concurrency: int | None = None
-    ) -> list[dict[str, Any]]:
+    def __init__(self, timeout: float = 2.0, concurrency: int = 50):
         """
-        Perform ARP sweep on a subnet.
+        Initialize ARP sweep.
 
         Args:
-            subnet: CIDR subnet (e.g., "192.168.1.0/24")
             timeout: Timeout per probe in seconds
             concurrency: Max concurrent probes
+        """
+        self.timeout = timeout
+        self.concurrency = concurrency
+
+    async def sweep_subnet(
+        self, subnet: str, interface: str | None = None
+    ) -> list[tuple[str, str | None, str]]:
+        """
+        Perform active ARP sweep on a subnet.
+
+        Args:
+            subnet: CIDR subnet to scan (e.g., "192.168.1.0/24")
+            interface: Network interface to use (None = auto-detect)
 
         Returns:
-            List of discovered devices: [{"ip": str, "mac": str, "interface": str}, ...]
+            List of (IP, MAC, interface) tuples. MAC may be None if not discovered.
         """
-        if timeout is None:
-            timeout = self.settings.scan_timeout_sec
-        if concurrency is None:
-            concurrency = self.settings.scan_concurrency
-
-        if not self.capabilities.can_arp_sweep():
-            logger.warning(
-                "ARP sweep requires root/NET_RAW capability. "
-                "Falling back to non-privileged method."
-            )
+        try:
+            network = ipaddress.ip_network(subnet, strict=False)
+        except ValueError as e:
+            logger.error(f"Invalid subnet {subnet}: {e}")
             return []
+
+        # Generate IP targets (exclude network/broadcast)
+        ip_targets = [str(ip) for ip in network.hosts()]
 
         logger.info(
             f"Starting ARP sweep: subnet={subnet}, "
-            f"timeout={timeout}s, concurrency={concurrency}"
+            f"targets={len(ip_targets)}, timeout={self.timeout}s, "
+            f"concurrency={self.concurrency}"
         )
 
+        # Try Scapy first (preferred if available)
         try:
-            # Try Scapy-based ARP sweep first
-            return await self._scapy_arp_sweep(subnet, timeout, concurrency)
+            from scapy.all import ARP, Ether, get_if_addr, get_if_hwaddr, srp
+
+            results = await self._sweep_with_scapy(ip_targets, interface)
+            return results
         except ImportError:
-            logger.warning("Scapy not available, ARP sweep unavailable")
-            return []
+            logger.debug("Scapy not available, trying raw socket")
         except Exception as e:
-            logger.error(f"ARP sweep failed: {e}", exc_info=True)
+            logger.warning(f"Scapy ARP sweep failed: {e}, falling back to raw socket")
+
+        # Fallback: raw socket (Linux/macOS with root)
+        try:
+            results = await self._sweep_with_raw_socket(ip_targets, interface)
+            return results
+        except Exception as e:
+            logger.error(f"Raw socket ARP sweep failed: {e}", exc_info=True)
             return []
 
-    async def _scapy_arp_sweep(
-        self, subnet: str, timeout: float, concurrency: int
-    ) -> list[dict[str, Any]]:
-        """Perform ARP sweep using Scapy."""
-        try:
-            from scapy.all import ARP, Ether, conf, get_if_hwaddr, sendp, srp
-        except ImportError as e:
-            logger.error(f"Scapy import failed: {e}")
-            raise ImportError("Scapy is required for ARP sweep") from e
+    async def _sweep_with_scapy(
+        self, ip_targets: list[str], interface: str | None
+    ) -> list[tuple[str, str | None, str]]:
+        """
+        Perform ARP sweep using Scapy.
 
-        # Parse subnet
-        network = ipaddress.ip_network(subnet, strict=False)
-        target_ips = [str(ip) for ip in network.hosts()]
+        Args:
+            ip_targets: List of IP addresses to probe
+            interface: Network interface to use
 
-        logger.debug(f"ARP sweeping {len(target_ips)} IPs in {subnet}")
+        Returns:
+            List of (IP, MAC, interface) tuples
+        """
+        from scapy.all import ARP, Ether, srp
 
-        # Get interface for sending (prefer non-loopback)
-        interface = self._get_default_interface()
+        # Get interface and MAC
+        if interface is None:
+            # Auto-detect: use default interface
+            try:
+                interface = socket.gethostbyname(socket.gethostname())
+            except Exception:
+                interface = None
 
-        # Create ARP request packets
-        packets = []
-        for ip in target_ips:
-            # Create Ethernet + ARP request
-            # dst="ff:ff:ff:ff:ff:ff" is broadcast
-            arp_request = Ether(dst="ff:ff:ff:ff:ff:ff") / ARP(pdst=ip)
-            packets.append((arp_request, ip))
+        results: list[tuple[str, str | None, str]] = []
 
-        # Send ARP requests with concurrency control and timeout
-        discovered: list[dict[str, Any]] = []
+        # Send ARP requests in batches with concurrency control
+        semaphore = asyncio.Semaphore(self.concurrency)
 
-        # Use semaphore to limit concurrency
-        semaphore = asyncio.Semaphore(concurrency)
-
-        async def probe_arp(packet_info: tuple[Any, str]) -> dict[str, Any] | None:
-            packet, target_ip = packet_info
+        async def probe_ip(ip: str) -> tuple[str, str | None, str] | None:
             async with semaphore:
                 try:
-                    # Run Scapy srp in executor (it's blocking)
+                    # Use asyncio to run Scapy's synchronous srp
                     loop = asyncio.get_event_loop()
-                    result = await asyncio.wait_for(
-                        loop.run_in_executor(
-                            None,
-                            lambda: srp(
-                                packet,
-                                timeout=timeout,
-                                verbose=0,
-                                iface=interface,
-                            ),
+                    arp_req = ARP(pdst=ip)
+                    # Run Scapy in executor (it's synchronous)
+                    answered, _ = await loop.run_in_executor(
+                        None,
+                        lambda: srp(
+                            Ether(dst="ff:ff:ff:ff:ff:ff") / arp_req,
+                            timeout=self.timeout,
+                            verbose=0,
+                            iface=interface,
                         ),
-                        timeout=timeout + 1.0,
                     )
 
-                    answered, _ = result
                     if answered:
                         for sent, received in answered:
-                            mac = received[Ether].src
-                            logger.debug(
-                                f"ARP response: {target_ip} -> {mac} "
-                                f"(interface: {interface})"
-                            )
-                            return {
-                                "ip": target_ip,
-                                "mac": mac.upper(),
-                                "interface": interface or "unknown",
-                            }
-                except TimeoutError:
-                    logger.debug(f"ARP probe timeout for {target_ip}")
+                            mac = received.hwsrc
+                            return (ip, mac, interface or "unknown")
+                    return None
                 except Exception as e:
-                    logger.debug(f"ARP probe failed for {target_ip}: {e}")
-                return None
+                    logger.debug(f"ARP probe failed for {ip}: {e}")
+                    return None
 
-        # Execute probes with limited concurrency
-        tasks = [probe_arp(pkt_info) for pkt_info in packets]
-        results = await asyncio.gather(*tasks, return_exceptions=True)
+        # Run probes concurrently
+        tasks = [probe_ip(ip) for ip in ip_targets]
+        probe_results = await asyncio.gather(*tasks, return_exceptions=True)
 
-        # Filter successful results
-        for result in results:
-            if isinstance(result, dict):
-                discovered.append(result)
-            elif isinstance(result, Exception):
-                logger.debug(f"ARP probe exception: {result}")
+        # Collect valid results
+        for result in probe_results:
+            if result and isinstance(result, tuple):
+                results.append(result)
 
-        logger.info(f"ARP sweep completed: discovered {len(discovered)} devices")
-        return discovered
+        logger.info(f"ARP sweep completed: found {len(results)} devices")
+        return results
 
-    def _get_default_interface(self) -> str | None:
-        """Get default network interface for ARP sweep."""
-        try:
-            from scapy.all import conf
+    async def _sweep_with_raw_socket(
+        self, ip_targets: list[str], interface: str | None
+    ) -> list[tuple[str, str | None, str]]:
+        """
+        Perform ARP sweep using raw socket (fallback).
 
-            # Get default interface from Scapy config
-            if conf.iface:
-                return conf.iface
+        Args:
+            ip_targets: List of IP addresses to probe
+            interface: Network interface to use
 
-            # Platform-specific fallback
-            if sys.platform == "darwin":
-                # macOS: try to get primary interface
-                import subprocess
+        Returns:
+            List of (IP, MAC, interface) tuples
 
-                result = subprocess.run(
-                    ["route", "get", "default"],
-                    capture_output=True,
-                    text=True,
-                    timeout=2,
-                )
-                for line in result.stdout.splitlines():
-                    if "interface:" in line:
-                        return line.split(":")[-1].strip()
-            elif sys.platform.startswith("linux"):
-                # Linux: try common interfaces
-                for iface in ["eth0", "enp0s3", "wlan0", "wlp2s0"]:
-                    try:
-                        import socket
-
-                        socket.if_nametoindex(iface)
-                        return iface
-                    except (OSError, AttributeError):
-                        continue
-        except Exception as e:
-            logger.debug(f"Could not determine default interface: {e}")
-
-        return None
+        Note: Raw socket requires root/CAP_NET_RAW on Linux.
+        """
+        # Raw socket implementation is platform-specific and complex
+        # For now, return empty list (can be implemented later if needed)
+        logger.warning("Raw socket ARP sweep not yet implemented")
+        return []
 
 
-# Global singleton
-_arp_sweep_instance: ARPSweep | None = None
+async def arp_sweep(
+    subnet: str,
+    timeout: float = 2.0,
+    concurrency: int = 50,
+    interface: str | None = None,
+) -> list[tuple[str, str | None, str]]:
+    """
+    Convenience function for ARP sweep.
 
+    Args:
+        subnet: CIDR subnet to scan
+        timeout: Timeout per probe in seconds
+        concurrency: Max concurrent probes
+        interface: Network interface to use
 
-def get_arp_sweep() -> ARPSweep:
-    """Get global ARPSweep instance."""
-    global _arp_sweep_instance
-    if _arp_sweep_instance is None:
-        _arp_sweep_instance = ARPSweep()
-    return _arp_sweep_instance
+    Returns:
+        List of (IP, MAC, interface) tuples
+    """
+    sweeper = ARPSweep(timeout=timeout, concurrency=concurrency)
+    return await sweeper.sweep_subnet(subnet, interface)
