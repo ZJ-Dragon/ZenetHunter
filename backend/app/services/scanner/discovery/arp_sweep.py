@@ -3,7 +3,6 @@
 import asyncio
 import ipaddress
 import logging
-import socket
 
 logger = logging.getLogger(__name__)
 
@@ -83,15 +82,38 @@ class ARPSweep:
         Returns:
             List of (IP, MAC, interface) tuples
         """
-        from scapy.all import ARP, Ether, srp
+        from scapy.all import ARP, Ether, conf, get_if_list, srp
 
-        # Get interface and MAC
+        # Get interface name (Scapy needs interface name, not IP address)
         if interface is None:
-            # Auto-detect: use default interface
+            # Auto-detect: use Scapy's default interface
             try:
-                interface = socket.gethostbyname(socket.gethostname())
-            except Exception:
+                # Use Scapy's conf.iface for default interface
+                interface = conf.iface if hasattr(conf, "iface") else None
+                # If conf.iface is not set, try to get first available interface
+                if not interface:
+                    if_list = get_if_list()
+                    if if_list:
+                        # Prefer en0, en1, etc. on macOS, or eth0, wlan0 on Linux
+                        for iface in if_list:
+                            if iface.startswith(("en", "eth", "wlan")):
+                                interface = iface
+                                break
+                        # If no preferred interface found, use first one
+                        if not interface:
+                            interface = if_list[0]
+                logger.debug(
+                    f"Auto-detected interface: {interface} "
+                    f"(available: {get_if_list()})"
+                )
+            except Exception as e:
+                logger.warning(f"Failed to auto-detect interface: {e}")
                 interface = None
+
+        logger.info(
+            f"Starting ARP sweep with Scapy: {len(ip_targets)} targets, "
+            f"interface={interface}, timeout={self.timeout}s"
+        )
 
         results: list[tuple[str, str | None, str]] = []
 
@@ -128,12 +150,25 @@ class ARPSweep:
         tasks = [probe_ip(ip) for ip in ip_targets]
         probe_results = await asyncio.gather(*tasks, return_exceptions=True)
 
-        # Collect valid results
+        # Collect valid results and log errors
+        error_count = 0
         for result in probe_results:
-            if result and isinstance(result, tuple):
+            if isinstance(result, Exception):
+                error_count += 1
+                if error_count <= 5:  # Log first 5 errors
+                    logger.debug(f"ARP probe exception: {result}")
+            elif result and isinstance(result, tuple):
                 results.append(result)
 
-        logger.info(f"ARP sweep completed: found {len(results)} devices")
+        logger.info(
+            f"ARP sweep completed: found {len(results)} devices "
+            f"(errors: {error_count}/{len(ip_targets)})"
+        )
+        if len(results) == 0:
+            logger.warning(
+                f"ARP sweep found no devices. "
+                f"Check interface={interface}, subnet range, and permissions."
+            )
         return results
 
     async def _sweep_with_raw_socket(

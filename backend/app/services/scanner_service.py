@@ -263,12 +263,20 @@ class ScannerService:
                 target_subnets=request.target_subnets or None
             )
 
+            logger.info(
+                f"Pipeline scan completed: "
+                f"discovered {len(discovery_results)} devices, "
+                f"enriched {len(enrichment_results)} devices"
+            )
+
             # Convert discovery results to (IP, MAC, interface) format
             # for compatibility with existing device processing code
             arp_devices = [
                 (result.ip, result.mac or "00:00:00:00:00:00", result.interface)
                 for result in discovery_results
             ]
+
+            logger.info(f"Processing {len(arp_devices)} devices from discovery results")
 
             # Store enrichment results for later use in device processing
             enrichment_map: dict[str, dict[str, Any]] = {}
