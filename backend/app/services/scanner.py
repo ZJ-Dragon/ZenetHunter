@@ -15,6 +15,7 @@ from app.repositories.device_fingerprint import (
 from app.services.device_model_lookup import get_device_model_lookup
 from app.services.fingerprint_collector import get_fingerprint_collector
 from app.services.recognition_engine import get_recognition_engine
+from app.services.scanner.pipeline import ScanPipeline
 from app.services.state import get_state_manager
 from app.services.websocket import get_connection_manager
 
@@ -34,6 +35,7 @@ class ScannerService:
         self.model_lookup = get_device_model_lookup()  # Device model lookup service
         self.fingerprint_collector = get_fingerprint_collector()
         self.recognition_engine = get_recognition_engine()
+        self.scan_pipeline = ScanPipeline()  # Active probe pipeline
         try:
             from app.core.engine.factory import get_attack_engine
 
@@ -247,29 +249,36 @@ class ScannerService:
                     "Scapy engine does not support scan_network, skipping active scan"
                 )
 
-            # 2. Passive Scan (Read ARP table)
-            # Perform ARP table scan (works without root)
-            # Check if cancelled before starting ARP scan
+            # Stage A: Active Discovery (using new pipeline)
+            # Check if cancelled before starting discovery
             if str(scan_id) not in self.active_tasks:
-                logger.info(f"Scan {scan_id} was cancelled, aborting ARP scan")
+                logger.info(f"Scan {scan_id} was cancelled, aborting discovery")
                 return
-            arp_devices = await self._scan_arp_table()
 
-            # If QUICK scan, just use ARP table
-            # If FULL scan, we could also do ping sweep (requires root/caps)
-            if request.type == "full":
-                # For now, FULL scan also just uses ARP table
-                # In future, could add ping sweep or port scanning
-                logger.info("FULL scan requested, using ARP table for now")
+            # Run active probe discovery
+            discovery_results = await self.scan_pipeline.run_discovery(
+                request.target_subnets
+            )
 
-            # Convert ARP entries to Device objects
+            # Convert discovery results to Device objects
             session_factory = get_session_factory()
             async with session_factory() as session:
                 try:
                     repo = DeviceRepository(session)
                     fp_repo = DeviceFingerprintRepository(session)
 
-                    for ip, mac, _interface in arp_devices:
+                    for discovery_result in discovery_results:
+                        ip = discovery_result.ip
+                        mac = discovery_result.mac
+                        interface = discovery_result.interface
+
+                        # Skip if MAC is missing (partial discovery result)
+                        if not mac:
+                            logger.warning(
+                                f"Device {ip} discovered without MAC address, skipping"
+                            )
+                            continue
+
                         # Check if device already exists
                         existing_device = await repo.get_by_mac(mac)
 
