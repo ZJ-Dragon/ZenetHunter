@@ -90,10 +90,23 @@ class ScanPipeline:
         method = self.capabilities.get_recommended_discovery_method()
 
         if method == "arp_sweep" and self.capabilities.can_arp_sweep():
-            # ARP sweep will be implemented in next task
-            logger.info("ARP sweep discovery selected (implementation pending)")
-            # Placeholder: will be replaced with actual ARP sweep
-            all_results = []
+            # Use active ARP sweep
+            from app.services.scanner.discovery.arp_sweep import ARPSweep
+
+            logger.info("ARP sweep discovery selected")
+            sweeper = ARPSweep(
+                timeout=self.settings.scan_timeout_sec,
+                concurrency=self.settings.scan_concurrency,
+            )
+            for subnet_str in target_subnets:
+                sweep_results = await sweeper.sweep_subnet(subnet_str)
+                # Convert to DiscoveryResult
+                for ip, mac, interface in sweep_results:
+                    all_results.append(
+                        DiscoveryResult(
+                            ip=ip, mac=mac, interface=interface, partial=(mac is None)
+                        )
+                    )
         elif method == "icmp_sweep" and self.capabilities.can_icmp_ping():
             # ICMP ping sweep will be implemented later
             logger.info("ICMP sweep discovery selected (implementation pending)")

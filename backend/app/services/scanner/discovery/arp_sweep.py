@@ -104,7 +104,7 @@ class ARPSweep:
                     loop = asyncio.get_event_loop()
                     arp_req = ARP(pdst=ip)
                     # Run Scapy in executor (it's synchronous)
-                    answered, _ = await loop.run_in_executor(
+                    answered, _unanswered = await loop.run_in_executor(
                         None,
                         lambda: srp(
                             Ether(dst="ff:ff:ff:ff:ff:ff") / arp_req,

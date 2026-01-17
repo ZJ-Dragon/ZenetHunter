@@ -1,7 +1,6 @@
 import asyncio
 import logging
 import re
-import sys
 from datetime import UTC, datetime
 from uuid import uuid4
 
@@ -15,7 +14,6 @@ from app.repositories.device_fingerprint import (
 from app.services.device_model_lookup import get_device_model_lookup
 from app.services.fingerprint_collector import get_fingerprint_collector
 from app.services.recognition_engine import get_recognition_engine
-from app.services.scanner.pipeline import ScanPipeline
 from app.services.state import get_state_manager
 from app.services.websocket import get_connection_manager
 
@@ -35,7 +33,6 @@ class ScannerService:
         self.model_lookup = get_device_model_lookup()  # Device model lookup service
         self.fingerprint_collector = get_fingerprint_collector()
         self.recognition_engine = get_recognition_engine()
-        self.scan_pipeline = ScanPipeline()  # Active probe pipeline
         try:
             from app.core.engine.factory import get_attack_engine
 
@@ -249,36 +246,42 @@ class ScannerService:
                     "Scapy engine does not support scan_network, skipping active scan"
                 )
 
-            # Stage A: Active Discovery (using new pipeline)
+            # 2. Active Discovery (Stage A: Active Probe Scan)
+            # Use active scanning pipeline instead of passive ARP table read
             # Check if cancelled before starting discovery
             if str(scan_id) not in self.active_tasks:
                 logger.info(f"Scan {scan_id} was cancelled, aborting discovery")
                 return
 
-            # Run active probe discovery
-            discovery_results = await self.scan_pipeline.run_discovery(
-                request.target_subnets
+            from app.services.scanner.pipeline import ScanPipeline
+
+            pipeline = ScanPipeline()
+            discovery_results, enrichment_results = await pipeline.run_full_scan(
+                target_subnets=request.target_subnets or None
             )
 
-            # Convert discovery results to Device objects
+            # Convert discovery results to (IP, MAC, interface) format
+            # for compatibility with existing device processing code
+            arp_devices = [
+                (result.ip, result.mac or "00:00:00:00:00:00", result.interface)
+                for result in discovery_results
+            ]
+
+            # If QUICK scan, just use ARP table
+            # If FULL scan, we could also do ping sweep (requires root/caps)
+            if request.type == "full":
+                # For now, FULL scan also just uses ARP table
+                # In future, could add ping sweep or port scanning
+                logger.info("FULL scan requested, using ARP table for now")
+
+            # Convert ARP entries to Device objects
             session_factory = get_session_factory()
             async with session_factory() as session:
                 try:
                     repo = DeviceRepository(session)
                     fp_repo = DeviceFingerprintRepository(session)
 
-                    for discovery_result in discovery_results:
-                        ip = discovery_result.ip
-                        mac = discovery_result.mac
-                        interface = discovery_result.interface
-
-                        # Skip if MAC is missing (partial discovery result)
-                        if not mac:
-                            logger.warning(
-                                f"Device {ip} discovered without MAC address, skipping"
-                            )
-                            continue
-
+                    for ip, mac, _interface in arp_devices:
                         # Check if device already exists
                         existing_device = await repo.get_by_mac(mac)
 
@@ -511,412 +514,6 @@ class ScannerService:
                     },
                 }
             )
-
-    async def _scan_arp_table(self) -> list[tuple[str, str, str]]:
-        """
-        Scan ARP table to discover devices.
-        Returns list of (IP, MAC, interface) tuples.
-        Works cross-platform (Linux/macOS/Windows/Docker).
-        """
-        devices = []
-        platform = sys.platform
-
-        # Detect if running in Docker container
-        is_docker = False
-        try:
-            with open("/proc/self/cgroup") as f:
-                if "docker" in f.read() or "containerd" in f.read():
-                    is_docker = True
-        except (FileNotFoundError, PermissionError):
-            pass
-
-        logger.info(
-            f"Starting ARP table scan on platform: {platform}, Docker: {is_docker}"
-        )
-
-        # Broadcast scan progress
-        await self.ws_manager.broadcast(
-            {
-                "event": "scanProgress",
-                "data": {
-                    "message": f"开始扫描 ARP 表 (平台: {platform})",
-                    "timestamp": datetime.now(UTC).isoformat(),
-                },
-            }
-        )
-
-        # macOS Implementation
-        if platform == "darwin":
-            try:
-                # arp -an lists all entries without DNS resolution
-                result = await asyncio.create_subprocess_exec(
-                    "arp",
-                    "-an",
-                    stdout=asyncio.subprocess.PIPE,
-                    stderr=asyncio.subprocess.PIPE,
-                )
-                # Add timeout to prevent hanging
-                # (5 seconds should be enough for arp command)
-                try:
-                    stdout, stderr = await asyncio.wait_for(
-                        result.communicate(), timeout=5.0
-                    )
-                except TimeoutError:
-                    logger.error("ARP command timed out after 5 seconds")
-                    result.kill()
-                    await result.wait()
-                    return []
-
-                if result.returncode == 0:
-                    output = stdout.decode()
-                    logger.debug(
-                        f"macOS arp -an output: {output[:200]}..."
-                    )  # Log first 200 chars
-
-                    for line in output.splitlines():
-                        if not line.strip():
-                            continue
-
-                        # Format: ? (IP) at MAC on IFACE ...
-                        # e.g. ? (192.168.1.1) at 00:11:22:33:44:55
-                        # on en0 ifscope [ethernet]
-                        # or: (192.168.1.1) at 00:11:22:33:44:55 on en0
-                        try:
-                            # Try to extract IP from parentheses
-                            ip_match = re.search(r"\(([0-9.]+)\)", line)
-                            if not ip_match:
-                                continue
-                            ip_str = ip_match.group(1)
-
-                            # Extract MAC address (after "at")
-                            at_match = re.search(r"\bat\s+([0-9a-fA-F:]+)", line)
-                            if not at_match:
-                                continue
-                            mac_str = at_match.group(1)
-
-                            # Extract interface (after "on")
-                            on_match = re.search(r"\bon\s+(\w+)", line)
-                            interface = on_match.group(1) if on_match else "unknown"
-
-                            # Normalize MAC (macOS can omit leading zeros)
-                            # e.g. 0:1:2... -> 00:01:02...
-                            mac_parts = mac_str.split(":")
-                            if len(mac_parts) == 6:
-                                mac_clean = ":".join(
-                                    p.zfill(2) for p in mac_parts
-                                ).upper()
-
-                                # Filter out multicast/broadcast/incomplete
-                                if (
-                                    self._is_valid_mac(mac_clean)
-                                    and mac_clean != "00:00:00:00:00:00"
-                                    and mac_clean != "FF:FF:FF:FF:FF:FF"
-                                ):
-                                    devices.append((ip_str, mac_clean, interface))
-                                    logger.debug(
-                                        f"Found device via macOS arp: "
-                                        f"{ip_str} -> {mac_clean} on {interface}"
-                                    )
-                        except Exception as e:
-                            logger.debug(
-                                f"Failed to parse macOS arp line '{line}': {e}"
-                            )
-                            continue
-                else:
-                    error_msg = stderr.decode() if stderr else "Unknown error"
-                    logger.warning(
-                        f"macOS arp command failed "
-                        f"(code {result.returncode}): {error_msg}"
-                    )
-
-            except FileNotFoundError:
-                logger.warning(
-                    "'arp' command not found on macOS. ARP scanning unavailable."
-                )
-            except Exception as e:
-                logger.error(f"macOS ARP scan failed: {e}", exc_info=True)
-
-            if not devices and is_docker:
-                logger.warning(
-                    "No devices found in Docker container. "
-                    "This may be normal if the network is empty or if "
-                    "host network mode is not enabled. "
-                    "If using host network mode with privileged mode, "
-                    "ARP scanning should work. "
-                    "Check docker-compose.yml for network_mode: 'host' "
-                    "and privileged: true."
-                )
-            else:
-                logger.info(f"macOS ARP scan completed. Found {len(devices)} devices.")
-            return devices
-
-        # Linux Implementation (also handles Docker containers)
-        if platform.startswith("linux"):
-            try:
-                # Try using 'ip neigh' command (modern, works on most Linux)
-                result = await asyncio.create_subprocess_exec(
-                    "ip",
-                    "neigh",
-                    "show",
-                    stdout=asyncio.subprocess.PIPE,
-                    stderr=asyncio.subprocess.PIPE,
-                )
-                # Add timeout to prevent hanging
-                # (5 seconds should be enough for ip command)
-                try:
-                    stdout, stderr = await asyncio.wait_for(
-                        result.communicate(), timeout=5.0
-                    )
-                except TimeoutError:
-                    logger.error("ip neigh command timed out after 5 seconds")
-                    result.kill()
-                    await result.wait()
-                    return []
-
-                if result.returncode == 0:
-                    output = stdout.decode()
-                    logger.debug(
-                        f"Linux ip neigh output: {output[:200]}..."
-                    )  # Log first 200 chars
-
-                    # Parse ip neigh output
-                    # Format: IP dev INTERFACE lladdr MAC ADDR STALE|REACHABLE
-                    for line in output.splitlines():
-                        if not line.strip():
-                            continue
-                        parts = line.strip().split()
-                        if len(parts) >= 5:
-                            ip_str = parts[0]
-                            interface = parts[2]
-                            mac_str = parts[4]
-
-                            # Validate MAC address format
-                            if self._is_valid_mac(mac_str):
-                                devices.append((ip_str, mac_str.upper(), interface))
-                                logger.debug(
-                                    f"Found device via ip neigh: "
-                                    f"{ip_str} -> {mac_str} on {interface}"
-                                )
-                else:
-                    error_msg = stderr.decode() if stderr else "Unknown error"
-                    logger.debug(
-                        f"ip neigh command failed "
-                        f"(code {result.returncode}): {error_msg}"
-                    )
-
-                # Fallback: try /proc/net/arp if ip command failed or found no devices
-                if not devices:
-                    try:
-                        with open("/proc/net/arp") as f:
-                            lines = f.readlines()[1:]  # Skip header
-                            for line in lines:
-                                if not line.strip():
-                                    continue
-                                parts = line.split()
-                                if len(parts) >= 6:
-                                    ip_str = parts[0]
-                                    mac_str = parts[3]
-                                    interface = parts[5]
-
-                                    # Skip incomplete entries (MAC is 00:00:00:00:00:00)
-                                    if (
-                                        mac_str != "00:00:00:00:00:00"
-                                        and self._is_valid_mac(mac_str)
-                                    ):
-                                        devices.append(
-                                            (ip_str, mac_str.upper(), interface)
-                                        )
-                                        logger.debug(
-                                            f"Found device via /proc/net/arp: "
-                                            f"{ip_str} -> {mac_str} on {interface}"
-                                        )
-                    except (FileNotFoundError, PermissionError) as e:
-                        logger.warning(f"Could not read /proc/net/arp: {e}")
-                    except Exception as e:
-                        logger.warning(f"Error reading /proc/net/arp: {e}")
-
-            except FileNotFoundError:
-                logger.warning("'ip' command not found, trying /proc/net/arp")
-                # Fallback to /proc/net/arp handled above
-                try:
-                    with open("/proc/net/arp") as f:
-                        lines = f.readlines()[1:]  # Skip header
-                        for line in lines:
-                            if not line.strip():
-                                continue
-                            parts = line.split()
-                            if len(parts) >= 6:
-                                ip_str = parts[0]
-                                mac_str = parts[3]
-                                interface = parts[5]
-
-                                if (
-                                    mac_str != "00:00:00:00:00:00"
-                                    and self._is_valid_mac(mac_str)
-                                ):
-                                    devices.append((ip_str, mac_str.upper(), interface))
-                                    logger.debug(
-                                        f"Found device via /proc/net/arp: "
-                                        f"{ip_str} -> {mac_str}"
-                                    )
-                except (FileNotFoundError, PermissionError) as e:
-                    logger.warning(f"Could not read /proc/net/arp: {e}")
-            except Exception as e:
-                logger.error(f"Error during Linux ARP table scan: {e}", exc_info=True)
-
-            if not devices and is_docker:
-                logger.warning(
-                    "No devices found in Docker container. "
-                    "Docker containers typically cannot access host ARP table. "
-                    "Consider using host network mode (--network=host) "
-                    "or mounting /proc/net/arp."
-                )
-            else:
-                logger.info(f"Linux ARP scan completed. Found {len(devices)} devices.")
-            return devices
-
-        # Windows Implementation
-        if platform == "win32":
-            try:
-                # Windows uses 'arp -a' to list ARP table
-                result = await asyncio.create_subprocess_exec(
-                    "arp",
-                    "-a",
-                    stdout=asyncio.subprocess.PIPE,
-                    stderr=asyncio.subprocess.PIPE,
-                    creationflags=(
-                        0x08000000 if sys.platform == "win32" else 0
-                    ),  # CREATE_NO_WINDOW on Windows
-                )
-                # Add timeout to prevent hanging
-                # (5 seconds should be enough for arp command)
-                try:
-                    stdout, stderr = await asyncio.wait_for(
-                        result.communicate(), timeout=5.0
-                    )
-                except TimeoutError:
-                    logger.error("ARP command timed out after 5 seconds")
-                    result.kill()
-                    await result.wait()
-                    return []
-
-                if result.returncode == 0:
-                    output = stdout.decode("utf-8", errors="ignore")
-                    logger.debug(
-                        f"Windows arp -a output: {output[:200]}..."
-                    )  # Log first 200 chars
-
-                    # Windows ARP output format:
-                    # Interface: 192.168.1.100 --- 0xa
-                    #   Internet Address      Physical Address      Type
-                    #   192.168.1.1          00-11-22-33-44-55     dynamic
-                    #   192.168.1.2          aa-bb-cc-dd-ee-ff     static
-                    current_interface = "unknown"
-                    for line in output.splitlines():
-                        line = line.strip()
-                        if not line:
-                            continue
-
-                        # Check for interface line: "Interface: IP --- 0xN"
-                        interface_match = re.search(
-                            r"Interface:\s+([0-9.]+)", line, re.IGNORECASE
-                        )
-                        if interface_match:
-                            current_interface = interface_match.group(1)
-                            continue
-
-                        # Skip header line
-                        if (
-                            "Internet Address" in line
-                            or "Physical Address" in line
-                            or "Type" in line
-                        ):
-                            continue
-
-                        # Parse ARP entry: "IP          MAC-ADDRESS      TYPE"
-                        # Format: IP address, MAC address (with dashes), Type
-                        parts = line.split()
-                        if len(parts) >= 2:
-                            ip_str = parts[0]
-                            mac_str = parts[1].replace(
-                                "-", ":"
-                            )  # Convert Windows format to standard
-
-                            # Validate IP and MAC
-                            if re.match(
-                                r"^[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}$",
-                                ip_str,
-                            ):
-                                # Normalize MAC address
-                                mac_parts = mac_str.split(":")
-                                if len(mac_parts) == 6:
-                                    mac_clean = ":".join(
-                                        p.zfill(2) for p in mac_parts
-                                    ).upper()
-
-                                    # Filter out multicast/broadcast/incomplete
-                                    if (
-                                        self._is_valid_mac(mac_clean)
-                                        and mac_clean != "00:00:00:00:00:00"
-                                        and mac_clean != "FF:FF:FF:FF:FF:FF"
-                                    ):
-                                        devices.append(
-                                            (ip_str, mac_clean, current_interface)
-                                        )
-                                        logger.debug(
-                                            f"Found device via Windows arp: "
-                                            f"{ip_str} -> {mac_clean} on "
-                                            f"{current_interface}"
-                                        )
-                else:
-                    error_msg = (
-                        stderr.decode("utf-8", errors="ignore")
-                        if stderr
-                        else "Unknown error"
-                    )
-                    logger.warning(
-                        f"Windows arp command failed "
-                        f"(code {result.returncode}): {error_msg}"
-                    )
-
-            except FileNotFoundError:
-                logger.warning(
-                    "'arp' command not found on Windows. ARP scanning unavailable."
-                )
-            except Exception as e:
-                logger.error(f"Windows ARP scan failed: {e}", exc_info=True)
-
-            logger.info(f"Windows ARP scan completed. Found {len(devices)} devices.")
-            return devices
-
-        # Unknown platform - log warning and return empty
-        logger.warning(
-            f"Unsupported platform for ARP scanning: {platform}. "
-            f"Returning empty device list."
-        )
-        return devices
-
-        # Remove duplicates (same MAC)
-        seen_macs = set()
-        unique_devices = []
-        for ip, mac, interface in devices:
-            if mac not in seen_macs:
-                seen_macs.add(mac)
-                unique_devices.append((ip, mac, interface))
-
-        logger.info(f"ARP table scan found {len(unique_devices)} unique devices")
-
-        # Broadcast scan progress
-        await self.ws_manager.broadcast(
-            {
-                "event": "scanProgress",
-                "data": {
-                    "message": f"扫描完成，发现 {len(unique_devices)} 个设备",
-                    "timestamp": datetime.now(UTC).isoformat(),
-                },
-            }
-        )
-        return unique_devices
 
     def _is_valid_mac(self, mac_str: str) -> bool:
         """Check if a string is a valid MAC address."""
