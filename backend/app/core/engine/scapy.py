@@ -163,8 +163,7 @@ class ScapyAttackEngine(AttackEngine):
                 # Windows-specific detection
                 try:
                     # Use ipconfig to get default gateway on Windows
-                    import asyncio
-
+                    # Note: asyncio is already imported at module level
                     result = await asyncio.create_subprocess_exec(
                         "ipconfig",
                         stdout=asyncio.subprocess.PIPE,
