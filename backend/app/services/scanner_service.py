@@ -254,7 +254,8 @@ class ScannerService:
                 logger.info(f"Scan {scan_id} was cancelled, aborting discovery")
                 return
 
-            # Import from scanner/ directory (no conflict now that scanner.py is renamed)
+            # Import from scanner/ directory
+            # (no conflict now that scanner.py is renamed)
             from app.services.scanner.pipeline import ScanPipeline
 
             pipeline = ScanPipeline()
