@@ -139,8 +139,63 @@ class ScanPipeline:
 
         enrichment_results: list[EnrichmentResult] = []
 
-        # Enrichment will be implemented in later tasks
-        # mDNS, SSDP, NBNS, SNMP providers will be added
+        # Enrich each device with available methods
+        for device in discovered_devices:
+            if not device.mac:
+                continue  # Skip devices without MAC
+
+            fingerprint_data: dict[str, Any] = {}
+            evidence_sources: list[str] = []
+
+            # mDNS enrichment (if enabled)
+            if self.settings.feature_mdns:
+                try:
+                    from app.services.scanner.enrich.mdns import enrich_with_mdns
+
+                    mdns_data = await enrich_with_mdns(
+                        device_ip=device.ip,
+                        device_mac=device.mac,
+                        timeout=self.settings.scan_timeout_sec,
+                    )
+                    if mdns_data:
+                        fingerprint_data.update(mdns_data)
+                        evidence_sources.append("mdns")
+                        logger.debug(
+                            f"mDNS enrichment for {device.ip}: "
+                            f"found {len(mdns_data.get('mdns_services', []))} services"
+                        )
+                except Exception as e:
+                    logger.debug(f"mDNS enrichment failed for {device.ip}: {e}")
+
+            # SSDP enrichment (if enabled)
+            if self.settings.feature_ssdp:
+                try:
+                    from app.services.scanner.enrich.ssdp import enrich_with_ssdp
+
+                    ssdp_data = await enrich_with_ssdp(
+                        device_ip=device.ip,
+                        device_mac=device.mac,
+                        timeout=self.settings.scan_timeout_sec,
+                    )
+                    if ssdp_data:
+                        fingerprint_data.update(ssdp_data)
+                        evidence_sources.append("ssdp")
+                        logger.debug(
+                            f"SSDP enrichment for {device.ip}: "
+                            f"found {len(ssdp_data)} fields"
+                        )
+                except Exception as e:
+                    logger.debug(f"SSDP enrichment failed for {device.ip}: {e}")
+
+            # Only add result if we found some evidence
+            if fingerprint_data or evidence_sources:
+                enrichment_results.append(
+                    EnrichmentResult(
+                        device_mac=device.mac,
+                        fingerprint_data=fingerprint_data,
+                        evidence_sources=evidence_sources,
+                    )
+                )
 
         logger.info(
             f"Enrichment stage completed: "

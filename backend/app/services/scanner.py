@@ -2,6 +2,7 @@ import asyncio
 import logging
 import re
 from datetime import UTC, datetime
+from typing import Any
 from uuid import uuid4
 
 from app.core.database import get_session_factory
@@ -267,6 +268,13 @@ class ScannerService:
                 for result in discovery_results
             ]
 
+            # Store enrichment results for later use in device processing
+            enrichment_map: dict[str, dict[str, Any]] = {}
+            for enrichment in enrichment_results:
+                enrichment_map[enrichment.device_mac.lower()] = (
+                    enrichment.fingerprint_data
+                )
+
             # If QUICK scan, just use ARP table
             # If FULL scan, we could also do ping sweep (requires root/caps)
             if request.type == "full":
@@ -359,7 +367,10 @@ class ScannerService:
 
                         # Perform device recognition (multi-signal)
                         try:
-                            # Collect fingerprint signals
+                            # Retrieve fingerprint data from enrichment_map
+                            enrichment_fingerprint = enrichment_map.get(mac.lower(), {})
+
+                            # Collect additional fingerprint signals
                             fingerprint = (
                                 await self.fingerprint_collector.collect_from_device(
                                     device_ip=str(ip),
@@ -368,11 +379,21 @@ class ScannerService:
                                 )
                             )
 
-                            # Run recognition engine
+                            # Merge enrichment data with collected fingerprint
+                            full_fingerprint = {
+                                **fingerprint,
+                                **enrichment_fingerprint,  # Enrichment data
+                                # Also include device metadata
+                                "ip": str(ip),
+                                "mac": mac,
+                                "name": device.name,
+                            }
+
+                            # Run recognition engine with combined fingerprint
                             recognition_result = (
                                 self.recognition_engine.recognize_device(
                                     mac=mac,
-                                    fingerprint=fingerprint,
+                                    fingerprint=full_fingerprint,
                                     existing_vendor=device.vendor,
                                 )
                             )
