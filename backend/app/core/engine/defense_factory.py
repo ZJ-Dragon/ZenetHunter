@@ -4,7 +4,6 @@ import logging
 
 from app.core.engine.base_defense import DefenseEngine
 from app.core.engine.dummy_defense import DummyDefenseEngine
-from app.core.engine.linux_defense import LinuxDefenseEngine
 from app.core.platform.detect import (
     get_platform_features,
     is_linux,
@@ -49,8 +48,15 @@ def get_defense_engine() -> DefenseEngine:
     # Linux defense engine
     if is_linux():
         if is_root:
-            logger.info("Root permissions on Linux detected. Using LinuxDefenseEngine.")
-            return LinuxDefenseEngine()
+            try:
+                from app.core.engine.linux_defense import LinuxDefenseEngine
+
+                logger.info(
+                    "Root permissions on Linux detected. Using LinuxDefenseEngine."
+                )
+                return LinuxDefenseEngine()
+            except ImportError as e:
+                logger.warning(f"Failed to import LinuxDefenseEngine: {e}")
         else:
             logger.warning(
                 "Root permissions missing on Linux. "
