@@ -107,6 +107,22 @@ if _HAVE_PYDANTIC_SETTINGS:
             default=300, validation_alias="WEBHOOK_TOLERANCE_SEC"
         )
 
+        # Scanning configuration
+        scan_range: str = Field(default="192.168.1.0/24", validation_alias="SCAN_RANGE")
+        scan_timeout_sec: int = Field(default=30, validation_alias="SCAN_TIMEOUT_SEC")
+        scan_concurrency: int = Field(default=50, validation_alias="SCAN_CONCURRENCY")
+        scan_interval_sec: int | None = Field(
+            default=None, validation_alias="SCAN_INTERVAL_SEC"
+        )
+        # Feature flags for enrichment
+        feature_mdns: bool = Field(default=True, validation_alias="FEATURE_MDNS")
+        feature_ssdp: bool = Field(default=True, validation_alias="FEATURE_SSDP")
+        feature_nbns: bool = Field(default=False, validation_alias="FEATURE_NBNS")
+        feature_snmp: bool = Field(default=False, validation_alias="FEATURE_SNMP")
+        feature_fingerbank: bool = Field(
+            default=False, validation_alias="FEATURE_FINGERBANK"
+        )
+
         # CORS: comma‑separated list → list[str]
         cors_origins_raw: str = Field(
             default_factory=lambda: os.getenv("CORS_ALLOW_ORIGINS")
@@ -264,6 +280,44 @@ else:
         )
         webhook_tolerance_sec: int = Field(
             default_factory=lambda: int(os.getenv("WEBHOOK_TOLERANCE_SEC", "300"))
+        )
+        # Scanning configuration
+        scan_range: str = Field(
+            default_factory=lambda: os.getenv("SCAN_RANGE", "192.168.1.0/24")
+        )
+        scan_timeout_sec: int = Field(
+            default_factory=lambda: int(os.getenv("SCAN_TIMEOUT_SEC", "30"))
+        )
+        scan_concurrency: int = Field(
+            default_factory=lambda: int(os.getenv("SCAN_CONCURRENCY", "50"))
+        )
+        scan_interval_sec: int | None = Field(
+            default_factory=lambda: (
+                int(os.getenv("SCAN_INTERVAL_SEC"))
+                if os.getenv("SCAN_INTERVAL_SEC")
+                else None
+            )
+        )
+        feature_mdns: bool = Field(
+            default_factory=lambda: os.getenv("FEATURE_MDNS", "true").lower() == "true"
+        )
+        feature_ssdp: bool = Field(
+            default_factory=lambda: os.getenv("FEATURE_SSDP", "true").lower() == "true"
+        )
+        feature_nbns: bool = Field(
+            default_factory=lambda: (
+                os.getenv("FEATURE_NBNS", "false").lower() == "true"
+            )
+        )
+        feature_snmp: bool = Field(
+            default_factory=lambda: (
+                os.getenv("FEATURE_SNMP", "false").lower() == "true"
+            )
+        )
+        feature_fingerbank: bool = Field(
+            default_factory=lambda: (
+                os.getenv("FEATURE_FINGERBANK", "false").lower() == "true"
+            )
         )
 
         @property
