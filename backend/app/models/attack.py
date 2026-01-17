@@ -1,51 +1,119 @@
+"""Active Defense Models for Network Security Research.
+
+This module defines active defense strategies used in controlled network security research.
+All operations are designed for authorized testing environments only.
+
+⚠️  SECURITY RESEARCH ONLY ⚠️
+This module contains implementations of active defense techniques for academic research
+and authorized security testing. Unauthorized use is strictly prohibited and may be illegal.
+"""
+
 from enum import Enum
 
 from pydantic import BaseModel, ConfigDict, Field
 
 
-class AttackType(str, Enum):
-    """Available attack/interference types for active defense."""
+class ActiveDefenseType(str, Enum):
+    """Active defense strategies for network security research.
+    
+    These techniques are implemented for research purposes in controlled environments.
+    Each strategy serves specific security research objectives:
+    
+    - Device isolation and network segmentation testing
+    - Intrusion response simulation
+    - Network resilience evaluation
+    - Attack surface analysis
+    """
 
-    KICK = "kick"  # WiFi Deauthentication/Disassociation
-    BLOCK = "block"  # ARP Spoofing / Man-in-the-Middle
-    DHCP_SPOOF = "dhcp_spoof"  # DHCP Spoofing (redirect to controlled server)
-    DNS_SPOOF = "dns_spoof"  # DNS Spoofing (redirect DNS queries)
-    ICMP_REDIRECT = "icmp_redirect"  # ICMP Redirect (route manipulation)
-    PORT_SCAN = "port_scan"  # Port Scanning (reconnaissance)
-    TRAFFIC_SHAPE = "traffic_shape"  # Traffic Shaping (bandwidth limiting)
-    MAC_FLOOD = "mac_flood"  # MAC Flooding (switch table exhaustion)
-    VLAN_HOP = "vlan_hop"  # VLAN Hopping (if applicable)
-    BEACON_FLOOD = "beacon_flood"  # WiFi Beacon Flood (AP confusion)
+    # WiFi Layer Active Defense
+    KICK = "kick"  # WiFi Deauthentication (802.11 deauth frame injection)
+    BEACON_FLOOD = "beacon_flood"  # WiFi Beacon Flooding (AP confusion testing)
+    
+    # Network Layer Active Defense  
+    BLOCK = "block"  # ARP Spoofing (traffic redirection/isolation)
+    ARP_FLOOD = "arp_flood"  # ARP Table Poisoning (network stress testing)
+    ICMP_REDIRECT = "icmp_redirect"  # ICMP Redirect (route manipulation testing)
+    
+    # Protocol Layer Active Defense
+    DHCP_SPOOF = "dhcp_spoof"  # DHCP Spoofing (address assignment control)
+    DNS_SPOOF = "dns_spoof"  # DNS Spoofing (name resolution redirection)
+    
+    # Switch/Bridge Layer Active Defense
+    MAC_FLOOD = "mac_flood"  # MAC Address Flooding (CAM table exhaustion)
+    VLAN_HOP = "vlan_hop"  # VLAN Hopping (segmentation testing)
+    
+    # Advanced Techniques
+    PORT_SCAN = "port_scan"  # Active Port Scanning (service discovery)
+    TRAFFIC_SHAPE = "traffic_shape"  # Traffic Shaping (bandwidth control)
 
 
-class AttackStatus(str, Enum):
-    IDLE = "idle"
-    RUNNING = "running"
-    STOPPED = "stopped"
-    FAILED = "failed"
+class ActiveDefenseStatus(str, Enum):
+    """Status of active defense operations."""
+    
+    IDLE = "idle"  # No active operation running
+    RUNNING = "running"  # Operation in progress
+    STOPPED = "stopped"  # Operation stopped manually
+    FAILED = "failed"  # Operation failed due to error
 
 
-class AttackRequest(BaseModel):
-    """Request to start an attack on a device."""
+class ActiveDefenseRequest(BaseModel):
+    """Request to initiate an active defense operation.
+    
+    Attributes:
+        type: The type of active defense strategy to employ
+        duration: Maximum duration in seconds (1-3600)
+        intensity: Operation intensity level (1-10), default 5
+    """
 
-    type: AttackType = Field(
-        default=AttackType.KICK, description="Type of attack to perform"
+    type: ActiveDefenseType = Field(
+        default=ActiveDefenseType.KICK,
+        description="Active defense strategy to execute"
     )
     duration: int = Field(
         default=60,
         ge=1,
         le=3600,
-        description="Duration in seconds (for temporary attacks)",
+        description="Maximum operation duration in seconds"
+    )
+    intensity: int = Field(
+        default=5,
+        ge=1,
+        le=10,
+        description="Operation intensity (1=minimal, 10=maximum)"
     )
 
+    model_config = ConfigDict(
+        from_attributes=True,
+        json_schema_extra={
+            "example": {
+                "type": "arp_flood",
+                "duration": 120,
+                "intensity": 5
+            }
+        }
+    )
+
+
+class ActiveDefenseResponse(BaseModel):
+    """Response for active defense operations.
+    
+    Attributes:
+        device_mac: Target device MAC address
+        status: Current operation status
+        message: Status or error message
+        start_time: Operation start timestamp (ISO format)
+    """
+
+    device_mac: str = Field(..., description="Target device MAC address")
+    status: ActiveDefenseStatus = Field(..., description="Operation status")
+    message: str | None = Field(None, description="Status or error message")
+    start_time: str | None = Field(None, description="Operation start time (ISO 8601)")
+
     model_config = ConfigDict(from_attributes=True)
 
 
-class AttackResponse(BaseModel):
-    """Response for attack operations."""
-
-    device_mac: str = Field(..., description="Target device MAC")
-    status: AttackStatus = Field(..., description="Current attack status")
-    message: str | None = Field(None, description="Status message")
-
-    model_config = ConfigDict(from_attributes=True)
+# Legacy aliases for backward compatibility (will be deprecated)
+AttackType = ActiveDefenseType
+AttackStatus = ActiveDefenseStatus
+AttackRequest = ActiveDefenseRequest
+AttackResponse = ActiveDefenseResponse
