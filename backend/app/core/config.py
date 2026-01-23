@@ -84,6 +84,18 @@ if _HAVE_PYDANTIC_SETTINGS:
             default="insecure-dev-secret-key-do-not-use-in-production",
             validation_alias="SECRET_KEY",
         )
+        
+        # Active Defense Kill-Switch (Safety Control)
+        active_defense_enabled: bool = Field(
+            default=False,
+            validation_alias="ACTIVE_DEFENSE_ENABLED",
+            description="Global kill-switch for active defense operations. Must be explicitly enabled."
+        )
+        active_defense_readonly: bool = Field(
+            default=False,
+            validation_alias="ACTIVE_DEFENSE_READONLY",
+            description="Read-only mode: allows querying but prevents execution of operations"
+        )
 
         # External services (optional in early project phases)
         database_url: str | None = Field(default=None, validation_alias="DATABASE_URL")

@@ -51,6 +51,9 @@ class ActiveDefenseService:
         
         Sets up state management, WebSocket communication, and the attack engine.
         """
+        from app.core.config import get_settings
+        
+        self.settings = get_settings()
         self.state = get_state_manager()
         self.ws = get_connection_manager()
         self.engine = get_attack_engine()
@@ -58,7 +61,9 @@ class ActiveDefenseService:
         self.active_tasks: dict[str, asyncio.Task] = {}
         logger.info(
             f"ActiveDefenseService initialized with engine: "
-            f"{self.engine.__class__.__name__}"
+            f"{self.engine.__class__.__name__} | "
+            f"Global enabled: {self.settings.active_defense_enabled} | "
+            f"Readonly mode: {self.settings.active_defense_readonly}"
         )
 
     async def start_operation(
