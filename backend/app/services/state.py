@@ -3,11 +3,9 @@ import logging
 from threading import Lock
 from typing import Any
 
-from app.models.attack import AttackStatus
-from app.models.defender import DefenseStatus, DefenseType
+from app.models.attack import ActiveDefenseStatus
 from app.models.device import Device, DeviceType
 from app.models.log import SystemLog
-from app.models.scheduler import StrategyFeedback
 from app.models.topology import NetworkTopology, TopologyLink, TopologyNode
 from app.services.websocket import get_connection_manager
 
@@ -39,8 +37,6 @@ class StateManager:
         # Simple Allow/Block lists (MAC addresses)
         self._allow_list: set[str] = set()
         self._block_list: set[str] = set()
-        # Strategy feedback history (for AI scheduler)
-        self._strategy_feedback: list[StrategyFeedback] = []
 
         self._data_lock = Lock()
         # We need to access WebSocket manager but avoid circular imports if possible.
@@ -128,33 +124,13 @@ class StateManager:
         return device
 
     def update_device_attack_status(
-        self, mac: str, status: AttackStatus
+        self, mac: str, status: ActiveDefenseStatus
     ) -> Device | None:
-        """Update the attack status of a device."""
+        """Update the active defense status of a device."""
         with self._data_lock:
             device = self._devices.get(mac.lower())
             if device:
-                device.attack_status = status
-                self._devices[mac.lower()] = device
-                return device
-            return None
-
-    def update_device_defense_status(
-        self,
-        mac: str,
-        status: DefenseStatus,
-        policy: DefenseType | None = None,
-    ) -> Device | None:
-        """Update the defense status of a device."""
-        with self._data_lock:
-            device = self._devices.get(mac.lower())
-            if device:
-                device.defense_status = status
-                if policy is not None:
-                    device.active_defense_policy = policy
-                elif status == DefenseStatus.INACTIVE:
-                    device.active_defense_policy = None
-
+                device.active_defense_status = status
                 self._devices[mac.lower()] = device
                 return device
             return None
@@ -297,13 +273,7 @@ class StateManager:
             "mac": device.mac.lower(),
             "type": device.type.value,
             "status": device.status.value,
-            "attack_status": device.attack_status.value,
-            "defense_status": device.defense_status.value,
-            "active_defense_policy": (
-                device.active_defense_policy.value
-                if device.active_defense_policy
-                else None
-            ),
+            "active_defense_status": device.active_defense_status.value,
             "is_first_seen": (
                 (device.last_seen - device.first_seen).total_seconds() < 3600
             ),
