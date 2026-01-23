@@ -74,22 +74,85 @@ fi
 # 进入后端目录
 cd backend
 
-# 检查依赖
-if [ ! -d ".venv" ] && [ -z "$VIRTUAL_ENV" ]; then
-    echo "创建虚拟环境..."
-    python3 -m venv .venv
+# 智能环境检测
+IN_CONDA=false
+IN_VENV=false
+
+# 检测是否在conda环境中
+if [ ! -z "$CONDA_DEFAULT_ENV" ] && [ "$CONDA_DEFAULT_ENV" != "base" ]; then
+    IN_CONDA=true
+    echo "✓ 检测到 Conda 环境: $CONDA_DEFAULT_ENV"
+    echo "  将使用当前 Conda 环境安装依赖"
+elif [ ! -z "$VIRTUAL_ENV" ]; then
+    IN_VENV=true
+    echo "✓ 检测到虚拟环境: $VIRTUAL_ENV"
+elif [ -d ".venv" ]; then
+    echo "✓ 发现本地虚拟环境，正在激活..."
     source .venv/bin/activate
+    IN_VENV=true
+else
+    echo "未检测到虚拟环境"
+    echo ""
+    echo "建议使用隔离环境运行，避免污染系统环境："
+    echo ""
+    echo "选项1（推荐）: Conda环境"
+    echo "  conda env create -f ../environment.yml"
+    echo "  conda activate zenethunter"
+    echo "  ./start-local.sh"
+    echo ""
+    echo "选项2: Python虚拟环境"
+    echo "  python3 -m venv .venv"
+    echo "  source .venv/bin/activate"
+    echo "  ./start-local.sh"
+    echo ""
+    echo "选项3: 使用系统环境（不推荐）"
+    echo "  继续运行（可能污染系统Python环境）"
+    echo ""
+    read -p "是否在系统环境中继续？(y/n) " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        echo "已取消。请先创建虚拟环境或conda环境"
+        exit 1
+    fi
+    echo "⚠️  警告：将在系统环境中安装依赖"
 fi
 
 # 安装依赖
+echo ""
 echo "安装/更新依赖..."
-pip install -q --upgrade pip
-# 确保安装所有必需依赖，包括 greenlet（SQLAlchemy 异步必需）和 alembic（数据库迁移）
-pip install -q -e . || {
-    echo "警告: 使用 pip install -e . 失败，尝试直接安装依赖..."
-    pip install -q greenlet>=3.0.0 alembic>=1.13.0
-    pip install -q -e .
-}
+
+if [ "$IN_CONDA" = true ]; then
+    echo "使用 Conda 环境安装依赖..."
+    # 在conda环境中，优先使用conda安装，必要时使用pip
+    conda install -y -q pip 2>/dev/null || true
+    pip install -q --upgrade pip
+    
+    # 安装后端包（editable模式）
+    pip install -q -e . || {
+        echo "警告: editable安装失败，尝试直接安装依赖..."
+        pip install -q greenlet>=3.0.0 alembic>=1.13.0
+        pip install -q -e .
+    }
+    echo "✅ 依赖已安装到 Conda 环境: $CONDA_DEFAULT_ENV"
+elif [ "$IN_VENV" = true ]; then
+    echo "使用虚拟环境安装依赖..."
+    pip install -q --upgrade pip
+    pip install -q -e . || {
+        echo "警告: editable安装失败，尝试直接安装依赖..."
+        pip install -q greenlet>=3.0.0 alembic>=1.13.0
+        pip install -q -e .
+    }
+    echo "✅ 依赖已安装到虚拟环境"
+else
+    echo "⚠️  在系统环境中安装依赖..."
+    pip install -q --upgrade pip
+    pip install -q -e . || {
+        echo "警告: editable安装失败，尝试直接安装依赖..."
+        pip install -q greenlet>=3.0.0 alembic>=1.13.0
+        pip install -q -e .
+    }
+    echo "⚠️  依赖已安装到系统环境（可能污染全局Python）"
+fi
 
 # 检查和初始化数据库
 echo ""
