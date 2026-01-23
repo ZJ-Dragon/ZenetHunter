@@ -6,7 +6,7 @@ from datetime import UTC, datetime
 from enum import Enum
 from typing import TYPE_CHECKING
 
-from sqlalchemy import DateTime, Integer, String, Text
+from sqlalchemy import Boolean, DateTime, Integer, String, Text
 from sqlalchemy import Enum as SQLEnum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -86,6 +86,9 @@ class DeviceModel(Base):
     recognition_evidence: Mapped[str | None] = mapped_column(
         Text, nullable=True
     )  # JSON
+    recognition_manual_override: Mapped[bool] = mapped_column(
+        default=False, nullable=False, server_default="0"
+    )  # Admin manually confirmed recognition
 
     # Relationship to fingerprint (optional)
     fingerprint: Mapped[DeviceFingerprintModel | None] = relationship(
