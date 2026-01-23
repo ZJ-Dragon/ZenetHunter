@@ -1,11 +1,13 @@
 """Active Defense Models for Network Security Research.
 
-This module defines active defense strategies used in controlled network security research.
-All operations are designed for authorized testing environments only.
+This module defines active defense strategies used in controlled
+network security research. All operations are designed for authorized
+testing environments only.
 
 ⚠️  SECURITY RESEARCH ONLY ⚠️
-This module contains implementations of active defense techniques for academic research
-and authorized security testing. Unauthorized use is strictly prohibited and may be illegal.
+This module contains implementations of active defense techniques for
+academic research and authorized security testing. Unauthorized use is
+strictly prohibited and may be illegal.
 """
 
 from enum import Enum

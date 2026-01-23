@@ -88,8 +88,9 @@ async def setup_system(
     Currently accepts setup data but doesn't persist admin credentials.
     Users can still login with default credentials (admin/zenethunter).
     """
-    # MVP Implementation: Setup wizard accepts configuration but uses default credentials
-    # For production deployment, admin user creation with hashed passwords should be implemented
+    # MVP Implementation: Setup wizard accepts configuration but uses
+    # default credentials. For production deployment, admin user creation
+    # with hashed passwords should be implemented
     # Current behavior: Users login with default credentials (admin/zenethunter)
     # Future enhancement: Create admin user in database with bcrypt-hashed password
     _ = data.get("admin_password", "")  # Reserved for future implementation

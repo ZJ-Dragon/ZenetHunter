@@ -40,7 +40,10 @@ router = APIRouter(
     "/types",
     response_model=list[dict],
     summary="List available active defense types",
-    description="Get a list of all available active defense strategies with descriptions",
+    description=(
+        "Get a list of all available active defense strategies "
+        "with descriptions"
+    ),
 )
 async def list_defense_types(
     current_user: Annotated[User, Depends(get_current_user)],
@@ -65,7 +68,9 @@ async def list_defense_types(
 def _get_defense_description(defense_type: ActiveDefenseType) -> str:
     """Get human-readable description for a defense type."""
     descriptions = {
-        ActiveDefenseType.KICK: "WiFi Deauthentication - Disconnect device from wireless network",
+        ActiveDefenseType.KICK: (
+            "WiFi Deauthentication - Disconnect device from network"
+        ),
         ActiveDefenseType.BLOCK: "ARP Spoofing - Redirect or block device traffic",
         ActiveDefenseType.ARP_FLOOD: "ARP Flooding - Stress test network ARP tables",
         ActiveDefenseType.DHCP_SPOOF: "DHCP Spoofing - Control IP address assignment",

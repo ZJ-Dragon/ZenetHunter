@@ -178,7 +178,7 @@ async def override_recognition(
                 ErrorCode.API_BAD_REQUEST,
                 f"Invalid device type: {request.device_type}",
                 extra={"valid_types": [t.value for t in DeviceTypeEnum]},
-            )
+            ) from None
 
     # Mark as manually overridden
     device.recognition_manual_override = True
