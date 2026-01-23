@@ -195,13 +195,14 @@ class DeviceRepository:
         await self.session.flush()
 
     async def update_attack_status(
-        self, mac: str, status: AttackStatus
+        self, mac: str, status: ActiveDefenseStatus | str
     ) -> DeviceModel | None:
-        """Update attack status for a device."""
+        """Update active defense status for a device."""
+        status_value = status.value if hasattr(status, 'value') else status
         result = await self.session.execute(
             update(DeviceModel)
             .where(DeviceModel.mac == mac.lower())
-            .values(attack_status=status.value)
+            .values(active_defense_status=status_value)
             .returning(DeviceModel)
         )
         await self.session.flush()
@@ -220,12 +221,8 @@ class DeviceRepository:
             model=device_model.model,
             type=DeviceType(device_model.type.value),
             status=DeviceStatus(device_model.status.value),
-            attack_status=AttackStatus(device_model.attack_status),
-            defense_status=DefenseStatus(device_model.defense_status),
-            active_defense_policy=(
-                DefenseType(device_model.active_defense_policy)
-                if device_model.active_defense_policy
-                else None
+            active_defense_status=ActiveDefenseStatus(
+                device_model.active_defense_status
             ),
             first_seen=device_model.first_seen,
             last_seen=device_model.last_seen,
