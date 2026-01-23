@@ -7,9 +7,8 @@ from typing import Any
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.attack import AttackStatus
+from app.models.attack import ActiveDefenseStatus
 from app.models.db.device import DeviceModel, DeviceStatusEnum, DeviceTypeEnum
-from app.models.defender import DefenseStatus, DefenseType
 from app.models.device import Device, DeviceStatus, DeviceType
 
 
@@ -29,13 +28,7 @@ class DeviceRepository:
             model=device.model,
             type=DeviceTypeEnum(device.type.value),
             status=DeviceStatusEnum(device.status.value),
-            attack_status=device.attack_status.value,
-            defense_status=device.defense_status.value,
-            active_defense_policy=(
-                device.active_defense_policy.value
-                if device.active_defense_policy
-                else None
-            ),
+            active_defense_status=device.active_defense_status.value,
             first_seen=device.first_seen,
             last_seen=device.last_seen,
             tags=json.dumps(device.tags) if device.tags else None,
@@ -78,13 +71,7 @@ class DeviceRepository:
             db_device.model = device.model
             db_device.type = DeviceTypeEnum(device.type.value)
             db_device.status = DeviceStatusEnum(device.status.value)
-            db_device.attack_status = device.attack_status.value
-            db_device.defense_status = device.defense_status.value
-            db_device.active_defense_policy = (
-                device.active_defense_policy.value
-                if device.active_defense_policy
-                else None
-            )
+            db_device.active_defense_status = device.active_defense_status.value
             db_device.last_seen = device.last_seen
             db_device.tags = json.dumps(device.tags) if device.tags else None
             db_device.alias = device.alias
@@ -120,13 +107,7 @@ class DeviceRepository:
                 model=device.model,
                 type=DeviceTypeEnum(device.type.value),
                 status=DeviceStatusEnum(device.status.value),
-                attack_status=device.attack_status.value,
-                defense_status=device.defense_status.value,
-                active_defense_policy=(
-                    device.active_defense_policy.value
-                    if device.active_defense_policy
-                    else None
-                ),
+                active_defense_status=device.active_defense_status.value,
                 first_seen=device.first_seen,
                 last_seen=device.last_seen,
                 tags=json.dumps(device.tags) if device.tags else None,
@@ -166,11 +147,7 @@ class DeviceRepository:
         device_model.model = device.model
         device_model.type = DeviceTypeEnum(device.type.value)
         device_model.status = DeviceStatusEnum(device.status.value)
-        device_model.attack_status = device.attack_status.value
-        device_model.defense_status = device.defense_status.value
-        device_model.active_defense_policy = (
-            device.active_defense_policy.value if device.active_defense_policy else None
-        )
+        device_model.active_defense_status = device.active_defense_status.value
         device_model.last_seen = device.last_seen
         device_model.tags = json.dumps(device.tags) if device.tags else None
         device_model.alias = device.alias
@@ -230,24 +207,8 @@ class DeviceRepository:
         await self.session.flush()
         return result.scalar_one_or_none()
 
-    async def update_defense_status(
-        self, mac: str, status: DefenseStatus, policy: DefenseType | None = None
-    ) -> DeviceModel | None:
-        """Update defense status and policy for a device."""
-        update_values: dict[str, Any] = {"defense_status": status.value}
-        if policy is not None:
-            update_values["active_defense_policy"] = policy.value
-        elif status == DefenseStatus.INACTIVE:
-            update_values["active_defense_policy"] = None
-
-        result = await self.session.execute(
-            update(DeviceModel)
-            .where(DeviceModel.mac == mac.lower())
-            .values(**update_values)
-            .returning(DeviceModel)
-        )
-        await self.session.flush()
-        return result.scalar_one_or_none()
+    # Defense status methods removed in v2.0 (active defense refactor)
+    # Use update_attack_status() instead
 
     def to_domain_model(self, device_model: DeviceModel) -> Device:
         """Convert database model to domain model."""
