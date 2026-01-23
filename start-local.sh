@@ -4,6 +4,28 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
+# 设置信号处理器用于优雅关闭
+cleanup() {
+    echo ""
+    echo "=== 正在关闭所有服务 ==="
+    
+    # 终止所有后台进程
+    if [ ! -z "$BACKEND_PID" ]; then
+        echo "正在关闭后端服务 (PID: $BACKEND_PID)..."
+        kill -TERM $BACKEND_PID 2>/dev/null || true
+        sleep 2
+        # 如果还没关闭，强制kill
+        kill -KILL $BACKEND_PID 2>/dev/null || true
+    fi
+    
+    # 清理临时文件
+    echo "清理完成"
+    exit 0
+}
+
+# 注册信号处理器
+trap cleanup SIGINT SIGTERM EXIT
+
 echo "=== ZenetHunter 本地启动 ==="
 echo ""
 
@@ -39,21 +61,85 @@ fi
 # 安装依赖
 echo "安装/更新依赖..."
 pip install -q --upgrade pip
-# 确保安装所有必需依赖，包括 greenlet（SQLAlchemy 异步必需）
+# 确保安装所有必需依赖，包括 greenlet（SQLAlchemy 异步必需）和 alembic（数据库迁移）
 pip install -q -e . || {
     echo "警告: 使用 pip install -e . 失败，尝试直接安装依赖..."
-    pip install -q greenlet>=3.0.0
+    pip install -q greenlet>=3.0.0 alembic>=1.13.0
     pip install -q -e .
 }
 
-# 检查数据库
+# 检查和初始化数据库
 echo ""
-echo "检查数据库配置..."
+echo "检查数据库状态..."
+
+# 设置DATABASE_URL
 if [ -z "$DATABASE_URL" ]; then
     echo "使用默认 SQLite 数据库 (backend/data/zenethunter.db)"
     export DATABASE_URL="sqlite+aiosqlite:///./data/zenethunter.db"
 else
     echo "使用环境变量 DATABASE_URL"
+fi
+
+# 确保data目录存在
+if [ ! -d "data" ]; then
+    mkdir -p data
+    echo "创建数据目录: data/"
+fi
+
+# 检查数据库文件和schema
+if [ -f "data/zenethunter.db" ]; then
+    echo "数据库已存在: data/zenethunter.db"
+    
+    # 检查是否需要迁移
+    COLUMN_CHECK=$(sqlite3 data/zenethunter.db "PRAGMA table_info(devices);" 2>/dev/null | grep "active_defense_status" || echo "")
+    
+    if [ -z "$COLUMN_CHECK" ]; then
+        echo ""
+        echo "⚠️  检测到数据库schema不匹配！"
+        echo "    旧schema有: attack_status, defense_status"
+        echo "    新schema需要: active_defense_status"
+        echo ""
+        echo "正在自动修复数据库schema..."
+        
+        # 自动添加缺失的列
+        sqlite3 data/zenethunter.db <<EOF
+-- 添加新列
+ALTER TABLE devices ADD COLUMN active_defense_status TEXT DEFAULT 'idle';
+ALTER TABLE devices ADD COLUMN recognition_manual_override INTEGER DEFAULT 0;
+
+-- 从旧列迁移数据
+UPDATE devices SET active_defense_status = COALESCE(attack_status, 'idle') WHERE active_defense_status IS NULL OR active_defense_status = '';
+
+-- 注意：defense_status和active_defense_policy列会保留但不再使用
+EOF
+        
+        if [ $? -eq 0 ]; then
+            echo "✅ 数据库schema已自动更新"
+        else
+            echo "❌ 自动更新失败"
+            echo ""
+            echo "手动解决方案："
+            echo "  选项1（推荐）: 删除旧数据库"
+            echo "    rm -rf data/zenethunter.db*"
+            echo ""
+            echo "  选项2: 运行Alembic迁移"
+            echo "    alembic upgrade head"
+            echo ""
+            read -p "是否删除旧数据库并重建？(y/n) " -n 1 -r
+            echo
+            if [[ $REPLY =~ ^[Yy]$ ]]; then
+                rm -f data/zenethunter.db data/zenethunter.db-*
+                echo "✅ 旧数据库已删除，将创建新数据库"
+            else
+                echo "退出。请手动解决schema问题后重新运行"
+                exit 1
+            fi
+        fi
+    else
+        echo "✅ 数据库schema正常"
+    fi
+else
+    echo "数据库不存在，将在首次启动时自动创建"
 fi
 
 # 检测操作系统
