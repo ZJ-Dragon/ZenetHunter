@@ -4,36 +4,62 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
-# 端口检测函数
-check_port() {
-    local port=$1
-    if command -v lsof &> /dev/null; then
-        lsof -ti:$port 2>/dev/null
-    elif command -v netstat &> /dev/null; then
-        netstat -an | grep ":$port " | grep LISTEN | awk '{print $NF}' | head -1
+# 检测并清理旧的uvicorn进程
+cleanup_old_processes() {
+    echo "检查是否有残留的后端进程..."
+    
+    # 查找所有uvicorn进程
+    local uvicorn_pids=$(ps aux | grep -E "uvicorn app.main|python.*app.main" | grep -v grep | awk '{print $2}')
+    
+    if [ ! -z "$uvicorn_pids" ]; then
+        echo "⚠️  发现残留的后端进程:"
+        ps aux | grep -E "uvicorn app.main|python.*app.main" | grep -v grep | head -3
+        echo ""
+        echo "正在清理残留进程..."
+        
+        # Kill所有找到的进程
+        for pid in $uvicorn_pids; do
+            kill -KILL $pid 2>/dev/null || true
+        done
+        
+        sleep 2
+        echo "✅ 残留进程已清理"
     else
-        # Fallback: try to bind to port
-        python3 -c "import socket; s=socket.socket(); s.bind(('', $port)); s.close()" 2>/dev/null
-        if [ $? -eq 0 ]; then
-            echo ""
-        else
-            echo "occupied"
-        fi
+        echo "✅ 无残留进程"
     fi
 }
 
-kill_port() {
+# 端口检测和清理
+check_and_free_port() {
     local port=$1
+    local port_name=$2
+    
+    # 方法1: 使用lsof检查端口
     if command -v lsof &> /dev/null; then
         local pids=$(lsof -ti:$port 2>/dev/null)
         if [ ! -z "$pids" ]; then
-            echo "正在终止占用端口 $port 的进程 (PID: $pids)..."
+            echo "⚠️  $port_name 端口 $port 被占用 (PID: $pids)"
+            echo "正在释放端口..."
             kill -KILL $pids 2>/dev/null || true
             sleep 1
+            echo "✅ 端口 $port 已释放"
             return 0
         fi
     fi
-    return 1
+    
+    # 方法2: 尝试绑定端口测试
+    if ! python3 -c "import socket; s=socket.socket(); s.bind(('', $port)); s.close()" 2>/dev/null; then
+        echo "⚠️  $port_name 端口 $port 可能被占用，尝试清理..."
+        # 尝试通过netstat找到进程
+        if command -v netstat &> /dev/null; then
+            # macOS netstat
+            netstat -anv | grep "\.$port " | grep LISTEN
+        fi
+        # 强制清理可能的占用
+        sleep 1
+    fi
+    
+    return 0
 }
 
 # 设置信号处理器用于优雅关闭
