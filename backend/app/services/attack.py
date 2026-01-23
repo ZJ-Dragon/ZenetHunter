@@ -138,6 +138,15 @@ class ActiveDefenseService:
 
         start_time = datetime.now(UTC)
         
+        # Log operation start to audit trail
+        await self._log_operation_attempt(
+            mac=mac,
+            operation_type=request.type.value,
+            status="started",
+            message=f"Active defense {request.type.value} started on {mac}",
+            user=None,  # TODO: Extract from request context
+        )
+        
         # Notify clients via WebSocket
         await self.ws.broadcast(
             {
@@ -229,6 +238,15 @@ class ActiveDefenseService:
 
         # Update device status
         self.state.update_device_attack_status(mac, ActiveDefenseStatus.STOPPED)
+        
+        # Log operation stop to audit trail
+        await self._log_operation_attempt(
+            mac=mac,
+            operation_type="stop",
+            status="stopped",
+            message=f"Active defense operation stopped on {mac}",
+            user=None,  # TODO: Extract from request context
+        )
 
         # Notify clients via WebSocket
         await self.ws.broadcast(
@@ -375,6 +393,15 @@ class ActiveDefenseService:
             # Update final status
             self.state.update_device_attack_status(mac, ActiveDefenseStatus.IDLE)
             
+            # Log successful completion to audit trail
+            await self._log_operation_attempt(
+                mac=mac,
+                operation_type=request.type.value,
+                status="success",
+                message=f"Active defense {request.type.value} completed successfully on {mac}",
+                user=None,
+            )
+            
             logger.info(f"Operation {request.type.value} on {mac} completed successfully")
 
         except asyncio.CancelledError:
@@ -394,6 +421,16 @@ class ActiveDefenseService:
         except Exception as e:
             logger.error(f"Operation execution error for {mac}: {e}", exc_info=True)
             self.state.update_device_attack_status(mac, ActiveDefenseStatus.FAILED)
+            
+            # Log failure to audit trail
+            await self._log_operation_attempt(
+                mac=mac,
+                operation_type=request.type.value,
+                status="failed",
+                message=f"Active defense {request.type.value} failed: {str(e)}",
+                user=None,
+            )
+            
             await self.ws.broadcast(
                 {
                     "event": "activeDefenseLog",
