@@ -81,12 +81,56 @@ class ActiveDefenseService:
         Raises:
             None - errors are returned in the response object
         """
+        # Check global kill-switch
+        if not self.settings.active_defense_enabled:
+            logger.warning(
+                f"Active defense operation blocked by kill-switch: {request.type.value} on {mac}"
+            )
+            return ActiveDefenseResponse(
+                device_mac=mac,
+                status=ActiveDefenseStatus.FAILED,
+                message="Active defense operations are disabled (ACTIVE_DEFENSE_ENABLED=False)",
+            )
+        
+        # Check readonly mode
+        if self.settings.active_defense_readonly:
+            logger.warning(
+                f"Active defense operation blocked by readonly mode: {request.type.value} on {mac}"
+            )
+            return ActiveDefenseResponse(
+                device_mac=mac,
+                status=ActiveDefenseStatus.FAILED,
+                message="Active defense is in readonly mode (ACTIVE_DEFENSE_READONLY=True)",
+            )
+        
         device = self.state.get_device(mac)
         if not device:
             return ActiveDefenseResponse(
                 device_mac=mac,
                 status=ActiveDefenseStatus.FAILED,
                 message="Target device not found in network",
+            )
+        
+        # Check engine capabilities and permissions
+        if not self.engine.check_permissions():
+            logger.error(
+                f"Insufficient permissions for active defense operation: {request.type.value}"
+            )
+            # Log to audit trail
+            await self._log_operation_attempt(
+                mac=mac,
+                operation_type=request.type.value,
+                status="unsupported",
+                message="Insufficient system permissions (root/CAP_NET_RAW required)",
+                user=None,  # Would come from auth context
+            )
+            return ActiveDefenseResponse(
+                device_mac=mac,
+                status=ActiveDefenseStatus.FAILED,
+                message=(
+                    "Operation requires elevated permissions. "
+                    "Please run backend with root/administrator privileges or add CAP_NET_RAW capability."
+                ),
             )
 
         # Update device status in state manager
@@ -219,6 +263,49 @@ class ActiveDefenseService:
         Deprecated: Use stop_operation() instead.
         """
         return await self.stop_operation(mac)
+    
+    async def _log_operation_attempt(
+        self,
+        mac: str,
+        operation_type: str,
+        status: str,
+        message: str,
+        user: str | None = None,
+    ) -> None:
+        """Log operation attempt to audit trail (event_log table).
+        
+        Args:
+            mac: Target device MAC
+            operation_type: Type of operation attempted
+            status: Operation status (success/failed/unsupported)
+            message: Descriptive message
+            user: Username who initiated operation
+        """
+        try:
+            from app.core.database import get_session_factory
+            from app.repositories.event_log import EventLogRepository
+            from datetime import UTC, datetime
+            import json
+            
+            session_factory = get_session_factory()
+            async with session_factory() as session:
+                repo = EventLogRepository(session)
+                await repo.create(
+                    level="INFO" if status == "success" else "WARNING",
+                    source="active_defense",
+                    event_type=f"operation_{status}",
+                    message=message,
+                    device_mac=mac,
+                    user_id=user,
+                    metadata=json.dumps({
+                        "operation_type": operation_type,
+                        "status": status,
+                        "timestamp": datetime.now(UTC).isoformat(),
+                    })
+                )
+                await session.commit()
+        except Exception as e:
+            logger.error(f"Failed to log operation attempt: {e}", exc_info=True)
 
     async def _run_operation_task(
         self, mac: str, request: ActiveDefenseRequest
