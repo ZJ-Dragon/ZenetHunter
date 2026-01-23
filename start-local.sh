@@ -111,6 +111,14 @@ trap cleanup SIGINT SIGTERM EXIT
 echo "=== ZenetHunter 本地启动 ==="
 echo ""
 
+# 首先清理所有残留进程和端口
+echo "=== 预检查：清理残留资源 ==="
+cleanup_old_processes
+check_and_free_port 8000 "后端"
+check_and_free_port 5173 "前端"
+echo "✅ 预检查完成"
+echo ""
+
 # 检查 Python 环境
 if ! command -v python3 &> /dev/null; then
     echo "错误: 未找到 python3"
