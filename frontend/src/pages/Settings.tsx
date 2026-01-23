@@ -145,6 +145,27 @@ export const Settings: React.FC = () => {
     localStorage.setItem('platform', newPlatform);
   };
 
+  const handleShutdown = async () => {
+    setIsShuttingDown(true);
+    try {
+      toast.loading('正在关闭服务器...', { duration: 2000 });
+
+      await logsService.shutdownServer();
+
+      toast.success('服务器已关闭');
+
+      // Wait a moment then show message
+      setTimeout(() => {
+        toast.error('与服务器的连接已断开', { duration: 5000 });
+      }, 1000);
+    } catch (error) {
+      console.error('Shutdown failed:', error);
+      toast.error('关闭服务器失败');
+      setIsShuttingDown(false);
+      setShowShutdownConfirm(false);
+    }
+  };
+
   const handleSave = async () => {
     setIsSaving(true);
     try {
