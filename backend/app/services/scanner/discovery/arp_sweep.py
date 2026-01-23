@@ -117,58 +117,87 @@ class ARPSweep:
 
         results: list[tuple[str, str | None, str]] = []
 
-        # Send ARP requests in batches with concurrency control
-        semaphore = asyncio.Semaphore(self.concurrency)
-
-        async def probe_ip(ip: str) -> tuple[str, str | None, str] | None:
-            async with semaphore:
+        # ⚡ OPTIMIZED: Use Scapy's batch scanning instead of per-IP srp
+        # This is MUCH faster: single srp call for entire subnet vs 254 calls
+        
+        try:
+            # Create ARP request for all targets at once
+            # Join IPs with "/" for Scapy's multi-target format
+            # Or use CIDR directly if available
+            
+            # For better performance, scan in chunks
+            CHUNK_SIZE = 50  # Scan 50 IPs at a time
+            
+            for chunk_start in range(0, len(ip_targets), CHUNK_SIZE):
+                chunk = ip_targets[chunk_start:chunk_start + CHUNK_SIZE]
+                chunk_num = chunk_start // CHUNK_SIZE + 1
+                total_chunks = (len(ip_targets) + CHUNK_SIZE - 1) // CHUNK_SIZE
+                
+                logger.info(
+                    f"Scanning chunk {chunk_num}/{total_chunks} "
+                    f"({len(chunk)} IPs)..."
+                )
+                
+                # Build packet list for this chunk
+                packets = [
+                    Ether(dst="ff:ff:ff:ff:ff:ff") / ARP(pdst=ip) 
+                    for ip in chunk
+                ]
+                
                 try:
-                    # Use asyncio to run Scapy's synchronous srp
+                    # Run batch srp in executor (single call for whole chunk)
                     loop = asyncio.get_event_loop()
-                    arp_req = ARP(pdst=ip)
-                    # Run Scapy in executor (it's synchronous)
-                    answered, _unanswered = await loop.run_in_executor(
-                        None,
-                        lambda: srp(
-                            Ether(dst="ff:ff:ff:ff:ff:ff") / arp_req,
-                            timeout=self.timeout,
-                            verbose=0,
-                            iface=interface,
+                    answered, _unanswered = await asyncio.wait_for(
+                        loop.run_in_executor(
+                            None,
+                            lambda: srp(
+                                packets,
+                                timeout=self.timeout,
+                                verbose=0,
+                                iface=interface,
+                            ),
                         ),
+                        timeout=self.timeout + 5.0,  # Add 5s buffer
                     )
-
-                    if answered:
-                        for _sent, received in answered:
-                            mac = received.hwsrc
-                            return (ip, mac, interface or "unknown")
-                    return None
+                    
+                    # Collect results from this chunk
+                    for _sent, received in answered:
+                        ip = received.psrc
+                        mac = received.hwsrc
+                        results.append((ip, mac, interface or "unknown"))
+                    
+                    logger.debug(
+                        f"Chunk {chunk_num} complete: "
+                        f"found {len(answered)} devices"
+                    )
+                    
+                except asyncio.TimeoutError:
+                    logger.warning(
+                        f"Chunk {chunk_num} timed out, continuing..."
+                    )
                 except Exception as e:
-                    logger.debug(f"ARP probe failed for {ip}: {e}")
-                    return None
-
-        # Run probes concurrently
-        tasks = [probe_ip(ip) for ip in ip_targets]
-        probe_results = await asyncio.gather(*tasks, return_exceptions=True)
-
-        # Collect valid results and log errors
-        error_count = 0
-        for result in probe_results:
-            if isinstance(result, Exception):
-                error_count += 1
-                if error_count <= 5:  # Log first 5 errors
-                    logger.debug(f"ARP probe exception: {result}")
-            elif result and isinstance(result, tuple):
-                results.append(result)
+                    logger.warning(
+                        f"Chunk {chunk_num} failed: {e}, continuing..."
+                    )
+                
+                # Brief pause between chunks to avoid network flooding
+                if chunk_start + CHUNK_SIZE < len(ip_targets):
+                    await asyncio.sleep(0.1)
+                    
+        except Exception as e:
+            logger.error(f"ARP sweep failed: {e}", exc_info=True)
 
         logger.info(
             f"ARP sweep completed: found {len(results)} devices "
-            f"(errors: {error_count}/{len(ip_targets)})"
+            f"from {len(ip_targets)} targets"
         )
+        
         if len(results) == 0:
             logger.warning(
                 f"ARP sweep found no devices. "
                 f"Check interface={interface}, subnet range, and permissions."
             )
+        
         return results
 
     async def _sweep_with_raw_socket(
