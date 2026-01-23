@@ -345,9 +345,23 @@ if [ -n "$LOCAL_IP" ]; then
 fi
 
 echo ""
-echo "启动服务..."
-echo "后端 API: http://localhost:8000"
-echo "API 文档: http://localhost:8000/docs"
+echo "=== 清理环境 ==="
+
+# 清理所有残留进程
+cleanup_old_processes
+
+# 检查和清理端口
+echo ""
+echo "检查端口占用..."
+BACKEND_PORT=8000
+check_and_free_port 8000 "后端"
+check_and_free_port 5173 "前端"
+echo "✅ 端口检查完成"
+
+echo ""
+echo "=== 启动服务 ==="
+echo "后端 API: http://localhost:${BACKEND_PORT:-8000}"
+echo "API 文档: http://localhost:${BACKEND_PORT:-8000}/docs"
 echo ""
 echo "前端页面 (React):"
 echo "  - 本地访问: http://localhost:5173"
