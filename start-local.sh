@@ -9,17 +9,40 @@ cleanup() {
     echo ""
     echo "=== 正在关闭所有服务 ==="
     
-    # 终止所有后台进程
-    if [ ! -z "$BACKEND_PID" ]; then
+    # 终止后端进程
+    if [ ! -z "$BACKEND_PID" ] && kill -0 $BACKEND_PID 2>/dev/null; then
         echo "正在关闭后端服务 (PID: $BACKEND_PID)..."
         kill -TERM $BACKEND_PID 2>/dev/null || true
-        sleep 2
+        
+        # 等待最多3秒
+        for i in {1..6}; do
+            if ! kill -0 $BACKEND_PID 2>/dev/null; then
+                echo "✅ 后端服务已优雅关闭"
+                break
+            fi
+            sleep 0.5
+        done
+        
         # 如果还没关闭，强制kill
-        kill -KILL $BACKEND_PID 2>/dev/null || true
+        if kill -0 $BACKEND_PID 2>/dev/null; then
+            echo "⚠️  优雅关闭超时，强制终止..."
+            kill -KILL $BACKEND_PID 2>/dev/null || true
+        fi
     fi
     
-    # 清理临时文件
-    echo "清理完成"
+    # 终止前端进程（如果存在）
+    if [ ! -z "$FRONTEND_PID" ] && kill -0 $FRONTEND_PID 2>/dev/null; then
+        echo "正在关闭前端服务 (PID: $FRONTEND_PID)..."
+        kill -TERM $FRONTEND_PID 2>/dev/null || true
+        sleep 1
+        kill -KILL $FRONTEND_PID 2>/dev/null || true
+        echo "✅ 前端服务已关闭"
+    fi
+    
+    # 清理uvicorn子进程
+    pkill -f "uvicorn app.main" 2>/dev/null || true
+    
+    echo "✅ 清理完成"
     exit 0
 }
 
