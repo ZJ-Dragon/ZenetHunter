@@ -223,36 +223,7 @@ class StateManager:
             if mac.lower() in self._block_list:
                 self._block_list.remove(mac.lower())
 
-    # --- Strategy Feedback Management (for AI Scheduler) ---
-
-    def add_strategy_feedback(self, feedback: StrategyFeedback) -> None:
-        """Add strategy feedback for AI scheduler learning."""
-        with self._data_lock:
-            self._strategy_feedback.append(feedback)
-            # Keep only last 1000 feedback entries
-            if len(self._strategy_feedback) > 1000:
-                self._strategy_feedback = self._strategy_feedback[-1000:]
-
-    def get_strategy_feedback(
-        self, device_mac: str | None = None, limit: int = 100
-    ) -> list[StrategyFeedback]:
-        """
-        Get strategy feedback history.
-
-        Args:
-            device_mac: Filter by device MAC (optional)
-            limit: Maximum number of entries to return
-
-        Returns:
-            List of strategy feedback entries, sorted by timestamp (newest first)
-        """
-        with self._data_lock:
-            feedback = self._strategy_feedback
-            if device_mac:
-                feedback = [
-                    f for f in feedback if f.device_mac.lower() == device_mac.lower()
-                ]
-            return sorted(feedback, key=lambda x: x.timestamp, reverse=True)[:limit]
+    # Strategy Feedback Management removed in v2.0 (scheduler module removed)
 
     def get_device_state_features(self, mac: str) -> dict[str, Any]:
         """
