@@ -4,6 +4,38 @@
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
 
+# 端口检测函数
+check_port() {
+    local port=$1
+    if command -v lsof &> /dev/null; then
+        lsof -ti:$port 2>/dev/null
+    elif command -v netstat &> /dev/null; then
+        netstat -an | grep ":$port " | grep LISTEN | awk '{print $NF}' | head -1
+    else
+        # Fallback: try to bind to port
+        python3 -c "import socket; s=socket.socket(); s.bind(('', $port)); s.close()" 2>/dev/null
+        if [ $? -eq 0 ]; then
+            echo ""
+        else
+            echo "occupied"
+        fi
+    fi
+}
+
+kill_port() {
+    local port=$1
+    if command -v lsof &> /dev/null; then
+        local pids=$(lsof -ti:$port 2>/dev/null)
+        if [ ! -z "$pids" ]; then
+            echo "正在终止占用端口 $port 的进程 (PID: $pids)..."
+            kill -KILL $pids 2>/dev/null || true
+            sleep 1
+            return 0
+        fi
+    fi
+    return 1
+}
+
 # 设置信号处理器用于优雅关闭
 cleanup() {
     echo ""
@@ -39,8 +71,9 @@ cleanup() {
         echo "✅ 前端服务已关闭"
     fi
     
-    # 清理uvicorn子进程
+    # 清理所有uvicorn和vite进程
     pkill -f "uvicorn app.main" 2>/dev/null || true
+    pkill -f "vite.*ZenetHunter" 2>/dev/null || true
     
     echo "✅ 清理完成"
     exit 0
@@ -370,14 +403,14 @@ else
     echo "使用普通权限启动后端服务..."
 fi
 
-# 后台启动uvicorn
-uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload &
+# 后台启动uvicorn（使用检测后的端口）
+uvicorn app.main:app --host 0.0.0.0 --port ${BACKEND_PORT:-8000} --reload &
 BACKEND_PID=$!
 
 echo ""
 echo "✅ 后端服务器已启动 (PID: $BACKEND_PID)"
-echo "   API: http://localhost:8000"
-echo "   Docs: http://localhost:8000/docs"
+echo "   API: http://localhost:${BACKEND_PORT:-8000}"
+echo "   Docs: http://localhost:${BACKEND_PORT:-8000}/docs"
 echo ""
 echo "💡 按 Ctrl+C 优雅关闭（<5秒）或使用UI关闭"
 echo ""
