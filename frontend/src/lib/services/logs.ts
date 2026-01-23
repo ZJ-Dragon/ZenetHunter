@@ -56,4 +56,11 @@ export const logsService = {
     const response = await api.get<ScanConfig>('/config/scan');
     return response.data;
   },
+
+  shutdownServer: async (): Promise<{ status: string; message: string }> => {
+    const response = await api.post<{ status: string; message: string }>(
+      '/shutdown'
+    );
+    return response.data;
+  },
 };

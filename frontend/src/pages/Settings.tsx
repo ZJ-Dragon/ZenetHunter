@@ -1,7 +1,19 @@
 import React, { useEffect, useState, useCallback } from 'react';
 import { logsService, ScanConfig } from '../lib/services/logs';
-import { Settings as SettingsIcon, Moon, Sun, Monitor, Server, Save, RefreshCw, Network } from 'lucide-react';
+import {
+  Settings as SettingsIcon,
+  Moon,
+  Sun,
+  Monitor,
+  Server,
+  Save,
+  RefreshCw,
+  Network,
+  Power,
+  AlertTriangle,
+} from 'lucide-react';
 import { clsx } from 'clsx';
+import toast from 'react-hot-toast';
 
 type Theme = 'light' | 'dark' | 'system';
 type Platform = 'windows' | 'macos' | 'linux';
@@ -26,6 +38,8 @@ export const Settings: React.FC = () => {
   const [scanConfig, setScanConfig] = useState<ScanConfig | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [isShuttingDown, setIsShuttingDown] = useState(false);
+  const [showShutdownConfirm, setShowShutdownConfirm] = useState(false);
 
   const fetchSystemInfo = useCallback(async () => {
     try {
@@ -464,6 +478,59 @@ export const Settings: React.FC = () => {
                 </dd>
               </div>
             </dl>
+          </div>
+
+          {/* Danger Zone - Server Shutdown */}
+          <div
+            className="mt-6 pt-6 px-4 py-4 rounded-lg"
+            style={{
+              borderTop: '1px solid var(--winui-border-subtle)',
+              backgroundColor: 'rgba(220, 38, 38, 0.05)',
+              border: '1px solid rgba(220, 38, 38, 0.2)',
+            }}
+          >
+            <div className="flex items-start">
+              <AlertTriangle className="h-5 w-5 text-red-600 mr-3 mt-0.5" />
+              <div className="flex-1">
+                <h4 className="text-sm font-semibold text-red-600 mb-2">
+                  危险区域
+                </h4>
+                <p className="text-sm text-gray-600 mb-4">
+                  关闭后端服务器将终止所有正在运行的操作，包括扫描和主动防御任务。
+                  所有WebSocket连接将断开。
+                </p>
+                {!showShutdownConfirm ? (
+                  <button
+                    onClick={() => setShowShutdownConfirm(true)}
+                    disabled={isShuttingDown}
+                    className="inline-flex items-center px-4 py-2 border border-red-600 rounded-md shadow-sm text-sm font-medium text-red-600 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <Power className="h-4 w-4 mr-2" />
+                    关闭服务器
+                  </button>
+                ) : (
+                  <div className="flex items-center space-x-3">
+                    <p className="text-sm font-medium text-red-600">
+                      确定要关闭服务器吗？
+                    </p>
+                    <button
+                      onClick={handleShutdown}
+                      disabled={isShuttingDown}
+                      className="inline-flex items-center px-3 py-1.5 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50"
+                    >
+                      {isShuttingDown ? '关闭中...' : '确认关闭'}
+                    </button>
+                    <button
+                      onClick={() => setShowShutdownConfirm(false)}
+                      disabled={isShuttingDown}
+                      className="inline-flex items-center px-3 py-1.5 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                    >
+                      取消
+                    </button>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       )}
