@@ -125,19 +125,48 @@ if _HAVE_PYDANTIC_SETTINGS:
             default=300, validation_alias="WEBHOOK_TOLERANCE_SEC"
         )
 
-        # Active Scanning Configuration
+        # Hybrid Scanning Configuration
+        scan_mode: str = Field(
+            default="hybrid",
+            validation_alias="SCAN_MODE",
+            description="Scan mode: 'hybrid' (cache-based) or 'full' (full subnet)",
+        )
+        scan_allow_full_subnet: bool = Field(
+            default=False,
+            validation_alias="SCAN_ALLOW_FULL_SUBNET",
+            description="Allow full subnet scanning (high resource usage)",
+        )
+        scan_refresh_window: int = Field(
+            default=10,
+            validation_alias="SCAN_REFRESH_WINDOW",
+            description="Candidate refresh window in seconds",
+        )
+        scan_refresh_concurrency: int = Field(
+            default=10,
+            validation_alias="SCAN_REFRESH_CONCURRENCY",
+            description="Max concurrent refresh probes",
+        )
+        scan_refresh_timeout: float = Field(
+            default=1.0,
+            validation_alias="SCAN_REFRESH_TIMEOUT",
+            description="Refresh probe timeout per device",
+        )
+
+        # Legacy/Advanced Scanning Configuration
         scan_range: str = Field(
             default="192.168.1.0/24",
             validation_alias="SCAN_RANGE",
-            description="CIDR range for network scanning",
+            description="CIDR range for full subnet scanning (advanced mode only)",
         )
         scan_timeout_sec: int = Field(
-            default=30, validation_alias="SCAN_TIMEOUT_SEC", description="Scan timeout"
+            default=30,
+            validation_alias="SCAN_TIMEOUT_SEC",
+            description="Full scan timeout",
         )
         scan_concurrency: int = Field(
             default=10,
             validation_alias="SCAN_CONCURRENCY",
-            description="Max concurrent probes",
+            description="Max concurrent probes (full scan)",
         )
         scan_interval_sec: int | None = Field(
             default=None,
