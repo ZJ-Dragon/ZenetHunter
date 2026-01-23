@@ -116,8 +116,7 @@ class ActiveDefenseService:
         # Check engine capabilities and permissions
         if not self.engine.check_permissions():
             logger.error(
-                f"Insufficient permissions for active defense: "
-                f"{request.type.value}"
+                f"Insufficient permissions for active defense: " f"{request.type.value}"
             )
             # Log to audit trail
             await self._log_operation_attempt(
