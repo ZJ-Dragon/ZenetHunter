@@ -17,7 +17,6 @@ from app.models.attack import (
     ActiveDefenseRequest,
     ActiveDefenseResponse,
     ActiveDefenseStatus,
-    ActiveDefenseType,
 )
 from app.services.state import get_state_manager
 from app.services.websocket import get_connection_manager
@@ -27,17 +26,17 @@ logger = logging.getLogger(__name__)
 
 class ActiveDefenseService:
     """Active Defense Service for network security operations.
-    
+
     This service manages active defense operations targeting specific devices
     on the network. It uses configurable engine adapters (Scapy-based or dummy)
     depending on available system permissions and capabilities.
-    
+
     Key features:
     - Asynchronous operation execution
     - Real-time status updates via WebSocket
     - Automatic task cleanup and cancellation
     - Comprehensive logging and error handling
-    
+
     Supported operations:
     - WiFi deauthentication
     - ARP-based traffic manipulation
@@ -48,11 +47,11 @@ class ActiveDefenseService:
 
     def __init__(self):
         """Initialize the Active Defense Service.
-        
+
         Sets up state management, WebSocket communication, and the attack engine.
         """
         from app.core.config import get_settings
-        
+
         self.settings = get_settings()
         self.state = get_state_manager()
         self.ws = get_connection_manager()
@@ -70,14 +69,14 @@ class ActiveDefenseService:
         self, mac: str, request: ActiveDefenseRequest
     ) -> ActiveDefenseResponse:
         """Start an active defense operation on a target device.
-        
+
         Args:
             mac: Target device MAC address
             request: Operation request containing type, duration, and intensity
-            
+
         Returns:
             ActiveDefenseResponse with operation status and details
-            
+
         Raises:
             None - errors are returned in the response object
         """
@@ -91,7 +90,7 @@ class ActiveDefenseService:
                 status=ActiveDefenseStatus.FAILED,
                 message="Active defense operations are disabled (ACTIVE_DEFENSE_ENABLED=False)",
             )
-        
+
         # Check readonly mode
         if self.settings.active_defense_readonly:
             logger.warning(
@@ -102,7 +101,7 @@ class ActiveDefenseService:
                 status=ActiveDefenseStatus.FAILED,
                 message="Active defense is in readonly mode (ACTIVE_DEFENSE_READONLY=True)",
             )
-        
+
         device = self.state.get_device(mac)
         if not device:
             return ActiveDefenseResponse(
@@ -110,7 +109,7 @@ class ActiveDefenseService:
                 status=ActiveDefenseStatus.FAILED,
                 message="Target device not found in network",
             )
-        
+
         # Check engine capabilities and permissions
         if not self.engine.check_permissions():
             logger.error(
@@ -137,7 +136,7 @@ class ActiveDefenseService:
         self.state.update_device_attack_status(mac, ActiveDefenseStatus.RUNNING)
 
         start_time = datetime.now(UTC)
-        
+
         # Log operation start to audit trail
         await self._log_operation_attempt(
             mac=mac,
@@ -146,7 +145,7 @@ class ActiveDefenseService:
             message=f"Active defense {request.type.value} started on {mac}",
             user=None,  # TODO: Extract from request context
         )
-        
+
         # Notify clients via WebSocket
         await self.ws.broadcast(
             {
@@ -197,7 +196,7 @@ class ActiveDefenseService:
             f"(duration={request.duration}s, intensity={request.intensity}) "
             f"via {engine_name}"
         )
-        
+
         return ActiveDefenseResponse(
             device_mac=mac,
             status=ActiveDefenseStatus.RUNNING,
@@ -207,10 +206,10 @@ class ActiveDefenseService:
 
     async def stop_operation(self, mac: str) -> ActiveDefenseResponse:
         """Stop an active defense operation on a target device.
-        
+
         Args:
             mac: Target device MAC address
-            
+
         Returns:
             ActiveDefenseResponse with stop status
         """
@@ -238,7 +237,7 @@ class ActiveDefenseService:
 
         # Update device status
         self.state.update_device_attack_status(mac, ActiveDefenseStatus.STOPPED)
-        
+
         # Log operation stop to audit trail
         await self._log_operation_attempt(
             mac=mac,
@@ -268,20 +267,22 @@ class ActiveDefenseService:
         )
 
     # Legacy compatibility methods
-    async def start_attack(self, mac: str, request: ActiveDefenseRequest) -> ActiveDefenseResponse:
+    async def start_attack(
+        self, mac: str, request: ActiveDefenseRequest
+    ) -> ActiveDefenseResponse:
         """Legacy alias for start_operation().
-        
+
         Deprecated: Use start_operation() instead.
         """
         return await self.start_operation(mac, request)
 
     async def stop_attack(self, mac: str) -> ActiveDefenseResponse:
         """Legacy alias for stop_operation().
-        
+
         Deprecated: Use stop_operation() instead.
         """
         return await self.stop_operation(mac)
-    
+
     async def _log_operation_attempt(
         self,
         mac: str,
@@ -291,7 +292,7 @@ class ActiveDefenseService:
         user: str | None = None,
     ) -> None:
         """Log operation attempt to audit trail (event_log table).
-        
+
         Args:
             mac: Target device MAC
             operation_type: Type of operation attempted
@@ -300,11 +301,12 @@ class ActiveDefenseService:
             user: Username who initiated operation
         """
         try:
+            import json
+            from datetime import UTC, datetime
+
             from app.core.database import get_session_factory
             from app.repositories.event_log import EventLogRepository
-            from datetime import UTC, datetime
-            import json
-            
+
             session_factory = get_session_factory()
             async with session_factory() as session:
                 repo = EventLogRepository(session)
@@ -315,27 +317,27 @@ class ActiveDefenseService:
                     message=message,
                     device_mac=mac,
                     user_id=user,
-                    metadata=json.dumps({
-                        "operation_type": operation_type,
-                        "status": status,
-                        "timestamp": datetime.now(UTC).isoformat(),
-                    })
+                    metadata=json.dumps(
+                        {
+                            "operation_type": operation_type,
+                            "status": status,
+                            "timestamp": datetime.now(UTC).isoformat(),
+                        }
+                    ),
                 )
                 await session.commit()
         except Exception as e:
             logger.error(f"Failed to log operation attempt: {e}", exc_info=True)
 
-    async def _run_operation_task(
-        self, mac: str, request: ActiveDefenseRequest
-    ):
+    async def _run_operation_task(self, mac: str, request: ActiveDefenseRequest):
         """Background task to execute active defense operation via engine.
-        
+
         This method runs in a background asyncio task and handles:
         - Operation execution via the attack engine
         - Real-time logging and status updates
         - Error handling and recovery
         - Automatic cleanup on completion
-        
+
         Args:
             mac: Target device MAC address
             request: Operation request with type, duration, and intensity
@@ -389,10 +391,10 @@ class ActiveDefenseService:
                     },
                 }
             )
-            
+
             # Update final status
             self.state.update_device_attack_status(mac, ActiveDefenseStatus.IDLE)
-            
+
             # Log successful completion to audit trail
             await self._log_operation_attempt(
                 mac=mac,
@@ -401,8 +403,10 @@ class ActiveDefenseService:
                 message=f"Active defense {request.type.value} completed successfully on {mac}",
                 user=None,
             )
-            
-            logger.info(f"Operation {request.type.value} on {mac} completed successfully")
+
+            logger.info(
+                f"Operation {request.type.value} on {mac} completed successfully"
+            )
 
         except asyncio.CancelledError:
             logger.info(f"Operation for {mac} was cancelled by user")
@@ -421,7 +425,7 @@ class ActiveDefenseService:
         except Exception as e:
             logger.error(f"Operation execution error for {mac}: {e}", exc_info=True)
             self.state.update_device_attack_status(mac, ActiveDefenseStatus.FAILED)
-            
+
             # Log failure to audit trail
             await self._log_operation_attempt(
                 mac=mac,
@@ -430,7 +434,7 @@ class ActiveDefenseService:
                 message=f"Active defense {request.type.value} failed: {str(e)}",
                 user=None,
             )
-            
+
             await self.ws.broadcast(
                 {
                     "event": "activeDefenseLog",
@@ -455,7 +459,7 @@ _service_instance = None
 
 def get_active_defense_service() -> ActiveDefenseService:
     """Get the singleton instance of ActiveDefenseService.
-    
+
     Returns:
         ActiveDefenseService: The service instance
     """
@@ -468,7 +472,7 @@ def get_active_defense_service() -> ActiveDefenseService:
 # Legacy alias for backward compatibility
 def get_attack_service() -> ActiveDefenseService:
     """Legacy alias for get_active_defense_service().
-    
+
     Deprecated: Use get_active_defense_service() instead.
     This function will be removed in a future version.
     """

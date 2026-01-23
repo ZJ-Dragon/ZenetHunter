@@ -288,7 +288,7 @@ const ws = new WebSocket('ws://localhost:8000/ws');
 
 ws.onmessage = (event) => {
   const data = JSON.parse(event.data);
-  
+
   switch(data.event) {
     case 'activeDefenseStarted':
       console.log('Operation started:', data.data);
@@ -361,15 +361,15 @@ The Active Defense module uses a modular engine architecture:
 ```python
 class ScapyAttackEngine(AttackEngine):
     """Scapy-based implementation of active defense operations."""
-    
+
     def check_permissions(self) -> bool:
         """Verify required permissions for raw packet operations."""
-        
-    async def start_attack(self, target_mac: str, 
+
+    async def start_attack(self, target_mac: str,
                           attack_type: ActiveDefenseType,
                           duration: int) -> None:
         """Execute active defense operation."""
-        
+
     async def stop_attack(self, target_mac: str) -> None:
         """Emergency stop for active operations."""
 ```

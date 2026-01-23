@@ -78,20 +78,20 @@ class ActiveDefenseType(str, Enum):
     # WiFi Layer
     KICK = "kick"                    # WiFi Deauthentication
     BEACON_FLOOD = "beacon_flood"    # WiFi Beacon Flooding
-    
+
     # Network Layer
     BLOCK = "block"                  # ARP Spoofing
     ARP_FLOOD = "arp_flood"          # ARP Table Poisoning
     ICMP_REDIRECT = "icmp_redirect"  # ICMP Redirect
-    
+
     # Protocol Layer
     DHCP_SPOOF = "dhcp_spoof"        # DHCP Spoofing
     DNS_SPOOF = "dns_spoof"          # DNS Spoofing
-    
+
     # Switch/Bridge Layer
     MAC_FLOOD = "mac_flood"          # MAC Address Flooding
     VLAN_HOP = "vlan_hop"            # VLAN Hopping
-    
+
     # Advanced
     PORT_SCAN = "port_scan"          # Active Port Scanning
     TRAFFIC_SHAPE = "traffic_shape"  # Traffic Shaping
@@ -272,7 +272,7 @@ class ScapyAttackEngine(AttackEngine):
     async def start_attack(target_mac, attack_type, duration)
     async def stop_attack(target_mac)
     async def scan_network() -> list[tuple[str, str]]
-    
+
     # 各类型攻击的私有实现
     async def _run_kick_attack(...)
     async def _run_block_attack(...)

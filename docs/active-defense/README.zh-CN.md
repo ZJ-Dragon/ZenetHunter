@@ -288,7 +288,7 @@ const ws = new WebSocket('ws://localhost:8000/ws');
 
 ws.onmessage = (event) => {
   const data = JSON.parse(event.data);
-  
+
   switch(data.event) {
     case 'activeDefenseStarted':
       console.log('操作已启动:', data.data);
@@ -361,15 +361,15 @@ ws.onmessage = (event) => {
 ```python
 class ScapyAttackEngine(AttackEngine):
     """基于Scapy的主动防御操作实现。"""
-    
+
     def check_permissions(self) -> bool:
         """验证原始数据包操作所需的权限。"""
-        
-    async def start_attack(self, target_mac: str, 
+
+    async def start_attack(self, target_mac: str,
                           attack_type: ActiveDefenseType,
                           duration: int) -> None:
         """执行主动防御操作。"""
-        
+
     async def stop_attack(self, target_mac: str) -> None:
         """紧急停止活动操作。"""
 ```

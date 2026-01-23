@@ -43,7 +43,7 @@ class Device(BaseModel):
     )
     active_defense_status: ActiveDefenseStatus = Field(
         default=ActiveDefenseStatus.IDLE,
-        description="Current active defense operation status"
+        description="Current active defense operation status",
     )
     first_seen: datetime = Field(
         default_factory=lambda: datetime.now(UTC),

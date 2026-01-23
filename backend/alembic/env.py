@@ -33,12 +33,12 @@ target_metadata = Base.metadata
 def get_url():
     """Get database URL from environment or config."""
     import os
-    
+
     # Try to get from environment variable first (12-factor)
     url = os.getenv("DATABASE_URL")
     if url:
         return url
-    
+
     # Fallback to config file
     return config.get_main_option("sqlalchemy.url")
 
@@ -83,7 +83,7 @@ async def run_async_migrations() -> None:
     """Run migrations in async mode (for async engines)."""
     configuration = config.get_section(config.config_ini_section, {})
     configuration["sqlalchemy.url"] = get_url()
-    
+
     connectable = async_engine_from_config(
         configuration,
         prefix="sqlalchemy.",

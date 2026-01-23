@@ -46,17 +46,19 @@ async def list_defense_types(
     current_user: Annotated[User, Depends(get_current_user)],
 ) -> list[dict]:
     """List all available active defense operation types.
-    
+
     Returns a comprehensive list of supported active defense strategies,
     including their identifiers, names, and descriptions.
     """
     defense_types = []
     for defense_type in ActiveDefenseType:
-        defense_types.append({
-            "id": defense_type.value,
-            "name": defense_type.name,
-            "description": _get_defense_description(defense_type),
-        })
+        defense_types.append(
+            {
+                "id": defense_type.value,
+                "name": defense_type.name,
+                "description": _get_defense_description(defense_type),
+            }
+        )
     return defense_types
 
 
@@ -101,20 +103,20 @@ async def start_operation(
     db: AsyncSession = Depends(get_db),
 ) -> ActiveDefenseResponse:
     """Start an active defense operation on a target device.
-    
+
     This endpoint initiates an active defense operation with the specified
     parameters. The operation runs asynchronously in the background.
-    
+
     Args:
         mac: Target device MAC address (format: aa:bb:cc:dd:ee:ff)
         request: Operation parameters (type, duration, intensity)
         current_user: Authenticated user (injected)
         service: Active defense service (injected)
         db: Database session (injected)
-        
+
     Returns:
         ActiveDefenseResponse with operation status and details
-        
+
     Raises:
         AppError: If the operation fails to start
     """
@@ -122,7 +124,7 @@ async def start_operation(
     if response.status == "failed":
         raise AppError(
             ErrorCode.API_BAD_REQUEST,
-            response.message or "Failed to start active defense operation"
+            response.message or "Failed to start active defense operation",
         )
 
     # Update device status in database
@@ -152,27 +154,26 @@ async def stop_operation(
     db: AsyncSession = Depends(get_db),
 ) -> ActiveDefenseResponse:
     """Stop an active defense operation on a target device.
-    
+
     This endpoint immediately stops any running active defense operation
     on the specified device and performs cleanup.
-    
+
     Args:
         mac: Target device MAC address
         current_user: Authenticated user (injected)
         service: Active defense service (injected)
         db: Database session (injected)
-        
+
     Returns:
         ActiveDefenseResponse with stop status
-        
+
     Raises:
         AppError: If the device is not found
     """
     response = await service.stop_operation(mac)
     if response.status == "failed":
         raise AppError(
-            ErrorCode.CONFIG_NOT_FOUND,
-            response.message or "Target device not found"
+            ErrorCode.CONFIG_NOT_FOUND, response.message or "Target device not found"
         )
 
     # Update device status in database

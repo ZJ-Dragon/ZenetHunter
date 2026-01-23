@@ -90,7 +90,7 @@ class ScannerService:
 
         # Create initial result
         scan_id = uuid4()
-        
+
         # Store current scan status
         async with self._scan_lock:
             self._current_scan = ScanResult(
@@ -118,10 +118,10 @@ class ScannerService:
 
         # Return immediately
         return self._current_scan
-    
+
     def get_current_scan_status(self) -> ScanResult:
         """Get the status of the current or most recent scan.
-        
+
         Returns:
             ScanResult with current scan status, or idle status if no scan has run
         """

@@ -42,11 +42,11 @@ async def clear_all(self) -> int:
 ```python
 async def clear_all(self) -> int:
     from sqlalchemy import delete
-    
+
     # Count devices before deletion
     result = await self.session.execute(select(DeviceModel))
     count = len(result.scalars().all())
-    
+
     # Use bulk delete for efficiency - O(1)
     await self.session.execute(delete(DeviceModel))
     await self.session.flush()
@@ -85,7 +85,7 @@ async def _clear_device_cache(self):
                 repo = DeviceRepository(session)
                 deleted_count = await repo.clear_all()
                 await session.commit()
-                
+
                 # Broadcast device list cleared event (non-blocking)
                 try:
                     await asyncio.wait_for(
@@ -131,8 +131,8 @@ cd /Users/zenux/.cursor/worktrees/ZenetHunter/mxx
 ```bash
 # 1. 手动向数据库插入大量设备（模拟遗留数据）
 sqlite3 backend/data/zenethunter.db
-sqlite> INSERT INTO device (mac, ip, name, vendor, type, status, first_seen, last_seen) 
-        SELECT 
+sqlite> INSERT INTO device (mac, ip, name, vendor, type, status, first_seen, last_seen)
+        SELECT
           printf('aa:bb:cc:dd:%02X:%02X', x/256, x%256),
           printf('192.168.1.%d', x%256),
           'Test Device ' || x,
@@ -194,7 +194,7 @@ sqlite> INSERT INTO device (mac, ip, name, vendor, type, status, first_seen, las
 
 - [ ] 后端服务正常启动
 - [ ] 点击扫描按钮有即时响应（toast 提示）
-- [ ] 后端日志显示 "Clearing old device list..." 
+- [ ] 后端日志显示 "Clearing old device list..."
 - [ ] 后端日志显示 "Cleared X old devices from database"（在 10 秒内）
 - [ ] 扫描流程继续执行（即使清空超时）
 - [ ] 前端收到 scanStarted WebSocket 事件

