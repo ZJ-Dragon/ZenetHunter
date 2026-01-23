@@ -2,7 +2,6 @@
 
 import json
 from datetime import UTC, datetime
-from typing import Any
 
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -198,7 +197,7 @@ class DeviceRepository:
         self, mac: str, status: ActiveDefenseStatus | str
     ) -> DeviceModel | None:
         """Update active defense status for a device."""
-        status_value = status.value if hasattr(status, 'value') else status
+        status_value = status.value if hasattr(status, "value") else status
         result = await self.session.execute(
             update(DeviceModel)
             .where(DeviceModel.mac == mac.lower())

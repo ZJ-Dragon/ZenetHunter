@@ -89,7 +89,7 @@ class DeviceModel(Base):
     recognition_manual_override: Mapped[bool] = mapped_column(
         default=False, nullable=False, server_default="0"
     )  # Admin manually confirmed recognition
-    
+
     # Scanning metadata (hybrid scanner)
     discovery_source: Mapped[str | None] = mapped_column(
         String(50), nullable=True

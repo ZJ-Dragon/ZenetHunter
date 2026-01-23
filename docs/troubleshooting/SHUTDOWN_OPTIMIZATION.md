@@ -43,7 +43,7 @@ async with asyncio.timeout(shutdown_timeout):
     ...
 ```
 
-**效果**: 
+**效果**:
 - ✅ 防止无限期挂起
 - ✅ 5秒后强制退出
 - ✅ 确保程序能够关闭
@@ -63,7 +63,7 @@ attack = AttackService()
 for task in asyncio.all_tasks():
     if task is not asyncio.current_task() and not task.done():
         task_name = task.get_name()
-        if any(keyword in task_name.lower() 
+        if any(keyword in task_name.lower()
                for keyword in ["scan", "attack", "operation"]):
             task.cancel()
 ```
@@ -124,12 +124,12 @@ async def shutdown_application(
         "event": "systemShutdown",
         "data": {"message": "Backend server is shutting down"}
     })
-    
+
     # 延迟关闭
     async def delayed_shutdown():
         await asyncio.sleep(0.5)
         os.kill(os.getpid(), signal.SIGTERM)
-    
+
     asyncio.create_task(delayed_shutdown())
     return {"status": "shutdown_initiated"}
 ```
@@ -171,7 +171,7 @@ async def shutdown_application(
 {/* Danger Zone */}
 <div className="danger-zone">
   <AlertTriangle /> 危险区域
-  
+
   {!showShutdownConfirm ? (
     <button onClick={() => setShowShutdownConfirm(true)}>
       <Power /> 关闭服务器
@@ -318,7 +318,7 @@ delayed_shutdown_time = 0.5  # API shutdown延迟（秒）
    ```bash
    # 查看Python进程
    ps aux | grep uvicorn
-   
+
    # 强制杀死
    kill -9 <PID>
    ```
@@ -327,7 +327,7 @@ delayed_shutdown_time = 0.5  # API shutdown延迟（秒）
    ```bash
    # SQLite - 检查锁文件
    ls -la backend/data/*.db*
-   
+
    # PostgreSQL - 检查活动连接
    SELECT * FROM pg_stat_activity WHERE datname = 'zenethunter';
    ```

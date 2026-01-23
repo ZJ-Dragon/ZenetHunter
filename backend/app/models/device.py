@@ -70,7 +70,7 @@ class Device(BaseModel):
     recognition_evidence: dict[str, Any] | None = Field(
         None, description="Recognition evidence (matched fields, sources, weights)"
     )
-    
+
     # Scanning metadata (hybrid scanner)
     discovery_source: str | None = Field(
         None,

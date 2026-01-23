@@ -147,10 +147,10 @@ async def lifespan(app: FastAPI):  # noqa: D401 (docstring optional)
     finally:
         # Shutdown tasks - this runs when the app is shutting down
         logger.info("Application shutdown initiated, cleaning up resources...")
-        
+
         # Set a global shutdown timeout to prevent hanging
         shutdown_timeout = 5.0  # 5 seconds max for entire shutdown
-        
+
         try:
             async with asyncio.timeout(shutdown_timeout):
                 # Step 1: Cancel all active background tasks FIRST
@@ -158,7 +158,7 @@ async def lifespan(app: FastAPI):  # noqa: D401 (docstring optional)
                 try:
                     # Collect all running tasks (don't create new service instances)
                     tasks_to_cancel = []
-                    
+
                     # Get all asyncio tasks except the current one
                     for task in asyncio.all_tasks():
                         if task is not asyncio.current_task() and not task.done():
@@ -166,12 +166,17 @@ async def lifespan(app: FastAPI):  # noqa: D401 (docstring optional)
                             task_name = task.get_name()
                             if any(
                                 keyword in task_name.lower()
-                                for keyword in ["scan", "attack", "operation", "defense"]
+                                for keyword in [
+                                    "scan",
+                                    "attack",
+                                    "operation",
+                                    "defense",
+                                ]
                             ):
                                 logger.debug(f"Cancelling task: {task_name}")
                                 task.cancel()
                                 tasks_to_cancel.append(task)
-                    
+
                     # Wait briefly for tasks to cancel (1 second max)
                     if tasks_to_cancel:
                         logger.info(
@@ -179,37 +184,37 @@ async def lifespan(app: FastAPI):  # noqa: D401 (docstring optional)
                         )
                         await asyncio.wait(tasks_to_cancel, timeout=1.0)
                         logger.info("Background tasks cancelled")
-                
+
                 except Exception as e:
                     logger.warning(f"Error cancelling background tasks: {e}")
-                
+
                 # Step 2: Close all WebSocket connections
                 logger.info("Step 2/3: Closing WebSocket connections...")
                 try:
                     from app.services.websocket import get_connection_manager
-                    
+
                     ws_manager = get_connection_manager()
                     # Force close with timeout
                     await asyncio.wait_for(ws_manager.close_all(), timeout=1.0)
                     logger.info("WebSocket connections closed")
-                except asyncio.TimeoutError:
+                except TimeoutError:
                     logger.warning("WebSocket close timed out, forcing shutdown")
                 except Exception as e:
                     logger.warning(f"Error closing WebSocket connections: {e}")
-                
+
                 # Step 3: Close database connections
                 logger.info("Step 3/3: Closing database connections...")
                 try:
                     from app.core.database import close_db
-                    
+
                     await asyncio.wait_for(close_db(), timeout=1.0)
                     logger.info("Database connections closed")
-                except asyncio.TimeoutError:
+                except TimeoutError:
                     logger.warning("Database close timed out, forcing shutdown")
                 except Exception as e:
                     logger.warning(f"Error closing database: {e}")
-        
-        except asyncio.TimeoutError:
+
+        except TimeoutError:
             logger.error(
                 f"Shutdown exceeded {shutdown_timeout}s timeout, "
                 f"forcing immediate exit"
@@ -220,6 +225,7 @@ async def lifespan(app: FastAPI):  # noqa: D401 (docstring optional)
             logger.info("Shutdown complete")
             # Force flush logs
             import sys
+
             sys.stdout.flush()
             sys.stderr.flush()
 

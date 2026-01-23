@@ -97,7 +97,7 @@ async def _read_macos_arp_cache() -> list[ARPCandidate]:
         logger.info(f"Read {len(candidates)} candidates from macOS ARP cache")
         return candidates
 
-    except asyncio.TimeoutError:
+    except TimeoutError:
         logger.error("ARP cache read timed out")
         return []
     except Exception as e:
@@ -156,7 +156,7 @@ async def _read_linux_neighbor_cache() -> list[ARPCandidate]:
         logger.info(f"Read {len(candidates)} candidates from Linux neighbor cache")
         return candidates
 
-    except asyncio.TimeoutError:
+    except TimeoutError:
         logger.error("Neighbor cache read timed out")
         return []
     except Exception as e:
@@ -253,7 +253,7 @@ async def _read_windows_arp_cache() -> list[ARPCandidate]:
         logger.info(f"Read {len(candidates)} candidates from Windows ARP cache")
         return candidates
 
-    except asyncio.TimeoutError:
+    except TimeoutError:
         logger.error("Windows ARP cache read timed out")
         return []
     except Exception as e:

@@ -57,7 +57,7 @@
 - **新增API**:
   - `PATCH /api/devices/{mac}` - 更新设备别名和标签
   - `POST /api/devices/{mac}/recognition/override` - 覆盖自动识别
-- **数据库字段**: 
+- **数据库字段**:
   - `recognition_manual_override: bool` - 标记手动确认
   - 自动设置confidence=100
   - 记录覆盖用户和时间戳到evidence
@@ -104,7 +104,7 @@
 ### ✅ 质量保证（已完成）
 
 #### 9. Pre-commit 检查 ✅
-- **提交**: 
+- **提交**:
   - `09b12fd style: fix trailing whitespace and line length`
   - `bddba00 style: fix line length violations for ruff compliance`
   - `64d69e6 style: apply black formatting`

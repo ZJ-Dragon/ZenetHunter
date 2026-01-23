@@ -111,7 +111,6 @@ async def _ping_device(ip: str, timeout: float) -> tuple[bool, float | None, str
         (online, rtt_ms, method)
     """
     import platform
-    import subprocess
 
     try:
         # Platform-specific ping command
@@ -147,7 +146,7 @@ async def _ping_device(ip: str, timeout: float) -> tuple[bool, float | None, str
             else:
                 return (False, None, "icmp-ping")
 
-        except asyncio.TimeoutError:
+        except TimeoutError:
             # Timeout means device is offline or unreachable
             return (False, None, "icmp-ping-timeout")
 

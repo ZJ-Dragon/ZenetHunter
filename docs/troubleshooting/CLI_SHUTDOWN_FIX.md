@@ -26,17 +26,17 @@
 # 检查数据库schema
 if [ -f "data/zenethunter.db" ]; then
     COLUMN_CHECK=$(sqlite3 data/zenethunter.db "PRAGMA table_info(devices);" | grep "active_defense_status")
-    
+
     if [ -z "$COLUMN_CHECK" ]; then
         echo "⚠️  检测到schema不匹配，自动修复..."
-        
+
         # 自动添加缺失列
         sqlite3 data/zenethunter.db <<EOF
 ALTER TABLE devices ADD COLUMN active_defense_status TEXT DEFAULT 'idle';
 ALTER TABLE devices ADD COLUMN recognition_manual_override INTEGER DEFAULT 0;
 UPDATE devices SET active_defense_status = COALESCE(attack_status, 'idle');
 EOF
-        
+
         echo "✅ 数据库schema已更新"
     fi
 fi
@@ -56,11 +56,11 @@ fi
 # 信号处理函数
 cleanup() {
     echo "=== 正在关闭所有服务 ==="
-    
+
     # 1. 终止后端（优雅 → 强制）
     if [ ! -z "$BACKEND_PID" ]; then
         kill -TERM $BACKEND_PID 2>/dev/null
-        
+
         # 等待3秒
         for i in {1..6}; do
             if ! kill -0 $BACKEND_PID 2>/dev/null; then
@@ -69,23 +69,23 @@ cleanup() {
             fi
             sleep 0.5
         done
-        
+
         # 超时则强制kill
         if kill -0 $BACKEND_PID 2>/dev/null; then
             echo "⚠️  超时，强制终止..."
             kill -KILL $BACKEND_PID 2>/dev/null
         fi
     fi
-    
+
     # 2. 终止前端
     if [ ! -z "$FRONTEND_PID" ]; then
         kill -TERM $FRONTEND_PID 2>/dev/null
         kill -KILL $FRONTEND_PID 2>/dev/null
     fi
-    
+
     # 3. 清理uvicorn子进程
     pkill -f "uvicorn app.main" 2>/dev/null
-    
+
     exit 0
 }
 
@@ -211,7 +211,7 @@ bb1185e feat: enhance cleanup to kill frontend and uvicorn subprocesses
 # === 正在关闭所有服务 ===
 # ✅ 后端已优雅关闭
 # ✅ 清理完成
-# 
+#
 # 耗时: <3秒
 ```
 

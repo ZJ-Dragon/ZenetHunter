@@ -55,7 +55,7 @@ async with asyncio.timeout(shutdown_timeout):
 ```python
 # ✅ 遍历所有asyncio任务
 for task in asyncio.all_tasks():
-    if any(keyword in task.get_name().lower() 
+    if any(keyword in task.get_name().lower()
            for keyword in ["scan", "attack", "operation", "defense"]):
         task.cancel()
 ```
@@ -107,12 +107,12 @@ Authorization: Bearer {admin_token}
 ```tsx
 <div className="danger-zone">
   <AlertTriangle /> 危险区域
-  
+
   {/* 双重确认 */}
   <button onClick={() => setShowShutdownConfirm(true)}>
     <Power /> 关闭服务器
   </button>
-  
+
   {showShutdownConfirm && (
     <>
       <button onClick={handleShutdown}>确认关闭</button>
@@ -127,7 +127,7 @@ Authorization: Bearer {admin_token}
 2. ✅ 服务器已关闭
 3. ❌ 与服务器的连接已断开
 
-**修复提交**: 
+**修复提交**:
 - `d2b31ec` feat: add server shutdown button in settings UI
 - `44af968` feat: add handleShutdown function to Settings component
 
@@ -160,7 +160,7 @@ async def update_attack_status(mac, status: AttackStatus)
 async def update_attack_status(mac, status: ActiveDefenseStatus | str)
 ```
 
-**修复提交**: 
+**修复提交**:
 - `8f5e1a3` fix: remove defender imports from device repository
 - `54ba292` fix: update attack status method to use ActiveDefenseStatus
 

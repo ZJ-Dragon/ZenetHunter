@@ -98,15 +98,15 @@ sudo lsof -ti:5173 | xargs kill -9
 cleanup_old_processes() {
     # 查找所有uvicorn进程
     local uvicorn_pids=$(ps aux | grep -E "uvicorn app.main" | grep -v grep | awk '{print $2}')
-    
+
     if [ ! -z "$uvicorn_pids" ]; then
         echo "⚠️  发现残留进程，清理中..."
-        
+
         for pid in $uvicorn_pids; do
             # 优先尝试普通kill，失败则使用sudo
             kill -KILL $pid 2>/dev/null || sudo kill -KILL $pid 2>/dev/null
         done
-        
+
         sleep 2
         echo "✅ 进程已清理"
     fi
@@ -119,10 +119,10 @@ cleanup_old_processes() {
 check_and_free_port() {
     local port=$1
     local port_name=$2
-    
+
     # 使用lsof检查端口
     local pids=$(lsof -ti:$port 2>/dev/null)
-    
+
     if [ ! -z "$pids" ]; then
         echo "⚠️  $port_name 端口 $port 被占用 (PID: $pids)"
         kill -KILL $pids 2>/dev/null || sudo kill -KILL $pids 2>/dev/null
@@ -165,7 +165,7 @@ check_and_free_port() {
 1. **预检查阶段** (启动前)
    - cleanup_old_processes()
    - check_and_free_port()
-   
+
 2. **trap处理器** (关闭时)
    - Kill BACKEND_PID
    - Kill FRONTEND_PID
@@ -256,7 +256,7 @@ sudo kill -9 <PID>
 # === 预检查：清理残留资源 ===
 # ✅ 无残留进程
 # ✅ 端口空闲
-# 
+#
 # 然后正常启动，无Address already in use错误
 ```
 

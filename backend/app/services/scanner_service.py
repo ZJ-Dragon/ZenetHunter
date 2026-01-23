@@ -202,9 +202,9 @@ class ScannerService:
     async def _do_scan(self, scan_id, request: ScanRequest):
         """Actual scan implementation using hybrid 3-stage approach."""
         from app.core.config import get_settings
-        
+
         settings = get_settings()
-        
+
         logger.info(
             f"Scan {scan_id} started in mode: {settings.scan_mode} | succeed=true"
         )
@@ -225,31 +225,33 @@ class ScannerService:
         try:
             devices_found = 0
             discovered_devices = []
-            
+
             # Use hybrid scan (3-stage: Candidate → Refresh → Enrich)
             from app.services.scanner.pipeline import ScanPipeline
-            
+
             pipeline = ScanPipeline()
-            
+
             # Define event callback for progress updates
             async def progress_callback(event_name: str, data: dict):
                 await self.ws_manager.broadcast({"event": event_name, "data": data})
                 logger.info(
                     f"Scan progress: {data.get('stage', 'unknown')} | succeed=true"
                 )
-            
+
             # Run hybrid scan
-            scan_result = await pipeline.run_hybrid_scan(event_callback=progress_callback)
-            
+            scan_result = await pipeline.run_hybrid_scan(
+                event_callback=progress_callback
+            )
+
             stats = scan_result.get("stats", {})
             discovered_devices = scan_result.get("devices", [])
-            
+
             logger.info(
                 f"Hybrid scan stats: candidates={stats.get('candidate_count', 0)}, "
                 f"confirmed={stats.get('refresh_confirmed', 0)}, "
                 f"enriched={stats.get('enrich_completed', 0)} | succeed=true"
             )
-            
+
             # Fallback to old method if hybrid fails or returns no devices
             if not discovered_devices and hasattr(self.scapy_engine, "scan_network"):
                 try:

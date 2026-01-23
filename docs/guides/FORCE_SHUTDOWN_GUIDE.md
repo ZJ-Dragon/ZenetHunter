@@ -33,7 +33,7 @@
 - ⚠️ 可能丢失未保存数据
 - ⚠️ 数据库连接可能未正确关闭
 
-**适用场景**: 
+**适用场景**:
 - 优雅关闭失败/卡住
 - 紧急终止
 - 系统无响应
@@ -139,9 +139,9 @@ async def immediate_force_shutdown():
     for task in asyncio.all_tasks():
         if task is not asyncio.current_task():
             task.cancel()
-    
+
     await asyncio.sleep(0.1)  # Brief delay for response
-    
+
     # SIGKILL - immediate kill
     os.kill(os.getpid(), signal.SIGKILL)
 ```
@@ -154,9 +154,9 @@ const handleForceShutdown = async () => {
   setIsShuttingDown(true);
   try {
     await logsService.forceShutdownServer();
-    
+
     toast.success('服务器已强制关闭');
-    
+
     // Close page after 2.5 seconds
     setTimeout(() => {
       window.close();
@@ -165,11 +165,11 @@ const handleForceShutdown = async () => {
         window.location.href = 'about:blank';
       }, 500);
     }, 2500);
-    
+
   } catch (error) {
     // Expected - server killed before response
     toast.error('服务器已强制终止，页面即将关闭');
-    
+
     setTimeout(() => {
       window.close();
       window.location.href = 'about:blank';
@@ -287,7 +287,7 @@ kill -9 <PID>
 
 **原因**: 浏览器安全策略限制 `window.close()`
 
-**解决**: 
+**解决**:
 - 已自动重定向到 `about:blank`
 - 或手动关闭标签页
 

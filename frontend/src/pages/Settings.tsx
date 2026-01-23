@@ -573,7 +573,7 @@ export const Settings: React.FC = () => {
                       <Power className="h-4 w-4 mr-2" />
                       优雅关闭服务器
                     </button>
-                    
+
                     {showForceShutdown && (
                       <div className="pt-3 border-t border-red-300">
                         <p className="text-xs text-red-700 mb-2">
@@ -611,7 +611,7 @@ export const Settings: React.FC = () => {
                         取消
                       </button>
                     </div>
-                    
+
                     <div className="pt-3 border-t border-red-300">
                       <p className="text-xs text-red-700 mb-2">
                         💀 如果优雅关闭卡住，点击下方强制关闭（会kill进程）

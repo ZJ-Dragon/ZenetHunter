@@ -7,21 +7,21 @@ cd "$SCRIPT_DIR"
 # 检测并清理旧的uvicorn进程
 cleanup_old_processes() {
     echo "检查是否有残留的后端进程..."
-    
+
     # 查找所有uvicorn进程
     local uvicorn_pids=$(ps aux | grep -E "uvicorn app.main|python.*app.main" | grep -v grep | awk '{print $2}')
-    
+
     if [ ! -z "$uvicorn_pids" ]; then
         echo "⚠️  发现残留的后端进程:"
         ps aux | grep -E "uvicorn app.main|python.*app.main" | grep -v grep | head -3
         echo ""
         echo "正在清理残留进程..."
-        
+
         # Kill所有找到的进程
         for pid in $uvicorn_pids; do
             kill -KILL $pid 2>/dev/null || true
         done
-        
+
         sleep 2
         echo "✅ 残留进程已清理"
     else
@@ -33,7 +33,7 @@ cleanup_old_processes() {
 check_and_free_port() {
     local port=$1
     local port_name=$2
-    
+
     # 方法1: 使用lsof检查端口
     if command -v lsof &> /dev/null; then
         local pids=$(lsof -ti:$port 2>/dev/null)
@@ -46,7 +46,7 @@ check_and_free_port() {
             return 0
         fi
     fi
-    
+
     # 方法2: 尝试绑定端口测试
     if ! python3 -c "import socket; s=socket.socket(); s.bind(('', $port)); s.close()" 2>/dev/null; then
         echo "⚠️  $port_name 端口 $port 可能被占用，尝试清理..."
@@ -58,7 +58,7 @@ check_and_free_port() {
         # 强制清理可能的占用
         sleep 1
     fi
-    
+
     return 0
 }
 
@@ -66,12 +66,12 @@ check_and_free_port() {
 cleanup() {
     echo ""
     echo "=== 正在关闭所有服务 ==="
-    
+
     # 终止后端进程
     if [ ! -z "$BACKEND_PID" ] && kill -0 $BACKEND_PID 2>/dev/null; then
         echo "正在关闭后端服务 (PID: $BACKEND_PID)..."
         kill -TERM $BACKEND_PID 2>/dev/null || true
-        
+
         # 等待最多3秒
         for i in {1..6}; do
             if ! kill -0 $BACKEND_PID 2>/dev/null; then
@@ -80,14 +80,14 @@ cleanup() {
             fi
             sleep 0.5
         done
-        
+
         # 如果还没关闭，强制kill
         if kill -0 $BACKEND_PID 2>/dev/null; then
             echo "⚠️  优雅关闭超时，强制终止..."
             kill -KILL $BACKEND_PID 2>/dev/null || true
         fi
     fi
-    
+
     # 终止前端进程（如果存在）
     if [ ! -z "$FRONTEND_PID" ] && kill -0 $FRONTEND_PID 2>/dev/null; then
         echo "正在关闭前端服务 (PID: $FRONTEND_PID)..."
@@ -96,11 +96,11 @@ cleanup() {
         kill -KILL $FRONTEND_PID 2>/dev/null || true
         echo "✅ 前端服务已关闭"
     fi
-    
+
     # 清理所有uvicorn和vite进程
     pkill -f "uvicorn app.main" 2>/dev/null || true
     pkill -f "vite.*ZenetHunter" 2>/dev/null || true
-    
+
     echo "✅ 清理完成"
     exit 0
 }
@@ -193,7 +193,7 @@ if [ "$IN_CONDA" = true ]; then
     # 在conda环境中，优先使用conda安装，必要时使用pip
     conda install -y -q pip 2>/dev/null || true
     pip install -q --upgrade pip
-    
+
     # 安装后端包（editable模式）
     pip install -q -e . || {
         echo "警告: editable安装失败，尝试直接安装依赖..."
@@ -242,10 +242,10 @@ fi
 # 检查数据库文件和schema
 if [ -f "data/zenethunter.db" ]; then
     echo "数据库已存在: data/zenethunter.db"
-    
+
     # 检查是否需要迁移
     COLUMN_CHECK=$(sqlite3 data/zenethunter.db "PRAGMA table_info(devices);" 2>/dev/null | grep "active_defense_status" || echo "")
-    
+
     if [ -z "$COLUMN_CHECK" ]; then
         echo ""
         echo "⚠️  检测到数据库schema不匹配！"
@@ -253,7 +253,7 @@ if [ -f "data/zenethunter.db" ]; then
         echo "    新schema需要: active_defense_status"
         echo ""
         echo "正在自动修复数据库schema..."
-        
+
         # 自动添加缺失的列
         sqlite3 data/zenethunter.db <<EOF
 -- 添加新列
@@ -265,7 +265,7 @@ UPDATE devices SET active_defense_status = COALESCE(attack_status, 'idle') WHERE
 
 -- 注意：defense_status和active_defense_policy列会保留但不再使用
 EOF
-        
+
         if [ $? -eq 0 ]; then
             echo "✅ 数据库schema已自动更新"
         else

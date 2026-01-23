@@ -250,12 +250,12 @@ if [ "$IN_CONDA" = true ]; then
     # Conda环境：使用pip安装到conda env
     pip install -e .
     echo "✅ 安装到 Conda 环境: $CONDA_DEFAULT_ENV"
-    
+
 elif [ "$IN_VENV" = true ]; then
     # venv环境：正常pip安装
     pip install -e .
     echo "✅ 安装到虚拟环境"
-    
+
 else
     # 系统环境：警告后安装
     echo "⚠️  安装到系统环境"

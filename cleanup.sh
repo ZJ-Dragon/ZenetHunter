@@ -13,11 +13,11 @@ if [ ! -z "$UVICORN_PIDS" ]; then
     ps aux | grep -E "uvicorn app.main|python.*app.main" | grep -v grep
     echo ""
     echo "正在终止..."
-    
+
     for pid in $UVICORN_PIDS; do
         kill -KILL $pid 2>/dev/null || sudo kill -KILL $pid 2>/dev/null || true
     done
-    
+
     sleep 2
     echo "✅ uvicorn 进程已清理"
 else

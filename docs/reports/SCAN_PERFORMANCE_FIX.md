@@ -67,16 +67,16 @@ CHUNK_SIZE = 50
 for chunk in chunks(ip_targets, 50):
     # 为这批IP创建数据包列表
     packets = [Ether()/ARP(pdst=ip) for ip in chunk]
-    
+
     # 单次srp调用扫描整批
     answered, _ = await run_in_executor(
         srp(packets, timeout=2, iface=iface)
     )
-    
+
     # 处理这批结果
     for sent, received in answered:
         results.append((received.psrc, received.hwsrc))
-    
+
     # 短暂暂停，避免网络洪水
     await asyncio.sleep(0.1)
 ```
@@ -120,7 +120,7 @@ packets = [Ether()/ARP(pdst=ip) for ip in chunk]
 srp(packets, ...)
 ```
 
-**改善**: 
+**改善**:
 - ✅ Scapy内部优化批量发送
 - ✅ 减少系统调用开销
 - ✅ 更高效的包发送
@@ -224,14 +224,14 @@ await asyncio.gather(*tasks)  # ← 阻塞在这里
 # 5-6个批次
 for chunk in chunks(ips, 50):
     packets = [ARP(pdst=ip) for ip in chunk]
-    
+
     answered = await run_in_executor(
         lambda: srp(packets, ...)  # ← 单次调用
     )
-    
+
     for sent, recv in answered:
         results.append((recv.psrc, recv.hwsrc))
-    
+
     logger.info(f"Chunk complete: found {len(answered)} devices")
 ```
 

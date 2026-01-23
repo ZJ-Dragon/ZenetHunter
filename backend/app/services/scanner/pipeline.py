@@ -2,7 +2,7 @@
 
 Three-stage scanning:
 1. Candidate: Collect from ARP cache, DHCP leases (no active scan)
-2. Refresh: Targeted probes to confirm online status  
+2. Refresh: Targeted probes to confirm online status
 3. Enrich: Fingerprint collection only for confirmed-online devices
 """
 
@@ -235,9 +235,7 @@ class ScanPipeline:
 
     # === NEW: Hybrid Scanning (3-stage) ===
 
-    async def run_hybrid_scan(
-        self, event_callback=None
-    ) -> dict[str, Any]:
+    async def run_hybrid_scan(self, event_callback=None) -> dict[str, Any]:
         """Run hybrid scan: Candidate → Refresh → Enrich.
 
         Args:
@@ -332,7 +330,9 @@ class ScanPipeline:
             stats["devices_found"] = len(discovered)
             stats["completed_at"] = datetime.now(UTC).isoformat()
 
-            logger.info(f"Hybrid scan complete: {len(discovered)} devices | succeed=true")
+            logger.info(
+                f"Hybrid scan complete: {len(discovered)} devices | succeed=true"
+            )
 
             return {"stats": stats, "devices": discovered}
 

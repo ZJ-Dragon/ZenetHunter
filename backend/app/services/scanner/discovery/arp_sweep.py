@@ -119,31 +119,30 @@ class ARPSweep:
 
         # ⚡ OPTIMIZED: Use Scapy's batch scanning instead of per-IP srp
         # This is MUCH faster: single srp call for entire subnet vs 254 calls
-        
+
         try:
             # Create ARP request for all targets at once
             # Join IPs with "/" for Scapy's multi-target format
             # Or use CIDR directly if available
-            
+
             # For better performance, scan in chunks
             CHUNK_SIZE = 50  # Scan 50 IPs at a time
-            
+
             for chunk_start in range(0, len(ip_targets), CHUNK_SIZE):
-                chunk = ip_targets[chunk_start:chunk_start + CHUNK_SIZE]
+                chunk = ip_targets[chunk_start : chunk_start + CHUNK_SIZE]
                 chunk_num = chunk_start // CHUNK_SIZE + 1
                 total_chunks = (len(ip_targets) + CHUNK_SIZE - 1) // CHUNK_SIZE
-                
+
                 logger.info(
                     f"Scanning chunk {chunk_num}/{total_chunks} "
                     f"({len(chunk)} IPs)..."
                 )
-                
+
                 # Build packet list for this chunk
                 packets = [
-                    Ether(dst="ff:ff:ff:ff:ff:ff") / ARP(pdst=ip) 
-                    for ip in chunk
+                    Ether(dst="ff:ff:ff:ff:ff:ff") / ARP(pdst=ip) for ip in chunk
                 ]
-                
+
                 try:
                     # Run batch srp in executor (single call for whole chunk)
                     loop = asyncio.get_event_loop()
@@ -159,31 +158,26 @@ class ARPSweep:
                         ),
                         timeout=self.timeout + 5.0,  # Add 5s buffer
                     )
-                    
+
                     # Collect results from this chunk
                     for _sent, received in answered:
                         ip = received.psrc
                         mac = received.hwsrc
                         results.append((ip, mac, interface or "unknown"))
-                    
+
                     logger.debug(
-                        f"Chunk {chunk_num} complete: "
-                        f"found {len(answered)} devices"
+                        f"Chunk {chunk_num} complete: " f"found {len(answered)} devices"
                     )
-                    
-                except asyncio.TimeoutError:
-                    logger.warning(
-                        f"Chunk {chunk_num} timed out, continuing..."
-                    )
+
+                except TimeoutError:
+                    logger.warning(f"Chunk {chunk_num} timed out, continuing...")
                 except Exception as e:
-                    logger.warning(
-                        f"Chunk {chunk_num} failed: {e}, continuing..."
-                    )
-                
+                    logger.warning(f"Chunk {chunk_num} failed: {e}, continuing...")
+
                 # Brief pause between chunks to avoid network flooding
                 if chunk_start + CHUNK_SIZE < len(ip_targets):
                     await asyncio.sleep(0.1)
-                    
+
         except Exception as e:
             logger.error(f"ARP sweep failed: {e}", exc_info=True)
 
@@ -191,13 +185,13 @@ class ARPSweep:
             f"ARP sweep completed: found {len(results)} devices "
             f"from {len(ip_targets)} targets"
         )
-        
+
         if len(results) == 0:
             logger.warning(
                 f"ARP sweep found no devices. "
                 f"Check interface={interface}, subnet range, and permissions."
             )
-        
+
         return results
 
     async def _sweep_with_raw_socket(
