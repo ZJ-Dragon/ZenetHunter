@@ -70,5 +70,17 @@ class Device(BaseModel):
     recognition_evidence: dict[str, Any] | None = Field(
         None, description="Recognition evidence (matched fields, sources, weights)"
     )
+    
+    # Scanning metadata (hybrid scanner)
+    discovery_source: str | None = Field(
+        None,
+        description="How device was discovered: candidate-cache, dhcp, active-refresh, enrich, full-scan",
+    )
+    freshness_score: int | None = Field(
+        None,
+        ge=0,
+        le=100,
+        description="Data freshness score (0=stale, 100=just confirmed)",
+    )
 
     model_config = ConfigDict(from_attributes=True)

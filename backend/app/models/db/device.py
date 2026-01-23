@@ -89,6 +89,14 @@ class DeviceModel(Base):
     recognition_manual_override: Mapped[bool] = mapped_column(
         default=False, nullable=False, server_default="0"
     )  # Admin manually confirmed recognition
+    
+    # Scanning metadata (hybrid scanner)
+    discovery_source: Mapped[str | None] = mapped_column(
+        String(50), nullable=True
+    )  # candidate-cache, dhcp, active-refresh, enrich, full-scan
+    freshness_score: Mapped[int | None] = mapped_column(
+        Integer, nullable=True
+    )  # 0-100: how fresh/reliable is this data
 
     # Relationship to fingerprint (optional)
     fingerprint: Mapped[DeviceFingerprintModel | None] = relationship(
