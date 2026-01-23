@@ -41,8 +41,7 @@ router = APIRouter(
     response_model=list[dict],
     summary="List available active defense types",
     description=(
-        "Get a list of all available active defense strategies "
-        "with descriptions"
+        "Get a list of all available active defense strategies " "with descriptions"
     ),
 )
 async def list_defense_types(
