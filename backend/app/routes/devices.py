@@ -1,13 +1,34 @@
-from fastapi import APIRouter, Depends
+from typing import Annotated
+
+from fastapi import APIRouter, Depends, Path
+from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.core.database import get_db
 from app.core.exceptions import AppError, ErrorCode
+from app.core.security import get_current_user
+from app.models.auth import User
 from app.models.device import Device
 from app.repositories.device import DeviceRepository
 from app.services.state import StateManager, get_state_manager
+from app.services.websocket import get_connection_manager
 
 router = APIRouter(prefix="/devices", tags=["devices"])
+
+
+class DeviceUpdateRequest(BaseModel):
+    """Request to update device information."""
+    
+    alias: str | None = Field(None, description="User-friendly device alias")
+    tags: list[str] | None = Field(None, description="Device tags")
+
+
+class RecognitionOverrideRequest(BaseModel):
+    """Request to manually override automatic device recognition."""
+    
+    vendor: str | None = Field(None, description="Manually confirmed vendor")
+    model: str | None = Field(None, description="Manually confirmed model")
+    device_type: str | None = Field(None, description="Manually confirmed device type")
 
 
 @router.get("", response_model=list[Device])
