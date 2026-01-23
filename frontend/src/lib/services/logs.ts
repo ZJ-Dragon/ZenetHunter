@@ -63,4 +63,14 @@ export const logsService = {
     );
     return response.data;
   },
+
+  forceShutdownServer: async (): Promise<{
+    status: string;
+    message: string;
+  }> => {
+    const response = await api.post<{ status: string; message: string }>(
+      '/force-shutdown'
+    );
+    return response.data;
+  },
 };
