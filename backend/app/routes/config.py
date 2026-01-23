@@ -88,15 +88,14 @@ async def setup_system(
     Currently accepts setup data but doesn't persist admin credentials.
     Users can still login with default credentials (admin/zenethunter).
     """
-    # MVP: Placeholder - in future, create admin user in DB with hashed password
-    # For now, just accept the setup request
-    # The admin_password from data will be used in future to create admin user
-    # TODO: Implement admin user creation with password hashing in DB
-    # These variables are kept for future use
-    _ = data.get("admin_password", "")
-    _ = data.get("target_subnets", [])
-    _ = data.get("scan_interval", 300)
-    _ = data.get("default_policy", "monitor")
+    # MVP Implementation: Setup wizard accepts configuration but uses default credentials
+    # For production deployment, admin user creation with hashed passwords should be implemented
+    # Current behavior: Users login with default credentials (admin/zenethunter)
+    # Future enhancement: Create admin user in database with bcrypt-hashed password
+    _ = data.get("admin_password", "")  # Reserved for future implementation
+    _ = data.get("target_subnets", [])  # Reserved for scan configuration
+    _ = data.get("scan_interval", 300)  # Reserved for auto-scan intervals
+    _ = data.get("default_policy", "monitor")  # Reserved for default policy
 
     # Log setup completion (in future, persist to DB)
     # For now, setup is considered complete if this endpoint is called successfully

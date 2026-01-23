@@ -262,9 +262,10 @@ class ScapyAttackEngine(AttackEngine):
 
         # Detect monitor interface (simplistic detection)
         iface = conf.iface
-        # TODO: Better monitor mode detection
-        # For now, assume default interface supports injection
-        # or user configured it
+        # Note: Monitor mode detection is platform-specific and complex.
+        # Current implementation assumes default interface supports injection
+        # or user has configured a monitor-mode interface as default.
+        # For production use, consider explicit interface configuration.
 
         # Construct Deauth frame
         # Reason 7: Class 3 frame received from nonassociated station
