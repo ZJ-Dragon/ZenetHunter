@@ -83,12 +83,16 @@ class ActiveDefenseService:
         # Check global kill-switch
         if not self.settings.active_defense_enabled:
             logger.warning(
-                f"Active defense operation blocked by kill-switch: {request.type.value} on {mac}"
+                f"Active defense blocked by kill-switch: "
+                f"{request.type.value} on {mac}"
             )
             return ActiveDefenseResponse(
                 device_mac=mac,
                 status=ActiveDefenseStatus.FAILED,
-                message="Active defense operations are disabled (ACTIVE_DEFENSE_ENABLED=False)",
+                message=(
+                    "Active defense operations are disabled "
+                    "(ACTIVE_DEFENSE_ENABLED=False)"
+                ),
             )
 
         # Check readonly mode
