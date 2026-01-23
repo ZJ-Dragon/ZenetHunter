@@ -34,6 +34,9 @@ class ScannerService:
         self.model_lookup = get_device_model_lookup()  # Device model lookup service
         self.fingerprint_collector = get_fingerprint_collector()
         self.recognition_engine = get_recognition_engine()
+        # Track current scan status
+        self._current_scan: ScanResult | None = None
+        self._scan_lock = asyncio.Lock()
         try:
             from app.core.engine.factory import get_attack_engine
 
@@ -87,6 +90,14 @@ class ScannerService:
 
         # Create initial result
         scan_id = uuid4()
+        
+        # Store current scan status
+        async with self._scan_lock:
+            self._current_scan = ScanResult(
+                id=scan_id,
+                status=ScanStatus.RUNNING,
+                started_at=datetime.now(UTC),
+            )
 
         # Start the background task immediately without waiting
         # Use create_task to ensure it runs in background
@@ -106,11 +117,22 @@ class ScannerService:
         logger.info(f"Scan task {scan_id} queued in background (task: {id(task)})")
 
         # Return immediately
-        return ScanResult(
-            id=scan_id,
-            status=ScanStatus.RUNNING,
-            started_at=datetime.now(UTC),
-        )
+        return self._current_scan
+    
+    def get_current_scan_status(self) -> ScanResult:
+        """Get the status of the current or most recent scan.
+        
+        Returns:
+            ScanResult with current scan status, or idle status if no scan has run
+        """
+        if self._current_scan is None:
+            # No scan has been run yet
+            return ScanResult(
+                id=uuid4(),
+                status=ScanStatus.IDLE,
+                started_at=datetime.now(UTC),
+            )
+        return self._current_scan
 
     async def _clear_device_cache(self):
         """

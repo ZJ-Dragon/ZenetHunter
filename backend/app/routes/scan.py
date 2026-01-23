@@ -42,6 +42,25 @@ async def start_scan(
         raise
 
 
+@router.get("/scan/status", response_model=ScanResult, summary="Get current scan status")
+async def get_scan_status(
+    current_user: Annotated[User, Depends(get_current_admin)],
+    service: ScannerService = Depends(get_scanner_service),
+) -> ScanResult:
+    """Get the status of the current or most recent scan.
+    
+    Returns scan information including:
+    - Scan ID and type
+    - Current status (idle/running/completed/failed)
+    - Devices found count
+    - Start and end timestamps
+    
+    Requires admin authentication.
+    """
+    status = service.get_current_scan_status()
+    return status
+
+
 @router.websocket("/ws")
 async def websocket_endpoint(
     websocket: WebSocket, manager: ConnectionManager = Depends(get_connection_manager)
