@@ -98,7 +98,7 @@ class ActiveDefenseService:
         # Check readonly mode
         if self.settings.active_defense_readonly:
             logger.warning(
-                f"Active defense operation blocked by readonly mode: {request.type.value} on {mac}"
+                f"Active defense blocked by readonly: " f"{request.type.value} on {mac}"
             )
             return ActiveDefenseResponse(
                 device_mac=mac,
