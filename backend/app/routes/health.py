@@ -86,3 +86,69 @@ async def shutdown_application(
         "status": "shutdown_initiated",
         "message": "Server will shutdown in 0.5 seconds"
     }
+
+
+@router.post("/force-shutdown", summary="Force immediate shutdown")
+async def force_shutdown(
+    current_user: Annotated[User, Depends(get_current_admin)],
+) -> dict[str, str]:
+    """Force immediate shutdown of the backend application.
+    
+    This endpoint performs an aggressive shutdown:
+    - Immediately cancels ALL asyncio tasks
+    - Closes WebSocket connections without waiting
+    - Sends SIGKILL for immediate termination
+    - No graceful cleanup, resources may not be properly released
+    
+    ⚠️  USE WITH CAUTION - This is a forceful shutdown that may:
+    - Leave database connections open
+    - Lose in-progress data
+    - Not flush all logs
+    
+    Use this only when normal shutdown fails or hangs.
+    
+    ⚠️  ADMIN ONLY - Requires administrator authentication.
+    """
+    logger.error(
+        f"FORCE SHUTDOWN requested by admin user: {current_user.username}"
+    )
+    
+    # Broadcast urgent shutdown notification
+    try:
+        from app.services.websocket import get_connection_manager
+        
+        ws_manager = get_connection_manager()
+        await ws_manager.broadcast({
+            "event": "systemForceShutdown",
+            "data": {
+                "message": "Backend server is being forcefully terminated",
+                "initiated_by": current_user.username,
+                "urgent": True,
+            }
+        })
+    except Exception:
+        pass  # Ignore errors in broadcast
+    
+    # Schedule aggressive shutdown
+    async def immediate_force_shutdown():
+        try:
+            # Cancel ALL tasks immediately
+            for task in asyncio.all_tasks():
+                if task is not asyncio.current_task():
+                    task.cancel()
+            
+            # Wait 100ms for response to be sent
+            await asyncio.sleep(0.1)
+        except Exception:
+            pass
+        finally:
+            # Send SIGKILL for immediate termination
+            logger.critical("Sending SIGKILL for immediate termination")
+            os.kill(os.getpid(), signal.SIGKILL)
+    
+    asyncio.create_task(immediate_force_shutdown())
+    
+    return {
+        "status": "force_shutdown_initiated",
+        "message": "Server will be forcefully terminated in 0.1 seconds"
+    }
