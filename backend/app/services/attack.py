@@ -99,7 +99,10 @@ class ActiveDefenseService:
             return ActiveDefenseResponse(
                 device_mac=mac,
                 status=ActiveDefenseStatus.FAILED,
-                message="Active defense is in readonly mode (ACTIVE_DEFENSE_READONLY=True)",
+                message=(
+                    "Active defense is in readonly mode "
+                    "(ACTIVE_DEFENSE_READONLY=True)"
+                ),
             )
 
         device = self.state.get_device(mac)
@@ -113,7 +116,8 @@ class ActiveDefenseService:
         # Check engine capabilities and permissions
         if not self.engine.check_permissions():
             logger.error(
-                f"Insufficient permissions for active defense operation: {request.type.value}"
+                f"Insufficient permissions for active defense: "
+                f"{request.type.value}"
             )
             # Log to audit trail
             await self._log_operation_attempt(
@@ -128,7 +132,8 @@ class ActiveDefenseService:
                 status=ActiveDefenseStatus.FAILED,
                 message=(
                     "Operation requires elevated permissions. "
-                    "Please run backend with root/administrator privileges or add CAP_NET_RAW capability."
+                    "Please run backend with root/administrator privileges "
+                    "or add CAP_NET_RAW capability."
                 ),
             )
 
@@ -400,7 +405,10 @@ class ActiveDefenseService:
                 mac=mac,
                 operation_type=request.type.value,
                 status="success",
-                message=f"Active defense {request.type.value} completed successfully on {mac}",
+                message=(
+                    f"Active defense {request.type.value} "
+                    f"completed successfully on {mac}"
+                ),
                 user=None,
             )
 
