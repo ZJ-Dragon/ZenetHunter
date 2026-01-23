@@ -299,14 +299,28 @@ trap cleanup SIGINT SIGTERM EXIT
 cd backend
 
 # 如果检测到 root 权限，使用最高权限启动
+echo ""
 if [ "$IS_ROOT" = true ]; then
-    echo ""
     echo "使用 root 权限启动后端服务..."
     echo "警告: 正在以 root 权限运行，请确保系统安全"
-    echo ""
-    # 已经是 root，直接运行（不需要 sudo）
-    uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 else
-    # 普通权限运行
-    uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
+    echo "使用普通权限启动后端服务..."
 fi
+
+# 后台启动uvicorn
+uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload &
+BACKEND_PID=$!
+
+echo ""
+echo "✅ 后端服务器已启动 (PID: $BACKEND_PID)"
+echo "   API: http://localhost:8000"
+echo "   Docs: http://localhost:8000/docs"
+echo ""
+echo "💡 按 Ctrl+C 优雅关闭（<5秒）或使用UI关闭"
+echo ""
+
+# 等待后端进程
+wait $BACKEND_PID
+BACKEND_EXIT_CODE=$?
+echo ""
+echo "后端进程已退出 (exit code: $BACKEND_EXIT_CODE)"
