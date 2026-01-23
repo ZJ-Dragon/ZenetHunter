@@ -74,6 +74,9 @@ def _get_defense_description(defense_type: ActiveDefenseType) -> str:
         ActiveDefenseType.BEACON_FLOOD: "Beacon Flooding - WiFi AP confusion testing",
         ActiveDefenseType.PORT_SCAN: "Port Scanning - Active service discovery",
         ActiveDefenseType.TRAFFIC_SHAPE: "Traffic Shaping - Bandwidth control testing",
+        ActiveDefenseType.SYN_FLOOD: "SYN Flooding - TCP connection exhaustion testing",
+        ActiveDefenseType.UDP_FLOOD: "UDP Flooding - Bandwidth exhaustion testing",
+        ActiveDefenseType.TCP_RST: "TCP RST Injection - Connection termination testing",
     }
     return descriptions.get(defense_type, "Active defense operation")
 

@@ -33,10 +33,13 @@ class ActiveDefenseType(str, Enum):
     BLOCK = "block"  # ARP Spoofing (traffic redirection/isolation)
     ARP_FLOOD = "arp_flood"  # ARP Table Poisoning (network stress testing)
     ICMP_REDIRECT = "icmp_redirect"  # ICMP Redirect (route manipulation testing)
+    SYN_FLOOD = "syn_flood"  # SYN Flooding (connection exhaustion testing)
+    UDP_FLOOD = "udp_flood"  # UDP Flooding (bandwidth exhaustion testing)
     
     # Protocol Layer Active Defense
     DHCP_SPOOF = "dhcp_spoof"  # DHCP Spoofing (address assignment control)
     DNS_SPOOF = "dns_spoof"  # DNS Spoofing (name resolution redirection)
+    TCP_RST = "tcp_rst"  # TCP Reset Injection (connection termination)
     
     # Switch/Bridge Layer Active Defense
     MAC_FLOOD = "mac_flood"  # MAC Address Flooding (CAM table exhaustion)
