@@ -143,10 +143,11 @@ export const AttackControl: React.FC<AttackControlProps> = ({ device, className 
     }
   };
 
-  // If device is us (Router or Gateway), disable attack for safety
-  const isSafeDevice = device.type === 'router';
-
-  if (isSafeDevice) return null;
+  // Router/Gateway warning (but still allow attack for testing)
+  const isGateway = device.type === 'router';
+  
+  // Note: Removed safety check - allow attack on any device for research purposes
+  // Users should be aware of risks when attacking gateway/router
 
   if (isUnderAttack) {
     return (
