@@ -6,6 +6,7 @@ Three-stage scanning:
 3. Enrich: Fingerprint collection only for confirmed-online devices
 """
 
+import asyncio
 import ipaddress
 import logging
 from dataclasses import dataclass
