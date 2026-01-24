@@ -229,9 +229,15 @@ class ScapyAttackEngine(AttackEngine):
                 logger.warning("Could not determine gateway IP for scan.")
                 return []
 
-            # Default to /24 if subnet not calculated
-            if not subnet:
-                subnet = ".".join(gw_ip.split(".")[:3]) + ".0/24"
+            # Calculate /24 subnet from gateway IP
+            if not subnet and gw_ip:
+                # Extract first 3 octets and form /24 network
+                octets = gw_ip.split(".")
+                if len(octets) == 4:
+                    subnet = f"{octets[0]}.{octets[1]}.{octets[2]}.0/24"
+                    logger.info(
+                        f"Calculated subnet from gateway {gw_ip}: {subnet}"
+                    )
 
             logger.info(f"[ScapyEngine] Scanning subnet {subnet} on interface {iface}")
 
