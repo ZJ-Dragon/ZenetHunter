@@ -69,6 +69,18 @@ export const DeviceList: React.FC = () => {
     fetchDevices();
   }, []);
 
+  // Listen for scan started - clear old devices
+  useWebSocketEvent('scanStarted', () => {
+    setDevices([]);
+    setIsLoading(true);
+  });
+  
+  // Listen for scan completed
+  useWebSocketEvent('scanCompleted', () => {
+    fetchDevices();
+    setIsLoading(false);
+  });
+
   // Listen for device recognition updates
   useWebSocketEvent(WSEventType.DEVICE_RECOGNITION_UPDATED, () => {
     fetchDevices();
@@ -98,13 +110,16 @@ export const DeviceList: React.FC = () => {
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <h1 className="text-2xl font-semibold" style={{ color: 'var(--winui-text-primary)', letterSpacing: '-0.02em' }}>Network Devices</h1>
-        <button
-          onClick={fetchDevices}
-          className="btn-winui-secondary inline-flex items-center"
-        >
-          <RefreshCw className={clsx("h-4 w-4 mr-2", isLoading && "animate-spin")} />
-          Refresh
-        </button>
+        <div className="flex items-center gap-2">
+          <ScanButton />
+          <button
+            onClick={fetchDevices}
+            className="btn-winui-secondary inline-flex items-center"
+          >
+            <RefreshCw className={clsx("h-4 w-4 mr-2", isLoading && "animate-spin")} />
+            Refresh
+          </button>
+        </div>
       </div>
 
       {/* Filters - WinUI3 Style */}
