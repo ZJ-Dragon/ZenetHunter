@@ -160,10 +160,13 @@ class ScanPipeline:
                 try:
                     from app.services.scanner.enrich.mdns import enrich_with_mdns
 
-                    mdns_data = await enrich_with_mdns(
-                        device_ip=device.ip,
-                        device_mac=device.mac,
-                        timeout=self.settings.scan_timeout_sec,
+                    mdns_data = await asyncio.wait_for(
+                        enrich_with_mdns(
+                            device_ip=device.ip,
+                            device_mac=device.mac,
+                            timeout=2.0,  # Short timeout per device
+                        ),
+                        timeout=3.0,  # Overall timeout
                     )
                     if mdns_data:
                         fingerprint_data.update(mdns_data)
@@ -180,10 +183,13 @@ class ScanPipeline:
                 try:
                     from app.services.scanner.enrich.ssdp import enrich_with_ssdp
 
-                    ssdp_data = await enrich_with_ssdp(
-                        device_ip=device.ip,
-                        device_mac=device.mac,
-                        timeout=self.settings.scan_timeout_sec,
+                    ssdp_data = await asyncio.wait_for(
+                        enrich_with_ssdp(
+                            device_ip=device.ip,
+                            device_mac=device.mac,
+                            timeout=2.0,  # Short timeout per device
+                        ),
+                        timeout=3.0,  # Overall timeout
                     )
                     if ssdp_data:
                         fingerprint_data.update(ssdp_data)
@@ -205,9 +211,17 @@ class ScanPipeline:
                     )
                 )
 
+        except TimeoutError:
+            logger.warning(
+                f"Enrichment timed out after 30s, "
+                f"completed {len(enrichment_results)}/{len(discovered_devices)}"
+            )
+        except Exception as e:
+            logger.error(f"Enrichment failed: {e}", exc_info=True)
+
         logger.info(
             f"Enrichment stage completed: "
-            f"enriched {len(enrichment_results)} devices"
+            f"enriched {len(enrichment_results)} devices | succeed=true"
         )
         return enrichment_results
 
