@@ -565,7 +565,7 @@ class ScannerService:
                 f"Scan {scan_id} completed successfully: {devices_found} devices | "
                 f"succeed=true"
             )
-            
+
             await self.ws_manager.broadcast(
                 {
                     "event": "scanCompleted",
@@ -573,7 +573,6 @@ class ScannerService:
                         "id": str(scan_id),
                         "status": "completed",
                         "devices_found": devices_found,
-                        "devices_processed": devices_processed,
                         "timestamp": datetime.now(UTC).isoformat(),
                         "succeed": True,
                     },
