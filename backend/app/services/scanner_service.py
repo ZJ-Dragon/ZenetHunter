@@ -224,6 +224,7 @@ class ScannerService:
 
         try:
             devices_found = 0
+            devices_processed = 0
             discovered_devices = []
 
             # Use hybrid scan (3-stage: Candidate → Refresh → Enrich)
