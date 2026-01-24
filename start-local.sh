@@ -256,9 +256,13 @@ if [ -f "data/zenethunter.db" ]; then
 
         # 自动添加缺失的列
         sqlite3 data/zenethunter.db <<EOF
--- 添加新列
+-- 添加v2.0新列（如果不存在）
 ALTER TABLE devices ADD COLUMN active_defense_status TEXT DEFAULT 'idle';
 ALTER TABLE devices ADD COLUMN recognition_manual_override INTEGER DEFAULT 0;
+
+-- 添加v2.1新列（混合扫描）
+ALTER TABLE devices ADD COLUMN discovery_source TEXT DEFAULT NULL;
+ALTER TABLE devices ADD COLUMN freshness_score INTEGER DEFAULT NULL;
 
 -- 从旧列迁移数据
 UPDATE devices SET active_defense_status = COALESCE(attack_status, 'idle') WHERE active_defense_status IS NULL OR active_defense_status = '';
