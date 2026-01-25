@@ -55,6 +55,11 @@ export interface Device {
       combined: number;
     };
   } | null;
+  // Manual override fields
+  name_manual: string | null;
+  vendor_manual: string | null;
+  manual_override_at: string | null;
+  manual_override_by: string | null;
 }
 
 export interface DeviceFilter {
