@@ -37,6 +37,21 @@ Essential documents in the project root:
   - Authentication guide
   - Error handling
 
+### Configuration
+
+- **[Environment Variables](ENVIRONMENT.md)** / **[中文](ENVIRONMENT.zh-CN.md)**
+  - Complete list of all environment variables
+  - Configuration file location and syntax
+  - Production deployment checklist
+  - Troubleshooting guide
+
+- **[System Environment Variables](SYSTEM_ENV.md)** / **[中文](SYSTEM_ENV.zh-CN.md)**
+  - System-level environment variables (Python, OS, Shell)
+  - Environment detection and priority
+  - Root privileges and permissions
+  - Docker container detection
+  - Troubleshooting system variables
+
 ### Engine Implementation
 
 - **[Engine Technical Docs](../backend/app/core/engine/README.md)** / **[中文](../backend/app/core/engine/README.zh-CN.md)**
