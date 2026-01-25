@@ -210,6 +210,44 @@ class DeviceRepository:
     # Defense status methods removed in v2.0 (active defense refactor)
     # Use update_attack_status() instead
 
+    async def update_manual_labels(
+        self,
+        mac: str,
+        name_manual: str | None = None,
+        vendor_manual: str | None = None,
+        updated_by: str | None = None,
+    ) -> DeviceModel | None:
+        """Update manual labels for a device.
+
+        Args:
+            mac: Device MAC address
+            name_manual: User-provided device name (None to clear)
+            vendor_manual: User-provided vendor name (None to clear)
+            updated_by: Username who made the update
+
+        Returns:
+            Updated DeviceModel or None if not found
+        """
+        result = await self.session.execute(
+            select(DeviceModel).where(DeviceModel.mac == mac.lower())
+        )
+        device_model = result.scalar_one_or_none()
+        if not device_model:
+            return None
+
+        # Update manual override fields
+        device_model.name_manual = name_manual
+        device_model.vendor_manual = vendor_manual
+        device_model.manual_override_at = datetime.now(UTC)
+        device_model.manual_override_by = updated_by
+
+        # Set the recognition_manual_override flag
+        has_manual = bool(name_manual or vendor_manual)
+        device_model.recognition_manual_override = has_manual
+
+        await self.session.flush()
+        return device_model
+
     def to_domain_model(self, device_model: DeviceModel) -> Device:
         """Convert database model to domain model."""
         return Device(
@@ -237,6 +275,10 @@ class DeviceRepository:
                 if getattr(device_model, "recognition_evidence", None)
                 else None
             ),
+            name_manual=getattr(device_model, "name_manual", None),
+            vendor_manual=getattr(device_model, "vendor_manual", None),
+            manual_override_at=getattr(device_model, "manual_override_at", None),
+            manual_override_by=getattr(device_model, "manual_override_by", None),
         )
 
 

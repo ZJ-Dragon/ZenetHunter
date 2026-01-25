@@ -71,6 +71,20 @@ class Device(BaseModel):
         None, description="Recognition evidence (matched fields, sources, weights)"
     )
 
+    # Manual override fields (user-provided labels)
+    name_manual: str | None = Field(
+        None, description="User-provided device name (takes priority)"
+    )
+    vendor_manual: str | None = Field(
+        None, description="User-provided vendor name (takes priority)"
+    )
+    manual_override_at: datetime | None = Field(
+        None, description="When manual override was applied"
+    )
+    manual_override_by: str | None = Field(
+        None, description="Username who applied the manual override"
+    )
+
     # Scanning metadata (hybrid scanner)
     discovery_source: str | None = Field(
         None,
@@ -84,3 +98,20 @@ class Device(BaseModel):
     )
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class DeviceUpdateRequest(BaseModel):
+    """Request model for updating device manual labels."""
+
+    name_manual: str | None = Field(
+        None,
+        max_length=255,
+        description="User-provided device name",
+    )
+    vendor_manual: str | None = Field(
+        None,
+        max_length=255,
+        description="User-provided vendor name",
+    )
+
+    model_config = ConfigDict(str_strip_whitespace=True)

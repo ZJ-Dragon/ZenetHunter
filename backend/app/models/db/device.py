@@ -90,6 +90,20 @@ class DeviceModel(Base):
         default=False, nullable=False, server_default="0"
     )  # Admin manually confirmed recognition
 
+    # Manual override fields (user-provided labels)
+    name_manual: Mapped[str | None] = mapped_column(
+        String(255), nullable=True
+    )  # User-provided device name
+    vendor_manual: Mapped[str | None] = mapped_column(
+        String(255), nullable=True
+    )  # User-provided vendor name
+    manual_override_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )  # When manual override was applied
+    manual_override_by: Mapped[str | None] = mapped_column(
+        String(100), nullable=True
+    )  # Who applied the manual override
+
     # Scanning metadata (hybrid scanner)
     discovery_source: Mapped[str | None] = mapped_column(
         String(50), nullable=True
