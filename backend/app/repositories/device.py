@@ -82,6 +82,15 @@ class DeviceRepository:
                 if device.recognition_evidence
                 else None
             )
+            # Manual override fields - only update if provided (don't overwrite)
+            if hasattr(device, "name_manual") and device.name_manual is not None:
+                db_device.name_manual = device.name_manual
+            if hasattr(device, "vendor_manual") and device.vendor_manual is not None:
+                db_device.vendor_manual = device.vendor_manual
+            if hasattr(device, "manual_override_at") and device.manual_override_at:
+                db_device.manual_override_at = device.manual_override_at
+            if hasattr(device, "manual_override_by") and device.manual_override_by:
+                db_device.manual_override_by = device.manual_override_by
             # Update first_seen only if it's earlier than current
             # Ensure both datetimes are timezone-aware before comparison
             device_first_seen = (
@@ -119,6 +128,11 @@ class DeviceRepository:
                     if device.recognition_evidence
                     else None
                 ),
+                # Manual override fields
+                name_manual=getattr(device, "name_manual", None),
+                vendor_manual=getattr(device, "vendor_manual", None),
+                manual_override_at=getattr(device, "manual_override_at", None),
+                manual_override_by=getattr(device, "manual_override_by", None),
             )
             self.session.add(db_device)
 

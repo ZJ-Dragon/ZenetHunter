@@ -14,6 +14,7 @@ from app.repositories.device_fingerprint import (
 )
 from app.services.device_model_lookup import get_device_model_lookup
 from app.services.fingerprint_collector import get_fingerprint_collector
+from app.services.manual_override_service import ManualOverrideService
 from app.services.recognition_engine import get_recognition_engine
 from app.services.state import get_state_manager
 from app.services.websocket import get_connection_manager
@@ -494,6 +495,36 @@ class ScannerService:
                                 **recognition_result,
                             }
                             await fp_repo.upsert(mac, fingerprint_data)
+
+                            # Check for manual override matching this fingerprint
+                            # This allows auto-applying user labels to similar devices
+                            override_service = ManualOverrideService(session)
+                            manual_override = (
+                                await override_service.check_and_apply_override(
+                                    mac=mac,
+                                    fingerprint_data=full_fingerprint,
+                                    vendor_guess=device.vendor_guess,
+                                    model_guess=device.model_guess,
+                                )
+                            )
+
+                            if manual_override:
+                                # Apply manual labels from matching override
+                                if manual_override.get("name_manual"):
+                                    device.name_manual = manual_override["name_manual"]
+                                if manual_override.get("vendor_manual"):
+                                    device.vendor_manual = manual_override[
+                                        "vendor_manual"
+                                    ]
+                                device.manual_override_at = datetime.now(UTC)
+                                device.manual_override_by = "auto-match"
+
+                                logger.info(
+                                    f"Applied manual override to {mac}: "
+                                    f"name={manual_override.get('name_manual')}, "
+                                    f"vendor={manual_override.get('vendor_manual')} "
+                                    f"(matched from {manual_override.get('source_mac')})"
+                                )
 
                             # Update device in database with recognition fields
                             device = await repo.upsert(device)
