@@ -466,7 +466,7 @@ class ScannerService:
                             }
 
                             # Run recognition engine with combined fingerprint
-                            recognition_result = (
+                            recognition_result = await (
                                 self.recognition_engine.recognize_device(
                                     mac=mac,
                                     fingerprint=full_fingerprint,

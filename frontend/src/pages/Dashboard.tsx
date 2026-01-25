@@ -234,11 +234,11 @@ export const Dashboard: React.FC = () => {
                     />
                     <div>
                       <p className="text-sm font-medium" style={{ color: 'var(--winui-text-primary)' }}>
-                        {device.name || device.mac}
+                        {device.name || device.alias || device.model || device.model_guess || device.mac}
                       </p>
                       <p className="text-xs" style={{ color: 'var(--winui-text-secondary)' }}>
-                        {device.ip} • {device.vendor_guess || device.vendor || 'Unknown'}
-                        {device.model_guess && ` • ${device.model_guess}`}
+                        {device.ip} • {device.vendor || device.vendor_guess || 'Unknown'}
+                        {(device.model || device.model_guess) && ` • ${device.model || device.model_guess}`}
                       </p>
                     </div>
                   </div>

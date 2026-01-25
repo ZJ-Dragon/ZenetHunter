@@ -58,13 +58,13 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({ node, onClose }) => {
           </div>
           <div className="flex-1">
             <h3 className="text-lg font-semibold" style={{ color: 'var(--winui-text-primary)' }}>
-              {device.name || device.vendor_guess || 'Unknown Device'}
+              {device.name || device.alias || device.model || device.model_guess || 'Unknown Device'}
             </h3>
             <p className="text-sm" style={{ color: 'var(--winui-text-secondary)' }}>
-              {device.vendor_guess || device.vendor || 'Unknown Vendor'}
-              {device.model_guess && (
+              {device.vendor || device.vendor_guess || 'Unknown Vendor'}
+              {(device.model || device.model_guess) && (
                 <span className="ml-2" style={{ color: 'var(--winui-text-tertiary)' }}>
-                  • {device.model_guess}
+                  • {device.model || device.model_guess}
                 </span>
               )}
             </p>
@@ -134,25 +134,29 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({ node, onClose }) => {
         </div>
 
         {/* Recognition Info */}
-        {(device.vendor_guess || device.model_guess || device.recognition_evidence) && (
+        {(device.vendor || device.vendor_guess || device.model || device.model_guess || device.recognition_evidence) && (
           <div>
             <h4 className="text-sm font-semibold uppercase tracking-wider mb-3" style={{ color: 'var(--winui-text-secondary)' }}>
               Device Recognition
             </h4>
             <div className="card-winui p-4 space-y-3">
-              {device.vendor_guess && (
+              {(device.vendor || device.vendor_guess) && (
                 <div>
-                  <dt className="text-xs mb-1" style={{ color: 'var(--winui-text-secondary)' }}>Vendor Guess</dt>
+                  <dt className="text-xs mb-1" style={{ color: 'var(--winui-text-secondary)' }}>
+                    {device.vendor ? 'Vendor (Identified)' : 'Vendor (OUI Guess)'}
+                  </dt>
                   <dd className="text-sm font-semibold" style={{ color: 'var(--winui-text-primary)' }}>
-                    {device.vendor_guess}
+                    {device.vendor || device.vendor_guess}
                   </dd>
                 </div>
               )}
-              {device.model_guess && (
+              {(device.model || device.model_guess) && (
                 <div>
-                  <dt className="text-xs mb-1" style={{ color: 'var(--winui-text-secondary)' }}>Model Guess</dt>
+                  <dt className="text-xs mb-1" style={{ color: 'var(--winui-text-secondary)' }}>
+                    {device.model ? 'Model (Identified)' : 'Model (Guess)'}
+                  </dt>
                   <dd className="text-sm font-semibold" style={{ color: 'var(--winui-text-primary)' }}>
-                    {device.model_guess}
+                    {device.model || device.model_guess}
                   </dd>
                 </div>
               )}
