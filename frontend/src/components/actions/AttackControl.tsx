@@ -142,9 +142,6 @@ export const AttackControl: React.FC<AttackControlProps> = ({ device, className 
       setIsLoading(false);
     }
   };
-
-  // Router/Gateway warning (but still allow attack for testing)
-  const isGateway = device.type === 'router';
   
   // Note: Removed safety check - allow attack on any device for research purposes
   // Users should be aware of risks when attacking gateway/router

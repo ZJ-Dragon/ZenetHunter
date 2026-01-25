@@ -1,8 +1,6 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { Device, DeviceStatus, DeviceType } from '../types/device';
 import { deviceService } from '../lib/services/device';
-import { AttackControl } from '../components/actions/AttackControl';
-import { SchedulerControl } from '../components/actions/SchedulerControl';
 import { ScanButton } from '../components/actions/ScanButton';
 import { Search, Filter, RefreshCw, Laptop, Smartphone, Router, Shield, Wifi, CheckCircle, AlertCircle } from 'lucide-react';
 import { clsx } from 'clsx';
@@ -70,13 +68,13 @@ export const DeviceList: React.FC = () => {
   }, []);
 
   // Listen for scan started - clear old devices
-  useWebSocketEvent('scanStarted', () => {
+  useWebSocketEvent(WSEventType.SCAN_STARTED, () => {
     setDevices([]);
     setIsLoading(true);
   });
   
   // Listen for scan completed
-  useWebSocketEvent('scanCompleted', () => {
+  useWebSocketEvent(WSEventType.SCAN_COMPLETED, () => {
     fetchDevices();
     setIsLoading(false);
   });
@@ -130,7 +128,8 @@ export const DeviceList: React.FC = () => {
           </div>
           <input
             type="text"
-            className="input-winui pl-10"
+            className="input-winui"
+            style={{ paddingLeft: '42px' }}
             placeholder="Search by Name, IP, MAC or Vendor..."
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -142,7 +141,8 @@ export const DeviceList: React.FC = () => {
               <Filter className="h-5 w-5" style={{ color: 'var(--winui-text-tertiary)' }} />
             </div>
             <select
-              className="input-winui pl-10"
+              className="input-winui"
+              style={{ paddingLeft: '42px' }}
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value as DeviceStatus | 'all')}
             >
@@ -166,7 +166,6 @@ export const DeviceList: React.FC = () => {
                 <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--winui-text-secondary)' }}>MAC Address</th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--winui-text-secondary)' }}>Status</th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--winui-text-secondary)' }}>Last Seen</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--winui-text-secondary)' }}>Actions</th>
               </tr>
             </thead>
             <tbody style={{ backgroundColor: 'var(--winui-surface)' }}>
@@ -192,13 +191,13 @@ export const DeviceList: React.FC = () => {
                         </div>
                         <div className="ml-4">
                           <div className="text-sm font-medium" style={{ color: 'var(--winui-text-primary)' }}>
-                            {device.name || device.vendor_guess || 'Unknown Device'}
+                            {device.name || device.alias || device.model || device.model_guess || 'Unknown Device'}
                           </div>
                           <div className="text-sm flex items-center gap-2" style={{ color: 'var(--winui-text-secondary)' }}>
-                            {device.vendor_guess || device.vendor || 'Unknown Vendor'}
-                            {device.model_guess && (
+                            {device.vendor || device.vendor_guess || 'Unknown Vendor'}
+                            {(device.model || device.model_guess) && (
                               <span className="text-xs" style={{ color: 'var(--winui-text-tertiary)' }}>
-                                • {device.model_guess}
+                                • {device.model || device.model_guess}
                               </span>
                             )}
                             {device.recognition_confidence !== null && device.recognition_confidence > 0 && (
@@ -242,17 +241,11 @@ export const DeviceList: React.FC = () => {
                     <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: 'var(--winui-text-secondary)' }}>
                       {new Date(device.last_seen).toLocaleString()}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center space-x-2">
-                        <SchedulerControl device={device} />
-                        <AttackControl device={device} />
-                      </div>
-                    </td>
                   </tr>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={6} className="px-6 py-12 text-center">
+                  <td colSpan={5} className="px-6 py-12 text-center">
                     <div className="flex flex-col items-center justify-center">
                       <Search className="h-12 w-12 mb-4" style={{ color: 'var(--winui-text-tertiary)' }} />
                       <h3 className="text-lg font-semibold mb-1" style={{ color: 'var(--winui-text-primary)' }}>No devices found</h3>
