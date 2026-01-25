@@ -215,7 +215,23 @@ nohup.out
 
 # Temp files
 backend/=3.0.0
-backend/data/zenethunter.db
+
+############################
+# Database files (CRITICAL: Must not be committed to prevent data leakage)
+############################
+# SQLite database files
+backend/data/*.db
+backend/data/*.sqlite
+backend/data/*.sqlite3
+
+# SQLite WAL mode temporary files (can contain recent data)
+# These files are created when SQLite uses Write-Ahead Logging
+backend/data/*-wal
+backend/data/*-shm
+
+# Also ignore any .db files elsewhere that might contain user data
+**/*.db-wal
+**/*.db-shm
 
 # Recognition provider cache (contains potentially sensitive lookup data)
 backend/data/cache/
