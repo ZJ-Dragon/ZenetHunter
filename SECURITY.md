@@ -57,6 +57,34 @@ If in doubt about scope, contact us **before** testing.
 
 ---
 
+## External Recognition Services Security
+
+### Domain Whitelist
+
+External recognition providers are restricted to specific domains:
+- `macvendors.com`, `api.macvendors.com` (vendor lookup)
+- `api.fingerbank.org` (device fingerprint)
+
+All other domains are blocked by the HTTP client whitelist.
+
+### Rate Limiting & Circuit Breaker
+
+- **Rate Limits**: Enforced per provider (QPS and daily limits)
+- **Circuit Breaker**: Prevents cascading failures if provider is down
+- **Timeout Protection**: Requests timeout after 5-10 seconds
+
+### Data Minimization
+
+- **OUI-Only Mode**: Default enabled, sends only OUI prefix (first 3 octets), not full MAC
+- **Sanitized Logging**: Audit logs contain no full MACs, API keys, or sensitive fingerprints
+- **Cache Privacy**: Cache keys are hashed, cache directory is gitignored
+
+### Default: Disabled
+
+External lookups are **disabled by default** (`FEATURE_EXTERNAL_LOOKUP=false`). Users must explicitly enable via environment variable or UI (admin only).
+
+See [docs/PRIVACY.md](docs/PRIVACY.md) and [docs/EXTERNAL_SERVICES.md](docs/EXTERNAL_SERVICES.md) for details.
+
 ## Coordinated Disclosure
 
 We follow a coordinated disclosure model:
