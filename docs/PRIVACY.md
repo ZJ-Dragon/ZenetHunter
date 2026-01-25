@@ -100,6 +100,73 @@ External lookups comply with:
 - **Privacy by Design**: Default OFF, opt-in only
 - **Data Minimization**: Only necessary data is sent
 
+## Manual Device Labeling
+
+### Overview
+
+ZenetHunter allows administrators to manually label devices with custom names and vendor information. This feature provides:
+
+1. **User-Defined Labels**: Override automatic recognition with your own device names and vendor information
+2. **Fingerprint-Based Reuse**: Manual labels can be automatically applied to similar devices
+3. **Local-Only Storage**: All manual labels are stored in the local SQLite database
+
+### Data Storage
+
+Manual labels are stored in two tables:
+
+1. **devices table**: Contains per-device manual overrides (`name_manual`, `vendor_manual`)
+2. **manual_overrides table**: Contains fingerprint-based labels for reuse across devices
+
+### Privacy Protection
+
+**All manual labeling data is stored locally and never transmitted:**
+
+- Labels are stored in the local SQLite database (`backend/data/zenethunter.db`)
+- No external services are involved in manual labeling
+- No synchronization with cloud services
+- Data remains on your local machine
+
+### Database File Protection
+
+**The database is protected from version control:**
+
+- `backend/data/*.db` - All SQLite database files
+- `backend/data/*-wal` - SQLite Write-Ahead Log files
+- `backend/data/*-shm` - SQLite Shared Memory files
+
+These files are excluded from git via `.gitignore` to prevent:
+- Accidental commit of device information
+- Exposure of manually labeled device names
+- Leakage of network topology data
+
+### Audit Logging
+
+All manual labeling operations are logged:
+- Who made the change (username)
+- When the change was made
+- Which device was affected (MAC address)
+- What labels were applied (without sensitive content)
+
+### Clearing Manual Labels
+
+To clear all manual labels:
+
+1. **Per-Device**: Use the "Clear manual labels" button in the device detail drawer
+2. **All Devices**: Delete the database file and restart the application
+
+### Fingerprint Key Generation
+
+When you manually label a device, a "fingerprint key" is generated from:
+- DHCP options (Vendor Class Identifier, hostname patterns)
+- mDNS service types
+- SSDP server headers
+- OUI prefix (as fallback)
+
+This key enables automatic label application to similar devices. The key is:
+- **One-way hash**: Cannot be reversed to original data
+- **Non-identifying**: Does not contain MAC addresses or IPs
+- **Local-only**: Stored in local database only
+
 ## Questions?
 
 See [EXTERNAL_SERVICES.md](EXTERNAL_SERVICES.md) for provider details and [SECURITY.md](../SECURITY.md) for security policies.
