@@ -77,7 +77,6 @@ class StateManager:
             self._logs.clear()
             self._allow_list.clear()
             self._block_list.clear()
-            self._strategy_feedback.clear()
 
     def get_all_devices(self) -> list[Device]:
         """Return a list of all tracked devices."""

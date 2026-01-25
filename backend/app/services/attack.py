@@ -18,6 +18,7 @@ from app.models.attack import (
     ActiveDefenseResponse,
     ActiveDefenseStatus,
 )
+from app.models.device import Device
 from app.services.state import get_state_manager
 from app.services.websocket import get_connection_manager
 
@@ -65,6 +66,45 @@ class ActiveDefenseService:
             f"Readonly mode: {self.settings.active_defense_readonly}"
         )
 
+    async def _get_device_or_load_from_db(self, mac: str) -> Device | None:
+        """Get device from state manager, or load from database if not in memory.
+
+        This ensures devices that were scanned in previous sessions (and persisted
+        to the database) can still be targeted for active defense operations.
+
+        Args:
+            mac: Target device MAC address
+
+        Returns:
+            Device if found in state or database, None otherwise
+        """
+        # First check in-memory state
+        device = self.state.get_device(mac)
+        if device:
+            return device
+
+        # Not in memory, try to load from database
+        try:
+            from app.core.database import get_session_factory
+            from app.repositories.device import DeviceRepository
+
+            session_factory = get_session_factory()
+            async with session_factory() as session:
+                repo = DeviceRepository(session)
+                device = await repo.get_by_mac(mac)
+
+                if device:
+                    # Found in DB, add to state manager for future lookups
+                    self.state.update_device(device)
+                    logger.info(
+                        f"Loaded device {mac} from database into state manager"
+                    )
+                    return device
+        except Exception as e:
+            logger.error(f"Failed to load device {mac} from database: {e}")
+
+        return None
+
     async def start_operation(
         self, mac: str, request: ActiveDefenseRequest
     ) -> ActiveDefenseResponse:
@@ -109,8 +149,12 @@ class ActiveDefenseService:
                 ),
             )
 
-        device = self.state.get_device(mac)
+        # Try to get device from state manager or database
+        device = await self._get_device_or_load_from_db(mac)
         if not device:
+            logger.warning(
+                f"Target device {mac} not found in state manager or database"
+            )
             return ActiveDefenseResponse(
                 device_mac=mac,
                 status=ActiveDefenseStatus.FAILED,
@@ -221,8 +265,12 @@ class ActiveDefenseService:
         Returns:
             ActiveDefenseResponse with stop status
         """
-        device = self.state.get_device(mac)
+        # Try to get device from state manager or database
+        device = await self._get_device_or_load_from_db(mac)
         if not device:
+            logger.warning(
+                f"Target device {mac} not found in state manager or database"
+            )
             return ActiveDefenseResponse(
                 device_mac=mac,
                 status=ActiveDefenseStatus.FAILED,
@@ -309,7 +357,6 @@ class ActiveDefenseService:
             user: Username who initiated operation
         """
         try:
-            import json
             from datetime import UTC, datetime
 
             from app.core.database import get_session_factory
@@ -318,20 +365,17 @@ class ActiveDefenseService:
             session_factory = get_session_factory()
             async with session_factory() as session:
                 repo = EventLogRepository(session)
-                await repo.create(
+                await repo.add_log(
                     level="INFO" if status == "success" else "WARNING",
-                    source="active_defense",
-                    event_type=f"operation_{status}",
+                    module="active_defense",
                     message=message,
                     device_mac=mac,
-                    user_id=user,
-                    metadata=json.dumps(
-                        {
-                            "operation_type": operation_type,
-                            "status": status,
-                            "timestamp": datetime.now(UTC).isoformat(),
-                        }
-                    ),
+                    context={
+                        "operation_type": operation_type,
+                        "status": status,
+                        "timestamp": datetime.now(UTC).isoformat(),
+                        "user": user,
+                    },
                 )
                 await session.commit()
         except Exception as e:
