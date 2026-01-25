@@ -37,38 +37,48 @@ The system automatically detects the platform and selects the appropriate implem
 ## Quick Start (dev; minimal)  
 These commands are for **development**. Production/container usage lives in `deploy/`.
 
-### 1) Backend (dev)
+### 1) One-Command Start (Recommended)
+
+The easiest way to run ZenetHunter locally:
+
+**Linux/macOS:**
+```bash
+./start-local.sh              # Normal start
+./start-local.sh --clean      # Clean caches before starting
+./start-local.sh --clean-all  # Deep clean (including DB and venv) before starting
+sudo ./start-local.sh         # Run with root privileges (recommended for full network features)
+```
+
+**Windows:**
+```cmd
+start-local.bat               # Normal start
+start-local.bat --clean       # Clean caches before starting
+start-local.bat --clean-all   # Deep clean (including DB and venv) before starting
+```
+
+The startup script automatically:
+- ✅ Kills residual processes (uvicorn, vite)
+- ✅ Frees occupied ports (8000, 5173)
+- ✅ Cleans Python/frontend/OS caches (with `--clean`)
+- ✅ Detects and activates virtual environments
+- ✅ Installs/updates dependencies
+- ✅ Checks and repairs database schema
+- ✅ Starts both backend and frontend services
+- ✅ Graceful shutdown on Ctrl+C
+
+### 2) Manual Start (Alternative)
+
+If you prefer manual control:
+
+**Backend:**
 ```bash
 cd backend
 python -m venv .venv && source .venv/bin/activate  # Windows: .venv\\Scripts\\activate
 pip install -e .
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
-The `uvicorn app.main:app` import string follows the FastAPI/Uvicorn convention (`main` module, `app = FastAPI()` object). During development you can enable `--reload`.
 
-### 2) Clean Cache (optional)
-
-Before running after code changes, you may want to clear all caches:
-
-**Python script (cross-platform, recommended):**
-```bash
-python clean-cache.py              # Clean all caches (excludes DB and venv)
-python clean-cache.py --all        # Clean everything including DB and venv
-python clean-cache.py --db         # Also clean database files
-python clean-cache.py --venv       # Also clean virtual environments
-```
-
-**Shell script (Linux/macOS):**
-```bash
-./clean-cache.sh [--all] [--db] [--venv]
-```
-
-**Batch script (Windows):**
-```cmd
-clean-cache.bat [--all] [--db] [--venv]
-```
-
-### 3) Frontend (dev)
+**Frontend:**
 ```bash
 cd frontend
 npm ci  # or npm install / pnpm i / bun install
@@ -76,7 +86,7 @@ npm run dev
 ```
 Vite's dev server defaults to port **5173** and can be customized (e.g. `--host 0.0.0.0`).
 
-### 3) Docker Deployment (Recommended)
+### 3) Docker Deployment (Production)
 
 ZenetHunter provides multiple ways to run with Docker, ensuring the latest code (including uncommitted changes) is always used.
 

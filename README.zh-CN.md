@@ -40,52 +40,39 @@ ZenetHunter 支持多平台，并自动检测：
 
 ## 快速开始
 
-### 方式一：本地运行（推荐，无需 Docker）
+### 方式一：一键启动（推荐）
 
-**最简单的方式，直接打开 HTML 文件即可使用：**
+**最简单的方式，一条命令启动前后端：**
 
-1. **清理缓存（可选，代码更改后推荐）**：
-   ```bash
-   # Python 脚本（跨平台，推荐）
-   python clean-cache.py              # 清理所有缓存（不包括数据库和虚拟环境）
-   python clean-cache.py --all        # 清理所有缓存（包括数据库和虚拟环境）
-   python clean-cache.py --db         # 同时清理数据库文件
-   python clean-cache.py --venv       # 同时清理虚拟环境
+**Linux/macOS:**
+```bash
+./start-local.sh              # 正常启动
+./start-local.sh --clean      # 清理缓存后启动
+./start-local.sh --clean-all  # 深度清理（包括数据库和虚拟环境）后启动
+sudo ./start-local.sh         # 以 root 权限运行（推荐，启用完整网络功能）
+```
 
-   # Shell 脚本（Linux/macOS）
-   ./clean-cache.sh [--all] [--db] [--venv]
+**Windows:**
+```cmd
+start-local.bat               # 正常启动
+start-local.bat --clean       # 清理缓存后启动
+start-local.bat --clean-all   # 深度清理（包括数据库和虚拟环境）后启动
+```
 
-   # 批处理脚本（Windows）
-   clean-cache.bat [--all] [--db] [--venv]
-   ```
+**启动脚本自动完成以下操作**：
+- ✅ 杀死残留进程（uvicorn、vite）
+- ✅ 释放占用端口（8000、5173）
+- ✅ 清理 Python/前端/系统缓存（使用 `--clean`）
+- ✅ 检测并激活虚拟环境
+- ✅ 安装/更新依赖
+- ✅ 检查并修复数据库 schema
+- ✅ 启动后端和前端服务
+- ✅ Ctrl+C 优雅关闭
 
-2. **启动后端服务**：
-   ```bash
-   # Linux/macOS
-   ./start-local.sh
-
-   # Windows
-   start-local.bat
-   ```
-
-3. **打开前端页面**：
-   - 直接在浏览器中打开 `html/index.html`
-   - 或使用本地 HTTP 服务器（推荐，避免 CORS 问题）：
-     ```bash
-     cd html
-     python -m http.server 8080
-     # 然后访问 http://localhost:8080
-     ```
-
-4. **开始使用**：
-   - 访问 `http://localhost:8000/docs` 查看 API 文档
-   - 在 HTML 页面中执行网络扫描、查看设备等操作
-
-**优势**：
-- ✅ 无需 Docker，直接运行
-- ✅ 无需构建前端，直接打开 HTML
-- ✅ 快速启动，适合开发和测试
-- ✅ 所有功能完整可用
+**访问地址**：
+- 后端 API: http://localhost:8000
+- API 文档: http://localhost:8000/docs
+- 前端页面: http://localhost:5173
 
 **注意事项**：
 - 确保 Python 3.11+ 已安装
@@ -93,29 +80,26 @@ ZenetHunter 支持多平台，并自动检测：
 - 使用 SQLite 作为默认数据库（无需额外配置）
 - 如需使用 PostgreSQL，设置 `DATABASE_URL` 环境变量
 
-### 方式二：Docker 部署（生产环境）
+### 方式二：手动启动（备选）
 
-## 快速开始（Docker）（最小可运行 · 占位）
-> 以下为**开发环境**最小启动命令，具体参数与脚本以各模块 README 为准；生产/容器见 `deploy/`。
+如需手动控制各服务：
 
-### 1) 后端（开发）
+**后端：**
 ```bash
 cd backend
 python -m venv .venv && source .venv/bin/activate  # Windows: .venv\\Scripts\\activate
-pip install -e .  # 如使用 PEP 621/pyproject；或改用项目内的 dev 脚本
+pip install -e .
 uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```
-\- `uvicorn app.main:app --reload` 为开发模式；生产部署请使用进程管理/ASGI 服务器与关闭 `--reload`。
 
-### 2) 前端（开发）
+**前端：**
 ```bash
 cd frontend
 npm ci  # 或 npm install / pnpm i / bun install
 npm run dev
 ```
-默认开发端口（Vite）通常为 `5173`；可在 `vite.config.*` 中调整。
 
-### 3) Docker 部署（推荐）
+### 方式三：Docker 部署（生产环境）
 
 ZenetHunter 提供了多种 Docker 运行方式，确保始终使用最新代码（包括未提交的本地更改）。
 
