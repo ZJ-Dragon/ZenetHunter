@@ -216,3 +216,7 @@ nohup.out
 # Temp files
 backend/=3.0.0
 backend/data/zenethunter.db
+
+# Recognition provider cache (contains potentially sensitive lookup data)
+backend/data/cache/
+.idea/

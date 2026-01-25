@@ -54,13 +54,31 @@ async def get_scan_config():
     Returns current scan settings and feature flags.
     Note: Configuration is read from environment variables,
     this endpoint is read-only for display purposes.
+    
+    The scan_range shown is the detected/active subnet, not just the config default.
     """
     from app.core.config import get_settings
+    from app.services.scanner.network_detection import detect_local_subnet
 
     settings = get_settings()
 
+    # Detect actual subnet (will fallback to config if detection fails)
+    try:
+        network_info = await detect_local_subnet()
+        active_scan_range = network_info.subnet
+        detection_method = network_info.method
+    except Exception as e:
+        # If detection fails, use config default
+        import logging
+        logger = logging.getLogger(__name__)
+        logger.warning(f"Subnet detection failed, using config default: {e}")
+        active_scan_range = settings.scan_range
+        detection_method = "config"
+
     return {
-        "scan_range": settings.scan_range,
+        "scan_range": active_scan_range,  # Show detected subnet, not config default
+        "scan_range_config": settings.scan_range,  # Original config value
+        "detection_method": detection_method,
         "scan_timeout_sec": settings.scan_timeout_sec,
         "scan_concurrency": settings.scan_concurrency,
         "scan_interval_sec": settings.scan_interval_sec,
@@ -70,6 +88,7 @@ async def get_scan_config():
             "nbns": settings.feature_nbns,
             "snmp": settings.feature_snmp,
             "fingerbank": settings.feature_fingerbank,
+            "active_probe": getattr(settings, "feature_active_probe", True),
         },
     }
 

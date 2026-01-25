@@ -172,9 +172,28 @@ class FingerprintNormalizer:
                 fingerprint_data["ja3"]
             )
 
-        # Pass through other fields (mdns_services, ssdp_server, evidence)
-        # These are JSON and will be handled separately
-        for key in ("mdns_services", "ssdp_server", "evidence"):
+        # Pass through other fields (mdns_services, ssdp_server, evidence, active_probe fields)
+        # These are JSON or structured data and will be handled separately
+        pass_through_keys = (
+            "mdns_services",
+            "ssdp_server",
+            "ssdp_manufacturer",
+            "ssdp_model",
+            "ssdp_model_name",
+            "evidence",
+            # Active probe fields
+            "http_server",
+            "http_title",
+            "http_meta_device",
+            "http_meta_model",
+            "http_meta_product",
+            "telnet_banner",
+            "ssh_banner",
+            "ssh_vendor",
+            "printer_protocol",
+            "iot_protocol",
+        )
+        for key in pass_through_keys:
             if key in fingerprint_data:
                 normalized[key] = fingerprint_data[key]
 

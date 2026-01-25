@@ -16,6 +16,7 @@ from typing import Any
 from app.core.config import get_settings
 from app.services.scanner.candidate import get_arp_candidates, get_dhcp_candidates
 from app.services.scanner.capabilities import get_scanner_capabilities
+from app.services.scanner.network_detection import detect_local_subnet
 from app.services.scanner.refresh import refresh_candidates
 
 logger = logging.getLogger(__name__)
@@ -64,13 +65,19 @@ class ScanPipeline:
         Stage A: Discover online devices using active probing.
 
         Args:
-            target_subnets: List of CIDR subnets to scan. If None, uses config.
+            target_subnets: List of CIDR subnets to scan. If None, auto-detects from ARP/gateway.
 
         Returns:
             List of discovered devices (IP/MAC pairs)
         """
         if target_subnets is None:
-            target_subnets = [self.settings.scan_range]
+            # Auto-detect subnet instead of using config default
+            network_info = await detect_local_subnet()
+            target_subnets = [network_info.subnet]
+            logger.info(
+                f"Auto-detected subnet for discovery: {network_info.subnet} "
+                f"(method: {network_info.method})"
+            )
 
         logger.info(
             f"Starting discovery stage: "
@@ -209,6 +216,32 @@ class ScanPipeline:
                         except Exception as e:
                             logger.debug(f"SSDP enrichment failed for {device.ip}: {e}")
 
+                    # Active probe enrichment (HTTP, Telnet, SSH, Printer, IoT protocols)
+                    # This simulates normal server connections to get device info
+                    if self.settings.feature_active_probe:
+                        try:
+                            from app.services.scanner.enrich.active_probe import (
+                                enrich_with_active_probe,
+                            )
+
+                            probe_data = await asyncio.wait_for(
+                                enrich_with_active_probe(
+                                    device_ip=device.ip,
+                                    device_mac=device.mac,
+                                    timeout=2.0,  # Short timeout per device
+                                ),
+                                timeout=3.0,  # Overall timeout
+                            )
+                            if probe_data:
+                                fingerprint_data.update(probe_data)
+                                evidence_sources.append("active_probe")
+                                logger.debug(
+                                    f"Active probe for {device.ip}: "
+                                    f"found {len(probe_data)} fields"
+                                )
+                        except Exception as e:
+                            logger.debug(f"Active probe failed for {device.ip}: {e}")
+
                     # Only add result if we found some evidence
                     if fingerprint_data or evidence_sources:
                         enrichment_results.append(
@@ -276,6 +309,18 @@ class ScanPipeline:
         }
 
         try:
+            # Detect local subnet first (before generating candidates)
+            logger.info("Detecting local network subnet...")
+            network_info = await detect_local_subnet()
+            detected_subnet = network_info.subnet
+            logger.info(
+                f"Detected subnet: {detected_subnet} "
+                f"(method: {network_info.method}, gateway: {network_info.gateway_ip})"
+            )
+            stats["detected_subnet"] = detected_subnet
+            stats["detection_method"] = network_info.method
+            stats["gateway_ip"] = network_info.gateway_ip
+
             # Stage 1: Generate candidates from local sources
             if event_callback:
                 await event_callback(
@@ -283,6 +328,7 @@ class ScanPipeline:
                     {
                         "stage": "candidate",
                         "message": "Collecting candidates from local caches...",
+                        "detected_subnet": detected_subnet,
                     },
                 )
 
