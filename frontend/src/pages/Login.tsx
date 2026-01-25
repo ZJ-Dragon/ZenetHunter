@@ -84,7 +84,8 @@ export const Login: React.FC = () => {
                   required
                   value={username}
                   onChange={(e) => setUsername(e.target.value)}
-                  className="input-winui block w-full pl-10 pr-3 py-2"
+                  className="input-winui block w-full pr-3 py-2"
+                  style={{ paddingLeft: '42px' }}
                   placeholder="admin"
                 />
               </div>
@@ -101,7 +102,8 @@ export const Login: React.FC = () => {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="input-winui block w-full pl-10 pr-3 py-2"
+                  className="input-winui block w-full pr-3 py-2"
+                  style={{ paddingLeft: '42px' }}
                   placeholder="••••••••"
                 />
               </div>
