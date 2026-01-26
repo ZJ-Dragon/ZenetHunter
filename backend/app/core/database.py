@@ -162,6 +162,7 @@ async def init_db() -> None:
             DeviceFingerprintModel,
             DeviceModel,
             EventLogModel,
+            ManualOverrideModel,
             TrustListModel,
         )
     except ImportError as e:
