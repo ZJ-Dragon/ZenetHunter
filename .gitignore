@@ -115,9 +115,6 @@ out/
 **/.vitepress/dist
 **/.vitepress/cache
 
-dist/
-build/
-
 # dotenv files
 .env
 .env.*
@@ -162,6 +159,7 @@ nohup.out
 ############################
 # JetBrains IDEs (subset of Global/JetBrains.gitignore)
 ############################
+.idea/*
 .idea/**/workspace.xml
 .idea/**/tasks.xml
 .idea/**/usage.statistics.xml
@@ -235,4 +233,3 @@ backend/data/*-shm
 
 # Recognition provider cache (contains potentially sensitive lookup data)
 backend/data/cache/
-.idea/
