@@ -14,8 +14,7 @@
 │           ├─ features_macos.py  # macOS-specific network features
 │           └─ macos_defense.py    # macOS defense engine (pfctl)
 ├─ frontend/           # Frontend SPA (Vite + React + TypeScript)
-├─ deploy/             # Deployment scripts and documentation
-├─ docs/               # Docs site (Getting Started, Architecture, APIs, Errors, Data Model, Guides)
+├─ docs/               # Documentation (active defense, API, active probe, external services, platform/env guides)
 ├─ .github/            # CI workflows
 └─ README.md           # This file
 ```
@@ -25,12 +24,12 @@
 ZenetHunter supports multiple platforms with automatic detection:
 
 - **Linux**: Full support with iptables defense engine
-- **macOS**: Full support with pfctl defense engine (see [README-MACOS.md](README-MACOS.md))
-- **Windows**: Full support with Windows Firewall (netsh) defense engine
+- **macOS**: Full support with pfctl defense engine (see [macOS guide](docs/guides/README-MACOS.md))
+- **Windows**: Full support with Windows Firewall (netsh) defense engine (see [Windows guide](docs/guides/README-WINDOWS.md))
 
 The system automatically detects the platform and selects the appropriate implementation.
 
-> See `/docs/index.md` for the documentation landing page.
+> Documentation hub: [docs/index.md](docs/index.md) (English) / [docs/index.zh-CN.md](docs/index.zh-CN.md)
 
 ---
 
@@ -309,22 +308,22 @@ The images follow Docker **best practices** (multi-stage builds, .dockerignore, 
 - **Config/State Manager**: canonical models for devices/topology/allow-deny lists/logs with read/write APIs.
 - **Frontend SPA**: device list, topology, policy triggers, and real‑time status via WebSocket.
 
-> API & message formats: see **Module Interface Spec**.  
-> Data model: see **Data Structures & DB Model**.
+> API & message formats: see [docs/api/README.md](docs/api/README.md).  
+> Active defense internals: see [docs/active-defense/README.md](docs/active-defense/README.md).
 
 ---
 
-## Developer Guide Entrypoints
-- **Getting Started**: `/docs/getting-started.md`
-- **Architecture**: `/docs/architecture.md`
-- **Module Interface Spec**: `/docs/module-apis.md`
-- **AI Dispatcher Design**: `/docs/ai-dispatcher.md`
-- **Defender Module**: `/docs/defender.md`
-- **Errors & Exceptions**: `/docs/errors-and-exceptions.md`
-- **Data Structures & DB Model**: `/docs/data-model.md`
-- **Deployment**: `/deploy/README.md`
-
-> Filenames may differ while docs are being migrated—treat these as pointers.
+## Documentation Entrypoints
+- **Docs hub**: [docs/index.md](docs/index.md) / [中文](docs/index.zh-CN.md)
+- **Active Defense**: [docs/active-defense/README.md](docs/active-defense/README.md) / [中文](docs/active-defense/README.zh-CN.md)
+- **Active Probe**: [docs/active-probe/ACTIVE_PROBE.md](docs/active-probe/ACTIVE_PROBE.md) / [中文](docs/active-probe/ACTIVE_PROBE.zh-CN.md)
+- **API reference**: [docs/api/README.md](docs/api/README.md) / [中文](docs/api/README.zh-CN.md)
+- **Platform setup**: macOS ([docs/guides/README-MACOS.md](docs/guides/README-MACOS.md) / [中文](docs/guides/README-MACOS.zh-CN.md)), Windows ([docs/guides/README-WINDOWS.md](docs/guides/README-WINDOWS.md) / [中文](docs/guides/README-WINDOWS.zh-CN.md))
+- **Runtime configuration**: [docs/guides/ENVIRONMENT.md](docs/guides/ENVIRONMENT.md) / [中文](docs/guides/ENVIRONMENT.zh-CN.md)
+- **External recognition services**: [docs/external-services/EXTERNAL_SERVICES.md](docs/external-services/EXTERNAL_SERVICES.md) / [中文](docs/external-services/EXTERNAL_SERVICES.zh-CN.md)
+- **Privacy guardrails**: [docs/external-services/PRIVACY.md](docs/external-services/PRIVACY.md) / [中文](docs/external-services/PRIVACY.zh-CN.md)
+- **Conda setup (zh)**: [docs/guides/CONDA_SETUP.md](docs/guides/CONDA_SETUP.md)
+- **Force-shutdown operations (zh)**: [docs/guides/FORCE_SHUTDOWN_GUIDE.md](docs/guides/FORCE_SHUTDOWN_GUIDE.md)
 
 ---
 

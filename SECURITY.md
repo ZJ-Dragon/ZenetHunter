@@ -83,7 +83,7 @@ All other domains are blocked by the HTTP client whitelist.
 
 External lookups are **disabled by default** (`FEATURE_EXTERNAL_LOOKUP=false`). Users must explicitly enable via environment variable or UI (admin only).
 
-See [docs/PRIVACY.md](docs/PRIVACY.md) and [docs/EXTERNAL_SERVICES.md](docs/EXTERNAL_SERVICES.md) for details.
+See [PRIVACY.md](docs/external-services/PRIVACY.md) and [EXTERNAL_SERVICES.md](docs/external-services/EXTERNAL_SERVICES.md) for details.
 
 ## Coordinated Disclosure
 

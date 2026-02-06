@@ -201,6 +201,6 @@ docker compose up -d
 
 ## 相关文档
 
-- [主 README](README.md)
-- [macOS 支持指南](README-MACOS.md) (如果存在)
-- [后端文档](backend/README.md)
+- [主 README](../../README.md)
+- [macOS 支持指南](README-MACOS.md)
+- [后端文档](../../backend/README.md)

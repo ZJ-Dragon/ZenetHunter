@@ -18,8 +18,7 @@
 │           ├─ features_macos.py  # macOS 特定网络功能
 │           └─ macos_defense.py   # macOS 防御引擎（pfctl）
 ├─ frontend/           # 前端 SPA（Vite + React + TS）
-├─ deploy/             # 部署脚本和文档
-├─ docs/               # 文档站（入门、架构、接口、异常规范、数据模型、开发指南）
+├─ docs/               # 文档（主动防御、API、主动探测、外部服务、平台/环境指南）
 ├─ .github/            # CI 工作流
 └─ README.md           # 顶层说明（本文件）
 ```
@@ -29,12 +28,12 @@
 ZenetHunter 支持多平台，并自动检测：
 
 - **Linux**: 完整支持，使用 iptables 防御引擎
-- **macOS**: 完整支持，使用 pfctl 防御引擎（详见 [README-MACOS.md](README-MACOS.md)）
-- **Windows**: 完整支持，使用 Windows Firewall (netsh) 防御引擎（详见 [README-WINDOWS.md](README-WINDOWS.md)）
+- **macOS**: 完整支持，使用 pfctl 防御引擎（详见 [macOS 指南](docs/guides/README-MACOS.md)）
+- **Windows**: 完整支持，使用 Windows Firewall (netsh) 防御引擎（详见 [Windows 指南](docs/guides/README-WINDOWS.md)）
 
 系统会自动检测平台并选择相应的实现。
 
-> 详细说明见：`/docs/index.md`（文档站导航）。
+> 文档主页： [docs/index.zh-CN.md](docs/index.zh-CN.md) / [EN](docs/index.md)
 
 ---
 
@@ -302,21 +301,22 @@ cd deploy
 - **Active Defense**：主动防御操作控制面板
 - **Logs**：操作日志和事件查看
 
-> 详细 API/消息格式：见《模块交互接口文档》；数据模型：见《数据结构与数据库模型》。
+> API 与消息格式：见 [docs/api/README.zh-CN.md](docs/api/README.zh-CN.md)。  
+> 主动防御细节：见 [docs/active-defense/README.zh-CN.md](docs/active-defense/README.zh-CN.md)。
 
 ---
 
 ## 开发指南入口
-- **入门**：`/docs/入门.md`
-- **架构**：`/docs/架构设计.md`
-- **模块交互接口**：`/docs/模块交互接口文档.md`
-- **AI 调度设计**：`/docs/AI 调度器设计文档.md`
-- **防御模块说明**：`/docs/Defender 模块说明.md`
-- **错误与异常处理规范**：`/docs/错误与异常处理规范.md`
-- **数据结构与数据库模型**：`/docs/数据结构与数据库模型.md`
-- **部署（Ugreen / Docker）**：`/deploy/README.md`
-
-> 上述文档文件名为占位，实际以仓库内文件为准。
+- **文档主页**： [docs/index.zh-CN.md](docs/index.zh-CN.md) / [EN](docs/index.md)
+- **主动防御**： [docs/active-defense/README.zh-CN.md](docs/active-defense/README.zh-CN.md) / [EN](docs/active-defense/README.md)
+- **主动探测**： [docs/active-probe/ACTIVE_PROBE.zh-CN.md](docs/active-probe/ACTIVE_PROBE.zh-CN.md) / [EN](docs/active-probe/ACTIVE_PROBE.md)
+- **API 参考**： [docs/api/README.zh-CN.md](docs/api/README.zh-CN.md) / [EN](docs/api/README.md)
+- **平台启动**： macOS（[docs/guides/README-MACOS.zh-CN.md](docs/guides/README-MACOS.zh-CN.md) / [EN](docs/guides/README-MACOS.md)），Windows（[docs/guides/README-WINDOWS.zh-CN.md](docs/guides/README-WINDOWS.zh-CN.md) / [EN](docs/guides/README-WINDOWS.md)）
+- **运行时配置**： [docs/guides/ENVIRONMENT.zh-CN.md](docs/guides/ENVIRONMENT.zh-CN.md) / [EN](docs/guides/ENVIRONMENT.md)
+- **外部识别服务**： [docs/external-services/EXTERNAL_SERVICES.zh-CN.md](docs/external-services/EXTERNAL_SERVICES.zh-CN.md) / [EN](docs/external-services/EXTERNAL_SERVICES.md)
+- **隐私与合规**： [docs/external-services/PRIVACY.zh-CN.md](docs/external-services/PRIVACY.zh-CN.md) / [EN](docs/external-services/PRIVACY.md)
+- **Conda 环境（中文）**： [docs/guides/CONDA_SETUP.md](docs/guides/CONDA_SETUP.md)
+- **强制关闭功能（中文）**： [docs/guides/FORCE_SHUTDOWN_GUIDE.md](docs/guides/FORCE_SHUTDOWN_GUIDE.md)
 
 ---
 

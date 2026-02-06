@@ -51,7 +51,7 @@ ZenetHunter integrates with external recognition providers to improve device ide
 - Default: Disabled
 
 **Usage**:
-```python
+```bash
 # Requires API key configuration
 export FINGERBANK_API_KEY=your_key_here
 export FEATURE_EXTERNAL_LOOKUP=true
@@ -147,6 +147,6 @@ Content-Type: application/json
 ## References
 
 - [PRIVACY.md](PRIVACY.md): Privacy policy and data minimization
-- [SECURITY.md](../SECURITY.md): Security policies and domain whitelist
+- [SECURITY.md](../../SECURITY.md): Security policies and domain whitelist
 - MACVendors API: https://macvendors.com/api
 - Fingerbank API: https://fingerbank.org/api

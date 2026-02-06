@@ -169,4 +169,4 @@ This key enables automatic label application to similar devices. The key is:
 
 ## Questions?
 
-See [EXTERNAL_SERVICES.md](EXTERNAL_SERVICES.md) for provider details and [SECURITY.md](../SECURITY.md) for security policies.
+See [EXTERNAL_SERVICES.md](EXTERNAL_SERVICES.md) for provider details and [SECURITY.md](../../SECURITY.md) for security policies.

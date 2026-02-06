@@ -126,6 +126,6 @@ macOS 网络扫描使用以下方法：
 
 ## 相关文档
 
-- [主 README](README.md) - 完整的项目文档
-- [后端 README](backend/README.md) - 后端开发指南
-- [部署文档](deploy/README.md) - 部署说明
+- [主 README](../../README.zh-CN.md) - 项目总览
+- [后端 README](../../backend/README.zh-CN.md) - 后端开发指南
+- [部署说明](../../README.zh-CN.md) - Docker/一键启动
