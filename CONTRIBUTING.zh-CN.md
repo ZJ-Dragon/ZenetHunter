@@ -81,7 +81,7 @@ chore(gitignore): exclude venv and node_modules
   - 开发：`npm run dev`
   - 构建：`npm run build`
 
-> 详细运行方式见各子目录 `README.md`；生产/容器化见 `deploy/`。
+> 详细运行方式见各子目录 `README.md`。
 
 ---
 

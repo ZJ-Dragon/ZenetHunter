@@ -31,13 +31,11 @@ jobs:
           filters: |
             backend:
               - 'backend/**'
-              - 'deploy/backend.Dockerfile'
               - '.pre-commit-config.yaml'
               - '.editorconfig'
               - '.github/workflows/ci.yml'
             frontend:
               - 'frontend/**'
-              - 'deploy/frontend.Dockerfile'
               - '.github/workflows/ci.yml'
 
   backend:
