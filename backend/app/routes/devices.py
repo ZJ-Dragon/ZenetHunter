@@ -15,8 +15,11 @@ from app.models.auth import User
 from app.models.device import Device
 from app.repositories.device import DeviceRepository
 from app.repositories.event_log import EventLogRepository
-from app.repositories.manual_override import ManualOverrideRepository
 from app.services.fingerprint_key import generate_fingerprint_key
+from app.services.manual_profile_service import (
+    ManualProfileService,
+    build_match_keys,
+)
 from app.services.state import StateManager, get_state_manager
 from app.services.websocket import get_connection_manager
 
@@ -232,7 +235,6 @@ async def override_recognition(
     device.recognition_confidence = 100  # Manual confirmation = 100% confidence
 
     # Update recognition evidence
-    import json
     from datetime import UTC, datetime
 
     evidence = json.loads(device.recognition_evidence or "{}")
@@ -299,7 +301,7 @@ async def update_manual_label(
         ManualLabelResponse with updated device and fingerprint key
     """
     device_repo = DeviceRepository(db)
-    override_repo = ManualOverrideRepository(db)
+    manual_profile_service = ManualProfileService(db)
     event_repo = EventLogRepository(db)
 
     # Get existing device
@@ -324,31 +326,36 @@ async def update_manual_label(
         model_guess=device.model_guess,
     )
 
-    # Update device manual labels
-    updated_model = await device_repo.update_manual_labels(
+    match_keys = build_match_keys(
         mac=mac,
-        name_manual=request.name_manual,
-        vendor_manual=request.vendor_manual,
-        updated_by=current_user.username,
+        fingerprint_components=components,
+        vendor_guess=device.vendor_guess,
+        model_guess=device.model_guess,
     )
 
-    if not updated_model:
+    profile = await manual_profile_service.create_or_update_profile(
+        mac=mac,
+        manual_name=request.name_manual,
+        manual_vendor=request.vendor_manual,
+        fingerprint_key=fingerprint_key,
+        match_keys=match_keys,
+        ip_hint=str(device.ip),
+    )
+
+    bound_model = await device_repo.bind_manual_profile(
+        mac=mac,
+        profile_id=profile.profile_id,
+        updated_by=current_user.username,
+        manual_name=profile.manual_name,
+        manual_vendor=profile.manual_vendor,
+    )
+
+    if not bound_model:
         raise AppError(
             ErrorCode.CONFIG_NOT_FOUND,
             f"Failed to update device {mac}",
             extra={"mac": mac},
         )
-
-    # Store/update manual override for fingerprint-based matching
-    await override_repo.upsert(
-        fingerprint_key=fingerprint_key,
-        manual_name=request.name_manual,
-        manual_vendor=request.vendor_manual,
-        source_mac=mac,
-        source_ip=str(device.ip),
-        fingerprint_components=components,
-        username=current_user.username,
-    )
 
     # Audit log the change
     await event_repo.add_log(
@@ -362,6 +369,7 @@ async def update_manual_label(
             "name_manual": request.name_manual,
             "vendor_manual": request.vendor_manual,
             "fingerprint_key": fingerprint_key,
+            "manual_profile_id": profile.profile_id,
             "timestamp": datetime.now(UTC).isoformat(),
         },
     )
@@ -369,7 +377,13 @@ async def update_manual_label(
     await db.commit()
 
     # Convert to domain model for response
-    updated_device = device_repo.to_domain_model(updated_model)
+    updated_device = await device_repo.get_by_mac(mac)
+    if not updated_device:
+        raise AppError(
+            ErrorCode.CONFIG_NOT_FOUND,
+            f"Device with MAC {mac} not found",
+            extra={"mac": mac},
+        )
 
     # Update state manager
     state.update_device(updated_device)
@@ -380,9 +394,12 @@ async def update_manual_label(
             "event": "deviceUpdated",
             "data": {
                 "mac": mac,
-                "name_manual": request.name_manual,
-                "vendor_manual": request.vendor_manual,
+                "display_name": updated_device.display_name,
+                "display_vendor": updated_device.display_vendor,
+                "name_manual": updated_device.name_manual,
+                "vendor_manual": updated_device.vendor_manual,
                 "manual_override": True,
+                "manual_profile_id": profile.profile_id,
                 "fingerprint_key": fingerprint_key,
                 "updated_by": current_user.username,
                 "timestamp": datetime.now(UTC).isoformat(),
@@ -436,15 +453,12 @@ async def clear_manual_label(
             extra={"mac": mac},
         )
 
-    # Clear manual labels
-    updated_model = await device_repo.update_manual_labels(
-        mac=mac,
-        name_manual=None,
-        vendor_manual=None,
-        updated_by=current_user.username,
+    # Clear manual labels/binding
+    cleared_model = await device_repo.clear_manual_profile(
+        mac=mac, updated_by=current_user.username
     )
 
-    if not updated_model:
+    if not cleared_model:
         raise AppError(
             ErrorCode.CONFIG_NOT_FOUND,
             f"Failed to update device {mac}",
@@ -467,7 +481,13 @@ async def clear_manual_label(
     await db.commit()
 
     # Convert to domain model
-    updated_device = device_repo.to_domain_model(updated_model)
+    updated_device = await device_repo.get_by_mac(mac)
+    if not updated_device:
+        raise AppError(
+            ErrorCode.CONFIG_NOT_FOUND,
+            f"Device with MAC {mac} not found",
+            extra={"mac": mac},
+        )
 
     # Update state manager
     state.update_device(updated_device)
@@ -478,9 +498,12 @@ async def clear_manual_label(
             "event": "deviceUpdated",
             "data": {
                 "mac": mac,
-                "name_manual": None,
-                "vendor_manual": None,
+                "display_name": updated_device.display_name,
+                "display_vendor": updated_device.display_vendor,
+                "name_manual": updated_device.name_manual,
+                "vendor_manual": updated_device.vendor_manual,
                 "manual_override": False,
+                "manual_profile_id": None,
                 "updated_by": current_user.username,
                 "timestamp": datetime.now(UTC).isoformat(),
             },

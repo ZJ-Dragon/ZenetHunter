@@ -160,12 +160,14 @@ async def init_db() -> None:
         # Import all models to ensure they are registered with Base.metadata
         from app.models.db import (  # noqa: F401
             DeviceFingerprintModel,
+            DeviceManualProfileModel,
             DeviceModel,
             EventLogModel,
-            ProbeObservationModel,
             ManualOverrideModel,
+            ProbeObservationModel,
             TrustListModel,
         )
+        from app.services.manual_profile_service import migrate_manual_labels
     except ImportError as e:
         logger.error(f"Failed to import database models: {e}")
         raise
@@ -258,23 +260,54 @@ async def init_db() -> None:
                 try:
                     result = await conn.execute(
                         text(
-                            "SELECT COUNT(*) as count FROM pragma_table_info('probe_observations') WHERE name = 'keyword_hits'"
+                            """
+                            SELECT COUNT(*) as count
+                            FROM pragma_table_info('probe_observations')
+                            WHERE name = 'keyword_hits'
+                            """
                         )
                     )
                     row = result.fetchone()
                     if row and row[0] == 0:
                         logger.info(
-                            "Adding 'keyword_hits' column to probe_observations table (migration)"
+                            "Adding 'keyword_hits' column to probe_observations table"
                         )
                         await conn.execute(
                             text(
-                                "ALTER TABLE probe_observations ADD COLUMN keyword_hits JSON NULL"
+                                "ALTER TABLE probe_observations "
+                                "ADD COLUMN keyword_hits JSON NULL"
                             )
                         )
                         await conn.commit()
                         logger.info("Migration completed for keyword_hits column")
                 except Exception as e:
                     logger.debug(f"Could not check/add keyword_hits column: {e}")
+                # Ensure manual_profile_id column exists on devices
+                try:
+                    result = await conn.execute(
+                        text(
+                            """
+                            SELECT COUNT(*) as count
+                            FROM pragma_table_info('devices')
+                            WHERE name = 'manual_profile_id'
+                            """
+                        )
+                    )
+                    row = result.fetchone()
+                    if row and row[0] == 0:
+                        logger.info("Adding manual_profile_id column to devices table")
+                        await conn.execute(
+                            text(
+                                "ALTER TABLE devices "
+                                "ADD COLUMN manual_profile_id INTEGER NULL"
+                            )
+                        )
+                        await conn.commit()
+                        logger.info("Migration completed for manual_profile_id column")
+                except Exception as e:
+                    logger.debug(
+                        f"Could not check/add manual_profile_id column on sqlite: {e}"
+                    )
             elif db_url.startswith("postgresql"):
                 # For PostgreSQL, check if model column exists
                 try:
@@ -372,19 +405,54 @@ async def init_db() -> None:
                     row = result.fetchone()
                     if row and row[0] == 0:
                         logger.info(
-                            "Adding 'keyword_hits' column to probe_observations table (migration)"
+                            "Adding 'keyword_hits' column to probe_observations table"
                         )
                         await conn.execute(
                             text(
-                                "ALTER TABLE probe_observations ADD COLUMN keyword_hits JSONB NULL"
+                                "ALTER TABLE probe_observations "
+                                "ADD COLUMN keyword_hits JSONB NULL"
                             )
                         )
                         await conn.commit()
                         logger.info("Migration completed for keyword_hits column")
                 except Exception as e:
                     logger.debug(f"Could not check/add keyword_hits column: {e}")
+                # Ensure manual_profile_id column exists on devices
+                try:
+                    result = await conn.execute(
+                        text(
+                            """
+                            SELECT COUNT(*) as count
+                            FROM information_schema.columns
+                            WHERE table_name = 'devices'
+                            AND column_name = 'manual_profile_id'
+                        """
+                        )
+                    )
+                    row = result.fetchone()
+                    if row and row[0] == 0:
+                        logger.info("Adding manual_profile_id column to devices table")
+                        await conn.execute(
+                            text(
+                                "ALTER TABLE devices "
+                                "ADD COLUMN manual_profile_id INTEGER NULL"
+                            )
+                        )
+                        await conn.commit()
+                        logger.info("Migration completed for manual_profile_id column")
+                except Exception as e:
+                    logger.debug(
+                        f"Could not check/add manual_profile_id column on postgres: {e}"
+                    )
 
         logger.info("Database tables created/updated")
+        try:
+            session_factory = get_session_factory()
+            async with session_factory() as session:
+                await migrate_manual_labels(session)
+                await session.commit()
+        except Exception as e:  # pragma: no cover - safety
+            logger.warning("Manual profile migration skipped: %s", e)
     except Exception as e:
         logger.error(f"Failed to create/update database tables: {e}", exc_info=True)
         raise

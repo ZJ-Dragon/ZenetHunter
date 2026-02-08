@@ -6,12 +6,13 @@ from datetime import UTC, datetime
 from enum import Enum
 from typing import TYPE_CHECKING
 
-from sqlalchemy import DateTime, Integer, String, Text
+from sqlalchemy import DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy import Enum as SQLEnum
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
 from app.models.attack import ActiveDefenseStatus
+from app.models.db.device_manual_profile import DeviceManualProfileModel
 
 if TYPE_CHECKING:
     from app.models.db.device_fingerprint import DeviceFingerprintModel
@@ -89,6 +90,9 @@ class DeviceModel(Base):
     recognition_manual_override: Mapped[bool] = mapped_column(
         default=False, nullable=False, server_default="0"
     )  # Admin manually confirmed recognition
+    manual_profile_id: Mapped[int | None] = mapped_column(
+        Integer, ForeignKey("device_manual_profiles.id"), nullable=True, index=True
+    )
 
     # Manual override fields (user-provided labels)
     name_manual: Mapped[str | None] = mapped_column(
@@ -118,4 +122,7 @@ class DeviceModel(Base):
         back_populates="device",
         uselist=False,
         cascade="all, delete-orphan",
+    )
+    manual_profile: Mapped[DeviceManualProfileModel | None] = relationship(
+        "DeviceManualProfileModel", lazy="joined"
     )

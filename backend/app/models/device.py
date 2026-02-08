@@ -5,6 +5,7 @@ from typing import Any
 from pydantic import BaseModel, ConfigDict, Field, IPvAnyAddress
 
 from app.models.attack import ActiveDefenseStatus
+from app.models.manual_profile import DeviceManualProfile
 
 
 class DeviceType(str, Enum):
@@ -57,6 +58,12 @@ class Device(BaseModel):
         default_factory=list, description="Tags associated with the device"
     )
     alias: str | None = Field(None, description="User-friendly alias for the device")
+    manual_profile_id: int | None = Field(
+        None, description="Bound manual profile ID (long-lived)"
+    )
+    manual_profile: DeviceManualProfile | None = Field(
+        None, description="Manual profile details"
+    )
     # Recognition fields
     vendor_guess: str | None = Field(
         None, description="Vendor guess from multi-signal recognition"
@@ -88,7 +95,7 @@ class Device(BaseModel):
     # Scanning metadata (hybrid scanner)
     discovery_source: str | None = Field(
         None,
-        description="How device was discovered: candidate-cache, dhcp, active-refresh, enrich, full-scan",
+        description="Discovery source: candidate-cache/dhcp/refresh/enrich/full-scan",
     )
     freshness_score: int | None = Field(
         None,
@@ -96,6 +103,17 @@ class Device(BaseModel):
         le=100,
         description="Data freshness score (0=stale, 100=just confirmed)",
     )
+    # Display helpers (manual > alias > auto)
+    display_name: str | None = Field(
+        None, description="Highest priority name for UI rendering"
+    )
+    display_vendor: str | None = Field(
+        None, description="Highest priority vendor for UI rendering"
+    )
+    name_auto: str | None = Field(
+        None, description="Automatically derived name/hostname"
+    )
+    vendor_auto: str | None = Field(None, description="Automatically derived vendor")
 
     model_config = ConfigDict(from_attributes=True)
 

@@ -10,8 +10,10 @@ from typing import Any
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.models.db.manual_override import ManualOverrideModel
+from app.repositories.device_manual_profile import DeviceManualProfileRepository
 from app.repositories.manual_override import ManualOverrideRepository
 from app.services.fingerprint_key import generate_fingerprint_key
+from app.services.manual_profile_service import build_match_keys
 
 logger = logging.getLogger(__name__)
 
@@ -22,6 +24,7 @@ class ManualOverrideService:
     def __init__(self, session: AsyncSession):
         self.session = session
         self.repo = ManualOverrideRepository(session)
+        self.manual_profile_repo = DeviceManualProfileRepository(session)
 
     async def check_and_apply_override(
         self,
@@ -57,12 +60,47 @@ class ManualOverrideService:
             model_guess=model_guess,
         )
 
-        # Look up in manual override table
+        # Try manual profile first (new source of truth)
+        match_keys = build_match_keys(
+            mac=mac,
+            fingerprint_components=components,
+            vendor_guess=vendor_guess,
+            model_guess=model_guess,
+        )
+        profile = await self.manual_profile_repo.find_best_match(
+            fingerprint_key=fingerprint_key, mac=mac, match_keys=match_keys
+        )
+        if profile:
+            logger.info(
+                "Manual profile matched for %s: profile=%s name=%s vendor=%s",
+                mac,
+                profile.id,
+                profile.manual_name,
+                profile.manual_vendor,
+            )
+            return {
+                "name_manual": profile.manual_name,
+                "vendor_manual": profile.manual_vendor,
+                "fingerprint_key": fingerprint_key,
+                "manual_profile_id": profile.id,
+                "match_source": "manual_profile",
+            }
+
+        # Fallback to legacy manual override table
         override = await self.repo.get_by_fingerprint_key(fingerprint_key)
 
         if override:
             # Found a match - increment counter and return labels
             await self.repo.increment_match_count(fingerprint_key)
+            profile = await self.manual_profile_repo.upsert(
+                fingerprint_key=fingerprint_key,
+                manual_name=override.manual_name,
+                manual_vendor=override.manual_vendor,
+                match_keys=match_keys,
+                mac=override.source_mac,
+                ip_hint=override.source_ip,
+                keywords=[],
+            )
 
             logger.info(
                 f"Manual override matched for {mac}: "
@@ -76,6 +114,8 @@ class ManualOverrideService:
                 "fingerprint_key": fingerprint_key,
                 "source_mac": override.source_mac,
                 "match_count": override.match_count + 1,
+                "manual_profile_id": profile.id,
+                "match_source": "manual_override",
             }
 
         logger.debug(f"No manual override found for {mac} (key={fingerprint_key})")

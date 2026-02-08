@@ -16,9 +16,9 @@ from app.repositories.event_log import EventLogRepository
 from app.repositories.probe_observation import ProbeObservationRepository
 from app.services.device_model_lookup import get_device_model_lookup
 from app.services.fingerprint_collector import get_fingerprint_collector
+from app.services.keyword_extractor import KeywordExtractor
 from app.services.manual_override_service import ManualOverrideService
 from app.services.recognition_engine import get_recognition_engine
-from app.services.keyword_extractor import KeywordExtractor
 from app.services.state import get_state_manager
 from app.services.websocket import get_connection_manager
 
@@ -229,7 +229,6 @@ class ScannerService:
         try:
             keyword_extractor = KeywordExtractor()
             devices_found = 0
-            devices_processed = 0
             discovered_devices = []
 
             # Use hybrid scan (3-stage: Candidate → Refresh → Enrich)
@@ -476,11 +475,13 @@ class ScannerService:
                             }
 
                             # Run recognition engine with combined fingerprint
-                            recognition_result = await (
-                                self.recognition_engine.recognize_device(
-                                    mac=mac,
-                                    fingerprint=full_fingerprint,
-                                    existing_vendor=device.vendor,
+                            recognition_result = (
+                                await (
+                                    self.recognition_engine.recognize_device(
+                                        mac=mac,
+                                        fingerprint=full_fingerprint,
+                                        existing_vendor=device.vendor,
+                                    )
                                 )
                             )
 
@@ -550,7 +551,9 @@ class ScannerService:
                             )
 
                             if manual_override:
-                                # Apply manual labels from matching override
+                                device.manual_profile_id = manual_override.get(
+                                    "manual_profile_id"
+                                )
                                 if manual_override.get("name_manual"):
                                     device.name_manual = manual_override["name_manual"]
                                 if manual_override.get("vendor_manual"):
@@ -558,13 +561,16 @@ class ScannerService:
                                         "vendor_manual"
                                     ]
                                 device.manual_override_at = datetime.now(UTC)
-                                device.manual_override_by = "auto-match"
+                                device.manual_override_by = manual_override.get(
+                                    "match_source", "auto-match"
+                                )
 
                                 logger.info(
-                                    f"Applied manual override to {mac}: "
-                                    f"name={manual_override.get('name_manual')}, "
-                                    f"vendor={manual_override.get('vendor_manual')} "
-                                    f"(matched from {manual_override.get('source_mac')})"
+                                    "Applied manual override to %s via %s (%s/%s)",
+                                    mac,
+                                    manual_override.get("match_source", "auto-match"),
+                                    manual_override.get("name_manual"),
+                                    manual_override.get("vendor_manual"),
                                 )
 
                             # Update device in database with recognition fields

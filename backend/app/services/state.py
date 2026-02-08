@@ -155,7 +155,7 @@ class StateManager:
                 nodes.append(
                     TopologyNode(
                         id=mac,
-                        label=device.name or str(device.ip),
+                        label=device.display_name or device.name or str(device.ip),
                         type=node_type,
                         data=device,
                     )
