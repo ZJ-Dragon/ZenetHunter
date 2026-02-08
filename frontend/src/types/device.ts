@@ -28,6 +28,19 @@ export enum DefenseStatus {
   ERROR = 'error',
 }
 
+export interface ManualProfile {
+  id: number;
+  manual_name: string | null;
+  manual_vendor: string | null;
+  fingerprint_key: string | null;
+  match_keys: Record<string, unknown>;
+  mac: string | null;
+  ip_hint: string | null;
+  keywords: string[];
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Device {
   mac: string;
   ip: string;
@@ -68,11 +81,17 @@ export interface Device {
       combined: number;
     };
   } | null;
-  // Manual override fields
+  // Manual override fields (legacy for compatibility)
   name_manual: string | null;
   vendor_manual: string | null;
   manual_override_at: string | null;
   manual_override_by: string | null;
+  manual_profile_id?: number | null;
+  manual_profile?: ManualProfile | null;
+  display_name?: string | null;
+  display_vendor?: string | null;
+  name_auto?: string | null;
+  vendor_auto?: string | null;
 }
 
 export interface DeviceFilter {

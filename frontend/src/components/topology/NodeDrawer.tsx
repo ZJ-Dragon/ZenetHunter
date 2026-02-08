@@ -24,7 +24,8 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({ node, onClose, onDeviceU
   const [observations, setObservations] = useState<ProbeObservation[]>([]);
   const [isLoadingObservations, setIsLoadingObservations] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
-  
+  const [showAutoIdentity, setShowAutoIdentity] = useState(false);
+
   // Editable state
   const [editingName, setEditingName] = useState(false);
   const [editingVendor, setEditingVendor] = useState(false);
@@ -38,6 +39,7 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({ node, onClose, onDeviceU
     setEditingName(false);
     setEditingVendor(false);
     setShowObservations(false);
+    setShowAutoIdentity(false);
     setObservations([]);
     fetchObservations();
   }, [initialDevice]);
@@ -54,28 +56,23 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({ node, onClose, onDeviceU
     }
   };
 
-  // Get display name with priority: manual > name > alias > model_guess
-  const getDisplayName = () => {
-    return device.name_manual || device.name || device.alias || device.model || device.model_guess || 'Unknown Device';
-  };
-
-  // Get display vendor with priority: manual > vendor > vendor_guess
-  const getDisplayVendor = () => {
-    return device.vendor_manual || device.vendor || device.vendor_guess || 'Unknown Vendor';
-  };
-
-  // Check if has manual override
-  const hasManualOverride = Boolean(device.name_manual || device.vendor_manual);
+  const manualName = device.manual_profile?.manual_name ?? device.name_manual;
+  const manualVendor = device.manual_profile?.manual_vendor ?? device.vendor_manual;
+  const autoName = device.name_auto || device.name || device.alias || device.model || device.model_guess || 'Unknown Device';
+  const autoVendor = device.vendor_auto || device.vendor || device.vendor_guess || 'Unknown Vendor';
+  const displayName = device.display_name || manualName || autoName || 'Unknown Device';
+  const displayVendor = device.display_vendor || manualVendor || autoVendor || 'Unknown Vendor';
+  const hasManualOverride = Boolean(manualName || manualVendor || device.manual_profile_id);
 
   // Start editing name
   const startEditingName = () => {
-    setNameValue(device.name_manual || device.name || device.alias || '');
+    setNameValue(manualName || device.name || device.alias || '');
     setEditingName(true);
   };
 
   // Start editing vendor
   const startEditingVendor = () => {
-    setVendorValue(device.vendor_manual || device.vendor || '');
+    setVendorValue(manualVendor || device.vendor || '');
     setEditingVendor(true);
   };
 
@@ -86,15 +83,15 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({ node, onClose, onDeviceU
 
     try {
       const response = await deviceService.updateManualLabel(device.mac, {
-        name_manual: field === 'name' ? (nameValue.trim() || null) : device.name_manual,
-        vendor_manual: field === 'vendor' ? (vendorValue.trim() || null) : device.vendor_manual,
+        name_manual: field === 'name' ? (nameValue.trim() || null) : (manualName ?? null),
+        vendor_manual: field === 'vendor' ? (vendorValue.trim() || null) : (manualVendor ?? null),
       });
 
       setDevice(response.device);
       onDeviceUpdate?.(response.device);
-      
+
       toast.success('Label saved successfully', { id: toastId });
-      
+
       if (field === 'name') {
         setEditingName(false);
       } else {
@@ -122,7 +119,7 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({ node, onClose, onDeviceU
   // Clear manual label
   const clearManualLabel = async () => {
     if (!hasManualOverride) return;
-    
+
     const confirmed = window.confirm('Clear manual labels and revert to auto-detected values?');
     if (!confirmed) return;
 
@@ -274,7 +271,7 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({ node, onClose, onDeviceU
                 ) : (
                   <div className="flex items-center gap-2 group">
                     <h3 className="text-lg font-semibold truncate" style={{ color: 'var(--winui-text-primary)' }}>
-                      {getDisplayName()}
+                      {displayName}
                     </h3>
                     <button
                       onClick={startEditingName}
@@ -284,7 +281,7 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({ node, onClose, onDeviceU
                     >
                       <Pencil className="h-4 w-4" />
                     </button>
-                    {device.name_manual && (
+                    {manualName && (
                       <span
                         className="flex items-center gap-1 px-2 py-0.5 text-xs rounded"
                         style={{ backgroundColor: 'rgba(16, 124, 16, 0.1)', color: '#107c10' }}
@@ -340,7 +337,7 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({ node, onClose, onDeviceU
                 ) : (
                   <div className="flex items-center gap-2 group">
                     <p className="text-sm truncate" style={{ color: 'var(--winui-text-secondary)' }}>
-                      {getDisplayVendor()}
+                      {displayVendor}
                       {(device.model || device.model_guess) && (
                         <span className="ml-2" style={{ color: 'var(--winui-text-tertiary)' }}>
                           • {device.model || device.model_guess}
@@ -355,7 +352,7 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({ node, onClose, onDeviceU
                     >
                       <Pencil className="h-3 w-3" />
                     </button>
-                    {device.vendor_manual && (
+                    {manualVendor && (
                       <span
                         className="flex items-center gap-1 px-2 py-0.5 text-xs rounded"
                         style={{ backgroundColor: 'rgba(16, 124, 16, 0.1)', color: '#107c10' }}
@@ -363,6 +360,39 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({ node, onClose, onDeviceU
                       >
                         <UserCheck className="h-3 w-3" />
                       </span>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              <div className="mb-2">
+                <button
+                  onClick={() => setShowAutoIdentity((prev) => !prev)}
+                  className="text-xs inline-flex items-center gap-2 px-2 py-1 rounded"
+                  style={{ backgroundColor: 'var(--winui-bg-tertiary)', color: 'var(--winui-text-secondary)' }}
+                >
+                  <ChevronDown className={`h-3 w-3 transition-transform ${showAutoIdentity ? 'rotate-180' : ''}`} />
+                  {showAutoIdentity ? 'Hide auto-detected identity' : 'Show auto-detected identity'}
+                </button>
+                {showAutoIdentity && (
+                  <div className="mt-2 space-y-1 text-xs rounded border p-3" style={{ borderColor: 'var(--winui-border-subtle)', backgroundColor: 'var(--winui-surface)' }}>
+                    <div>
+                      <span className="font-semibold" style={{ color: 'var(--winui-text-primary)' }}>Name (auto): </span>
+                      <span style={{ color: 'var(--winui-text-secondary)' }}>{autoName}</span>
+                    </div>
+                    <div>
+                      <span className="font-semibold" style={{ color: 'var(--winui-text-primary)' }}>Vendor (auto): </span>
+                      <span style={{ color: 'var(--winui-text-secondary)' }}>{autoVendor}</span>
+                    </div>
+                    {(device.model || device.model_guess) && (
+                      <div style={{ color: 'var(--winui-text-secondary)' }}>
+                        Model: {device.model || device.model_guess}
+                      </div>
+                    )}
+                    {manualName && (
+                      <div className="text-xxs uppercase tracking-wide" style={{ color: 'var(--winui-text-tertiary)' }}>
+                        Manual profile linked {device.manual_profile_id ? `#${device.manual_profile_id}` : ''}
+                      </div>
                     )}
                   </div>
                 )}
@@ -471,7 +501,18 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({ node, onClose, onDeviceU
                   Manual labels are active. Auto-detected values shown below for reference.
                 </div>
               )}
-              
+
+              {device.name_auto && (
+                <div>
+                  <dt className="text-xs mb-1" style={{ color: 'var(--winui-text-secondary)' }}>
+                    Name (auto)
+                  </dt>
+                  <dd className="text-sm font-semibold" style={{ color: 'var(--winui-text-primary)' }}>
+                    {device.name_auto}
+                  </dd>
+                </div>
+              )}
+
               {(device.vendor || device.vendor_guess) && (
                 <div>
                   <dt className="text-xs mb-1" style={{ color: 'var(--winui-text-secondary)' }}>
