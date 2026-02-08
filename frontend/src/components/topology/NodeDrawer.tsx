@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
-import { X, Monitor, Smartphone, Router, Shield, Activity, Clock, Hash, CheckCircle, AlertCircle, ChevronDown, ChevronUp, Eye, Pencil, Check, XCircle, UserCheck } from 'lucide-react';
+import { X, Monitor, Smartphone, Router, Shield, Activity, Clock, Hash, CheckCircle, AlertCircle, ChevronDown, ChevronUp, Eye, Pencil, Check, XCircle, UserCheck, FileJson, Download, MoreHorizontal } from 'lucide-react';
 import { TopologyNode } from '../../types/topology';
 import { Device, DeviceStatus } from '../../types/device';
 import { deviceService } from '../../lib/services/device';
+import { observationService } from '../../lib/services/observations';
+import { ProbeObservation, KeywordHit } from '../../types/observation';
 import toast from 'react-hot-toast';
 
 interface NodeDrawerProps {
@@ -17,6 +19,11 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({ node, onClose, onDeviceU
   const { data: initialDevice } = node;
   const [device, setDevice] = useState<Device>(initialDevice);
   const [showEvidence, setShowEvidence] = useState(false);
+  const [showKeywordIntel, setShowKeywordIntel] = useState(false);
+  const [showObservations, setShowObservations] = useState(false);
+  const [observations, setObservations] = useState<ProbeObservation[]>([]);
+  const [isLoadingObservations, setIsLoadingObservations] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
   
   // Editable state
   const [editingName, setEditingName] = useState(false);
@@ -30,7 +37,22 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({ node, onClose, onDeviceU
     setDevice(initialDevice);
     setEditingName(false);
     setEditingVendor(false);
+    setShowObservations(false);
+    setObservations([]);
+    fetchObservations();
   }, [initialDevice]);
+
+  const fetchObservations = async () => {
+    setIsLoadingObservations(true);
+    try {
+      const data = await observationService.listByDevice(initialDevice.mac, 10);
+      setObservations(data);
+    } catch (error) {
+      console.error('Failed to load observations', error);
+    } finally {
+      setIsLoadingObservations(false);
+    }
+  };
 
   // Get display name with priority: manual > name > alias > model_guess
   const getDisplayName = () => {
@@ -117,6 +139,54 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({ node, onClose, onDeviceU
       toast.error('Failed to clear labels', { id: toastId });
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const latestObservation = observations[0];
+  const evidenceHits = (device.recognition_evidence?.keyword_hits || []) as KeywordHit[];
+  const observationHits = observations.flatMap((obs) => (obs.keyword_hits || [])) as KeywordHit[];
+  const keywordHits = evidenceHits.length > 0 ? evidenceHits : observationHits;
+  const sortedHits = keywordHits
+    .slice()
+    .sort((a, b) => (b.priority || 0) - (a.priority || 0));
+  const topHit = sortedHits[0];
+  const dictionaryDelta = device.recognition_evidence?.confidence_breakdown?.dictionary_delta
+    ?? sortedHits.reduce((acc, hit) => acc + (hit.confidence_delta ?? 0), 0);
+  const dictionaryInfer: Partial<Record<'vendor' | 'product' | 'os' | 'category', string>> | undefined =
+    device.recognition_evidence?.dictionary_infer || topHit?.infer;
+
+  const formatHitInfer = (hit?: KeywordHit) => {
+    if (!hit) return '';
+    if (hit.infer_summary) return hit.infer_summary;
+    const parts: string[] = [];
+    if (hit.infer?.vendor) parts.push(hit.infer.vendor);
+    if (hit.infer?.product) parts.push(hit.infer.product);
+    if (hit.infer?.os) parts.push(hit.infer.os);
+    if (hit.infer?.category) parts.push(`[${hit.infer.category}]`);
+    return parts.join(' ').trim();
+  };
+
+  const copyObservationJson = async (obs: ProbeObservation) => {
+    try {
+      await navigator.clipboard.writeText(JSON.stringify(obs, null, 2));
+      toast.success('Observation copied');
+    } catch (err) {
+      console.error(err);
+      toast.error('Copy failed');
+    }
+  };
+
+  const exportNdjson = async () => {
+    setIsExporting(true);
+    try {
+      const ndjson = await observationService.exportDeviceNdjson(device.mac, 100);
+      await navigator.clipboard.writeText(ndjson);
+      toast.success('NDJSON copied');
+    } catch (err) {
+      console.error(err);
+      toast.error('Export failed');
+    } finally {
+      setIsExporting(false);
     }
   };
 
@@ -452,8 +522,24 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({ node, onClose, onDeviceU
                       {device.recognition_evidence.confidence_breakdown && (
                         <div>
                           <span className="font-semibold">Confidence Breakdown: </span>
-                          OUI: {device.recognition_evidence.confidence_breakdown.oui}%,
-                          DHCP: {device.recognition_evidence.confidence_breakdown.dhcp}%,
+                          {device.recognition_evidence.confidence_breakdown.active_probe !== undefined && (
+                            <>Active Probe: {device.recognition_evidence.confidence_breakdown.active_probe}% · </>
+                          )}
+                          {device.recognition_evidence.confidence_breakdown.oui !== undefined && (
+                            <>OUI: {device.recognition_evidence.confidence_breakdown.oui}% · </>
+                          )}
+                          {device.recognition_evidence.confidence_breakdown.dhcp !== undefined && (
+                            <>DHCP: {device.recognition_evidence.confidence_breakdown.dhcp}% · </>
+                          )}
+                          {device.recognition_evidence.confidence_breakdown.external_vendor !== undefined && (
+                            <>External Vendor: {device.recognition_evidence.confidence_breakdown.external_vendor}% · </>
+                          )}
+                          {device.recognition_evidence.confidence_breakdown.external_device !== undefined && (
+                            <>External Device: {device.recognition_evidence.confidence_breakdown.external_device}% · </>
+                          )}
+                          {device.recognition_evidence.confidence_breakdown.dictionary_delta !== undefined && (
+                            <>Dictionary Δ {device.recognition_evidence.confidence_breakdown.dictionary_delta >= 0 ? '+' : ''}{device.recognition_evidence.confidence_breakdown.dictionary_delta} · </>
+                          )}
                           Combined: {device.recognition_evidence.confidence_breakdown.combined}%
                         </div>
                       )}
@@ -464,6 +550,190 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({ node, onClose, onDeviceU
             </div>
           </div>
         )}
+
+        {/* Keyword Intelligence */}
+        <div className="card-winui p-4">
+          <div className="flex items-center justify-between mb-2">
+            <div>
+              <h4 className="text-sm font-semibold uppercase tracking-wider" style={{ color: 'var(--winui-text-secondary)' }}>
+                Keyword Intelligence
+              </h4>
+              <p className="text-xs mt-1" style={{ color: 'var(--winui-text-tertiary)' }}>
+                {keywordHits.length} hits
+                {topHit && formatHitInfer(topHit) && <> • {formatHitInfer(topHit)}</>}
+                {keywordHits.length > 0 && (
+                  <> • Δ {dictionaryDelta >= 0 ? '+' : ''}{dictionaryDelta}</>
+                )}
+              </p>
+            </div>
+            <button
+              onClick={() => setShowKeywordIntel((prev) => !prev)}
+              className="btn-winui-secondary inline-flex items-center gap-1"
+              disabled={keywordHits.length === 0}
+            >
+              <MoreHorizontal className="h-4 w-4" />
+              {showKeywordIntel ? 'Collapse' : 'Expand'}
+            </button>
+          </div>
+          {showKeywordIntel && (
+            <div className="space-y-2">
+              {keywordHits.length === 0 && (
+                <p className="text-xs" style={{ color: 'var(--winui-text-secondary)' }}>No keyword hits yet.</p>
+              )}
+              {keywordHits.length > 0 && (
+                <div className="p-3 rounded border" style={{ borderColor: 'var(--winui-border-subtle)', background: 'linear-gradient(135deg, rgba(0,120,212,0.08), rgba(0,120,212,0.02))' }}>
+                  <div className="flex items-center justify-between text-xs mb-1" style={{ color: 'var(--winui-text-primary)' }}>
+                    <span className="font-semibold">Dictionary applied</span>
+                    <span className="font-mono">
+                      Δ {dictionaryDelta >= 0 ? '+' : ''}{dictionaryDelta}{device.recognition_confidence !== null ? ` → ${device.recognition_confidence}%` : ''}
+                    </span>
+                  </div>
+                  {formatHitInfer(topHit) && (
+                    <div className="text-xs" style={{ color: 'var(--winui-text-secondary)' }}>
+                      Inference: {formatHitInfer(topHit)}
+                    </div>
+                  )}
+                  {dictionaryInfer && (dictionaryInfer.vendor || dictionaryInfer.product || dictionaryInfer.os || dictionaryInfer.category) && (
+                    <div className="text-xxs mt-1 uppercase tracking-wide" style={{ color: 'var(--winui-text-tertiary)' }}>
+                      Vendor: {dictionaryInfer.vendor || '—'} · Product: {dictionaryInfer.product || '—'} · OS: {dictionaryInfer.os || '—'} · Category: {dictionaryInfer.category || '—'}
+                    </div>
+                  )}
+                </div>
+              )}
+              {keywordHits.length > 0 && keywordHits
+                .slice()
+                .sort((a, b) => (b.priority || 0) - (a.priority || 0))
+                .map((hit) => (
+                  <div key={hit.rule_id} className="p-3 rounded border" style={{ borderColor: 'var(--winui-border-subtle)', backgroundColor: 'var(--winui-bg-tertiary)' }}>
+                    <div className="flex items-center justify-between">
+                      <div className="text-sm font-semibold" style={{ color: 'var(--winui-text-primary)' }}>
+                        {hit.rule_id}
+                      </div>
+                      <span className="text-xxs px-2 py-1 rounded-full" style={{ backgroundColor: 'rgba(0,120,212,0.1)', color: 'var(--winui-accent)' }}>
+                        Δ {hit.confidence_delta ?? 0}
+                      </span>
+                    </div>
+                    <div className="mt-1 text-xs" style={{ color: 'var(--winui-text-secondary)' }}>
+                      Matched: <span className="font-mono">{hit.matched_token}</span>
+                      {hit.priority !== undefined && (
+                        <span className="ml-2 text-xxs px-1.5 py-0.5 rounded-full" style={{ backgroundColor: 'rgba(0,0,0,0.05)', color: 'var(--winui-text-tertiary)' }}>
+                          Priority {hit.priority}
+                        </span>
+                      )}
+                    </div>
+                    {(hit.infer?.vendor || hit.infer?.product || hit.infer?.os || hit.infer?.category || hit.infer_summary) && (
+                      <div className="mt-1 text-xs" style={{ color: 'var(--winui-text-primary)' }}>
+                        {hit.infer_summary || (
+                          <>
+                            {hit.infer?.vendor && <span className="mr-2">Vendor: {hit.infer.vendor}</span>}
+                            {hit.infer?.product && <span className="mr-2">Product: {hit.infer.product}</span>}
+                            {hit.infer?.os && <span className="mr-2">OS: {hit.infer.os}</span>}
+                            {hit.infer?.category && <span className="mr-2">Category: {hit.infer.category}</span>}
+                          </>
+                        )}
+                        {hit.infer_summary && <span className="mr-2">{hit.infer_summary}</span>}
+                      </div>
+                    )}
+                    {hit.notes && (
+                      <p className="mt-1 text-xs" style={{ color: 'var(--winui-text-tertiary)' }}>
+                        {hit.notes}
+                      </p>
+                    )}
+                  </div>
+                ))}
+            </div>
+          )}
+        </div>
+
+        {/* Probe Observations */}
+        <div className="card-winui p-4">
+          <div className="flex items-center justify-between mb-2">
+            <div>
+              <h4 className="text-sm font-semibold uppercase tracking-wider" style={{ color: 'var(--winui-text-secondary)' }}>
+                Probe Details / Observations
+              </h4>
+              {latestObservation && !showObservations && (
+                <p className="text-xs mt-1" style={{ color: 'var(--winui-text-tertiary)' }}>
+                  {latestObservation.protocol} • {new Date(latestObservation.timestamp).toLocaleString()} • {latestObservation.keywords.length} keywords
+                </p>
+              )}
+            </div>
+            <button
+              onClick={() => {
+                if (!showObservations && observations.length === 0) {
+                  fetchObservations();
+                }
+                setShowObservations((prev) => !prev);
+              }}
+              className="btn-winui-secondary inline-flex items-center gap-1"
+            >
+              <MoreHorizontal className="h-4 w-4" />
+              {showObservations ? 'Collapse' : 'Expand'}
+            </button>
+          </div>
+
+          {showObservations && (
+            <div className="space-y-3">
+              {isLoadingObservations && (
+                <p className="text-xs" style={{ color: 'var(--winui-text-secondary)' }}>Loading observations...</p>
+              )}
+              {!isLoadingObservations && observations.length === 0 && (
+                <p className="text-xs" style={{ color: 'var(--winui-text-secondary)' }}>No observations yet.</p>
+              )}
+              {!isLoadingObservations && observations.map((obs) => (
+                <div key={obs.id} className="p-3 rounded-lg border" style={{ borderColor: 'var(--winui-border-subtle)', backgroundColor: 'var(--winui-bg-tertiary)' }}>
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs font-semibold px-2 py-1 rounded-full" style={{ backgroundColor: 'rgba(0,120,212,0.1)', color: 'var(--winui-accent)' }}>
+                        {obs.protocol}
+                      </span>
+                      <span className="text-xs" style={{ color: 'var(--winui-text-secondary)' }}>
+                        {new Date(obs.timestamp).toLocaleString()}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={() => copyObservationJson(obs)}
+                        className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
+                        title="Copy observation JSON"
+                      >
+                        <FileJson className="h-4 w-4" />
+                      </button>
+                      <span className="text-xs" style={{ color: 'var(--winui-text-tertiary)' }}>
+                        {obs.keywords.length} keywords
+                      </span>
+                    </div>
+                  </div>
+                  {obs.raw_summary && (
+                    <p className="text-sm mt-2" style={{ color: 'var(--winui-text-primary)' }}>
+                      {obs.raw_summary}
+                    </p>
+                  )}
+                  <div className="mt-2 flex flex-wrap gap-2">
+                    {obs.keywords.slice(0, 12).map((kw) => (
+                      <span key={kw} className="text-xxs px-2 py-1 rounded-full" style={{ backgroundColor: 'rgba(0,0,0,0.05)', color: 'var(--winui-text-secondary)' }}>
+                        {kw}
+                      </span>
+                    ))}
+                  </div>
+                  <pre className="mt-2 text-xs overflow-x-auto p-2 rounded" style={{ backgroundColor: 'var(--winui-surface)', color: 'var(--winui-text-primary)', border: '1px solid var(--winui-border-subtle)' }}>
+                    {JSON.stringify(obs.key_fields, null, 2)}
+                  </pre>
+                </div>
+              ))}
+              <div className="flex gap-2 justify-end">
+                <button
+                  onClick={exportNdjson}
+                  disabled={isExporting}
+                  className="btn-winui-secondary inline-flex items-center gap-2"
+                >
+                  <Download className="h-4 w-4" />
+                  Export NDJSON
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
 
         {/* Activity Info */}
         <div>

@@ -1,3 +1,5 @@
+import { KeywordHit } from './observation';
+
 export enum DeviceType {
   UNKNOWN = 'unknown',
   ROUTER = 'router',
@@ -49,9 +51,20 @@ export interface Device {
     sources: string[];
     matched_fields: string[];
     weights: Record<string, number>;
+    keyword_hits?: KeywordHit[];
+    dictionary_infer?: {
+      vendor?: string;
+      product?: string;
+      category?: string;
+      os?: string;
+    };
     confidence_breakdown?: {
+      active_probe?: number;
       oui: number;
       dhcp: number;
+      external_vendor?: number;
+      external_device?: number;
+      dictionary_delta?: number;
       combined: number;
     };
   } | null;

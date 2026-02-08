@@ -2,7 +2,9 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { Device, DeviceStatus, DeviceType } from '../types/device';
 import { deviceService } from '../lib/services/device';
 import { ScanButton } from '../components/actions/ScanButton';
-import { Search, Filter, RefreshCw, Laptop, Smartphone, Router, Shield, Wifi, CheckCircle, AlertCircle } from 'lucide-react';
+import { observationService } from '../lib/services/observations';
+import { ProbeObservation } from '../types/observation';
+import { Search, Filter, RefreshCw, Laptop, Smartphone, Router, Shield, Wifi, CheckCircle, AlertCircle, MoreHorizontal, Loader2, FileJson } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useWebSocketEvent } from '../contexts/WebSocketContext';
 import { WSEventType } from '../types/websocket';
@@ -50,6 +52,9 @@ export const DeviceList: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState('');
   const [filterStatus, setFilterStatus] = useState<DeviceStatus | 'all'>('all');
+  const [expandedMac, setExpandedMac] = useState<string | null>(null);
+  const [observationsByMac, setObservationsByMac] = useState<Record<string, ProbeObservation[]>>({});
+  const [observationsLoading, setObservationsLoading] = useState(false);
 
   const fetchDevices = async () => {
     setIsLoading(true);
@@ -66,6 +71,39 @@ export const DeviceList: React.FC = () => {
   useEffect(() => {
     fetchDevices();
   }, []);
+
+  const loadObservations = async (mac: string) => {
+    setObservationsLoading(true);
+    try {
+      const data = await observationService.listByDevice(mac, 5);
+      setObservationsByMac((prev) => ({ ...prev, [mac]: data }));
+    } catch (error) {
+      console.error('Failed to fetch observations:', error);
+    } finally {
+      setObservationsLoading(false);
+    }
+  };
+
+  const toggleObservations = (mac: string) => {
+    if (expandedMac === mac) {
+      setExpandedMac(null);
+      return;
+    }
+    setExpandedMac(mac);
+    if (!observationsByMac[mac]) {
+      loadObservations(mac);
+    }
+  };
+
+  const copyObservation = async (mac: string) => {
+    const obs = observationsByMac[mac];
+    if (!obs || obs.length === 0) return;
+    try {
+      await navigator.clipboard.writeText(JSON.stringify(obs[0], null, 2));
+    } catch (err) {
+      console.error('Failed to copy observation', err);
+    }
+  };
 
   // Listen for scan started - clear old devices
   useWebSocketEvent(WSEventType.SCAN_STARTED, () => {
@@ -166,86 +204,155 @@ export const DeviceList: React.FC = () => {
                 <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--winui-text-secondary)' }}>MAC Address</th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--winui-text-secondary)' }}>Status</th>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--winui-text-secondary)' }}>Last Seen</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--winui-text-secondary)' }}>More</th>
               </tr>
             </thead>
             <tbody style={{ backgroundColor: 'var(--winui-surface)' }}>
               {filteredDevices.length > 0 ? (
                 filteredDevices.map((device) => (
-                  <tr
-                    key={device.mac}
-                    className="transition-colors duration-150"
-                    style={{
-                      borderBottom: '1px solid var(--winui-border-subtle)',
-                    }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = 'var(--winui-bg-tertiary)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = 'var(--winui-surface)';
-                    }}
-                  >
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center">
-                        <div className="flex-shrink-0 h-10 w-10 flex items-center justify-center rounded-full" style={{ backgroundColor: 'var(--winui-bg-tertiary)' }}>
-                          <DeviceIcon type={device.type} />
-                        </div>
-                        <div className="ml-4">
-                          <div className="text-sm font-medium" style={{ color: 'var(--winui-text-primary)' }}>
-                            {device.name || device.alias || device.model || device.model_guess || 'Unknown Device'}
+                  <React.Fragment key={device.mac}>
+                    <tr
+                      className="transition-colors duration-150"
+                      style={{
+                        borderBottom: '1px solid var(--winui-border-subtle)',
+                      }}
+                      onMouseEnter={(e) => {
+                        e.currentTarget.style.backgroundColor = 'var(--winui-bg-tertiary)';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.currentTarget.style.backgroundColor = 'var(--winui-surface)';
+                      }}
+                    >
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="flex items-center">
+                          <div className="flex-shrink-0 h-10 w-10 flex items-center justify-center rounded-full" style={{ backgroundColor: 'var(--winui-bg-tertiary)' }}>
+                            <DeviceIcon type={device.type} />
                           </div>
-                          <div className="text-sm flex items-center gap-2" style={{ color: 'var(--winui-text-secondary)' }}>
-                            {device.vendor || device.vendor_guess || 'Unknown Vendor'}
-                            {(device.model || device.model_guess) && (
-                              <span className="text-xs" style={{ color: 'var(--winui-text-tertiary)' }}>
-                                • {device.model || device.model_guess}
-                              </span>
-                            )}
-                            {device.recognition_confidence !== null && device.recognition_confidence > 0 && (
-                              <span
-                                className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded"
-                                style={{
-                                  backgroundColor: device.recognition_confidence >= 70
-                                    ? 'rgba(16, 124, 16, 0.1)'
-                                    : device.recognition_confidence >= 40
-                                    ? 'rgba(245, 158, 11, 0.1)'
-                                    : 'rgba(107, 114, 128, 0.1)',
-                                  color: device.recognition_confidence >= 70
-                                    ? '#107c10'
-                                    : device.recognition_confidence >= 40
-                                    ? '#f59e0b'
-                                    : '#6b7280',
-                                }}
-                                title={`Recognition confidence: ${device.recognition_confidence}%`}
-                              >
-                                {device.recognition_confidence >= 70 ? (
-                                  <CheckCircle className="h-3 w-3" />
-                                ) : (
-                                  <AlertCircle className="h-3 w-3" />
-                                )}
-                                {device.recognition_confidence}%
-                              </span>
-                            )}
+                          <div className="ml-4">
+                            <div className="text-sm font-medium" style={{ color: 'var(--winui-text-primary)' }}>
+                              {device.name || device.alias || device.model || device.model_guess || 'Unknown Device'}
+                            </div>
+                            <div className="text-sm flex items-center gap-2" style={{ color: 'var(--winui-text-secondary)' }}>
+                              {device.vendor || device.vendor_guess || 'Unknown Vendor'}
+                              {(device.model || device.model_guess) && (
+                                <span className="text-xs" style={{ color: 'var(--winui-text-tertiary)' }}>
+                                  • {device.model || device.model_guess}
+                                </span>
+                              )}
+                              {device.recognition_confidence !== null && device.recognition_confidence > 0 && (
+                                <span
+                                  className="inline-flex items-center gap-1 text-xs px-2 py-0.5 rounded"
+                                  style={{
+                                    backgroundColor: device.recognition_confidence >= 70
+                                      ? 'rgba(16, 124, 16, 0.1)'
+                                      : device.recognition_confidence >= 40
+                                      ? 'rgba(245, 158, 11, 0.1)'
+                                      : 'rgba(107, 114, 128, 0.1)',
+                                    color: device.recognition_confidence >= 70
+                                      ? '#107c10'
+                                      : device.recognition_confidence >= 40
+                                      ? '#f59e0b'
+                                      : '#6b7280',
+                                  }}
+                                  title={`Recognition confidence: ${device.recognition_confidence}%`}
+                                >
+                                  {device.recognition_confidence >= 70 ? (
+                                    <CheckCircle className="h-3 w-3" />
+                                  ) : (
+                                    <AlertCircle className="h-3 w-3" />
+                                  )}
+                                  {device.recognition_confidence}%
+                                </span>
+                              )}
+                            </div>
                           </div>
                         </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="text-sm" style={{ color: 'var(--winui-text-primary)' }}>{device.ip}</div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap font-mono text-sm" style={{ color: 'var(--winui-text-secondary)' }}>
-                      {device.mac}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <StatusBadge status={device.status} />
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: 'var(--winui-text-secondary)' }}>
-                      {new Date(device.last_seen).toLocaleString()}
-                    </td>
-                  </tr>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <div className="text-sm" style={{ color: 'var(--winui-text-primary)' }}>{device.ip}</div>
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap font-mono text-sm" style={{ color: 'var(--winui-text-secondary)' }}>
+                        {device.mac}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <StatusBadge status={device.status} />
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: 'var(--winui-text-secondary)' }}>
+                        {new Date(device.last_seen).toLocaleString()}
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <button
+                          onClick={() => toggleObservations(device.mac)}
+                          className="btn-winui-secondary inline-flex items-center gap-1"
+                        >
+                          <MoreHorizontal className="h-4 w-4" />
+                          More
+                        </button>
+                      </td>
+                    </tr>
+                    {expandedMac === device.mac && (
+                      <tr>
+                        <td colSpan={6} className="px-6 py-3" style={{ backgroundColor: 'var(--winui-bg-tertiary)' }}>
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="text-xs font-semibold" style={{ color: 'var(--winui-text-secondary)' }}>
+                              Probe observations
+                            </div>
+                            {observationsLoading && <Loader2 className="h-4 w-4 animate-spin" />}
+                          </div>
+                          {observationsLoading && (
+                            <p className="text-xs" style={{ color: 'var(--winui-text-secondary)' }}>Loading...</p>
+                          )}
+                          {!observationsLoading && (!observationsByMac[device.mac] || observationsByMac[device.mac].length === 0) && (
+                            <p className="text-xs" style={{ color: 'var(--winui-text-secondary)' }}>No observations yet.</p>
+                          )}
+                          {!observationsLoading && observationsByMac[device.mac] && observationsByMac[device.mac].length > 0 && (
+                            <div className="space-y-2">
+                              {observationsByMac[device.mac].map((obs) => (
+                                <div key={obs.id} className="p-3 rounded border" style={{ borderColor: 'var(--winui-border-subtle)', backgroundColor: 'var(--winui-surface)' }}>
+                                  <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-2">
+                                      <span className="text-xxs px-2 py-1 rounded-full" style={{ backgroundColor: 'rgba(0,0,0,0.05)', color: 'var(--winui-text-secondary)' }}>
+                                        {obs.protocol}
+                                      </span>
+                                      <span className="text-xs" style={{ color: 'var(--winui-text-tertiary)' }}>
+                                        {new Date(obs.timestamp).toLocaleString()}
+                                      </span>
+                                    </div>
+                                    <button
+                                      onClick={() => copyObservation(device.mac)}
+                                      className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
+                                      title="Copy first observation JSON"
+                                    >
+                                      <FileJson className="h-4 w-4" />
+                                    </button>
+                                  </div>
+                                  <div className="mt-1 text-xs" style={{ color: 'var(--winui-text-primary)' }}>
+                                    {obs.raw_summary || 'No summary'}
+                                  </div>
+                                  {obs.keyword_hits && obs.keyword_hits.length > 0 && (
+                                    <div className="mt-1 text-xxs" style={{ color: 'var(--winui-text-secondary)' }}>
+                                      {obs.keyword_hits.length} keyword hits (top: {obs.keyword_hits[0].infer_summary || obs.keyword_hits[0].rule_id})
+                                    </div>
+                                  )}
+                                  <div className="mt-1 flex flex-wrap gap-1">
+                                    {obs.keywords.slice(0, 10).map((kw) => (
+                                      <span key={kw} className="text-xxs px-2 py-0.5 rounded-full" style={{ backgroundColor: 'rgba(0,0,0,0.05)', color: 'var(--winui-text-secondary)' }}>
+                                        {kw}
+                                      </span>
+                                    ))}
+                                  </div>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
                 ))
               ) : (
                 <tr>
-                  <td colSpan={5} className="px-6 py-12 text-center">
+                  <td colSpan={6} className="px-6 py-12 text-center">
                     <div className="flex flex-col items-center justify-center">
                       <Search className="h-12 w-12 mb-4" style={{ color: 'var(--winui-text-tertiary)' }} />
                       <h3 className="text-lg font-semibold mb-1" style={{ color: 'var(--winui-text-primary)' }}>No devices found</h3>
