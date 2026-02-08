@@ -12,6 +12,7 @@ Observability adds a reproducible trail for probe/enrichment responses without s
 - Table: `probe_observations`
   - `id` (UUID), `device_mac`, `scan_run_id`, `protocol`, `timestamp`
   - `key_fields` (JSON), `keywords` (JSON array), `keyword_hits` (JSON array), `raw_summary` (TEXT), `redaction_level` (TEXT)
+- Default local SQLite file: `./data/zenethunter.db` (WAL/SHM live alongside).
 - WAL/SHM files are ignored from VCS; copy the DB + NDJSON exports for offline analysis.
 
 ## APIs

@@ -12,6 +12,7 @@
 - 表：`probe_observations`
   - `id` (UUID)、`device_mac`、`scan_run_id`、`protocol`、`timestamp`
   - `key_fields`（JSON）、`keywords`（JSON 数组）、`keyword_hits`（JSON 数组）、`raw_summary`（TEXT）、`redaction_level`（TEXT）
+- 本地默认 SQLite 路径：`./data/zenethunter.db`（WAL/SHM 位于同目录）。
 - WAL/SHM 不入库；复制 SQLite 文件 + NDJSON 导出即可离线复现。
 
 ## API

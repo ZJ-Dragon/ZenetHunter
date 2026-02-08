@@ -759,7 +759,6 @@ class ScannerService:
             "modem",
             "gateway",
             "access point",
-            "ap",
             "switch",
             "hub",
             "wifi router",
