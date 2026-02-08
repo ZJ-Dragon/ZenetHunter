@@ -90,7 +90,7 @@ print_error() {
 # ============================================================
 cleanup_old_processes() {
     print_header "清理残留进程"
-    
+
     # 清理 uvicorn 进程
     local uvicorn_pids=$(ps aux | grep -E "uvicorn app.main|python.*app.main" | grep -v grep | awk '{print $2}')
     if [ ! -z "$uvicorn_pids" ]; then
@@ -103,7 +103,7 @@ cleanup_old_processes() {
     else
         print_success "无残留后端进程"
     fi
-    
+
     # 清理 vite 进程
     local vite_pids=$(ps aux | grep -E "vite.*ZenetHunter|node.*vite" | grep -v grep | awk '{print $2}')
     if [ ! -z "$vite_pids" ]; then
@@ -124,7 +124,7 @@ cleanup_old_processes() {
 check_and_free_port() {
     local port=$1
     local port_name=$2
-    
+
     if command -v lsof &> /dev/null; then
         local pids=$(lsof -ti:$port 2>/dev/null)
         if [ ! -z "$pids" ]; then
@@ -135,13 +135,13 @@ check_and_free_port() {
             return 0
         fi
     fi
-    
+
     # 备用方法：尝试绑定端口测试
     if ! python3 -c "import socket; s=socket.socket(); s.bind(('', $port)); s.close()" 2>/dev/null; then
         print_warning "$port_name 端口 $port 可能被占用"
         sleep 1
     fi
-    
+
     print_success "端口 $port 可用"
     return 0
 }
@@ -151,7 +151,7 @@ check_and_free_port() {
 # ============================================================
 clean_caches() {
     print_header "清理缓存"
-    
+
     # 1. Python 缓存
     echo "  清理 Python 缓存..."
     find . -type d -name "__pycache__" -exec rm -rf {} + 2>/dev/null || true
@@ -165,7 +165,7 @@ clean_caches() {
     find . -type d -name "build" -not -path "*/node_modules/*" -exec rm -rf {} + 2>/dev/null || true
     find . -type d -name "dist" -not -path "*/node_modules/*" -exec rm -rf {} + 2>/dev/null || true
     print_success "Python 缓存已清理"
-    
+
     # 2. 前端缓存
     if [ -d "frontend" ]; then
         echo "  清理前端缓存..."
@@ -177,27 +177,27 @@ clean_caches() {
         find frontend -name ".eslintcache" -delete 2>/dev/null || true
         print_success "前端缓存已清理"
     fi
-    
+
     # 3. 日志文件
     echo "  清理日志文件..."
     find . -type f -name "*.log" -not -path "*/node_modules/*" -delete 2>/dev/null || true
     find . -type f -name "*.log.*" -not -path "*/node_modules/*" -delete 2>/dev/null || true
     rm -f /tmp/zenethunter-*.log 2>/dev/null || true
     print_success "日志文件已清理"
-    
+
     # 4. OS 缓存
     echo "  清理系统缓存..."
     find . -name ".DS_Store" -delete 2>/dev/null || true
     find . -name "Thumbs.db" -delete 2>/dev/null || true
     find . -name "desktop.ini" -delete 2>/dev/null || true
     print_success "系统缓存已清理"
-    
+
     # 5. IDE 缓存
     echo "  清理 IDE 缓存..."
     find . -type f -name "*.swp" -delete 2>/dev/null || true
     find . -type f -name "*.swo" -delete 2>/dev/null || true
     print_success "IDE 缓存已清理"
-    
+
     # 6. 数据库锁文件
     echo "  清理数据库锁文件..."
     rm -f backend/data/zenethunter.db-shm backend/data/zenethunter.db-wal 2>/dev/null || true
@@ -209,23 +209,23 @@ clean_caches() {
 # ============================================================
 clean_all() {
     clean_caches
-    
+
     print_header "深度清理（数据库和虚拟环境）"
-    
+
     echo -e "${YELLOW}⚠ 警告: 将清理数据库和虚拟环境！${NC}"
     read -p "确认继续? (yes/no): " response
     if [ "$response" != "yes" ] && [ "$response" != "y" ]; then
         echo "已取消深度清理"
         return
     fi
-    
+
     # 清理数据库
     echo "  清理数据库文件..."
     find . -type f -name "*.db" -not -path "*/node_modules/*" -delete 2>/dev/null || true
     find . -type f -name "*.sqlite" -not -path "*/node_modules/*" -delete 2>/dev/null || true
     find . -type f -name "*.sqlite3" -not -path "*/node_modules/*" -delete 2>/dev/null || true
     print_success "数据库文件已清理"
-    
+
     # 清理虚拟环境
     echo "  清理虚拟环境..."
     rm -rf .venv venv ENV env venv.bak env.bak 2>/dev/null || true
@@ -239,12 +239,12 @@ clean_all() {
 shutdown_handler() {
     echo ""
     print_header "正在关闭所有服务"
-    
+
     # 终止后端进程
     if [ ! -z "$BACKEND_PID" ] && kill -0 $BACKEND_PID 2>/dev/null; then
         echo "正在关闭后端服务 (PID: $BACKEND_PID)..."
         kill -TERM $BACKEND_PID 2>/dev/null || true
-        
+
         # 等待最多3秒
         for i in {1..6}; do
             if ! kill -0 $BACKEND_PID 2>/dev/null; then
@@ -253,14 +253,14 @@ shutdown_handler() {
             fi
             sleep 0.5
         done
-        
+
         # 如果还没关闭，强制 kill
         if kill -0 $BACKEND_PID 2>/dev/null; then
             print_warning "优雅关闭超时，强制终止..."
             kill -KILL $BACKEND_PID 2>/dev/null || true
         fi
     fi
-    
+
     # 终止前端进程
     if [ ! -z "$FRONTEND_PID" ] && kill -0 $FRONTEND_PID 2>/dev/null; then
         echo "正在关闭前端服务 (PID: $FRONTEND_PID)..."
@@ -269,11 +269,11 @@ shutdown_handler() {
         kill -KILL $FRONTEND_PID 2>/dev/null || true
         print_success "前端服务已关闭"
     fi
-    
+
     # 清理所有相关进程
     pkill -f "uvicorn app.main" 2>/dev/null || true
     pkill -f "vite.*ZenetHunter" 2>/dev/null || true
-    
+
     print_success "清理完成"
     exit 0
 }
@@ -381,6 +381,9 @@ fi
 # ============================================================
 print_header "步骤 5/6: 检查数据库"
 
+# 确保 APP_ENV
+export APP_ENV=${APP_ENV:-development}
+
 # 设置 DATABASE_URL
 if [ -z "$DATABASE_URL" ]; then
     export DATABASE_URL="sqlite+aiosqlite:///./data/zenethunter.db"
@@ -395,10 +398,10 @@ mkdir -p data
 # 检查数据库 schema
 if [ -f "data/zenethunter.db" ]; then
     COLUMN_CHECK=$(sqlite3 data/zenethunter.db "PRAGMA table_info(devices);" 2>/dev/null | grep "active_defense_status" || echo "")
-    
+
     if [ -z "$COLUMN_CHECK" ]; then
         print_warning "检测到数据库 schema 不匹配，正在自动修复..."
-        
+
         sqlite3 data/zenethunter.db <<EOF 2>/dev/null || true
 ALTER TABLE devices ADD COLUMN active_defense_status TEXT DEFAULT 'idle';
 ALTER TABLE devices ADD COLUMN recognition_manual_override INTEGER DEFAULT 0;
@@ -413,6 +416,16 @@ EOF
 else
     print_success "将在首次启动时创建数据库"
 fi
+
+# ============================================================
+# 步骤 5.5: 重置本地运行态（保留手动库）
+# ============================================================
+print_header "步骤 5.5/6: 重置本地运行态（保留手动库）"
+if ! python3 -m app.maintenance.reset_runtime_data; then
+    print_error "本地运行态重置失败（仅允许 APP_ENV=development）"
+    exit 1
+fi
+print_success "已清空 devices/指纹/观测等运行态数据（手动库保留）"
 
 # ============================================================
 # 步骤 6: 启动服务
@@ -458,24 +471,24 @@ FRONTEND_PID=""
 if command -v node &> /dev/null && command -v npm &> /dev/null; then
     if [ -d "frontend" ]; then
         cd frontend
-        
+
         if [ ! -d "node_modules" ]; then
             echo "安装前端依赖..."
             npm install
         fi
-        
+
         echo "启动 React 前端服务器..."
         npm run dev > /tmp/zenethunter-frontend.log 2>&1 &
         FRONTEND_PID=$!
         sleep 2
-        
+
         if kill -0 $FRONTEND_PID 2>/dev/null; then
             print_success "前端服务器已启动 (PID: $FRONTEND_PID, 端口: 5173)"
         else
             print_warning "前端服务器启动失败，查看: /tmp/zenethunter-frontend.log"
             FRONTEND_PID=""
         fi
-        
+
         cd "$SCRIPT_DIR"
     fi
 else
