@@ -10,33 +10,47 @@ interface TopologyGraphProps {
 export const TopologyGraph: React.FC<TopologyGraphProps> = ({ data, onNodeClick }) => {
   const graphRef = useRef<ForceGraphMethods | undefined>(undefined);
   const containerRef = useRef<HTMLDivElement>(null);
-  const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [hoveredNode, setHoveredNode] = useState<TopologyNode | null>(null);
+  const [graphReady, setGraphReady] = useState(false);
 
   useEffect(() => {
+    if (!containerRef.current) return;
+
     const updateDimensions = () => {
-      if (containerRef.current) {
-        setDimensions({
-          width: containerRef.current.clientWidth,
-          height: containerRef.current.clientHeight,
-        });
-      }
+      if (!containerRef.current) return;
+      const { clientWidth, clientHeight } = containerRef.current;
+      setDimensions({
+        width: clientWidth,
+        height: clientHeight,
+      });
     };
 
-    window.addEventListener('resize', updateDimensions);
+    const observer = new ResizeObserver(() => {
+      updateDimensions();
+    });
+
+    observer.observe(containerRef.current);
     updateDimensions();
 
-    return () => window.removeEventListener('resize', updateDimensions);
+    return () => observer.disconnect();
   }, []);
 
-  // Auto-zoom to fit when data changes
+  const refreshGraphLayout = useCallback(() => {
+    if (!graphRef.current || data.nodes.length === 0) return;
+    requestAnimationFrame(() => {
+      graphRef.current?.zoomToFit(400, 32);
+    });
+  }, [data.nodes.length]);
+
+  // Mark graph ready when both data and dimensions are present
   useEffect(() => {
-    if (graphRef.current && data.nodes.length > 0) {
-      setTimeout(() => {
-        graphRef.current?.zoomToFit(400, 20);
-      }, 100);
+    const ready = dimensions.width > 0 && dimensions.height > 0;
+    setGraphReady(ready);
+    if (ready && data.nodes.length > 0) {
+      refreshGraphLayout();
     }
-  }, [data]);
+  }, [data.nodes.length, dimensions.width, dimensions.height, refreshGraphLayout]);
 
   // Enhanced node painting with modern meltgo style
   const nodePaint = useCallback((node: NodeObject, ctx: CanvasRenderingContext2D, globalScale: number) => {
@@ -160,31 +174,36 @@ export const TopologyGraph: React.FC<TopologyGraphProps> = ({ data, onNodeClick 
         position: 'relative',
       }}
     >
-      <ForceGraph2D
-        ref={graphRef}
-        width={dimensions.width}
-        height={dimensions.height}
-        graphData={data}
-        nodeLabel="label"
-        nodeCanvasObject={nodePaint}
-        linkCanvasObject={linkPaint}
-        onNodeClick={(node) => onNodeClick(node as unknown as TopologyNode)}
-        onNodeHover={(node) => setHoveredNode(node as unknown as TopologyNode | null)}
-        linkColor={() => 'rgba(0, 120, 212, 0.2)'}
-        linkWidth={1.5}
-        linkDirectionalArrowLength={6}
-        linkDirectionalArrowRelPos={1}
-        linkDirectionalArrowColor={() => 'rgba(0, 120, 212, 0.4)'}
-        cooldownTicks={100}
-        onEngineStop={() => {
-          if (graphRef.current && data.nodes.length > 0) {
-            graphRef.current.zoomToFit(400, 20);
-          }
-        }}
-        d3AlphaDecay={0.0228}
-        d3VelocityDecay={0.4}
-        nodeRelSize={6}
-      />
+      {graphReady && (
+        <ForceGraph2D
+          ref={graphRef}
+          width={dimensions.width}
+          height={dimensions.height}
+          graphData={data}
+          nodeLabel="label"
+          nodeCanvasObject={nodePaint}
+          linkCanvasObject={linkPaint}
+          onNodeClick={(node) => onNodeClick(node as unknown as TopologyNode)}
+          onNodeHover={(node) => setHoveredNode(node as unknown as TopologyNode | null)}
+          linkColor={() => 'rgba(0, 120, 212, 0.2)'}
+          linkWidth={1.5}
+          linkDirectionalArrowLength={6}
+          linkDirectionalArrowRelPos={1}
+          linkDirectionalArrowColor={() => 'rgba(0, 120, 212, 0.4)'}
+          cooldownTicks={100}
+          onEngineStop={() => {
+            refreshGraphLayout();
+          }}
+          d3AlphaDecay={0.0228}
+          d3VelocityDecay={0.4}
+          nodeRelSize={6}
+        />
+      )}
+      {!graphReady && (
+        <div className="absolute inset-0 flex items-center justify-center text-sm" style={{ color: 'var(--winui-text-secondary)' }}>
+          Preparing layout...
+        </div>
+      )}
     </div>
   );
 };
