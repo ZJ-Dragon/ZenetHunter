@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { ZoomIn, ZoomOut, Focus, Maximize2 } from 'lucide-react';
 import ForceGraph2D, { ForceGraphMethods, NodeObject, LinkObject } from 'react-force-graph-2d';
-import { forceCollide } from 'd3-force';
+import { forceCollide } from 'd3-force-3d';
 import { TopologyNode, NetworkTopology } from '../../types/topology';
 
 interface TopologyGraphProps {
