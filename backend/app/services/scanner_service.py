@@ -12,10 +12,13 @@ from app.repositories.device import DeviceRepository
 from app.repositories.device_fingerprint import (
     DeviceFingerprintRepository,
 )
+from app.repositories.event_log import EventLogRepository
+from app.repositories.probe_observation import ProbeObservationRepository
 from app.services.device_model_lookup import get_device_model_lookup
 from app.services.fingerprint_collector import get_fingerprint_collector
 from app.services.manual_override_service import ManualOverrideService
 from app.services.recognition_engine import get_recognition_engine
+from app.services.keyword_extractor import KeywordExtractor
 from app.services.state import get_state_manager
 from app.services.websocket import get_connection_manager
 
@@ -224,6 +227,7 @@ class ScannerService:
         )
 
         try:
+            keyword_extractor = KeywordExtractor()
             devices_found = 0
             devices_processed = 0
             discovered_devices = []
@@ -327,7 +331,8 @@ class ScannerService:
 
             pipeline = ScanPipeline()
             discovery_results, enrichment_results = await pipeline.run_full_scan(
-                target_subnets=request.target_subnets or None
+                target_subnets=request.target_subnets or None,
+                scan_run_id=str(scan_id),
             )
 
             logger.info(
@@ -347,10 +352,12 @@ class ScannerService:
 
             # Store enrichment results for later use in device processing
             enrichment_map: dict[str, dict[str, Any]] = {}
+            observation_map: dict[str, list[dict[str, Any]]] = {}
             for enrichment in enrichment_results:
                 enrichment_map[enrichment.device_mac.lower()] = (
                     enrichment.fingerprint_data
                 )
+                observation_map[enrichment.device_mac.lower()] = enrichment.observations
 
             # If QUICK scan, just use ARP table
             # If FULL scan, we could also do ping sweep (requires root/caps)
@@ -365,6 +372,8 @@ class ScannerService:
                 try:
                     repo = DeviceRepository(session)
                     fp_repo = DeviceFingerprintRepository(session)
+                    obs_repo = ProbeObservationRepository(session)
+                    event_repo = EventLogRepository(session)
 
                     for ip, mac, _interface in arp_devices:
                         # Check if device already exists
@@ -488,6 +497,38 @@ class ScannerService:
                             device.recognition_evidence = recognition_result.get(
                                 "evidence"
                             )
+
+                            # Persist observation entries captured during enrichment
+                            for obs in observation_map.get(mac.lower(), []):
+                                key_fields = obs.get("key_fields", {})
+                                keywords = (
+                                    keyword_extractor.extract(key_fields)
+                                    if key_fields
+                                    else []
+                                )
+                                keyword_hits = keyword_extractor.match_rules(
+                                    keywords, key_fields
+                                )
+                                record = await obs_repo.add(
+                                    device_mac=mac,
+                                    scan_run_id=str(scan_id),
+                                    protocol=obs.get("protocol", "probe"),
+                                    key_fields=key_fields,
+                                    keywords=keywords,
+                                    keyword_hits=keyword_hits,
+                                    raw_summary=obs.get("summary"),
+                                    redaction_level="standard",
+                                )
+                                await event_repo.add_log(
+                                    level="INFO",
+                                    module="observation",
+                                    message="Probe observation captured",
+                                    device_mac=mac,
+                                    context={
+                                        "observation_id": record.id,
+                                        "protocol": obs.get("protocol", "probe"),
+                                    },
+                                )
 
                             # Save fingerprint to database
                             fingerprint_data = {

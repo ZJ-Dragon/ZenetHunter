@@ -41,6 +41,7 @@ from app.routes import (
     integration_router,
     integration_webhooks,
     logs,
+    observations,
     recognition,
     scan,
     topology,
@@ -369,6 +370,7 @@ api_router.include_router(attack.router)
 api_router.include_router(recognition.router)
 api_router.include_router(integration_router.router)
 api_router.include_router(integration_webhooks.router)
+api_router.include_router(observations.router)
 
 app.include_router(api_router)
 

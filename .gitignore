@@ -187,6 +187,14 @@ nohup.out
 # SQLite sample databases
 *.sqlite
 *.sqlite3
+*.db
+*.db-wal
+*.db-shm
+*-wal
+*-shm
+/backend/data/*.db
+/backend/data/*.db-wal
+/backend/data/*.db-shm
 
 # Cache cleanup scripts (keep in repo, but ignore any generated files)
 # clean-cache.py, clean-cache.sh, clean-cache.bat are tracked

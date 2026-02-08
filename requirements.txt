@@ -55,6 +55,7 @@ pytest>=7.0
 pytest-cov>=4.0  # Coverage reporting
 pytest-asyncio>=0.21.0  # Async test support
 httpx>=0.24.0  # HTTP client for FastAPI TestClient
+pyyaml>=6.0  # Keyword dictionary loader
 
 # ============================================================
 # Optional but Recommended

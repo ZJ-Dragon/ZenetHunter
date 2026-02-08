@@ -162,6 +162,7 @@ async def init_db() -> None:
             DeviceFingerprintModel,
             DeviceModel,
             EventLogModel,
+            ProbeObservationModel,
             ManualOverrideModel,
             TrustListModel,
         )
@@ -253,6 +254,27 @@ async def init_db() -> None:
                         )
                 except Exception as e:
                     logger.debug(f"Could not check/add recognition columns: {e}")
+                # Ensure keyword_hits column exists on probe_observations
+                try:
+                    result = await conn.execute(
+                        text(
+                            "SELECT COUNT(*) as count FROM pragma_table_info('probe_observations') WHERE name = 'keyword_hits'"
+                        )
+                    )
+                    row = result.fetchone()
+                    if row and row[0] == 0:
+                        logger.info(
+                            "Adding 'keyword_hits' column to probe_observations table (migration)"
+                        )
+                        await conn.execute(
+                            text(
+                                "ALTER TABLE probe_observations ADD COLUMN keyword_hits JSON NULL"
+                            )
+                        )
+                        await conn.commit()
+                        logger.info("Migration completed for keyword_hits column")
+                except Exception as e:
+                    logger.debug(f"Could not check/add keyword_hits column: {e}")
             elif db_url.startswith("postgresql"):
                 # For PostgreSQL, check if model column exists
                 try:
@@ -335,6 +357,32 @@ async def init_db() -> None:
                         )
                 except Exception as e:
                     logger.debug(f"Could not check/add recognition columns: {e}")
+                # Ensure keyword_hits column exists on probe_observations
+                try:
+                    result = await conn.execute(
+                        text(
+                            """
+                            SELECT COUNT(*) as count
+                            FROM information_schema.columns
+                            WHERE table_name = 'probe_observations'
+                            AND column_name = 'keyword_hits'
+                        """
+                        )
+                    )
+                    row = result.fetchone()
+                    if row and row[0] == 0:
+                        logger.info(
+                            "Adding 'keyword_hits' column to probe_observations table (migration)"
+                        )
+                        await conn.execute(
+                            text(
+                                "ALTER TABLE probe_observations ADD COLUMN keyword_hits JSONB NULL"
+                            )
+                        )
+                        await conn.commit()
+                        logger.info("Migration completed for keyword_hits column")
+                except Exception as e:
+                    logger.debug(f"Could not check/add keyword_hits column: {e}")
 
         logger.info("Database tables created/updated")
     except Exception as e:

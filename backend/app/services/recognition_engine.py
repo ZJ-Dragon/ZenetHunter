@@ -8,6 +8,7 @@ from typing import Any
 
 from app.services.device_model_lookup import get_device_model_lookup
 from app.services.fingerprint_normalizer import FingerprintNormalizer
+from app.services.keyword_extractor import KeywordExtractor, apply_confidence_delta
 from app.services.recognition.external_service_policy import get_external_service_policy
 from app.services.recognition.providers.macvendors import MACVendorsProvider
 from app.services.recognition.providers.fingerbank import FingerbankProvider
@@ -23,6 +24,7 @@ class RecognitionEngine:
         self.model_lookup = get_device_model_lookup()
         self.local_rules: dict[str, dict[str, Any]] = {}
         self.policy = get_external_service_policy()
+        self.keyword_extractor = KeywordExtractor()
         # Initialize external providers (lazy-loaded)
         self._macvendors: MACVendorsProvider | None = None
         self._fingerbank: FingerbankProvider | None = None
@@ -328,6 +330,39 @@ class RecognitionEngine:
         else:
             final_confidence = 0
 
+        # Step 6: Keyword dictionary influence
+        keyword_tokens = self.keyword_extractor.extract(fingerprint)
+        keyword_hits = self.keyword_extractor.match_rules(keyword_tokens, fingerprint)
+        evidence["keyword_hits"] = keyword_hits
+        if keyword_hits:
+            evidence["sources"].append("dictionary")
+            evidence["matched_fields"].append("keyword_dictionary")
+            final_confidence, delta_total = apply_confidence_delta(
+                final_confidence, keyword_hits
+            )
+            evidence.setdefault("confidence_breakdown", {})
+            evidence["confidence_breakdown"]["dictionary_delta"] = delta_total
+            merged_infer: dict[str, str] = {}
+            for hit in sorted(
+                keyword_hits,
+                key=lambda h: (-int(h.get("priority", 0)), h.get("rule_id", "")),
+            ):
+                infer = hit.get("infer") or {}
+                for key in ("vendor", "product", "category", "os"):
+                    if key not in merged_infer and infer.get(key):
+                        merged_infer[key] = infer[key]
+            if merged_infer:
+                evidence["dictionary_infer"] = merged_infer
+            top_hit = sorted(
+                keyword_hits,
+                key=lambda h: (-int(h.get("priority", 0)), h.get("rule_id", "")),
+            )[0]
+            infer = top_hit.get("infer", {}) or {}
+            if not final_vendor and infer.get("vendor"):
+                final_vendor = infer.get("vendor")
+            if not final_model and infer.get("product"):
+                final_model = infer.get("product")
+
         # Add evidence summary
         evidence["confidence_breakdown"] = {
             "active_probe": active_probe_confidence,
@@ -336,6 +371,7 @@ class RecognitionEngine:
             "external_vendor": external_vendor_confidence,
             "external_device": external_device_confidence,
             "combined": final_confidence,
+            **evidence.get("confidence_breakdown", {}),
         }
 
         result = {

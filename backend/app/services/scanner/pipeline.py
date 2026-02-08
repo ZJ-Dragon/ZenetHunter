@@ -9,7 +9,7 @@ Three-stage scanning:
 import asyncio
 import ipaddress
 import logging
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from typing import Any
 
@@ -17,6 +17,7 @@ from app.core.config import get_settings
 from app.services.scanner.candidate import get_arp_candidates, get_dhcp_candidates
 from app.services.scanner.capabilities import get_scanner_capabilities
 from app.services.scanner.network_detection import detect_local_subnet
+from app.services.observation_recorder import build_key_fields, build_summary
 from app.services.scanner.refresh import refresh_candidates
 
 logger = logging.getLogger(__name__)
@@ -44,6 +45,7 @@ class EnrichmentResult:
     device_mac: str
     fingerprint_data: dict[str, Any]
     evidence_sources: list[str]
+    observations: list[dict[str, Any]] = field(default_factory=list)
 
 
 class ScanPipeline:
@@ -137,7 +139,10 @@ class ScanPipeline:
         return all_results
 
     async def run_enrichment(
-        self, discovered_devices: list[DiscoveryResult]
+        self,
+        discovered_devices: list[DiscoveryResult],
+        *,
+        scan_run_id: str | None = None,
     ) -> list[EnrichmentResult]:
         """
         Stage B: Enrich device fingerprints using gentle probes.
@@ -160,6 +165,7 @@ class ScanPipeline:
             async with asyncio.timeout(30.0):
                 # Enrich each device with available methods
                 for device in discovered_devices:
+                    observations: list[dict[str, Any]] = []
                     if not device.mac:
                         continue  # Skip devices without MAC
 
@@ -184,6 +190,17 @@ class ScanPipeline:
                             if mdns_data:
                                 fingerprint_data.update(mdns_data)
                                 evidence_sources.append("mdns")
+                                key_fields = build_key_fields("mdns", mdns_data)
+                                if key_fields:
+                                    observations.append(
+                                        {
+                                            "protocol": "mdns",
+                                            "key_fields": key_fields,
+                                            "summary": build_summary(
+                                                "mdns", key_fields
+                                            ),
+                                        }
+                                    )
                                 logger.debug(
                                     f"mDNS enrichment for {device.ip}: "
                                     f"found {len(mdns_data.get('mdns_services', []))} services"
@@ -209,6 +226,17 @@ class ScanPipeline:
                             if ssdp_data:
                                 fingerprint_data.update(ssdp_data)
                                 evidence_sources.append("ssdp")
+                                key_fields = build_key_fields("ssdp", ssdp_data)
+                                if key_fields:
+                                    observations.append(
+                                        {
+                                            "protocol": "ssdp",
+                                            "key_fields": key_fields,
+                                            "summary": build_summary(
+                                                "ssdp", key_fields
+                                            ),
+                                        }
+                                    )
                                 logger.debug(
                                     f"SSDP enrichment for {device.ip}: "
                                     f"found {len(ssdp_data)} fields"
@@ -235,6 +263,19 @@ class ScanPipeline:
                             if probe_data:
                                 fingerprint_data.update(probe_data)
                                 evidence_sources.append("active_probe")
+                                key_fields = build_key_fields(
+                                    "active_probe", probe_data
+                                )
+                                if key_fields:
+                                    observations.append(
+                                        {
+                                            "protocol": "active_probe",
+                                            "key_fields": key_fields,
+                                            "summary": build_summary(
+                                                "active_probe", key_fields
+                                            ),
+                                        }
+                                    )
                                 logger.debug(
                                     f"Active probe for {device.ip}: "
                                     f"found {len(probe_data)} fields"
@@ -249,6 +290,7 @@ class ScanPipeline:
                                 device_mac=device.mac,
                                 fingerprint_data=fingerprint_data,
                                 evidence_sources=evidence_sources,
+                                observations=observations,
                             )
                         )
 
@@ -267,7 +309,10 @@ class ScanPipeline:
         return enrichment_results
 
     async def run_full_scan(
-        self, target_subnets: list[str] | None = None
+        self,
+        target_subnets: list[str] | None = None,
+        *,
+        scan_run_id: str | None = None,
     ) -> tuple[list[DiscoveryResult], list[EnrichmentResult]]:
         """
         Run complete scan pipeline: Stage A + Stage B.
@@ -284,7 +329,9 @@ class ScanPipeline:
         # Stage B: Enrichment (only if devices found)
         enrichment_results: list[EnrichmentResult] = []
         if discovery_results:
-            enrichment_results = await self.run_enrichment(discovery_results)
+            enrichment_results = await self.run_enrichment(
+                discovery_results, scan_run_id=scan_run_id
+            )
 
         return discovery_results, enrichment_results
 

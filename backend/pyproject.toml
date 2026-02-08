@@ -23,6 +23,7 @@ dependencies = [
   "alembic>=1.13.0",  # For database migrations
   "scapy>=2.5.0",  # For network packet manipulation (attack/scan engine)
   "httpx>=0.25.0",  # For external API calls (recognition providers)
+  "pyyaml>=6.0",  # For keyword dictionary loading
 ]
 
 [project.optional-dependencies]
