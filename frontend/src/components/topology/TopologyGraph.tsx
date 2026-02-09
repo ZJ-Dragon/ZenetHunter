@@ -1,7 +1,7 @@
 import React, { useEffect, useRef, useState, useCallback, useMemo } from 'react';
 import { ZoomIn, ZoomOut, Focus, Maximize2 } from 'lucide-react';
 import ForceGraph2D, { ForceGraphMethods, NodeObject, LinkObject } from 'react-force-graph-2d';
-import { forceCollide } from 'd3-force-3d';
+import { forceCollide, forceManyBody } from 'd3-force-3d';
 import { TopologyNode, NetworkTopology } from '../../types/topology';
 
 interface TopologyGraphProps {
@@ -45,7 +45,7 @@ export const TopologyGraph: React.FC<TopologyGraphProps> = ({ data, onNodeClick 
         node.fy = 0;
       } else {
         const angle = (idx / Math.max(1, data.nodes.length)) * Math.PI * 2;
-        const radius = 220 + idx * 3;
+        const radius = 280 + idx * 6;
         node.x = Math.cos(angle) * radius;
         node.y = Math.sin(angle) * radius;
       }
@@ -96,7 +96,8 @@ export const TopologyGraph: React.FC<TopologyGraphProps> = ({ data, onNodeClick 
 
   useEffect(() => {
     if (!graphReady || !graphRef.current) return;
-    graphRef.current.d3Force('collide', forceCollide(26));
+    graphRef.current.d3Force('collide', forceCollide(38));
+    graphRef.current.d3Force('charge', forceManyBody().strength(-260));
     refreshGraphLayout();
   }, [graphReady, refreshGraphLayout]);
 
@@ -146,9 +147,9 @@ export const TopologyGraph: React.FC<TopologyGraphProps> = ({ data, onNodeClick 
     const label =
       rawLabel.length > 16 ? `${rawLabel.slice(0, 14)}…` : rawLabel;
     const vendorLabel = topologyNode.vendorLabel;
-    const fontSize = Math.max(11, 16 / globalScale);
-    const baseRadius = 14;
-    const radius = Math.max(10, baseRadius / Math.max(0.65, globalScale));
+    const fontSize = Math.max(9, 14 / globalScale);
+    const baseRadius = 16;
+    const radius = Math.max(11, baseRadius / Math.max(0.65, globalScale));
     const isHovered = hoveredNode?.id === topologyNode.id;
     const isFocused = focusedNodeId === topologyNode.id;
 
@@ -212,7 +213,7 @@ export const TopologyGraph: React.FC<TopologyGraphProps> = ({ data, onNodeClick 
     ctx.fillStyle = statusDot;
     ctx.fill();
 
-    const showPrimaryLabel = globalScale >= 0.6 || topologyNode.type === 'router';
+    const showPrimaryLabel = globalScale >= 0.58 || topologyNode.type === 'router';
     const showBadges = globalScale >= 1.2;
 
     if (showPrimaryLabel) {
@@ -221,7 +222,7 @@ export const TopologyGraph: React.FC<TopologyGraphProps> = ({ data, onNodeClick 
       const padding = 6;
 
       // Label background
-      ctx.fillStyle = 'rgba(0, 0, 0, 0.75)';
+      ctx.fillStyle = 'rgba(24, 26, 27, 0.82)';
       ctx.fillRect(
         topologyNode.x - textWidth / 2 - padding,
         textY - fontSize - padding,
@@ -314,11 +315,12 @@ export const TopologyGraph: React.FC<TopologyGraphProps> = ({ data, onNodeClick 
           width={dimensions.width}
           height={dimensions.height}
           graphData={preparedData}
-          nodeLabel={(node: any) =>
-            `${node.primaryLabel || node.label}\n${node.data?.ip || ''}\n${
-              node.vendorLabel || ''
-            }`
-          }
+          nodeLabel={(node: any) => {
+            const primary = node.primaryLabel || node.label;
+            const ip = node.data?.ip ? `IP: ${node.data.ip}` : '';
+            const vendor = node.vendorLabel ? `Vendor: ${node.vendorLabel}` : '';
+            return [primary, ip, vendor].filter(Boolean).join('\n');
+          }}
           nodeCanvasObject={nodePaint}
           linkCanvasObject={linkPaint}
           onNodeClick={handleNodeClick}
