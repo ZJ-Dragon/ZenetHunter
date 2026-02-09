@@ -87,7 +87,6 @@ async def get_scan_config():
             "ssdp": settings.feature_ssdp,
             "nbns": settings.feature_nbns,
             "snmp": settings.feature_snmp,
-            "fingerbank": settings.feature_fingerbank,
             "active_probe": getattr(settings, "feature_active_probe", True),
         },
     }

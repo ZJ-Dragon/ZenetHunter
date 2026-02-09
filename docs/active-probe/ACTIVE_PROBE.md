@@ -51,10 +51,8 @@ The engine attempts several protocols in parallel:
 ## Recognition priority
 Active Probe outputs carry the **highest confidence (75–85%)** because they are device-self-reported:
 1. Active Probe (HTTP/Telnet/SSH/Printer/IoT)
-2. Fingerbank device fingerprint (external, ~70%)
-3. MACVendors vendor lookup (external, ~80%)
-4. Local OUI lookup (~80%)
-5. DHCP fingerprint (local, ~70%)
+2. Local OUI and keyword/dictionary matches (~80%)
+3. DHCP fingerprint (local, ~70%)
 
 ## Configuration
 - Enable/disable via environment variables:
@@ -125,4 +123,4 @@ Active Probe outputs carry the **highest confidence (75–85%)** because they ar
 - Improve hit rate: extend timeouts for slow devices, verify open ports, check `active_probe` logs.
 
 ## Used with other methods
-Active Probe complements mDNS, SSDP/UPnP, OUI lookup, and external providers (MACVendors, Fingerbank). Results are merged with weighted confidence to choose the final identity.
+Active Probe complements mDNS, SSDP/UPnP, and local OUI/dictionary lookups. Results are merged with weighted confidence to choose the final identity.

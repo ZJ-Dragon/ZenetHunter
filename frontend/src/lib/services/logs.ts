@@ -35,7 +35,6 @@ export interface ScanConfig {
     ssdp: boolean;
     nbns: boolean;
     snmp: boolean;
-    fingerbank: boolean;
   };
 }
 

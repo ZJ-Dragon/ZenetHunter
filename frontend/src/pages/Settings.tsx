@@ -417,16 +417,6 @@ export const Settings: React.FC = () => {
                     )}
                   </dd>
                 </div>
-                <div className="flex items-center justify-between">
-                  <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>Fingerbank</dt>
-                  <dd className="text-sm">
-                    {scanConfig.features.fingerbank ? (
-                      <span className="text-green-600">✓ 启用</span>
-                    ) : (
-                      <span className="text-gray-500">✗ 禁用</span>
-                    )}
-                  </dd>
-                </div>
               </dl>
               <p className="mt-4 text-xs" style={{ color: 'var(--winui-text-tertiary)' }}>
                 配置通过环境变量设置，修改配置需要重启后端服务
