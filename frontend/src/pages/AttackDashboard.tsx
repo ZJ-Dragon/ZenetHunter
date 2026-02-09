@@ -82,6 +82,30 @@ export const AttackDashboard: React.FC = () => {
 
   const typeMenuRef = useRef<HTMLDivElement>(null);
 
+  const getDisplayName = useCallback((device: Device) => {
+    return (
+      device.display_name ||
+      device.manual_profile?.manual_name ||
+      device.name ||
+      device.alias ||
+      device.model ||
+      device.model_guess ||
+      device.name_auto ||
+      'Unknown Device'
+    );
+  }, []);
+
+  const getDisplayVendor = useCallback((device: Device) => {
+    return (
+      device.display_vendor ||
+      device.manual_profile?.manual_vendor ||
+      device.vendor ||
+      device.vendor_guess ||
+      device.vendor_auto ||
+      'Unknown Vendor'
+    );
+  }, []);
+
   // Close attack type menu when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -123,6 +147,9 @@ export const AttackDashboard: React.FC = () => {
   useEffect(() => {
     fetchDevices();
   }, [fetchDevices]);
+
+  useWebSocketEvent(WSEventType.DEVICE_UPDATED, fetchDevices);
+  useWebSocketEvent(WSEventType.DEVICE_RECOGNITION_UPDATED, fetchDevices);
 
   // Handle active defense started
   useWebSocketEvent(WSEventType.ACTIVE_DEFENSE_STARTED, (data: ActiveDefenseStartedData) => {
@@ -206,12 +233,13 @@ export const AttackDashboard: React.FC = () => {
   const filteredDevices = devices.filter(device => {
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
+    const name = getDisplayName(device).toLowerCase();
+    const vendor = getDisplayVendor(device).toLowerCase();
     return (
-      device.name?.toLowerCase().includes(query) ||
+      name.includes(query) ||
+      vendor.includes(query) ||
       device.ip.toLowerCase().includes(query) ||
-      device.mac.toLowerCase().includes(query) ||
-      device.vendor?.toLowerCase().includes(query) ||
-      device.vendor_guess?.toLowerCase().includes(query)
+      device.mac.toLowerCase().includes(query)
     );
   });
 
@@ -246,7 +274,7 @@ export const AttackDashboard: React.FC = () => {
   const handleLaunchAttack = async (device: Device) => {
     setLaunchingMacs(prev => new Set(prev).add(device.mac.toLowerCase()));
     const metadata = attackTypeMetadata[selectedAttackType];
-    const toastId = toast.loading(`Launching ${metadata.label} on ${device.name || device.ip}...`);
+    const toastId = toast.loading(`Launching ${metadata.label} on ${getDisplayName(device)}...`);
 
     try {
       await attackService.startAttack(device.mac, selectedAttackType, globalDuration, globalIntensity);
@@ -346,6 +374,8 @@ export const AttackDashboard: React.FC = () => {
             displayAttacks.map((attack) => {
               const device = attack.device || devices.find(d => d.mac.toLowerCase() === attack.mac.toLowerCase());
               const isStopping = stoppingMacs.has(attack.mac.toLowerCase());
+              const displayName = device ? getDisplayName(device) : 'Unknown Device';
+              const displayVendor = device ? getDisplayVendor(device) : 'Unknown Vendor';
 
               return (
                 <div
@@ -368,7 +398,7 @@ export const AttackDashboard: React.FC = () => {
                       <div className="ml-4 flex-1">
                         <div className="flex items-center gap-3">
                           <span className="text-sm font-semibold" style={{ color: 'var(--winui-text-primary)' }}>
-                            {device?.name || device?.alias || device?.model || device?.model_guess || 'Unknown Device'}
+                            {displayName}
                           </span>
                           <span
                             className="px-2 py-0.5 text-xs font-medium rounded"
@@ -386,9 +416,7 @@ export const AttackDashboard: React.FC = () => {
                           <span className="font-mono text-xs">{attack.mac}</span>
                         </div>
                         <div className="mt-1 flex items-center gap-4 text-xs" style={{ color: 'var(--winui-text-tertiary)' }}>
-                          {device?.vendor || device?.vendor_guess ? (
-                            <span>{device.vendor || device.vendor_guess}</span>
-                          ) : null}
+                          {displayVendor && <span>{displayVendor}</span>}
                           {attack.duration > 0 && (
                             <span className="flex items-center gap-1">
                               <Clock className="h-3 w-3" />
@@ -655,6 +683,8 @@ export const AttackDashboard: React.FC = () => {
                 const underAttack = isDeviceUnderAttack(device.mac);
                 const isLaunching = launchingMacs.has(device.mac.toLowerCase());
                 const isStopping = stoppingMacs.has(device.mac.toLowerCase());
+                const displayName = getDisplayName(device);
+                const displayVendor = getDisplayVendor(device);
 
                 return (
                   <div
@@ -691,7 +721,7 @@ export const AttackDashboard: React.FC = () => {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <span className="text-sm font-medium truncate" style={{ color: 'var(--winui-text-primary)' }}>
-                          {device.name || device.alias || device.model || device.model_guess || 'Unknown Device'}
+                          {displayName}
                         </span>
                         <div
                           className={clsx(
@@ -717,7 +747,7 @@ export const AttackDashboard: React.FC = () => {
                         <span className="font-mono text-[10px]" style={{ color: 'var(--winui-text-tertiary)' }}>{device.mac}</span>
                       </div>
                       <div className="text-xs mt-0.5" style={{ color: 'var(--winui-text-tertiary)' }}>
-                        {device.vendor || device.vendor_guess || 'Unknown Vendor'}
+                        {displayVendor}
                       </div>
                     </div>
 

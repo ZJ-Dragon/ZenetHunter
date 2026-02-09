@@ -17,6 +17,7 @@ export const TopologyGraph: React.FC<TopologyGraphProps> = ({ data, onNodeClick 
   const [graphReady, setGraphReady] = useState(false);
   const [focusedNodeId, setFocusedNodeId] = useState<string | null>(null);
   const lastClickRef = useRef<number>(0);
+   const [isInitializing, setIsInitializing] = useState(true);
 
   const preparedData = useMemo(() => {
     const nodes = data.nodes.map((n, idx) => {
@@ -89,6 +90,7 @@ export const TopologyGraph: React.FC<TopologyGraphProps> = ({ data, onNodeClick 
   useEffect(() => {
     const ready = dimensions.width > 0 && dimensions.height > 0;
     setGraphReady(ready);
+    setIsInitializing(!ready || (ready && data.nodes.length > 0));
     if (ready && data.nodes.length > 0) {
       refreshGraphLayout();
     }
@@ -100,6 +102,16 @@ export const TopologyGraph: React.FC<TopologyGraphProps> = ({ data, onNodeClick 
     graphRef.current.d3Force('charge', forceManyBody().strength(-260));
     refreshGraphLayout();
   }, [graphReady, refreshGraphLayout]);
+
+  useEffect(() => {
+    if (!graphReady) return;
+    // Extra nudge after data changes
+    const id = setTimeout(() => {
+      refreshGraphLayout();
+      setIsInitializing(false);
+    }, 120);
+    return () => clearTimeout(id);
+  }, [preparedData.nodes.length, graphReady, refreshGraphLayout]);
 
   useEffect(() => {
     const onVis = () => {
@@ -311,6 +323,7 @@ export const TopologyGraph: React.FC<TopologyGraphProps> = ({ data, onNodeClick 
     >
       {graphReady && (
         <ForceGraph2D
+          key={`graph-${preparedData.nodes.length}-${preparedData.links.length}`}
           ref={graphRef}
           width={dimensions.width}
           height={dimensions.height}
@@ -359,8 +372,11 @@ export const TopologyGraph: React.FC<TopologyGraphProps> = ({ data, onNodeClick 
           enableZoomInteraction
         />
       )}
-      {!graphReady && (
-        <div className="absolute inset-0 flex items-center justify-center text-sm" style={{ color: 'var(--winui-text-secondary)' }}>
+      {(!graphReady || isInitializing) && (
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-sm z-10"
+          style={{ color: 'var(--winui-text-secondary)', backgroundColor: 'rgba(255,255,255,0.72)' }}>
+          <div className="h-10 w-10 border-2 border-t-transparent rounded-full animate-spin mb-2"
+            style={{ borderColor: 'var(--winui-accent)' }} />
           Preparing layout...
         </div>
       )}

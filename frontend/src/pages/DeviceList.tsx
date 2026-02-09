@@ -130,19 +130,19 @@ export const DeviceList: React.FC = () => {
     return devices.filter((device) => {
       const names = [
         device.display_name,
+        device.manual_profile?.manual_name,
         device.name,
         device.alias,
         device.model,
         device.model_guess,
         device.name_auto,
-        device.manual_profile?.manual_name,
       ].filter(Boolean) as string[];
       const vendors = [
         device.display_vendor,
+        device.manual_profile?.manual_vendor,
         device.vendor,
         device.vendor_guess,
         device.vendor_auto,
-        device.manual_profile?.manual_vendor,
       ].filter(Boolean) as string[];
       const matchesSearch =
         names.some((n) => n.toLowerCase().includes(search.toLowerCase())) ||
@@ -292,9 +292,6 @@ export const DeviceList: React.FC = () => {
                                     {device.recognition_confidence}%
                                   </span>
                                 )}
-                              </div>
-                              <div className="text-xxs mt-1" style={{ color: 'var(--winui-text-tertiary)' }}>
-                                Auto: {autoName} • {autoVendor}
                               </div>
                             </div>
                           </div>
