@@ -549,6 +549,7 @@ class ScannerService:
                                     fingerprint_data=full_fingerprint,
                                     vendor_guess=device.vendor_guess,
                                     model_guess=device.model_guess,
+                                    ip_hint=str(ip),
                                 )
                             )
 

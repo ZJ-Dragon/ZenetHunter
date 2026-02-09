@@ -22,8 +22,7 @@ def build_match_keys(
     *,
     mac: str | None,
     fingerprint_components: dict[str, Any] | None = None,
-    vendor_guess: str | None = None,
-    model_guess: str | None = None,
+    ip_hint: str | None = None,
 ) -> dict[str, Any]:
     """Normalize a small set of match keys for profile matching."""
     keys: dict[str, Any] = {}
@@ -36,10 +35,8 @@ def build_match_keys(
         for k in ("dhcp_hostname", "mdns_services", "ssdp_server", "user_agent_type"):
             if v := fingerprint_components.get(k):
                 keys[k] = v
-    if vendor_guess:
-        keys["vendor_guess"] = vendor_guess
-    if model_guess:
-        keys["model_guess"] = model_guess
+    if ip_hint:
+        keys["ip_hint"] = ip_hint
     return keys
 
 
@@ -89,9 +86,13 @@ class ManualProfileService:
         mac: str | None,
         fingerprint_key: str | None,
         match_keys: dict[str, Any],
+        ip_hint: str | None = None,
     ) -> ManualMatchResult | None:
         profile = await self.repo.find_best_match(
-            fingerprint_key=fingerprint_key, mac=mac, match_keys=match_keys
+            fingerprint_key=fingerprint_key,
+            mac=mac,
+            match_keys=match_keys,
+            ip_hint=ip_hint,
         )
         if not profile:
             return None

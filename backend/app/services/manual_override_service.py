@@ -32,6 +32,7 @@ class ManualOverrideService:
         fingerprint_data: dict[str, Any] | None = None,
         vendor_guess: str | None = None,
         model_guess: str | None = None,
+        ip_hint: str | None = None,
     ) -> dict[str, Any] | None:
         """Check if device matches a manual override and return labels if found.
 
@@ -64,11 +65,13 @@ class ManualOverrideService:
         match_keys = build_match_keys(
             mac=mac,
             fingerprint_components=components,
-            vendor_guess=vendor_guess,
-            model_guess=model_guess,
+            ip_hint=ip_hint,
         )
         profile = await self.manual_profile_repo.find_best_match(
-            fingerprint_key=fingerprint_key, mac=mac, match_keys=match_keys
+            fingerprint_key=fingerprint_key,
+            mac=mac,
+            match_keys=match_keys,
+            ip_hint=ip_hint,
         )
         if profile:
             logger.info(
@@ -149,6 +152,7 @@ async def apply_manual_override_to_device(
     fingerprint_data: dict[str, Any] | None = None,
     vendor_guess: str | None = None,
     model_guess: str | None = None,
+    ip_hint: str | None = None,
 ) -> dict[str, Any] | None:
     """Convenience function to check and apply manual override.
 
@@ -168,4 +172,5 @@ async def apply_manual_override_to_device(
         fingerprint_data=fingerprint_data,
         vendor_guess=vendor_guess,
         model_guess=model_guess,
+        ip_hint=ip_hint,
     )
