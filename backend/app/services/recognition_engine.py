@@ -9,6 +9,7 @@ from typing import Any
 from app.services.device_model_lookup import get_device_model_lookup
 from app.services.fingerprint_normalizer import FingerprintNormalizer
 from app.services.keyword_extractor import KeywordExtractor, apply_confidence_delta
+
 logger = logging.getLogger(__name__)
 
 
@@ -103,10 +104,8 @@ class RecognitionEngine:
 
         # Extract from HTTP responses
         http_title = fingerprint.get("http_title", "")
-        http_server = fingerprint.get("http_server", "")
         http_meta_model = fingerprint.get("http_meta_model")
         http_meta_device = fingerprint.get("http_meta_device")
-        http_meta_product = fingerprint.get("http_meta_product")
 
         # Extract from Telnet/SSH banners
         telnet_banner = fingerprint.get("telnet_banner", "")

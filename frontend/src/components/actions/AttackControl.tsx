@@ -142,7 +142,7 @@ export const AttackControl: React.FC<AttackControlProps> = ({ device, className 
       setIsLoading(false);
     }
   };
-  
+
   // Note: Removed safety check - allow attack on any device for research purposes
   // Users should be aware of risks when attacking gateway/router
 

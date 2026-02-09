@@ -203,9 +203,13 @@ class ActiveProbeEnricher:
 
         # Extract meta tags
         meta_patterns = {
-            "device": r'<meta[^>]*name=["\']device["\'][^>]*content=["\']([^"\']+)["\']',
+            "device": (
+                r'<meta[^>]*name=["\']device["\'][^>]*content=["\']([^"\']+)["\']'
+            ),
             "model": r'<meta[^>]*name=["\']model["\'][^>]*content=["\']([^"\']+)["\']',
-            "product": r'<meta[^>]*name=["\']product["\'][^>]*content=["\']([^"\']+)["\']',
+            "product": (
+                r'<meta[^>]*name=["\']product["\'][^>]*content=["\']([^"\']+)["\']'
+            ),
         }
 
         for key, pattern in meta_patterns.items():
@@ -257,13 +261,15 @@ class ActiveProbeEnricher:
                 finally:
                     writer.close()
                     await writer.wait_closed()
-            except (ConnectionRefusedError, asyncio.TimeoutError, OSError):
+            except (TimeoutError, ConnectionRefusedError, OSError):
                 continue
             except Exception as exc:
                 logger.debug("Telnet probe %s:%s failed: %s", device_ip, port, exc)
                 continue
 
-        return ActiveProbeResult(fingerprint=fingerprint, observations=observations or [])
+        return ActiveProbeResult(
+            fingerprint=fingerprint, observations=observations or []
+        )
 
     async def _probe_ssh_banner(self, device_ip: str) -> ActiveProbeResult:
         fingerprint: dict[str, Any] = {}
@@ -296,7 +302,7 @@ class ActiveProbeEnricher:
                 writer.close()
                 await writer.wait_closed()
 
-        except (ConnectionRefusedError, asyncio.TimeoutError, OSError):
+        except (TimeoutError, ConnectionRefusedError, OSError):
             pass
         except Exception as e:
             logger.debug("SSH probe %s failed: %s", device_ip, e)
@@ -346,7 +352,7 @@ class ActiveProbeEnricher:
                 writer.close()
                 await writer.wait_closed()
 
-        except (ConnectionRefusedError, asyncio.TimeoutError, OSError):
+        except (TimeoutError, ConnectionRefusedError, OSError):
             pass
         except Exception as e:
             logger.debug("IPP probe %s failed: %s", device_ip, e)
@@ -377,7 +383,7 @@ class ActiveProbeEnricher:
                 writer.close()
                 await writer.wait_closed()
 
-        except (ConnectionRefusedError, asyncio.TimeoutError, OSError):
+        except (TimeoutError, ConnectionRefusedError, OSError):
             pass
         except Exception as e:
             logger.debug("LPD probe %s failed: %s", device_ip, e)

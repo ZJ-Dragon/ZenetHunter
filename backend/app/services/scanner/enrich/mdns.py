@@ -41,7 +41,9 @@ class _AsyncMDNSListener:
         self._tasks.add(task)
         task.add_done_callback(self._tasks.discard)
 
-    def add_service(self, zeroconf, service_type: str, name: str) -> None:  # pragma: no cover - callback
+    def add_service(
+        self, zeroconf, service_type: str, name: str
+    ) -> None:  # pragma: no cover - callback
         self._create_task(self._process_service(service_type, name))
 
     update_service = add_service

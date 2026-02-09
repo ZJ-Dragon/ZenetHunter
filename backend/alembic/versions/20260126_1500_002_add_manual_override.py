@@ -20,7 +20,7 @@ depends_on: str | Sequence[str] | None = None
 
 
 def upgrade() -> None:
-    """Add manual override columns to devices table and create manual_overrides table."""
+    """Add manual override columns and create the manual_overrides table."""
 
     # Add new columns to devices table for manual labeling
     op.add_column(

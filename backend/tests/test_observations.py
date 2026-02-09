@@ -6,13 +6,14 @@ pytest.importorskip("httpx", reason="httpx is required for FastAPI TestClient")
 
 from fastapi.testclient import TestClient  # noqa: E402
 
-from app.main import app  # noqa: E402
 from app.core.database import get_session_factory  # noqa: E402
+from app.main import app  # noqa: E402
 from app.repositories.probe_observation import ProbeObservationRepository  # noqa: E402
 
 
 def _seed_observation(mac: str = "aa:bb:cc:dd:ee:ff", scan_run_id: str = "test-scan"):
     session_factory = get_session_factory()
+
     async def _inner():
         async with session_factory() as session:
             repo = ProbeObservationRepository(session)
@@ -27,7 +28,9 @@ def _seed_observation(mac: str = "aa:bb:cc:dd:ee:ff", scan_run_id: str = "test-s
                 redaction_level="standard",
             )
             await session.commit()
+
     import asyncio
+
     asyncio.run(_inner())
 
 

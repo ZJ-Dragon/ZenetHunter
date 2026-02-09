@@ -64,13 +64,9 @@ def build_key_fields(protocol: str, raw_fields: dict[str, Any]) -> dict[str, Any
                     sanitized_entry: dict[str, Any] = {}
                     for sub_k, sub_v in list(item.items())[:10]:
                         if isinstance(sub_v, str):
-                            sanitized_entry[sub_k] = _sanitize_text(
-                                str(sub_v), 80
-                            )
+                            sanitized_entry[sub_k] = _sanitize_text(str(sub_v), 80)
                         elif isinstance(sub_v, (int, float, bool)):
-                            sanitized_entry[sub_k] = _sanitize_text(
-                                str(sub_v), 40
-                            )
+                            sanitized_entry[sub_k] = _sanitize_text(str(sub_v), 40)
                     if sanitized_entry:
                         sanitized_list.append(sanitized_entry)
             if sanitized_list:

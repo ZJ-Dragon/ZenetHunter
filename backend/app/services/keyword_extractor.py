@@ -3,11 +3,11 @@
 from __future__ import annotations
 
 import json
+import logging
 import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
-import logging
 
 import yaml  # type: ignore
 
@@ -59,7 +59,9 @@ class KeywordDictionary:
         if not self.path.exists():
             self.meta = {"mode": "missing"}
             self.rules = []
-            logger.warning("Keyword dictionary missing at %s; running without rules", self.path)
+            logger.warning(
+                "Keyword dictionary missing at %s; running without rules", self.path
+            )
             return
         try:
             content = yaml.safe_load(self.path.read_text(encoding="utf-8")) or {}
@@ -106,10 +108,7 @@ class KeywordDictionary:
                             priority=priority,
                             any_contains=any_contains,
                             any_regex=any_regex,
-                            infer={
-                                k: v
-                                for k, v in infer.items()
-                            },
+                            infer={k: v for k, v in infer.items()},
                             confidence_delta=confidence_delta,
                             notes=notes,
                         )
@@ -129,7 +128,9 @@ class KeywordDictionary:
                 exc,
             )
 
-    def match(self, keywords: list[str], key_fields: dict[str, Any]) -> list[dict[str, Any]]:
+    def match(
+        self, keywords: list[str], key_fields: dict[str, Any]
+    ) -> list[dict[str, Any]]:
         """Return keyword_hits with deduped rules."""
         if not self.rules:
             return []
@@ -198,7 +199,10 @@ class KeywordExtractor:
     """Extracts normalized keywords and applies dictionary rules."""
 
     def __init__(self, dictionary_path: Path | None = None):
-        base_path = dictionary_path or Path(__file__).parent.parent / "data" / "keyword_dictionary.yaml"
+        base_path = (
+            dictionary_path
+            or Path(__file__).parent.parent / "data" / "keyword_dictionary.yaml"
+        )
         self.dictionary = KeywordDictionary(base_path)
 
     def extract(self, key_fields: dict[str, Any]) -> list[str]:
@@ -230,11 +234,15 @@ class KeywordExtractor:
         _walk(key_fields)
         return sorted(tokens)
 
-    def match_rules(self, keywords: list[str], key_fields: dict[str, Any]) -> list[dict[str, Any]]:
+    def match_rules(
+        self, keywords: list[str], key_fields: dict[str, Any]
+    ) -> list[dict[str, Any]]:
         return self.dictionary.match(keywords, key_fields)
 
 
-def apply_confidence_delta(base_confidence: int, hits: list[dict[str, Any]]) -> tuple[int, int]:
+def apply_confidence_delta(
+    base_confidence: int, hits: list[dict[str, Any]]
+) -> tuple[int, int]:
     """Apply priority-ordered confidence deltas and clamp to [0, 100].
 
     Returns (new_confidence, total_delta).
@@ -242,7 +250,9 @@ def apply_confidence_delta(base_confidence: int, hits: list[dict[str, Any]]) -> 
     if not hits:
         return base_confidence, 0
     total_delta = 0
-    for hit in sorted(hits, key=lambda h: (-int(h.get("priority", 0)), h.get("rule_id", ""))):
+    for hit in sorted(
+        hits, key=lambda h: (-int(h.get("priority", 0)), h.get("rule_id", ""))
+    ):
         try:
             total_delta += int(hit.get("confidence_delta", 0))
         except Exception:

@@ -493,9 +493,7 @@ class ScannerService:
                                 "best_guess_model"
                             )
                             if recognition_result.get("best_guess_name"):
-                                device.name = recognition_result.get(
-                                    "best_guess_name"
-                                )
+                                device.name = recognition_result.get("best_guess_name")
                             device.recognition_confidence = recognition_result.get(
                                 "confidence"
                             )
@@ -745,22 +743,20 @@ class ScannerService:
         Guess device type from MAC address, IP, vendor, and model.
         Uses heuristics based on vendor/model names and IP address.
         """
+        vendor_lower = (vendor or "").lower()
+        model_lower = (model or "").lower()
+        combined = f"{vendor_lower} {model_lower}".lower()
+
         # Try to detect gateway (router)
         try:
             from scapy.all import conf
 
             # conf.route.route("0.0.0.0")[2] returns default gateway IP
             gateway_ip = conf.route.route("0.0.0.0")[2]
-            if ip and ip == gateway_ip:
+            if ip and ip == gateway_ip and vendor_lower != "apple":
                 return DeviceType.ROUTER
         except Exception:
             pass
-
-        # Use vendor and model information to infer device type
-        # Priority: model > vendor (model is more specific)
-        vendor_lower = (vendor or "").lower()
-        model_lower = (model or "").lower()
-        combined = f"{vendor_lower} {model_lower}".lower()
 
         # Router detection keywords (more specific, check model first)
         # Only match if model/vendor explicitly contains router-related terms
@@ -783,7 +779,11 @@ class ScannerService:
             "mi router",
         ]
         # Check model first (more specific)
-        if model_lower and any(keyword in model_lower for keyword in router_keywords):
+        if (
+            vendor_lower != "apple"
+            and model_lower
+            and any(keyword in model_lower for keyword in router_keywords)
+        ):
             return DeviceType.ROUTER
         # Then check vendor only if it's a known router manufacturer
         # AND model suggests router

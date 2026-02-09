@@ -21,6 +21,7 @@
 - NDJSON 导出可追加、便于回放和外部分析。
 
 ## 前端体验
+- 拓扑详情抽屉：新增“Discovered Services”（mDNS/SSDP）与 “Identification Hints”（HTTP/Printer/Banner）折叠区，默认收起以保持画布整洁。
 - 拓扑详情抽屉：“Probe Details / Observations”（默认折叠）。摘要显示协议/时间/关键词数，展开后展示 key_fields 和 keywords，并支持复制/导出。
 - 设备列表：每行“更多”省略号按钮展开紧凑观测预览，并显示关键词命中数。
 - 拓扑详情同时提供 “Keyword Intelligence” 卡片（默认折叠）：抬头展示命中数量与最高优先级推断摘要，展开后列出命中关键词、说明、置信度增量与推断字段（vendor/product/os/category）。

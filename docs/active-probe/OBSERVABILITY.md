@@ -21,6 +21,7 @@ Observability adds a reproducible trail for probe/enrichment responses without s
 - NDJSON export is append-friendly for replay and external tooling.
 
 ## Frontend UX
+- Topology device drawer: "Discovered Services" (mDNS/SSDP) and "Identification Hints" (HTTP/Printer/Banner) sections, collapsible by default to keep the canvas clean.
 - Topology device drawer: “Probe Details / Observations” (collapsed by default). Shows protocol, time, keyword count summary; expanded view reveals key fields and keywords, with copy/export actions.
 - Device list: per-row “More” (ellipsis) shows a compact observation preview and keyword hit count.
 - Topology device drawer also includes a “Keyword Intelligence” card (collapsed by default): count + top inference summary in the header, full hit list (matched token, notes, delta, inferred vendor/product/os/category) when expanded.

@@ -21,6 +21,8 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({ node, onClose, onDeviceU
   const [showEvidence, setShowEvidence] = useState(false);
   const [showKeywordIntel, setShowKeywordIntel] = useState(false);
   const [showObservations, setShowObservations] = useState(false);
+  const [showServices, setShowServices] = useState(true);
+  const [showHints, setShowHints] = useState(true);
   const [observations, setObservations] = useState<ProbeObservation[]>([]);
   const [isLoadingObservations, setIsLoadingObservations] = useState(false);
   const [isExporting, setIsExporting] = useState(false);
@@ -40,6 +42,8 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({ node, onClose, onDeviceU
     setEditingVendor(false);
     setShowObservations(false);
     setShowAutoIdentity(false);
+    setShowServices(true);
+    setShowHints(true);
     setObservations([]);
     fetchObservations();
   }, [initialDevice]);
@@ -185,6 +189,68 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({ node, onClose, onDeviceU
     } finally {
       setIsExporting(false);
     }
+  };
+
+  const serviceObservations = observations.filter(
+    (obs) => obs.protocol === 'mdns' || obs.protocol === 'ssdp'
+  );
+  const hintObservations = observations.filter((obs) =>
+    ['http_ident', 'printer_ident', 'telnet_banner', 'ssh_banner', 'active_probe'].includes(obs.protocol)
+  );
+
+  const formatValue = (value: unknown): string => {
+    if (value === null || value === undefined) return '';
+    if (typeof value === 'string') return value;
+    if (typeof value === 'number' || typeof value === 'boolean') return String(value);
+    if (Array.isArray(value)) {
+      return value
+        .slice(0, 3)
+        .map((v) => formatValue(v))
+        .filter(Boolean)
+        .join(', ');
+    }
+    if (typeof value === 'object') {
+      const objectValues = Object.values(value as Record<string, unknown>)
+        .map((v) => (typeof v === 'string' || typeof v === 'number' ? String(v) : ''))
+        .filter(Boolean);
+      if (objectValues.length > 0) {
+        return objectValues.slice(0, 3).join(', ');
+      }
+      try {
+        return JSON.stringify(value).slice(0, 120);
+      } catch (err) {
+        console.error(err);
+        return '';
+      }
+    }
+    return String(value);
+  };
+
+  const renderKeyChips = (obs: ProbeObservation) => {
+    const entries = Object.entries(obs.key_fields || {}).filter(([key]) => key !== 'protocol');
+    if (entries.length === 0) return null;
+    return (
+      <div className="mt-2 flex flex-wrap gap-2">
+        {entries.slice(0, 6).map(([key, value]) => (
+          <span
+            key={key}
+            className="text-xxs px-2 py-1 rounded-full"
+            style={{ backgroundColor: 'rgba(0,0,0,0.05)', color: 'var(--winui-text-secondary)' }}
+            title={formatValue(value)}
+          >
+            <span className="font-semibold">{key}:</span> {formatValue(value)}
+          </span>
+        ))}
+      </div>
+    );
+  };
+
+  const summarizeObservation = (obs: ProbeObservation): string => {
+    if (obs.raw_summary) return obs.raw_summary;
+    const values = Object.values(obs.key_fields || {})
+      .map((v) => formatValue(v))
+      .filter(Boolean);
+    return values.slice(0, 2).join(' • ');
   };
 
   return (
@@ -591,6 +657,106 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({ node, onClose, onDeviceU
             </div>
           </div>
         )}
+
+        {/* Service discovery */}
+        <div className="card-winui p-4">
+          <div className="flex items-center justify-between mb-2">
+            <div>
+              <h4 className="text-sm font-semibold uppercase tracking-wider" style={{ color: 'var(--winui-text-secondary)' }}>
+                Discovered Services
+              </h4>
+              <p className="text-xs mt-1" style={{ color: 'var(--winui-text-tertiary)' }}>
+                {serviceObservations.length > 0
+                  ? `Latest ${serviceObservations.length} mDNS/SSDP observations`
+                  : 'No service advertisements captured yet.'}
+              </p>
+            </div>
+            <button
+              onClick={() => setShowServices((prev) => !prev)}
+              className="btn-winui-secondary inline-flex items-center gap-1"
+            >
+              {showServices ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+              {showServices ? 'Collapse' : 'Expand'}
+            </button>
+          </div>
+          {showServices && (
+            <div className="space-y-2">
+              {serviceObservations.length === 0 && (
+                <p className="text-xs" style={{ color: 'var(--winui-text-secondary)' }}>
+                  No mDNS/SSDP services observed for this device yet.
+                </p>
+              )}
+              {serviceObservations.map((obs) => (
+                <div
+                  key={obs.id}
+                  className="p-3 rounded border"
+                  style={{ borderColor: 'var(--winui-border-subtle)', backgroundColor: 'var(--winui-bg-tertiary)' }}
+                >
+                  <div className="flex items-center justify-between text-xs" style={{ color: 'var(--winui-text-secondary)' }}>
+                    <span className="font-semibold" style={{ color: 'var(--winui-text-primary)' }}>
+                      {obs.protocol.toUpperCase()}
+                    </span>
+                    <span>{new Date(obs.timestamp).toLocaleString()}</span>
+                  </div>
+                  <p className="text-sm mt-1" style={{ color: 'var(--winui-text-primary)' }}>
+                    {summarizeObservation(obs) || 'Service details captured'}
+                  </p>
+                  {renderKeyChips(obs)}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Identification hints */}
+        <div className="card-winui p-4">
+          <div className="flex items-center justify-between mb-2">
+            <div>
+              <h4 className="text-sm font-semibold uppercase tracking-wider" style={{ color: 'var(--winui-text-secondary)' }}>
+                Identification Hints
+              </h4>
+              <p className="text-xs mt-1" style={{ color: 'var(--winui-text-tertiary)' }}>
+                {hintObservations.length > 0
+                  ? `Latest ${hintObservations.length} HTTP/Printer/Banner hints`
+                  : 'No identification probes captured yet.'}
+              </p>
+            </div>
+            <button
+              onClick={() => setShowHints((prev) => !prev)}
+              className="btn-winui-secondary inline-flex items-center gap-1"
+            >
+              {showHints ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+              {showHints ? 'Collapse' : 'Expand'}
+            </button>
+          </div>
+          {showHints && (
+            <div className="space-y-2">
+              {hintObservations.length === 0 && (
+                <p className="text-xs" style={{ color: 'var(--winui-text-secondary)' }}>
+                  No HTTP/printer/banner hints collected for this device yet.
+                </p>
+              )}
+              {hintObservations.map((obs) => (
+                <div
+                  key={obs.id}
+                  className="p-3 rounded border"
+                  style={{ borderColor: 'var(--winui-border-subtle)', backgroundColor: 'var(--winui-bg-tertiary)' }}
+                >
+                  <div className="flex items-center justify-between text-xs" style={{ color: 'var(--winui-text-secondary)' }}>
+                    <span className="font-semibold" style={{ color: 'var(--winui-text-primary)' }}>
+                      {obs.protocol.toUpperCase()}
+                    </span>
+                    <span>{new Date(obs.timestamp).toLocaleString()}</span>
+                  </div>
+                  <p className="text-sm mt-1" style={{ color: 'var(--winui-text-primary)' }}>
+                    {summarizeObservation(obs) || 'Identification hint captured'}
+                  </p>
+                  {renderKeyChips(obs)}
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
 
         {/* Keyword Intelligence */}
         <div className="card-winui p-4">
