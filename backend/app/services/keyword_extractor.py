@@ -34,12 +34,15 @@ class KeywordRule:
         category = self.infer.get("category")
         if vendor:
             parts.append(vendor)
+        name = self.infer.get("name")
         if product:
             parts.append(product)
         if os_name:
             parts.append(os_name)
         if category:
             parts.append(f"[{category}]")
+        if name:
+            parts.append(f"({name})")
         return " ".join(parts).strip()
 
 
@@ -92,7 +95,8 @@ class KeywordDictionary:
                     infer = {
                         k: str(v)
                         for k, v in infer_raw.items()
-                        if k in {"vendor", "product", "category", "os"} and v is not None
+                        if k in {"vendor", "product", "category", "os", "name"}
+                        and v is not None
                     }
                     confidence_delta = int(raw.get("confidence_delta", 0))
                     notes = str(raw.get("notes", "")).strip()

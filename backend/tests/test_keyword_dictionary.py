@@ -67,6 +67,28 @@ rules:
     assert new_conf == 100  # clamped
 
 
+def test_keyword_dictionary_supports_name_field(tmp_path: Path):
+    yaml_body = """
+version: "1.0.0"
+updated: "test"
+rules:
+  - id: named
+    priority: 50
+    match:
+      any_contains: ["specialdevice"]
+    infer:
+      vendor: "VendorX"
+      name: "Friendly Device"
+    confidence_delta: 5
+    notes: "name support"
+"""
+    path = _write_dict(tmp_path, yaml_body)
+    extractor = KeywordExtractor(dictionary_path=path)
+    hits = extractor.match_rules(["specialdevice"], {"http_title": "SpecialDevice"})
+    assert hits and hits[0]["infer"]["name"] == "Friendly Device"
+    assert "Friendly Device" in hits[0]["infer_summary"]
+
+
 def test_apply_confidence_delta_clamp_lower_and_upper():
     hits = [
         {"priority": 100, "confidence_delta": 15, "rule_id": "a"},

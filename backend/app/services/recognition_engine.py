@@ -334,6 +334,7 @@ class RecognitionEngine:
         keyword_tokens = self.keyword_extractor.extract(fingerprint)
         keyword_hits = self.keyword_extractor.match_rules(keyword_tokens, fingerprint)
         evidence["keyword_hits"] = keyword_hits
+        final_name: str | None = None
         if keyword_hits:
             evidence["sources"].append("dictionary")
             evidence["matched_fields"].append("keyword_dictionary")
@@ -348,7 +349,7 @@ class RecognitionEngine:
                 key=lambda h: (-int(h.get("priority", 0)), h.get("rule_id", "")),
             ):
                 infer = hit.get("infer") or {}
-                for key in ("vendor", "product", "category", "os"):
+                for key in ("vendor", "product", "category", "os", "name"):
                     if key not in merged_infer and infer.get(key):
                         merged_infer[key] = infer[key]
             if merged_infer:
@@ -362,6 +363,8 @@ class RecognitionEngine:
                 final_vendor = infer.get("vendor")
             if not final_model and infer.get("product"):
                 final_model = infer.get("product")
+            if infer.get("name"):
+                final_name = infer.get("name")
 
         # Add evidence summary
         evidence["confidence_breakdown"] = {
@@ -377,6 +380,7 @@ class RecognitionEngine:
         result = {
             "best_guess_vendor": final_vendor,
             "best_guess_model": final_model,
+            "best_guess_name": final_name,
             "confidence": final_confidence,
             "evidence": evidence,
         }

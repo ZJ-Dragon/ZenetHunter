@@ -17,6 +17,7 @@ rules:
       vendor: "UGREEN"
       os: "UGOS Pro"
       category: "NAS"
+      name: "UGREEN NAS"
     confidence_delta: 30
     notes: "UGOS Pro keyword strongly suggests UGREEN NAS."
 
@@ -261,6 +262,16 @@ rules:
     confidence_delta: 28
     notes: "HyperOS suggests Xiaomi ecosystem."
 
+  - id: xiaomi-router
+    priority: 85
+    match:
+      any_contains: ["小米路由器", "xiaomi router"]
+    infer:
+      vendor: "Xiaomi"
+      category: "Router"
+    confidence_delta: 50
+    notes: "Xiaomi Router"
+
   - id: xiaomi-miio-mdns
     priority: 95
     match:
@@ -275,7 +286,7 @@ rules:
   - id: xiaomi-mijia
     priority: 80
     match:
-      any_contains: ["mijia", "米家", "mihome", "mi home"]
+      any_contains: ["mijia", "米家", "mihome", "mi home", "mi"]
     infer:
       vendor: "Xiaomi"
       category: "Smart Home (Mi Ecosystem)"

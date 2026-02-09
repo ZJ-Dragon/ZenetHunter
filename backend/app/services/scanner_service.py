@@ -492,6 +492,10 @@ class ScannerService:
                             device.model_guess = recognition_result.get(
                                 "best_guess_model"
                             )
+                            if recognition_result.get("best_guess_name"):
+                                device.name = recognition_result.get(
+                                    "best_guess_name"
+                                )
                             device.recognition_confidence = recognition_result.get(
                                 "confidence"
                             )
