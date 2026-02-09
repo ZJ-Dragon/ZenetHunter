@@ -199,6 +199,16 @@ if _HAVE_PYDANTIC_SETTINGS:
                 "Simulates normal server connections to get device info."
             ),
         )
+        feature_http_ident: bool = Field(
+            default=True,
+            validation_alias="FEATURE_HTTP_IDENT",
+            description="Enable safe HTTP/HTTPS identification probes (local-only).",
+        )
+        feature_printer_ident: bool = Field(
+            default=True,
+            validation_alias="FEATURE_PRINTER_IDENT",
+            description="Enable printer identification probes when hints are present.",
+        )
 
         # CORS: comma‑separated list → list[str]
         cors_origins_raw: str = Field(
@@ -384,6 +394,14 @@ else:
         )
         feature_active_probe: bool = Field(
             default_factory=lambda: os.getenv("FEATURE_ACTIVE_PROBE", "true").lower()
+            == "true"
+        )
+        feature_http_ident: bool = Field(
+            default_factory=lambda: os.getenv("FEATURE_HTTP_IDENT", "true").lower()
+            == "true"
+        )
+        feature_printer_ident: bool = Field(
+            default_factory=lambda: os.getenv("FEATURE_PRINTER_IDENT", "true").lower()
             == "true"
         )
 

@@ -1,15 +1,31 @@
 """SSDP/UPnP enrichment for device fingerprinting (Stage B)."""
 
+from __future__ import annotations
+
 import asyncio
+import ipaddress
 import logging
 import socket
 from typing import Any
+from urllib.parse import urlparse
+
+import httpx
 
 logger = logging.getLogger(__name__)
 
 # SSDP multicast address and port
 SSDP_MULTICAST = ("239.255.255.250", 1900)
 SSDP_MX = 3  # Maximum wait time in seconds
+HTTP_FETCH_SEMAPHORE = asyncio.Semaphore(4)
+MAX_XML_BYTES = 4096
+
+
+def _is_private_ip(ip_str: str) -> bool:
+    try:
+        ip_obj = ipaddress.ip_address(ip_str)
+        return ip_obj.is_private or ip_obj.is_loopback
+    except ValueError:
+        return False
 
 
 class SSDPEnricher:
@@ -36,6 +52,8 @@ class SSDPEnricher:
             Dictionary with fingerprint data (ssdp_manufacturer, ssdp_model, etc.)
         """
         fingerprint: dict[str, Any] = {}
+        if not _is_private_ip(device_ip):
+            return fingerprint
 
         try:
             # Send SSDP M-SEARCH request and wait for responses
@@ -43,22 +61,27 @@ class SSDPEnricher:
 
             if responses:
                 # Parse SSDP responses and extract device info
-                device_info = self._parse_ssdp_responses(responses)
+                device_info = await self._parse_ssdp_responses(responses)
 
                 if device_info:
-                    # Extract manufacturer/model from device info
+                    if device_info.get("usn"):
+                        fingerprint["ssdp_usn"] = device_info["usn"]
+                    if device_info.get("st"):
+                        fingerprint["ssdp_st"] = device_info["st"]
+                    if device_info.get("location"):
+                        fingerprint["ssdp_location"] = device_info["location"]
+                    if device_info.get("server"):
+                        fingerprint["ssdp_server"] = device_info["server"]
+                    if device_info.get("device_type"):
+                        fingerprint["ssdp_device_type"] = device_info["device_type"]
                     if device_info.get("manufacturer"):
                         fingerprint["ssdp_manufacturer"] = device_info["manufacturer"]
                     if device_info.get("model"):
                         fingerprint["ssdp_model"] = device_info["model"]
                     if device_info.get("model_name"):
                         fingerprint["ssdp_model_name"] = device_info["model_name"]
-                    if device_info.get("device_type"):
-                        fingerprint["ssdp_device_type"] = device_info["device_type"]
-                    if device_info.get("server"):
-                        fingerprint["ssdp_server"] = device_info["server"]
-                    if device_info.get("location"):
-                        fingerprint["ssdp_location"] = device_info["location"]
+                    if device_info.get("friendly_name"):
+                        fingerprint["ssdp_friendly_name"] = device_info["friendly_name"]
 
         except Exception as e:
             logger.debug(f"SSDP enrichment failed for {device_ip}: {e}")
@@ -125,7 +148,7 @@ class SSDPEnricher:
 
         return responses
 
-    def _parse_ssdp_responses(self, responses: list[str]) -> dict[str, Any]:
+    async def _parse_ssdp_responses(self, responses: list[str]) -> dict[str, Any]:
         """
         Parse SSDP responses and extract device information.
 
@@ -148,29 +171,35 @@ class SSDPEnricher:
                     headers[key.strip().lower()] = value.strip()
 
             # Extract useful headers
-            if "location" in headers:
-                device_info["location"] = headers["location"]
+            location = headers.get("location")
+            server = headers.get("server")
+            st = headers.get("st") or headers.get("nt")
+            usn = headers.get("usn")
 
-            if "server" in headers:
-                device_info["server"] = headers["server"]
-
-            if "st" in headers or "nt" in headers:
-                device_type = headers.get("st") or headers.get("nt")
-                if device_type:
-                    device_info["device_type"] = device_type
+            if location and "ssdp_location" not in device_info:
+                device_info["location"] = location
+            if server and "server" not in device_info:
+                device_info["server"] = server
+            if st and "device_type" not in device_info:
+                device_info["device_type"] = st
+            if st:
+                device_info.setdefault("st", st)
+            if usn:
+                device_info.setdefault("usn", usn)
 
             # Try to fetch device description XML from location
-            if "location" in headers:
+            if location:
                 try:
-                    desc_info = self._fetch_device_description(headers["location"])
+                    desc_info = await self._fetch_device_description(location)
                     if desc_info:
-                        device_info.update(desc_info)
+                        for key, value in desc_info.items():
+                            device_info.setdefault(key, value)
                 except Exception as e:
                     logger.debug(f"Failed to fetch device description: {e}")
 
         return device_info
 
-    def _fetch_device_description(self, url: str) -> dict[str, Any]:
+    async def _fetch_device_description(self, url: str) -> dict[str, Any]:
         """
         Fetch and parse UPnP device description XML.
 
@@ -183,44 +212,56 @@ class SSDPEnricher:
         info: dict[str, Any] = {}
 
         try:
-            import urllib.request
+            parsed = urlparse(url)
+            host = parsed.hostname
+            if not host or not _is_private_ip(host):
+                return info
 
-            # Fetch XML with timeout
-            req = urllib.request.Request(url)
-            with urllib.request.urlopen(req, timeout=3) as response:
-                xml_data = response.read().decode("utf-8", errors="ignore")
+            async with HTTP_FETCH_SEMAPHORE:
+                async with httpx.AsyncClient(
+                    timeout=httpx.Timeout(2.0),
+                    follow_redirects=True,
+                    verify=False,
+                    limits=httpx.Limits(max_connections=4, max_keepalive_connections=4),
+                    headers={"User-Agent": "ZenetHunter/ssdp-ident"},
+                ) as client:
+                    resp = await client.get(url)
+                    if resp.status_code >= 400:
+                        return info
+                    collected = b""
+                    async for chunk in resp.aiter_bytes():
+                        collected += chunk
+                        if len(collected) > MAX_XML_BYTES:
+                            collected = collected[:MAX_XML_BYTES]
+                            break
+                    xml_data = collected.decode("utf-8", errors="ignore")
 
-                # Simple XML parsing (extract manufacturer/model)
-                # Note: Full XML parsing would use xml.etree.ElementTree
-                # but we use simple regex for minimal dependencies
-                import re
+            # Parse XML using ElementTree for safety
+            import xml.etree.ElementTree as ET
 
-                # Extract manufacturer
-                manufacturer_match = re.search(
-                    r"<manufacturer[^>]*>(.*?)</manufacturer>",
-                    xml_data,
-                    re.IGNORECASE | re.DOTALL,
-                )
-                if manufacturer_match:
-                    info["manufacturer"] = manufacturer_match.group(1).strip()
+            try:
+                root = ET.fromstring(xml_data)
+            except ET.ParseError:
+                return info
 
-                # Extract model name
-                model_name_match = re.search(
-                    r"<modelName[^>]*>(.*?)</modelName>",
-                    xml_data,
-                    re.IGNORECASE | re.DOTALL,
-                )
-                if model_name_match:
-                    info["model_name"] = model_name_match.group(1).strip()
+            def _find_text(tag: str) -> str | None:
+                elem = root.find(f".//{tag}")
+                if elem is not None and elem.text:
+                    return elem.text.strip()
+                return None
 
-                # Extract model number
-                model_match = re.search(
-                    r"<modelNumber[^>]*>(.*?)</modelNumber>",
-                    xml_data,
-                    re.IGNORECASE | re.DOTALL,
-                )
-                if model_match:
-                    info["model"] = model_match.group(1).strip()
+            manufacturer = _find_text("manufacturer")
+            model_name = _find_text("modelName")
+            model_number = _find_text("modelNumber")
+            friendly_name = _find_text("friendlyName")
+            if manufacturer:
+                info["manufacturer"] = manufacturer
+            if model_name:
+                info["model_name"] = model_name
+            if model_number:
+                info["model"] = model_number
+            if friendly_name:
+                info["friendly_name"] = friendly_name
 
         except Exception as e:
             logger.debug(f"Device description fetch failed for {url}: {e}")

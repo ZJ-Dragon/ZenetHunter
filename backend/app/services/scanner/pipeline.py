@@ -171,6 +171,8 @@ class ScanPipeline:
 
                     fingerprint_data: dict[str, Any] = {}
                     evidence_sources: list[str] = []
+                    mdns_data: dict[str, Any] = {}
+                    ssdp_data: dict[str, Any] = {}
 
                     # mDNS enrichment (if enabled)
                     if self.settings.feature_mdns:
@@ -252,19 +254,29 @@ class ScanPipeline:
                                 enrich_with_active_probe,
                             )
 
-                            probe_data = await asyncio.wait_for(
+                            probe_result = await asyncio.wait_for(
                                 enrich_with_active_probe(
                                     device_ip=device.ip,
                                     device_mac=device.mac,
                                     timeout=2.0,  # Short timeout per device
+                                    mdns_data=mdns_data,
+                                    ssdp_data=ssdp_data,
+                                    feature_http=getattr(
+                                        self.settings, "feature_http_ident", True
+                                    ),
+                                    feature_printer=getattr(
+                                        self.settings, "feature_printer_ident", True
+                                    ),
                                 ),
                                 timeout=3.0,  # Overall timeout
                             )
-                            if probe_data:
-                                fingerprint_data.update(probe_data)
+                            if probe_result and (
+                                probe_result.fingerprint or probe_result.observations
+                            ):
+                                fingerprint_data.update(probe_result.fingerprint)
                                 evidence_sources.append("active_probe")
                                 key_fields = build_key_fields(
-                                    "active_probe", probe_data
+                                    "active_probe", probe_result.fingerprint
                                 )
                                 if key_fields:
                                     observations.append(
@@ -276,9 +288,24 @@ class ScanPipeline:
                                             ),
                                         }
                                     )
+                                for obs in probe_result.observations or []:
+                                    protocol = obs.get("protocol", "active_probe")
+                                    sanitized = build_key_fields(
+                                        protocol, obs.get("key_fields", {})
+                                    )
+                                    if not sanitized:
+                                        continue
+                                    observations.append(
+                                        {
+                                            "protocol": protocol,
+                                            "key_fields": sanitized,
+                                            "summary": obs.get("summary")
+                                            or build_summary(protocol, sanitized),
+                                        }
+                                    )
                                 logger.debug(
                                     f"Active probe for {device.ip}: "
-                                    f"found {len(probe_data)} fields"
+                                    f"found {len(probe_result.fingerprint)} fields"
                                 )
                         except Exception as e:
                             logger.debug(f"Active probe failed for {device.ip}: {e}")

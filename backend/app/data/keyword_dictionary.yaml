@@ -3,9 +3,53 @@
 # - Root fields: version, updated, rules[]
 # - Rule: id, priority, match.any_contains[] (lowercase), optional match.any_regex[],
 #         infer.vendor/product/category/os, confidence_delta (int), notes (one-line)
-version: "2.2.0"
-updated: "2025-03-01"
+version: "2.3.0"
+updated: "2026-02-08"
 rules:
+  # =========================
+  # Service-level hints (mDNS/SSDP/HTTP)
+  # =========================
+  - id: service-ipp-printer
+    priority: 85
+    match:
+      any_contains: ["ipp", "ipps", "airprint"]
+    infer:
+      category: "Printer"
+      product: "IPP/AirPrint"
+    confidence_delta: 14
+    notes: "Printer service advertisement (mDNS/HTTP)."
+
+  - id: printer-jetdirect
+    priority: 70
+    match:
+      any_contains: ["jetdirect"]
+    infer:
+      vendor: "HP"
+      category: "Printer"
+    confidence_delta: 12
+    notes: "JetDirect server header/banner."
+
+  - id: printer-epson-escpr
+    priority: 65
+    match:
+      any_contains: ["escpr", "epson printer"]
+    infer:
+      vendor: "Epson"
+      category: "Printer"
+    confidence_delta: 12
+    notes: "Epson ESC/P-R printer hint."
+
+  - id: service-airplay
+    priority: 60
+    match:
+      any_contains: ["airplay", "raop"]
+    infer:
+      vendor: "Apple"
+      category: "Media"
+      product: "AirPlay"
+    confidence_delta: 10
+    notes: "AirPlay service advertisement."
+
   # =========================
   # UGREEN / UGOS
   # =========================

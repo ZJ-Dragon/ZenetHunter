@@ -80,6 +80,8 @@
 - `FEATURE_NBNS`（布尔，默认 `false`）：启用 NBNS（Windows 发现）。
 - `FEATURE_SNMP`（布尔，默认 `false`）：启用 SNMP（需要凭据）。
 - `FEATURE_ACTIVE_PROBE`（布尔，默认 `true`）：启用主动探测（HTTP/Telnet/SSH/打印/IoT）。
+- `FEATURE_HTTP_IDENT`（布尔，默认 `true`）：启用安全的 HTTP/HTTPS 识别探测。
+- `FEATURE_PRINTER_IDENT`（布尔，默认 `true`）：当存在提示时启用打印机识别探测。
 - 外部识别服务已移除，默认离线，不会对外请求。
 
 ## `backend/.env` 示例
@@ -108,6 +110,8 @@ SCAN_RANGE=192.168.31.0/24
 FEATURE_MDNS=true
 FEATURE_SSDP=true
 FEATURE_ACTIVE_PROBE=true
+FEATURE_HTTP_IDENT=true
+FEATURE_PRINTER_IDENT=true
 ```
 
 ## 生产环境检查清单

@@ -88,6 +88,8 @@ async def get_scan_config():
             "nbns": settings.feature_nbns,
             "snmp": settings.feature_snmp,
             "active_probe": getattr(settings, "feature_active_probe", True),
+            "http_ident": getattr(settings, "feature_http_ident", True),
+            "printer_ident": getattr(settings, "feature_printer_ident", True),
         },
     }
 

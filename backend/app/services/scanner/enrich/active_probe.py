@@ -1,143 +1,184 @@
-"""Active probing enrichment: query devices directly to get their information.
+"""Active probing enrichment: safe local-only HTTP and printer identification."""
 
-This module implements various active probing techniques to "ask" devices
-directly for their name, model, and other identifying information by
-simulating normal server connections.
-"""
+from __future__ import annotations
 
 import asyncio
+import ipaddress
 import logging
 import re
-import socket
+from dataclasses import dataclass
 from typing import Any
-from urllib.parse import urlparse
 
 import httpx
 
 logger = logging.getLogger(__name__)
 
+HTTP_PORTS = [80, 8080, 443, 8443, 8000, 8888]
+HTTP_SEMAPHORE = asyncio.Semaphore(6)
+READ_LIMIT = 4096
+
+
+def _is_private_ip(ip_str: str) -> bool:
+    try:
+        ip_obj = ipaddress.ip_address(ip_str)
+        return ip_obj.is_private or ip_obj.is_loopback
+    except ValueError:
+        return False
+
+
+@dataclass
+class ActiveProbeResult:
+    fingerprint: dict[str, Any]
+    observations: list[dict[str, Any]]
+
 
 class ActiveProbeEnricher:
-    """Active probe enricher that queries devices directly."""
+    """Active probe enricher that queries devices directly (local-only)."""
 
-    def __init__(self, timeout: float = 3.0):
+    def __init__(
+        self,
+        timeout: float = 3.0,
+        response_limit: int = READ_LIMIT,
+        *,
+        feature_http: bool = True,
+        feature_printer: bool = True,
+    ):
         """
         Initialize active probe enricher.
 
         Args:
             timeout: Timeout for each probe in seconds
+            response_limit: Max bytes to read from responses
+            feature_http: Enable HTTP/HTTPS identification
+            feature_printer: Enable printer identification when hints exist
         """
         self.timeout = timeout
+        self.response_limit = response_limit
+        self.feature_http = feature_http
+        self.feature_printer = feature_printer
 
-    async def enrich_device(self, device_ip: str, device_mac: str) -> dict[str, Any]:
-        """
-        Enrich device by actively querying it.
+    async def enrich_device(
+        self,
+        device_ip: str,
+        device_mac: str,
+        *,
+        mdns_data: dict[str, Any] | None = None,
+        ssdp_data: dict[str, Any] | None = None,
+    ) -> ActiveProbeResult | None:
+        """Run safe probes against a confirmed-online, local device."""
+        if not _is_private_ip(device_ip):
+            return None
 
-        Tries multiple methods:
-        1. HTTP/HTTPS requests to common ports
-        2. Telnet/SSH banner grabbing
-        3. SNMP queries (if enabled)
-        4. Protocol-specific queries (printer, IoT, etc.)
-
-        Args:
-            device_ip: Device IP address
-            device_mac: Device MAC address
-
-        Returns:
-            Dictionary with fingerprint data
-        """
         fingerprint: dict[str, Any] = {}
+        observations: list[dict[str, Any]] = []
+        tasks = []
 
-        # Run all probes concurrently
-        tasks = [
-            self._probe_http(device_ip),
-            self._probe_telnet_banner(device_ip),
-            self._probe_ssh_banner(device_ip),
-            self._probe_printer_protocol(device_ip),
-            self._probe_iot_protocols(device_ip),
-        ]
+        if self.feature_http:
+            tasks.append(self._probe_http(device_ip))
+        if self.feature_printer and self._has_printer_hint(mdns_data, ssdp_data):
+            tasks.append(self._probe_printer_protocol(device_ip))
+
+        # Lightweight banners for extra hints
+        tasks.append(self._probe_telnet_banner(device_ip))
+        tasks.append(self._probe_ssh_banner(device_ip))
 
         results = await asyncio.gather(*tasks, return_exceptions=True)
-
-        # Merge results
         for result in results:
-            if isinstance(result, dict):
+            if isinstance(result, ActiveProbeResult):
+                fingerprint.update(result.fingerprint)
+                observations.extend(result.observations)
+            elif isinstance(result, dict):
                 fingerprint.update(result)
             elif isinstance(result, Exception):
-                logger.debug(f"Probe failed: {result}")
+                logger.debug("Probe failed for %s: %s", device_ip, result)
 
-        return fingerprint
+        return ActiveProbeResult(fingerprint=fingerprint, observations=observations)
 
-    async def _probe_http(self, device_ip: str) -> dict[str, Any]:
-        """
-        Probe device via HTTP/HTTPS on common ports.
+    @staticmethod
+    def _has_printer_hint(
+        mdns_data: dict[str, Any] | None, ssdp_data: dict[str, Any] | None
+    ) -> bool:
+        mdns_services = mdns_data.get("mdns_services") if mdns_data else []
+        mdns_instances = mdns_data.get("mdns_instances") if mdns_data else []
+        ssdp_type = (ssdp_data or {}).get("ssdp_device_type") or ""
+        ssdp_server = (ssdp_data or {}).get("ssdp_server") or ""
+        hints = [ssdp_type.lower(), ssdp_server.lower()]
 
-        Tries to:
-        1. GET / on common ports (80, 8080, 443, 8443)
-        2. Extract device info from HTTP headers (Server, X-Powered-By, etc.)
-        3. Parse HTML title/device info from response
+        for svc in mdns_services or []:
+            svc_lower = str(svc).lower()
+            if "ipp" in svc_lower or "printer" in svc_lower or "print" in svc_lower:
+                return True
+        for inst in mdns_instances or []:
+            svc_type = str(inst.get("type", "")).lower()
+            if "ipp" in svc_type or "printer" in svc_type or "print" in svc_type:
+                return True
+        return any("printer" in h or "ipp" in h for h in hints)
 
-        Args:
-            device_ip: Device IP address
-
-        Returns:
-            Dictionary with HTTP fingerprint data
-        """
+    async def _probe_http(self, device_ip: str) -> ActiveProbeResult:
         fingerprint: dict[str, Any] = {}
-        common_ports = [80, 8080, 443, 8443, 8000, 8888]
+        observations: list[dict[str, Any]] = []
 
-        async with httpx.AsyncClient(
-            timeout=self.timeout, follow_redirects=True, verify=False
-        ) as client:
-            # Use verify=False to accept self-signed certs for IoT devices
-            for port in common_ports:
-                try:
-                    # Try HTTP/HTTPS
-                    if port in [443, 8443]:
-                        url = f"https://{device_ip}:{port}"
-                    else:
-                        url = f"http://{device_ip}:{port}"
+        for port in HTTP_PORTS:
+            url = f"http://{device_ip}:{port}"
+            if port in (443, 8443):
+                url = f"https://{device_ip}:{port}"
+            try:
+                async with HTTP_SEMAPHORE:
+                    async with httpx.AsyncClient(
+                        timeout=httpx.Timeout(self.timeout),
+                        follow_redirects=True,
+                        verify=False,
+                        limits=httpx.Limits(
+                            max_connections=6, max_keepalive_connections=6
+                        ),
+                        headers={"User-Agent": "ZenetHunter/http-ident"},
+                    ) as client:
+                        response = await client.get(url)
+                server = response.headers.get("Server")
+                status = response.status_code
+                body_text = await self._read_limited_body(response)
+                html_info = self._parse_html_for_device_info(body_text)
 
-                    try:
-                        response = await client.get(url, timeout=self.timeout)
+                http_fields: dict[str, Any] = {
+                    "http_status": status,
+                    "http_port": port,
+                }
+                if server:
+                    http_fields["http_server"] = server
 
-                        # Extract HTTP headers
-                        server = response.headers.get("Server", "")
-                        if server:
-                            fingerprint["http_server"] = server
+                fingerprint.update(http_fields)
+                fingerprint.update(html_info)
 
-                        powered_by = response.headers.get("X-Powered-By", "")
-                        if powered_by:
-                            fingerprint["http_powered_by"] = powered_by
+                obs_fields = {
+                    k: v
+                    for k, v in {**http_fields, **html_info}.items()
+                    if v is not None
+                }
+                observations.append(
+                    {
+                        "protocol": "http_ident",
+                        "key_fields": obs_fields,
+                        "summary": f"http {status} {server or ''}".strip(),
+                    }
+                )
+                break  # success, skip other ports
+            except (httpx.TimeoutException, httpx.ConnectError, httpx.HTTPError):
+                continue
+            except Exception as exc:
+                logger.debug("HTTP probe failed for %s:%s: %s", device_ip, port, exc)
+                continue
 
-                        # Try to extract device info from HTML
-                        if "text/html" in response.headers.get("Content-Type", ""):
-                            html = response.text[:5000]  # First 5KB
-                            device_info = self._parse_html_for_device_info(html)
-                            if device_info:
-                                fingerprint.update(device_info)
+        return ActiveProbeResult(fingerprint=fingerprint, observations=observations)
 
-                        # If we got a response, record the port
-                        fingerprint["http_port"] = port
-                        fingerprint["http_status"] = response.status_code
-
-                        logger.debug(
-                            f"HTTP probe {device_ip}:{port} - "
-                            f"Server: {server}, Status: {response.status_code}"
-                        )
-                        break  # Found working port, no need to try others
-
-                    except (httpx.ConnectError, httpx.TimeoutException, httpx.HTTPError):
-                        continue  # Try next port
-                    except Exception as e:
-                        logger.debug(f"HTTP probe {device_ip}:{port} failed: {e}")
-                        continue
-
-                except Exception as e:
-                    logger.debug(f"HTTP probe setup for {device_ip}:{port} failed: {e}")
-                    continue
-
-        return fingerprint
+    async def _read_limited_body(self, response: httpx.Response) -> str:
+        """Read a capped amount of body text to avoid large payloads."""
+        collected = b""
+        async for chunk in response.aiter_bytes():
+            collected += chunk
+            if len(collected) >= self.response_limit:
+                collected = collected[: self.response_limit]
+                break
+        return collected.decode("utf-8", errors="ignore")
 
     def _parse_html_for_device_info(self, html: str) -> dict[str, Any]:
         """
@@ -147,22 +188,17 @@ class ActiveProbeEnricher:
         - <title> tags
         - Device name/model in meta tags
         - Common device identifiers in HTML comments
-
-        Args:
-            html: HTML content
-
-        Returns:
-            Dictionary with parsed device info
         """
         info: dict[str, Any] = {}
 
         # Extract title
-        title_match = re.search(r"<title[^>]*>(.*?)</title>", html, re.IGNORECASE | re.DOTALL)
+        title_match = re.search(
+            r"<title[^>]*>(.*?)</title>", html, re.IGNORECASE | re.DOTALL
+        )
         if title_match:
             title = title_match.group(1).strip()
-            # Clean up title (remove extra whitespace)
             title = re.sub(r"\s+", " ", title)
-            if title and len(title) < 200:  # Reasonable title length
+            if title and len(title) < 200:
                 info["http_title"] = title
 
         # Extract meta tags
@@ -194,20 +230,9 @@ class ActiveProbeEnricher:
 
         return info
 
-    async def _probe_telnet_banner(self, device_ip: str) -> dict[str, Any]:
-        """
-        Probe device via Telnet banner grabbing.
-
-        Connects to common Telnet ports and reads the banner message,
-        which often contains device name/model.
-
-        Args:
-            device_ip: Device IP address
-
-        Returns:
-            Dictionary with Telnet banner data
-        """
+    async def _probe_telnet_banner(self, device_ip: str) -> ActiveProbeResult:
         fingerprint: dict[str, Any] = {}
+        observations: list[dict[str, Any]] = []
         telnet_ports = [23, 2323]
 
         for port in telnet_ports:
@@ -216,52 +241,33 @@ class ActiveProbeEnricher:
                     asyncio.open_connection(device_ip, port),
                     timeout=self.timeout,
                 )
-
-                # Read banner (first 512 bytes)
                 try:
-                    banner = await asyncio.wait_for(reader.read(512), timeout=1.0)
+                    banner = await asyncio.wait_for(reader.read(256), timeout=1.0)
                     banner_text = banner.decode("utf-8", errors="ignore").strip()
-
                     if banner_text:
-                        # Clean up banner
-                        banner_text = re.sub(r"\x1b\[[0-9;]*m", "", banner_text)  # Remove ANSI codes
-                        banner_text = re.sub(r"\s+", " ", banner_text)  # Normalize whitespace
-
-                        if len(banner_text) > 5 and len(banner_text) < 200:
-                            fingerprint["telnet_banner"] = banner_text
-                            logger.debug(f"Telnet banner from {device_ip}:{port}: {banner_text[:50]}")
-
-                except asyncio.TimeoutError:
-                    pass
-
-                writer.close()
-                await writer.wait_closed()
-
-                if "telnet_banner" in fingerprint:
-                    break  # Found banner, no need to try other ports
-
+                        cleaned = re.sub(r"\s+", " ", banner_text)
+                        fingerprint["telnet_banner"] = cleaned[:200]
+                        observations = [
+                            {
+                                "protocol": "telnet_banner",
+                                "key_fields": {"telnet_banner": cleaned[:160]},
+                            }
+                        ]
+                        break
+                finally:
+                    writer.close()
+                    await writer.wait_closed()
             except (ConnectionRefusedError, asyncio.TimeoutError, OSError):
                 continue
-            except Exception as e:
-                logger.debug(f"Telnet probe {device_ip}:{port} failed: {e}")
+            except Exception as exc:
+                logger.debug("Telnet probe %s:%s failed: %s", device_ip, port, exc)
                 continue
 
-        return fingerprint
+        return ActiveProbeResult(fingerprint=fingerprint, observations=observations or [])
 
-    async def _probe_ssh_banner(self, device_ip: str) -> dict[str, Any]:
-        """
-        Probe device via SSH banner grabbing.
-
-        Connects to SSH port and reads the SSH banner, which often
-        contains device/OS information.
-
-        Args:
-            device_ip: Device IP address
-
-        Returns:
-            Dictionary with SSH banner data
-        """
+    async def _probe_ssh_banner(self, device_ip: str) -> ActiveProbeResult:
         fingerprint: dict[str, Any] = {}
+        observations: list[dict[str, Any]] = []
 
         try:
             reader, writer = await asyncio.wait_for(
@@ -269,55 +275,40 @@ class ActiveProbeEnricher:
                 timeout=self.timeout,
             )
 
-            # Read SSH banner (first line)
             try:
                 banner = await asyncio.wait_for(reader.readline(), timeout=1.0)
                 banner_text = banner.decode("utf-8", errors="ignore").strip()
 
                 if banner_text:
-                    # SSH banner format: SSH-2.0-OpenSSH_7.9 or SSH-2.0-Cisco-1.25
-                    fingerprint["ssh_banner"] = banner_text
-                    logger.debug(f"SSH banner from {device_ip}: {banner_text}")
-
-                    # Try to extract device info from banner
-                    # Example: "SSH-2.0-Cisco-1.25" -> "Cisco"
+                    fingerprint["ssh_banner"] = banner_text[:200]
                     if "Cisco" in banner_text:
                         fingerprint["ssh_vendor"] = "Cisco"
                     elif "OpenSSH" in banner_text:
-                        # Could be Linux/Unix device
                         fingerprint["ssh_type"] = "OpenSSH"
+                    observations.append(
+                        {
+                            "protocol": "ssh_banner",
+                            "key_fields": {"ssh_banner": banner_text[:160]},
+                        }
+                    )
 
-            except asyncio.TimeoutError:
-                pass
-
-            writer.close()
-            await writer.wait_closed()
+            finally:
+                writer.close()
+                await writer.wait_closed()
 
         except (ConnectionRefusedError, asyncio.TimeoutError, OSError):
             pass
         except Exception as e:
-            logger.debug(f"SSH probe {device_ip} failed: {e}")
+            logger.debug("SSH probe %s failed: %s", device_ip, e)
 
-        return fingerprint
+        return ActiveProbeResult(fingerprint=fingerprint, observations=observations)
 
-    async def _probe_printer_protocol(self, device_ip: str) -> dict[str, Any]:
-        """
-        Probe device via printer protocols (IPP, LPD, etc.).
-
-        Many printers expose device information via IPP (Internet Printing Protocol)
-        or LPD (Line Printer Daemon).
-
-        Args:
-            device_ip: Device IP address
-
-        Returns:
-            Dictionary with printer protocol data
-        """
+    async def _probe_printer_protocol(self, device_ip: str) -> ActiveProbeResult:
         fingerprint: dict[str, Any] = {}
+        observations: list[dict[str, Any]] = []
 
         # Try IPP (Internet Printing Protocol) on port 631
         try:
-            # IPP request to get printer attributes
             ipp_request = (
                 b"\x02\x00"  # Version 2.0
                 b"\x00\x0a"  # Get-Printer-Attributes operation
@@ -341,22 +332,24 @@ class ActiveProbeEnricher:
             await writer.drain()
 
             try:
-                response = await asyncio.wait_for(reader.read(4096), timeout=1.0)
-                # Parse IPP response (simplified - full parsing would use proper IPP library)
-                response_str = response.decode("utf-8", errors="ignore")
-                if "printer" in response_str.lower() or "ipp" in response_str.lower():
+                response = await asyncio.wait_for(reader.read(512), timeout=1.0)
+                response_text = response.decode("utf-8", errors="ignore").lower()
+                if "printer" in response_text or "ipp" in response_text:
                     fingerprint["printer_protocol"] = "IPP"
-                    logger.debug(f"IPP response from {device_ip}")
-            except asyncio.TimeoutError:
-                pass
-
-            writer.close()
-            await writer.wait_closed()
+                    observations.append(
+                        {
+                            "protocol": "printer_ident",
+                            "key_fields": {"printer_protocol": "IPP"},
+                        }
+                    )
+            finally:
+                writer.close()
+                await writer.wait_closed()
 
         except (ConnectionRefusedError, asyncio.TimeoutError, OSError):
             pass
         except Exception as e:
-            logger.debug(f"IPP probe {device_ip} failed: {e}")
+            logger.debug("IPP probe %s failed: %s", device_ip, e)
 
         # Try LPD (Line Printer Daemon) on port 515
         try:
@@ -365,85 +358,43 @@ class ActiveProbeEnricher:
                 timeout=self.timeout,
             )
 
-            # LPD: Send \x02 (receive job) command
             writer.write(b"\x02")
             await writer.drain()
 
             try:
                 response = await asyncio.wait_for(reader.read(256), timeout=1.0)
                 if response:
-                    fingerprint["printer_protocol"] = "LPD"
-                    logger.debug(f"LPD response from {device_ip}")
-            except asyncio.TimeoutError:
-                pass
-
-            writer.close()
-            await writer.wait_closed()
-
-        except (ConnectionRefusedError, asyncio.TimeoutError, OSError):
-            pass
-        except Exception as e:
-            logger.debug(f"LPD probe {device_ip} failed: {e}")
-
-        return fingerprint
-
-    async def _probe_iot_protocols(self, device_ip: str) -> dict[str, Any]:
-        """
-        Probe device via IoT-specific protocols.
-
-        Tries common IoT device protocols:
-        - CoAP (Constrained Application Protocol) on port 5683
-        - MQTT (if broker on device)
-        - Custom IoT protocols
-
-        Args:
-            device_ip: Device IP address
-
-        Returns:
-            Dictionary with IoT protocol data
-        """
-        fingerprint: dict[str, Any] = {}
-
-        # Try CoAP (port 5683)
-        try:
-            # CoAP GET request to /.well-known/core
-            coap_request = bytes([
-                0x40, 0x01, 0x00, 0x00,  # Header: Ver=1, T=CON, Code=GET, MID=0
-                0xb7, 0x2a,  # Token
-                0x00, 0x01,  # Option: Uri-Path: ".well-known"
-                0x00, 0x04,  # Option: Uri-Path: "core"
-            ])
-
-            reader, writer = await asyncio.wait_for(
-                asyncio.open_connection(device_ip, 5683),
-                timeout=self.timeout,
-            )
-
-            writer.write(coap_request)
-            await writer.drain()
-
-            try:
-                response = await asyncio.wait_for(reader.read(512), timeout=1.0)
-                if response:
-                    fingerprint["iot_protocol"] = "CoAP"
-                    logger.debug(f"CoAP response from {device_ip}")
-            except asyncio.TimeoutError:
-                pass
-
-            writer.close()
-            await writer.wait_closed()
+                    fingerprint["printer_protocol"] = fingerprint.get(
+                        "printer_protocol", "LPD"
+                    )
+                    observations.append(
+                        {
+                            "protocol": "printer_ident",
+                            "key_fields": {"printer_protocol": "LPD"},
+                        }
+                    )
+            finally:
+                writer.close()
+                await writer.wait_closed()
 
         except (ConnectionRefusedError, asyncio.TimeoutError, OSError):
             pass
         except Exception as e:
-            logger.debug(f"CoAP probe {device_ip} failed: {e}")
+            logger.debug("LPD probe %s failed: %s", device_ip, e)
 
-        return fingerprint
+        return ActiveProbeResult(fingerprint=fingerprint, observations=observations)
 
 
 async def enrich_with_active_probe(
-    device_ip: str, device_mac: str, timeout: float = 3.0
-) -> dict[str, Any]:
+    device_ip: str,
+    device_mac: str,
+    timeout: float = 3.0,
+    *,
+    mdns_data: dict[str, Any] | None = None,
+    ssdp_data: dict[str, Any] | None = None,
+    feature_http: bool = True,
+    feature_printer: bool = True,
+) -> ActiveProbeResult | None:
     """
     Convenience function for active probe enrichment.
 
@@ -451,9 +402,22 @@ async def enrich_with_active_probe(
         device_ip: Device IP address
         device_mac: Device MAC address
         timeout: Timeout for each probe
+        mdns_data: mDNS results for hinting (printer detection)
+        ssdp_data: SSDP results for hinting (printer detection)
+        feature_http: Enable HTTP identification probe
+        feature_printer: Enable printer probe (requires hints)
 
     Returns:
-        Dictionary with fingerprint data
+        ActiveProbeResult with fingerprint data and observations, or None if skipped
     """
-    enricher = ActiveProbeEnricher(timeout=timeout)
-    return await enricher.enrich_device(device_ip, device_mac)
+    enricher = ActiveProbeEnricher(
+        timeout=timeout,
+        feature_http=feature_http,
+        feature_printer=feature_printer,
+    )
+    return await enricher.enrich_device(
+        device_ip=device_ip,
+        device_mac=device_mac,
+        mdns_data=mdns_data,
+        ssdp_data=ssdp_data,
+    )

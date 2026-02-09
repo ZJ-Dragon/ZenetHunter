@@ -80,6 +80,8 @@ All variables below are read by `backend/app/core/config.py` (Pydantic Settings)
 - `FEATURE_NBNS` (bool, default `false`): Enable NBNS (Windows discovery).
 - `FEATURE_SNMP` (bool, default `false`): Enable SNMP queries (requires creds).
 - `FEATURE_ACTIVE_PROBE` (bool, default `true`): Enable active probing (HTTP/Telnet/SSH/Printer/IoT).
+- `FEATURE_HTTP_IDENT` (bool, default `true`): Enable safe HTTP/HTTPS identification probes.
+- `FEATURE_PRINTER_IDENT` (bool, default `true`): Enable printer identification when hints are present.
 - External recognition providers have been removed; no outbound lookups are performed.
 
 ## Example `backend/.env`
@@ -108,6 +110,8 @@ SCAN_RANGE=192.168.31.0/24
 FEATURE_MDNS=true
 FEATURE_SSDP=true
 FEATURE_ACTIVE_PROBE=true
+FEATURE_HTTP_IDENT=true
+FEATURE_PRINTER_IDENT=true
 ```
 
 ## Production checklist

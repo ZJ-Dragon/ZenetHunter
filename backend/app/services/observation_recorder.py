@@ -19,13 +19,22 @@ SAFE_FIELD_WHITELIST = {
     "http_server",
     "http_meta_model",
     "http_meta_device",
+    "http_meta_product",
+    "http_status",
+    "http_port",
     "ssdp_manufacturer",
     "ssdp_model",
     "ssdp_model_name",
+    "ssdp_friendly_name",
+    "ssdp_usn",
+    "ssdp_st",
+    "ssdp_location",
     "telnet_banner",
     "ssh_banner",
     "mdns_services",
     "mdns_hostname",
+    "mdns_instances",
+    "printer_protocol",
 }
 
 
@@ -43,14 +52,27 @@ def build_key_fields(protocol: str, raw_fields: dict[str, Any]) -> dict[str, Any
             continue
         if isinstance(value, str):
             key_fields[key] = _sanitize_text(value)
+        elif isinstance(value, (int, float, bool)):
+            key_fields[key] = _sanitize_text(str(value), 40)
         elif isinstance(value, list):
             # Keep small lists (e.g., mdns services) with sanitized strings
             sanitized_list = []
             for item in value[:20]:
                 if isinstance(item, str):
                     sanitized_list.append(_sanitize_text(item, 80))
-                elif isinstance(item, dict) and "name" in item:
-                    sanitized_list.append(_sanitize_text(str(item["name"]), 80))
+                elif isinstance(item, dict):
+                    sanitized_entry: dict[str, Any] = {}
+                    for sub_k, sub_v in list(item.items())[:10]:
+                        if isinstance(sub_v, str):
+                            sanitized_entry[sub_k] = _sanitize_text(
+                                str(sub_v), 80
+                            )
+                        elif isinstance(sub_v, (int, float, bool)):
+                            sanitized_entry[sub_k] = _sanitize_text(
+                                str(sub_v), 40
+                            )
+                    if sanitized_entry:
+                        sanitized_list.append(sanitized_entry)
             if sanitized_list:
                 key_fields[key] = sanitized_list
         elif isinstance(value, dict):
@@ -59,6 +81,8 @@ def build_key_fields(protocol: str, raw_fields: dict[str, Any]) -> dict[str, Any
             for sub_k, sub_v in list(value.items())[:10]:
                 if isinstance(sub_v, str):
                     sanitized_dict[sub_k] = _sanitize_text(sub_v, 80)
+                elif isinstance(sub_v, (int, float, bool)):
+                    sanitized_dict[sub_k] = _sanitize_text(str(sub_v), 40)
             if sanitized_dict:
                 key_fields[key] = sanitized_dict
     # Attach protocol tag for context
@@ -73,6 +97,9 @@ def build_summary(protocol: str, key_fields: dict[str, Any]) -> str:
     title = key_fields.get("http_title") or key_fields.get("ssdp_model_name")
     server = key_fields.get("http_server")
     manufacturer = key_fields.get("ssdp_manufacturer")
+    mdns_services = key_fields.get("mdns_services")
+    if isinstance(mdns_services, list) and mdns_services:
+        parts.append(str(mdns_services[0]))
     if title:
         parts.append(str(title))
     if server and server not in parts:
