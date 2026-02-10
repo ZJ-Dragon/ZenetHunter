@@ -228,6 +228,8 @@ export const DeviceList: React.FC = () => {
                   const manualVendor = device.manual_profile?.manual_vendor ?? device.vendor_manual;
                   const displayName = device.display_name || manualName || device.name || device.alias || device.model || device.model_guess || 'Unknown Device';
                   const displayVendor = device.display_vendor || manualVendor || device.vendor || device.vendor_guess || 'Unknown Vendor';
+                  const autoName = device.name_auto || device.name || device.alias || device.model || device.model_guess || 'Unknown Device';
+                  const autoVendor = device.vendor_auto || device.vendor || device.vendor_guess || 'Unknown Vendor';
                   const hasManual = Boolean(manualName || manualVendor || device.manual_profile_id);
 
                   return (
