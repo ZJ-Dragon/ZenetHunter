@@ -1,9 +1,18 @@
 import axios from 'axios';
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+const rawApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
+
+// Normalize to always include /api suffix without duplication
+const normalizeApiBase = (url: string): string => {
+  const trimmed = url.replace(/\/+$/, '');
+  if (trimmed.endsWith('/api')) {
+    return trimmed;
+  }
+  return `${trimmed}/api`;
+};
 
 export const api = axios.create({
-  baseURL: API_URL,
+  baseURL: normalizeApiBase(rawApiUrl),
   timeout: 30000, // Increased to 30s for operations like scanning
   headers: {
     'Content-Type': 'application/json',
