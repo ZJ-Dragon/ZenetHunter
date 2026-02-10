@@ -2,10 +2,13 @@ import axios from 'axios';
 
 const rawApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
-// Normalize to always include /api suffix without duplication
+// Normalize API base:
+// - Trim trailing slashes
+// - If it already contains `/api` anywhere, respect it
+// - Otherwise append `/api`
 const normalizeApiBase = (url: string): string => {
   const trimmed = url.replace(/\/+$/, '');
-  if (trimmed.endsWith('/api')) {
+  if (/\/api(\/|$)/i.test(trimmed)) {
     return trimmed;
   }
   return `${trimmed}/api`;
