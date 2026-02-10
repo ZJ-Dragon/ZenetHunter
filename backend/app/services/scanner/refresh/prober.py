@@ -6,7 +6,6 @@ online and update their last_seen timestamp.
 
 import asyncio
 import logging
-import re
 from datetime import UTC, datetime
 from typing import NamedTuple
 

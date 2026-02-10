@@ -22,7 +22,8 @@ def build_match_keys(
     *,
     mac: str | None,
     fingerprint_components: dict[str, Any] | None = None,
-    ip_hint: str | None = None,
+    vendor_guess: str | None = None,
+    model_guess: str | None = None,
 ) -> dict[str, Any]:
     """Normalize a small set of match keys for profile matching."""
     keys: dict[str, Any] = {}
@@ -35,8 +36,10 @@ def build_match_keys(
         for k in ("dhcp_hostname", "mdns_services", "ssdp_server", "user_agent_type"):
             if v := fingerprint_components.get(k):
                 keys[k] = v
-    if ip_hint:
-        keys["ip_hint"] = ip_hint
+    if vendor_guess:
+        keys["vendor_guess"] = vendor_guess
+    if model_guess:
+        keys["model_guess"] = model_guess
     return keys
 
 
@@ -86,13 +89,9 @@ class ManualProfileService:
         mac: str | None,
         fingerprint_key: str | None,
         match_keys: dict[str, Any],
-        ip_hint: str | None = None,
     ) -> ManualMatchResult | None:
         profile = await self.repo.find_best_match(
-            fingerprint_key=fingerprint_key,
-            mac=mac,
-            match_keys=match_keys,
-            ip_hint=ip_hint,
+            fingerprint_key=fingerprint_key, mac=mac, match_keys=match_keys
         )
         if not profile:
             return None
@@ -110,8 +109,7 @@ async def migrate_manual_labels(session: AsyncSession) -> None:
     # Migrate legacy device manual fields
     devices_with_manuals = await session.execute(
         select(DeviceModel).where(
-            (DeviceModel.name_manual.is_not(None))
-            | (DeviceModel.vendor_manual.is_not(None))
+            (DeviceModel.name_manual.is_not(None)) | (DeviceModel.vendor_manual.is_not(None))
         )
     )
     migrated = 0

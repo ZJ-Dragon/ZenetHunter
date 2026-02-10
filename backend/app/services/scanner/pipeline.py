@@ -14,10 +14,10 @@ from datetime import UTC, datetime
 from typing import Any
 
 from app.core.config import get_settings
-from app.services.observation_recorder import build_key_fields, build_summary
 from app.services.scanner.candidate import get_arp_candidates, get_dhcp_candidates
 from app.services.scanner.capabilities import get_scanner_capabilities
 from app.services.scanner.network_detection import detect_local_subnet
+from app.services.observation_recorder import build_key_fields, build_summary
 from app.services.scanner.refresh import refresh_candidates
 
 logger = logging.getLogger(__name__)
@@ -67,8 +67,7 @@ class ScanPipeline:
         Stage A: Discover online devices using active probing.
 
         Args:
-            target_subnets: List of CIDR subnets to scan.
-                If None, auto-detects from ARP/gateway.
+            target_subnets: List of CIDR subnets to scan. If None, auto-detects from ARP/gateway.
 
         Returns:
             List of discovered devices (IP/MAC pairs)
@@ -172,8 +171,6 @@ class ScanPipeline:
 
                     fingerprint_data: dict[str, Any] = {}
                     evidence_sources: list[str] = []
-                    mdns_data: dict[str, Any] = {}
-                    ssdp_data: dict[str, Any] = {}
 
                     # mDNS enrichment (if enabled)
                     if self.settings.feature_mdns:
@@ -204,11 +201,9 @@ class ScanPipeline:
                                             ),
                                         }
                                     )
-                                service_count = len(mdns_data.get("mdns_services", []))
                                 logger.debug(
-                                    "mDNS enrichment for %s: found %s services",
-                                    device.ip,
-                                    service_count,
+                                    f"mDNS enrichment for {device.ip}: "
+                                    f"found {len(mdns_data.get('mdns_services', []))} services"
                                 )
                         except Exception as e:
                             logger.debug(f"mDNS enrichment failed for {device.ip}: {e}")
@@ -243,14 +238,13 @@ class ScanPipeline:
                                         }
                                     )
                                 logger.debug(
-                                    "SSDP enrichment for %s: found %s fields",
-                                    device.ip,
-                                    len(ssdp_data),
+                                    f"SSDP enrichment for {device.ip}: "
+                                    f"found {len(ssdp_data)} fields"
                                 )
                         except Exception as e:
                             logger.debug(f"SSDP enrichment failed for {device.ip}: {e}")
 
-                    # Active probe enrichment (HTTP, Telnet, SSH, Printer)
+                    # Active probe enrichment (HTTP, Telnet, SSH, Printer, IoT protocols)
                     # This simulates normal server connections to get device info
                     if self.settings.feature_active_probe:
                         try:
@@ -258,29 +252,19 @@ class ScanPipeline:
                                 enrich_with_active_probe,
                             )
 
-                            probe_result = await asyncio.wait_for(
+                            probe_data = await asyncio.wait_for(
                                 enrich_with_active_probe(
                                     device_ip=device.ip,
                                     device_mac=device.mac,
                                     timeout=2.0,  # Short timeout per device
-                                    mdns_data=mdns_data,
-                                    ssdp_data=ssdp_data,
-                                    feature_http=getattr(
-                                        self.settings, "feature_http_ident", True
-                                    ),
-                                    feature_printer=getattr(
-                                        self.settings, "feature_printer_ident", True
-                                    ),
                                 ),
                                 timeout=3.0,  # Overall timeout
                             )
-                            if probe_result and (
-                                probe_result.fingerprint or probe_result.observations
-                            ):
-                                fingerprint_data.update(probe_result.fingerprint)
+                            if probe_data:
+                                fingerprint_data.update(probe_data)
                                 evidence_sources.append("active_probe")
                                 key_fields = build_key_fields(
-                                    "active_probe", probe_result.fingerprint
+                                    "active_probe", probe_data
                                 )
                                 if key_fields:
                                     observations.append(
@@ -292,24 +276,9 @@ class ScanPipeline:
                                             ),
                                         }
                                     )
-                                for obs in probe_result.observations or []:
-                                    protocol = obs.get("protocol", "active_probe")
-                                    sanitized = build_key_fields(
-                                        protocol, obs.get("key_fields", {})
-                                    )
-                                    if not sanitized:
-                                        continue
-                                    observations.append(
-                                        {
-                                            "protocol": protocol,
-                                            "key_fields": sanitized,
-                                            "summary": obs.get("summary")
-                                            or build_summary(protocol, sanitized),
-                                        }
-                                    )
                                 logger.debug(
                                     f"Active probe for {device.ip}: "
-                                    f"found {len(probe_result.fingerprint)} fields"
+                                    f"found {len(probe_data)} fields"
                                 )
                         except Exception as e:
                             logger.debug(f"Active probe failed for {device.ip}: {e}")

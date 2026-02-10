@@ -73,7 +73,7 @@ async def _read_macos_arp_cache() -> list[ARPCandidate]:
         output = stdout.decode("utf-8", errors="ignore")
         candidates = []
 
-        # Parse arp output: ? (192.168.1.1) at aa:bb:cc:dd:ee:ff on en0 ifscope
+        # Parse arp output: ? (192.168.1.1) at aa:bb:cc:dd:ee:ff on en0 ifscope [ethernet]
         for line in output.splitlines():
             match = re.search(
                 r"\(([0-9.]+)\)\s+at\s+([0-9a-f:]{17})\s+on\s+(\w+)",
@@ -136,6 +136,13 @@ async def _read_linux_neighbor_cache() -> list[ARPCandidate]:
             if match:
                 ip, interface, mac = match.groups()
                 mac = mac.lower()
+                # Check state (REACHABLE, STALE, DELAY)
+                state = "REACHABLE"
+                if "STALE" in line:
+                    state = "STALE"
+                elif "DELAY" in line:
+                    state = "DELAY"
+
                 candidates.append(
                     ARPCandidate(
                         ip=ip,
@@ -231,8 +238,7 @@ async def _read_windows_arp_cache() -> list[ARPCandidate]:
             )
             if match:
                 ip, mac, entry_type = match.groups()
-                # Convert Windows MAC format (aa-bb-cc-dd-ee-ff)
-                # to standard (aa:bb:cc:dd:ee:ff)
+                # Convert Windows MAC format (aa-bb-cc-dd-ee-ff) to standard (aa:bb:cc:dd:ee:ff)
                 mac = mac.replace("-", ":").lower()
                 candidates.append(
                     ARPCandidate(

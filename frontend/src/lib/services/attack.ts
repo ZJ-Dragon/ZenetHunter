@@ -29,10 +29,10 @@ export const attackService = {
    */
   startAttack: async (mac: string, type: AttackType = AttackType.KICK, duration: number = 60, intensity: number = 5) => {
     // API endpoint: POST /api/active-defense/{mac}/start
-    const response = await api.post(`/active-defense/${mac}/start`, {
-      type,
+    const response = await api.post(`/active-defense/${mac}/start`, { 
+      type, 
       duration,
-      intensity
+      intensity 
     });
     return response.data;
   },

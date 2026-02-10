@@ -9,6 +9,9 @@ from typing import Any
 from app.services.device_model_lookup import get_device_model_lookup
 from app.services.fingerprint_normalizer import FingerprintNormalizer
 from app.services.keyword_extractor import KeywordExtractor, apply_confidence_delta
+from app.services.recognition.external_service_policy import get_external_service_policy
+from app.services.recognition.providers.macvendors import MACVendorsProvider
+from app.services.recognition.providers.fingerbank import FingerbankProvider
 
 logger = logging.getLogger(__name__)
 
@@ -20,7 +23,11 @@ class RecognitionEngine:
         self.normalizer = FingerprintNormalizer()
         self.model_lookup = get_device_model_lookup()
         self.local_rules: dict[str, dict[str, Any]] = {}
+        self.policy = get_external_service_policy()
         self.keyword_extractor = KeywordExtractor()
+        # Initialize external providers (lazy-loaded)
+        self._macvendors: MACVendorsProvider | None = None
+        self._fingerbank: FingerbankProvider | None = None
         self._load_local_rules()
 
     def _load_local_rules(self) -> None:
@@ -56,11 +63,13 @@ class RecognitionEngine:
         """
         Recognize device using multiple signals.
 
-        Priority (local-only):
+        Priority:
         1. Active probe evidence (HTTP, Telnet, SSH, SSDP - direct device responses)
         2. OUI-based vendor/model (local lookup, if MAC is non-random)
         3. DHCP fingerprint matching (local rules)
-        4. Additional signals (mDNS/SSDP/UA/JA3)
+        4. External vendor lookup (MACVendors, if enabled)
+        5. External device fingerprint (Fingerbank, if enabled and has key)
+        6. Additional signals (mDNS/SSDP/UA/JA3)
 
         Args:
             mac: Device MAC address
@@ -104,8 +113,10 @@ class RecognitionEngine:
 
         # Extract from HTTP responses
         http_title = fingerprint.get("http_title", "")
+        http_server = fingerprint.get("http_server", "")
         http_meta_model = fingerprint.get("http_meta_model")
         http_meta_device = fingerprint.get("http_meta_device")
+        http_meta_product = fingerprint.get("http_meta_product")
 
         # Extract from Telnet/SSH banners
         telnet_banner = fingerprint.get("telnet_banner", "")
@@ -225,14 +236,87 @@ class RecognitionEngine:
                     f"{dhcp_vendor}/{dhcp_model} (confidence: {dhcp_confidence})"
                 )
 
-        # Step 3: Combine results with weighted confidence (local only)
-        final_vendor = vendor_guess or dhcp_vendor
-        final_model = model_guess or dhcp_model
+        # Step 3: External vendor lookup (MACVendors, if enabled)
+        external_vendor_result = None
+        external_vendor_confidence = 0
+        if self.policy.external_lookup_enabled and mac and not self._is_random_mac(mac):
+            try:
+                if self._macvendors is None:
+                    self._macvendors = MACVendorsProvider()
+                if self._macvendors.is_enabled():
+                    external_vendor_result = await self._macvendors.lookup_vendor(mac)
+                    if external_vendor_result:
+                        external_vendor_confidence = external_vendor_result.get(
+                            "confidence", 80
+                        )
+                        evidence["sources"].append(
+                            external_vendor_result.get("source", "external:macvendors")
+                        )
+                        evidence["matched_fields"].append("mac_oui_external")
+                        evidence["weights"]["external_vendor"] = 0.8
+                        logger.debug(
+                            f"External vendor lookup for {mac}: "
+                            f"{external_vendor_result.get('vendor')} "
+                            f"(confidence: {external_vendor_confidence})"
+                        )
+            except Exception as e:
+                logger.warning(f"External vendor lookup failed for {mac}: {e}")
+
+        # Step 4: External device fingerprint (Fingerbank, if enabled and has key)
+        external_device_result = None
+        external_device_confidence = 0
+        if (
+            self.policy.external_lookup_enabled
+            and fingerprint
+            and any(fingerprint.values())
+        ):
+            try:
+                if self._fingerbank is None:
+                    self._fingerbank = FingerbankProvider()
+                if self._fingerbank.is_enabled():
+                    external_device_result = await self._fingerbank.lookup_device(
+                        fingerprint
+                    )
+                    if external_device_result:
+                        external_device_confidence = external_device_result.get(
+                            "confidence", 70
+                        )
+                        evidence["sources"].append(
+                            external_device_result.get("source", "external:fingerbank")
+                        )
+                        evidence["matched_fields"].append("fingerprint_external")
+                        evidence["weights"]["external_device"] = 0.7
+                        logger.debug(
+                            f"External device lookup: "
+                            f"{external_device_result.get('vendor')}/"
+                            f"{external_device_result.get('model')} "
+                            f"(confidence: {external_device_confidence})"
+                        )
+            except Exception as e:
+                logger.warning(f"External device lookup failed: {e}")
+
+        # Step 5: Combine results with weighted confidence
+        # Priority: external_device > external_vendor > local OUI > DHCP
+        final_vendor = (
+            (external_device_result and external_device_result.get("vendor"))
+            or (external_vendor_result and external_vendor_result.get("vendor"))
+            or vendor_guess
+            or dhcp_vendor
+        )
+        final_model = (
+            (external_device_result and external_device_result.get("model"))
+            or model_guess
+            or dhcp_model
+        )
 
         # Calculate combined confidence (weighted average)
         confidences = []
         if active_probe_confidence > 0:
             confidences.append(("active_probe", active_probe_confidence, 0.85))
+        if external_device_confidence > 0:
+            confidences.append(("external_device", external_device_confidence, 0.7))
+        if external_vendor_confidence > 0:
+            confidences.append(("external_vendor", external_vendor_confidence, 0.8))
         if oui_confidence > 0:
             confidences.append(("oui", oui_confidence, 0.8))
         if dhcp_confidence > 0:
@@ -250,7 +334,6 @@ class RecognitionEngine:
         keyword_tokens = self.keyword_extractor.extract(fingerprint)
         keyword_hits = self.keyword_extractor.match_rules(keyword_tokens, fingerprint)
         evidence["keyword_hits"] = keyword_hits
-        final_name: str | None = None
         if keyword_hits:
             evidence["sources"].append("dictionary")
             evidence["matched_fields"].append("keyword_dictionary")
@@ -265,7 +348,7 @@ class RecognitionEngine:
                 key=lambda h: (-int(h.get("priority", 0)), h.get("rule_id", "")),
             ):
                 infer = hit.get("infer") or {}
-                for key in ("vendor", "product", "category", "os", "name"):
+                for key in ("vendor", "product", "category", "os"):
                     if key not in merged_infer and infer.get(key):
                         merged_infer[key] = infer[key]
             if merged_infer:
@@ -279,14 +362,14 @@ class RecognitionEngine:
                 final_vendor = infer.get("vendor")
             if not final_model and infer.get("product"):
                 final_model = infer.get("product")
-            if infer.get("name"):
-                final_name = infer.get("name")
 
         # Add evidence summary
         evidence["confidence_breakdown"] = {
             "active_probe": active_probe_confidence,
             "oui": oui_confidence,
             "dhcp": dhcp_confidence,
+            "external_vendor": external_vendor_confidence,
+            "external_device": external_device_confidence,
             "combined": final_confidence,
             **evidence.get("confidence_breakdown", {}),
         }
@@ -294,7 +377,6 @@ class RecognitionEngine:
         result = {
             "best_guess_vendor": final_vendor,
             "best_guess_model": final_model,
-            "best_guess_name": final_name,
             "confidence": final_confidence,
             "evidence": evidence,
         }

@@ -80,9 +80,12 @@
 - `FEATURE_NBNS`（布尔，默认 `false`）：启用 NBNS（Windows 发现）。
 - `FEATURE_SNMP`（布尔，默认 `false`）：启用 SNMP（需要凭据）。
 - `FEATURE_ACTIVE_PROBE`（布尔，默认 `true`）：启用主动探测（HTTP/Telnet/SSH/打印/IoT）。
-- `FEATURE_HTTP_IDENT`（布尔，默认 `true`）：启用安全的 HTTP/HTTPS 识别探测。
-- `FEATURE_PRINTER_IDENT`（布尔，默认 `true`）：当存在提示时启用打印机识别探测。
-- 外部识别服务已移除，默认离线，不会对外请求。
+- `FEATURE_FINGERBANK`（布尔，默认 `false`）：启用 Fingerbank API（需密钥）。
+
+### 外部识别服务
+- `FEATURE_EXTERNAL_LOOKUP`（布尔，默认 `false`）：开启外部查询（MACVendors、Fingerbank）。
+- `EXTERNAL_LOOKUP_OUI_ONLY`（布尔，默认 `true`）：仅发送 MAC OUI 前缀以保护隐私。
+- `FINGERBANK_API_KEY`（字符串/可选）：`FEATURE_FINGERBANK=true` 时必需。
 
 ## `backend/.env` 示例
 ```bash
@@ -110,8 +113,11 @@ SCAN_RANGE=192.168.31.0/24
 FEATURE_MDNS=true
 FEATURE_SSDP=true
 FEATURE_ACTIVE_PROBE=true
-FEATURE_HTTP_IDENT=true
-FEATURE_PRINTER_IDENT=true
+FEATURE_EXTERNAL_LOOKUP=false
+EXTERNAL_LOOKUP_OUI_ONLY=true
+
+# 外部识别（可选）
+# FINGERBANK_API_KEY=your-api-key-here
 ```
 
 ## 生产环境检查清单
@@ -119,7 +125,7 @@ FEATURE_PRINTER_IDENT=true
 - 生成强随机的 `SECRET_KEY`，敏感信息使用安全存储。
 - 明确配置 `CORS_ALLOW_ORIGINS` 为前端域名。
 - 需要时提供非 SQLite 的 `DATABASE_URL`。
-- 谨慎开启 `ACTIVE_DEFENSE_ENABLED`。
+- 谨慎开启 `ACTIVE_DEFENSE_ENABLED`；除非接受传输完整 MAC，否则保持 `EXTERNAL_LOOKUP_OUI_ONLY=true`。
 
 ## 故障排查
 - 变量未加载：确认 `.env` 位于 `backend/`，使用 `KEY=value`（无空格），修改后重启服务。

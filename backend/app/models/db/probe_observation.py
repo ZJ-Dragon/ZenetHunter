@@ -30,6 +30,4 @@ class ProbeObservationModel(Base):
     keywords: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
     keyword_hits: Mapped[list] = mapped_column(JSON, nullable=False, default=list)
     raw_summary: Mapped[str | None] = mapped_column(Text, nullable=True)
-    redaction_level: Mapped[str] = mapped_column(
-        String(32), nullable=False, default="standard"
-    )
+    redaction_level: Mapped[str] = mapped_column(String(32), nullable=False, default="standard")

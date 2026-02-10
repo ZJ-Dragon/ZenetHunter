@@ -120,12 +120,12 @@ export const useWebSocketEvent = <T = unknown>(
     if (lastMessage && lastMessage.event === eventType) {
       // Create a unique ID for this message to prevent duplicate processing
       const messageId = JSON.stringify(lastMessage);
-
+      
       // Skip if we already processed this exact message
       if (lastProcessedRef.current === messageId) {
         return;
       }
-
+      
       lastProcessedRef.current = messageId;
       handlerRef.current(lastMessage.data as T);
     }

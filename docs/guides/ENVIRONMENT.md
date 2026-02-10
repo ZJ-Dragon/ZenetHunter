@@ -80,9 +80,12 @@ All variables below are read by `backend/app/core/config.py` (Pydantic Settings)
 - `FEATURE_NBNS` (bool, default `false`): Enable NBNS (Windows discovery).
 - `FEATURE_SNMP` (bool, default `false`): Enable SNMP queries (requires creds).
 - `FEATURE_ACTIVE_PROBE` (bool, default `true`): Enable active probing (HTTP/Telnet/SSH/Printer/IoT).
-- `FEATURE_HTTP_IDENT` (bool, default `true`): Enable safe HTTP/HTTPS identification probes.
-- `FEATURE_PRINTER_IDENT` (bool, default `true`): Enable printer identification when hints are present.
-- External recognition providers have been removed; no outbound lookups are performed.
+- `FEATURE_FINGERBANK` (bool, default `false`): Enable Fingerbank API (requires key).
+
+### External recognition providers
+- `FEATURE_EXTERNAL_LOOKUP` (bool, default `false`): Toggle external lookups (MACVendors, Fingerbank).
+- `EXTERNAL_LOOKUP_OUI_ONLY` (bool, default `true`): Send only MAC OUI prefix for privacy.
+- `FINGERBANK_API_KEY` (string/optional): Required when `FEATURE_FINGERBANK=true`.
 
 ## Example `backend/.env`
 ```bash
@@ -110,8 +113,11 @@ SCAN_RANGE=192.168.31.0/24
 FEATURE_MDNS=true
 FEATURE_SSDP=true
 FEATURE_ACTIVE_PROBE=true
-FEATURE_HTTP_IDENT=true
-FEATURE_PRINTER_IDENT=true
+FEATURE_EXTERNAL_LOOKUP=false
+EXTERNAL_LOOKUP_OUI_ONLY=true
+
+# External Recognition (optional)
+# FINGERBANK_API_KEY=your-api-key-here
 ```
 
 ## Production checklist
@@ -119,7 +125,7 @@ FEATURE_PRINTER_IDENT=true
 - Generate a strong `SECRET_KEY`; store secrets securely.
 - Explicitly configure `CORS_ALLOW_ORIGINS` for your frontend domains.
 - Provide a non-SQLite `DATABASE_URL` if required.
-- Enable `ACTIVE_DEFENSE_ENABLED` only if intended.
+- Enable `ACTIVE_DEFENSE_ENABLED` only if intended; keep `EXTERNAL_LOOKUP_OUI_ONLY=true` unless you accept full MAC sharing.
 
 ## Troubleshooting
 - Variables not loading: ensure `.env` lives in `backend/`, use `KEY=value` (no spaces), restart the server after changes.

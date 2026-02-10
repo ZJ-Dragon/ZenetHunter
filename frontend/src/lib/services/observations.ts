@@ -22,3 +22,4 @@ export const observationService = {
     return response.data;
   },
 };
+

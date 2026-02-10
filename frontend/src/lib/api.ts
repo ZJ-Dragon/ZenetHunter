@@ -1,18 +1,9 @@
 import axios from 'axios';
 
-const rawApiUrl = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
-
-// Ensure base URL always contains the /api prefix without duplicating it
-const normalizeApiBase = (url: string): string => {
-  const trimmed = url.replace(/\/+$/, '');
-  if (trimmed.endsWith('/api')) {
-    return trimmed;
-  }
-  return `${trimmed}/api`;
-};
+const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000/api';
 
 export const api = axios.create({
-  baseURL: normalizeApiBase(rawApiUrl),
+  baseURL: API_URL,
   timeout: 30000, // Increased to 30s for operations like scanning
   headers: {
     'Content-Type': 'application/json',

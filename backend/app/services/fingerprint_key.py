@@ -49,7 +49,9 @@ def generate_fingerprint_key(
     # Extract and normalize fingerprint signals
     if fingerprint_data:
         # DHCP Option 60 - Vendor Class Identifier (highest priority)
-        vci = fingerprint_data.get("dhcp_opt60_vci") or fingerprint_data.get("dhcp_vci")
+        vci = fingerprint_data.get("dhcp_opt60_vci") or fingerprint_data.get(
+            "dhcp_vci"
+        )
         if vci and isinstance(vci, str) and vci.strip():
             normalized_vci = vci.strip().lower()
             signals.append(f"vci:{normalized_vci}")
@@ -173,5 +175,7 @@ def match_fingerprint_key(
     Returns:
         The fingerprint key string
     """
-    key, _ = generate_fingerprint_key(fingerprint_data, mac, vendor_guess, model_guess)
+    key, _ = generate_fingerprint_key(
+        fingerprint_data, mac, vendor_guess, model_guess
+    )
     return key

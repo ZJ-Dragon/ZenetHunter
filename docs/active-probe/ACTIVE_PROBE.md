@@ -1,14 +1,15 @@
 # Active Probe Device Identification
 
 ## Overview
-Active Probe is a device identification technique that simulates normal client connections and lets devices tell us who they are (vendor, model, firmware). All probes are read-only, time-bounded, and **restricted to local/private IPs**. The pipeline is service-first: mDNS/SSDP collect service types and TXT hints, then targeted HTTP/HTTPS identification and printer probes (only when hints exist) run with strict timeouts and small response caps.
+Active Probe is a device identification technique that simulates normal client connections and lets devices tell us who they are (vendor, model, firmware). All probes are read-only and time-bounded.
 
 ## How it works
 The engine attempts several protocols in parallel:
-1) **HTTP/HTTPS** (controlled by `FEATURE_HTTP_IDENT`): fetches web admin pages with rate limits and 4 KB body cap
+1) **HTTP/HTTPS**: fetches web admin pages
 2) **Telnet**: grabs banners
 3) **SSH**: grabs banners
-4) **Printer protocols** (gated by hints + `FEATURE_PRINTER_IDENT`): IPP and LPD
+4) **Printer protocols**: IPP and LPD
+5) **IoT**: CoAP `/.well-known/core`
 
 ## Supported probes
 ### HTTP/HTTPS
@@ -50,16 +51,16 @@ The engine attempts several protocols in parallel:
 ## Recognition priority
 Active Probe outputs carry the **highest confidence (75–85%)** because they are device-self-reported:
 1. Active Probe (HTTP/Telnet/SSH/Printer/IoT)
-2. Local OUI and keyword/dictionary matches (~80%)
-3. DHCP fingerprint (local, ~70%)
+2. Fingerbank device fingerprint (external, ~70%)
+3. MACVendors vendor lookup (external, ~80%)
+4. Local OUI lookup (~80%)
+5. DHCP fingerprint (local, ~70%)
 
 ## Configuration
 - Enable/disable via environment variables:
   ```bash
   FEATURE_ACTIVE_PROBE=true   # default
   FEATURE_ACTIVE_PROBE=false  # disable active probing
-  FEATURE_HTTP_IDENT=true     # enable HTTP/HTTPS identification
-  FEATURE_PRINTER_IDENT=true  # enable printer probes when hints exist
   ```
 - Timeouts: ~2s per probe, ~3s overall per device (fast failover between ports).
 
@@ -104,8 +105,7 @@ Active Probe outputs carry the **highest confidence (75–85%)** because they ar
 
 ## Safety
 - Read-only: GETs and banner reads only; no configuration changes.
-- Time-boxed: per-probe timeouts prevent long hangs; response bodies capped to 4 KB.
-- Local-only: probes run only against private/loopback IPs; SSDP description fetches are skipped for non-local `LOCATION` hosts.
+- Time-boxed: per-probe timeouts prevent long hangs.
 - Concurrency: probes run in parallel but are bounded per device.
 - Error isolation: failures are contained and do not block other probes.
 
@@ -125,4 +125,4 @@ Active Probe outputs carry the **highest confidence (75–85%)** because they ar
 - Improve hit rate: extend timeouts for slow devices, verify open ports, check `active_probe` logs.
 
 ## Used with other methods
-Active Probe complements mDNS, SSDP/UPnP, and local OUI/dictionary lookups. Results are merged with weighted confidence to choose the final identity.
+Active Probe complements mDNS, SSDP/UPnP, OUI lookup, and external providers (MACVendors, Fingerbank). Results are merged with weighted confidence to choose the final identity.

@@ -149,7 +149,7 @@ class ARPSweep:
                     answered, _unanswered = await asyncio.wait_for(
                         loop.run_in_executor(
                             None,
-                            lambda packets=packets: srp(
+                            lambda: srp(
                                 packets,
                                 timeout=self.timeout,
                                 verbose=0,

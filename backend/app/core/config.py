@@ -191,6 +191,11 @@ if _HAVE_PYDANTIC_SETTINGS:
             validation_alias="FEATURE_SNMP",
             description="Enable SNMP (requires credentials)",
         )
+        feature_fingerbank: bool = Field(
+            default=False,
+            validation_alias="FEATURE_FINGERBANK",
+            description="Enable Fingerbank API (external, default off)",
+        )
         feature_active_probe: bool = Field(
             default=True,
             validation_alias="FEATURE_ACTIVE_PROBE",
@@ -199,15 +204,28 @@ if _HAVE_PYDANTIC_SETTINGS:
                 "Simulates normal server connections to get device info."
             ),
         )
-        feature_http_ident: bool = Field(
-            default=True,
-            validation_alias="FEATURE_HTTP_IDENT",
-            description="Enable safe HTTP/HTTPS identification probes (local-only).",
+
+        # External Recognition Providers
+        feature_external_lookup: bool = Field(
+            default=False,
+            validation_alias="FEATURE_EXTERNAL_LOOKUP",
+            description=(
+                "Enable external recognition providers (MACVendors, Fingerbank). "
+                "Default: False (safe default). UI and software add soft restrictions."
+            ),
         )
-        feature_printer_ident: bool = Field(
+        external_lookup_oui_only: bool = Field(
             default=True,
-            validation_alias="FEATURE_PRINTER_IDENT",
-            description="Enable printer identification probes when hints are present.",
+            validation_alias="EXTERNAL_LOOKUP_OUI_ONLY",
+            description=(
+                "OUI-only mode: send only OUI prefix (first 3 octets), not full MAC. "
+                "Privacy protection (default: True)"
+            ),
+        )
+        fingerbank_api_key: str | None = Field(
+            default=None,
+            validation_alias="FINGERBANK_API_KEY",
+            description="Fingerbank API key (required for Fingerbank provider)",
         )
 
         # CORS: comma‑separated list → list[str]
@@ -392,17 +410,26 @@ else:
         feature_snmp: bool = Field(
             default_factory=lambda: os.getenv("FEATURE_SNMP", "false").lower() == "true"
         )
+        feature_fingerbank: bool = Field(
+            default_factory=lambda: os.getenv("FEATURE_FINGERBANK", "false").lower()
+            == "true"
+        )
         feature_active_probe: bool = Field(
             default_factory=lambda: os.getenv("FEATURE_ACTIVE_PROBE", "true").lower()
             == "true"
         )
-        feature_http_ident: bool = Field(
-            default_factory=lambda: os.getenv("FEATURE_HTTP_IDENT", "true").lower()
+
+        # External Recognition Providers (fallback)
+        feature_external_lookup: bool = Field(
+            default_factory=lambda: os.getenv("FEATURE_EXTERNAL_LOOKUP", "false").lower()
             == "true"
         )
-        feature_printer_ident: bool = Field(
-            default_factory=lambda: os.getenv("FEATURE_PRINTER_IDENT", "true").lower()
+        external_lookup_oui_only: bool = Field(
+            default_factory=lambda: os.getenv("EXTERNAL_LOOKUP_OUI_ONLY", "true").lower()
             == "true"
+        )
+        fingerbank_api_key: str | None = Field(
+            default_factory=lambda: os.getenv("FINGERBANK_API_KEY")
         )
 
         # Integration: Webhook verification (fallback)

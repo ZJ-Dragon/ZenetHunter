@@ -329,7 +329,8 @@ async def update_manual_label(
     match_keys = build_match_keys(
         mac=mac,
         fingerprint_components=components,
-        ip_hint=str(device.ip),
+        vendor_guess=device.vendor_guess,
+        model_guess=device.model_guess,
     )
 
     profile = await manual_profile_service.create_or_update_profile(

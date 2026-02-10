@@ -35,9 +35,7 @@ export interface ScanConfig {
     ssdp: boolean;
     nbns: boolean;
     snmp: boolean;
-    active_probe?: boolean;
-    http_ident?: boolean;
-    printer_ident?: boolean;
+    fingerbank: boolean;
   };
 }
 

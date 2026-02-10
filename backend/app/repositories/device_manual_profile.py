@@ -2,6 +2,7 @@
 
 from __future__ import annotations
 
+import json
 from datetime import UTC, datetime
 from typing import Any
 
@@ -85,13 +86,10 @@ class DeviceManualProfileRepository:
         fingerprint_key: str | None,
         mac: str | None,
         match_keys: dict[str, Any] | None = None,
-        ip_hint: str | None = None,
-        min_score: int = 80,
     ) -> DeviceManualProfile | None:
         """Find the best matching manual profile using heuristics."""
         match_keys = match_keys or {}
         mac_lower = mac.lower() if mac else None
-        ip_hint = ip_hint or None
 
         # Fetch candidates lazily; table expected to be small
         result = await self.session.execute(select(DeviceManualProfileModel))
@@ -102,32 +100,10 @@ class DeviceManualProfileRepository:
 
         for profile in candidates:
             score = 0
-            fp_match = bool(
-                fingerprint_key
-                and profile.fingerprint_key
-                and profile.fingerprint_key == fingerprint_key
-            )
-            mac_match = bool(mac_lower and profile.mac and profile.mac == mac_lower)
-            ip_match = bool(ip_hint and profile.ip_hint and profile.ip_hint == ip_hint)
-
-            # If profile is bound to a MAC and it doesn't match, only allow
-            # matching when the fingerprint key is an exact hit.
-            if profile.mac and mac_lower and profile.mac != mac_lower and not fp_match:
-                continue
-            if (
-                profile.ip_hint
-                and ip_hint
-                and profile.ip_hint != ip_hint
-                and not (fp_match or mac_match)
-            ):
-                continue
-
-            if fp_match:
-                score += 120
-            if mac_match:
+            if fingerprint_key and profile.fingerprint_key == fingerprint_key:
                 score += 100
-            if ip_match:
-                score += 60
+            if mac_lower and profile.mac and profile.mac == mac_lower:
+                score += 80
 
             if match_keys and profile.match_keys:
                 score += self._score_match_keys(profile.match_keys, match_keys)
@@ -136,7 +112,7 @@ class DeviceManualProfileRepository:
                 best = profile
                 best_score = score
 
-        if best and best_score >= min_score:
+        if best:
             return DeviceManualProfile.model_validate(best)
         return None
 

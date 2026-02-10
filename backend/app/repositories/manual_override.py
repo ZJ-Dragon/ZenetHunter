@@ -80,9 +80,7 @@ class ManualOverrideRepository:
                 source_mac=source_mac,
                 source_ip=source_ip,
                 fingerprint_components=(
-                    json.dumps(fingerprint_components)
-                    if fingerprint_components
-                    else None
+                    json.dumps(fingerprint_components) if fingerprint_components else None
                 ),
                 created_by=username,
                 updated_by=username,

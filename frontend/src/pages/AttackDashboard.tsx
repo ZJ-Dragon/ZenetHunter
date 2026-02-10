@@ -71,7 +71,7 @@ export const AttackDashboard: React.FC = () => {
   const [logs, setLogs] = useState<ActiveDefenseLogEntry[]>([]);
   const [showLogs, setShowLogs] = useState(true);
   const [stoppingMacs, setStoppingMacs] = useState<Set<string>>(new Set());
-
+  
   // Global attack settings
   const [globalIntensity, setGlobalIntensity] = useState(5);
   const [globalDuration, setGlobalDuration] = useState(60);
@@ -79,32 +79,8 @@ export const AttackDashboard: React.FC = () => {
   const [showTypeMenu, setShowTypeMenu] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [launchingMacs, setLaunchingMacs] = useState<Set<string>>(new Set());
-
+  
   const typeMenuRef = useRef<HTMLDivElement>(null);
-
-  const getDisplayName = useCallback((device: Device) => {
-    return (
-      device.display_name ||
-      device.manual_profile?.manual_name ||
-      device.name ||
-      device.alias ||
-      device.model ||
-      device.model_guess ||
-      device.name_auto ||
-      'Unknown Device'
-    );
-  }, []);
-
-  const getDisplayVendor = useCallback((device: Device) => {
-    return (
-      device.display_vendor ||
-      device.manual_profile?.manual_vendor ||
-      device.vendor ||
-      device.vendor_guess ||
-      device.vendor_auto ||
-      'Unknown Vendor'
-    );
-  }, []);
 
   // Close attack type menu when clicking outside
   useEffect(() => {
@@ -125,7 +101,7 @@ export const AttackDashboard: React.FC = () => {
     try {
       const data = await deviceService.getAll();
       setDevices(data);
-
+      
       // Update active attacks with device info
       setActiveAttacks(prev => {
         const updated = new Map(prev);
@@ -147,9 +123,6 @@ export const AttackDashboard: React.FC = () => {
   useEffect(() => {
     fetchDevices();
   }, [fetchDevices]);
-
-  useWebSocketEvent(WSEventType.DEVICE_UPDATED, fetchDevices);
-  useWebSocketEvent(WSEventType.DEVICE_RECOGNITION_UPDATED, fetchDevices);
 
   // Handle active defense started
   useWebSocketEvent(WSEventType.ACTIVE_DEFENSE_STARTED, (data: ActiveDefenseStartedData) => {
@@ -193,16 +166,16 @@ export const AttackDashboard: React.FC = () => {
   useWebSocketEvent(WSEventType.ACTIVE_DEFENSE_LOG, (data: ActiveDefenseLogEntry) => {
     setLogs(prev => {
       // Deduplicate: skip if same message+mac within last 2 seconds
-      const isDuplicate = prev.some(log =>
-        log.message === data.message &&
+      const isDuplicate = prev.some(log => 
+        log.message === data.message && 
         log.mac === data.mac &&
         Math.abs(new Date(log.timestamp).getTime() - new Date(data.timestamp).getTime()) < 2000
       );
-
+      
       if (isDuplicate) {
         return prev;
       }
-
+      
       return [data, ...prev].slice(0, 100); // Keep last 100 logs
     });
   });
@@ -214,12 +187,12 @@ export const AttackDashboard: React.FC = () => {
 
   // Get devices with running attacks (from device status)
   const devicesWithAttacks = devices.filter(d => d.attack_status === AttackStatus.RUNNING);
-
+  
   // Merge with WebSocket-tracked attacks
   const allActiveAttacks = Array.from(activeAttacks.values());
-
+  
   // Use the larger set (device status or tracked attacks)
-  const displayAttacks = allActiveAttacks.length > 0 ? allActiveAttacks :
+  const displayAttacks = allActiveAttacks.length > 0 ? allActiveAttacks : 
     devicesWithAttacks.map(d => ({
       mac: d.mac,
       type: 'unknown',
@@ -233,31 +206,30 @@ export const AttackDashboard: React.FC = () => {
   const filteredDevices = devices.filter(device => {
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
-    const name = getDisplayName(device).toLowerCase();
-    const vendor = getDisplayVendor(device).toLowerCase();
     return (
-      name.includes(query) ||
-      vendor.includes(query) ||
+      device.name?.toLowerCase().includes(query) ||
       device.ip.toLowerCase().includes(query) ||
-      device.mac.toLowerCase().includes(query)
+      device.mac.toLowerCase().includes(query) ||
+      device.vendor?.toLowerCase().includes(query) ||
+      device.vendor_guess?.toLowerCase().includes(query)
     );
   });
 
   const handleStopAttack = async (mac: string) => {
     setStoppingMacs(prev => new Set(prev).add(mac.toLowerCase()));
     const toastId = toast.loading('Stopping attack...');
-
+    
     try {
       await attackService.stopAttack(mac);
       toast.success('Attack stopped', { id: toastId });
-
+      
       // Remove from active attacks
       setActiveAttacks(prev => {
         const updated = new Map(prev);
         updated.delete(mac.toLowerCase());
         return updated;
       });
-
+      
       fetchDevices();
     } catch (error) {
       console.error('Failed to stop attack:', error);
@@ -274,8 +246,8 @@ export const AttackDashboard: React.FC = () => {
   const handleLaunchAttack = async (device: Device) => {
     setLaunchingMacs(prev => new Set(prev).add(device.mac.toLowerCase()));
     const metadata = attackTypeMetadata[selectedAttackType];
-    const toastId = toast.loading(`Launching ${metadata.label} on ${getDisplayName(device)}...`);
-
+    const toastId = toast.loading(`Launching ${metadata.label} on ${device.name || device.ip}...`);
+    
     try {
       await attackService.startAttack(device.mac, selectedAttackType, globalDuration, globalIntensity);
       toast.success(`${metadata.label} attack started`, { id: toastId });
@@ -309,7 +281,7 @@ export const AttackDashboard: React.FC = () => {
   };
 
   const isDeviceUnderAttack = (mac: string) => {
-    return activeAttacks.has(mac.toLowerCase()) ||
+    return activeAttacks.has(mac.toLowerCase()) || 
            devices.find(d => d.mac.toLowerCase() === mac.toLowerCase())?.attack_status === AttackStatus.RUNNING;
   };
 
@@ -374,9 +346,7 @@ export const AttackDashboard: React.FC = () => {
             displayAttacks.map((attack) => {
               const device = attack.device || devices.find(d => d.mac.toLowerCase() === attack.mac.toLowerCase());
               const isStopping = stoppingMacs.has(attack.mac.toLowerCase());
-              const displayName = device ? getDisplayName(device) : 'Unknown Device';
-              const displayVendor = device ? getDisplayVendor(device) : 'Unknown Vendor';
-
+              
               return (
                 <div
                   key={attack.mac}
@@ -398,11 +368,11 @@ export const AttackDashboard: React.FC = () => {
                       <div className="ml-4 flex-1">
                         <div className="flex items-center gap-3">
                           <span className="text-sm font-semibold" style={{ color: 'var(--winui-text-primary)' }}>
-                            {displayName}
+                            {device?.name || device?.alias || device?.model || device?.model_guess || 'Unknown Device'}
                           </span>
-                          <span
+                          <span 
                             className="px-2 py-0.5 text-xs font-medium rounded"
-                            style={{
+                            style={{ 
                               backgroundColor: 'rgba(209, 52, 56, 0.1)',
                               color: '#d13438'
                             }}
@@ -416,7 +386,9 @@ export const AttackDashboard: React.FC = () => {
                           <span className="font-mono text-xs">{attack.mac}</span>
                         </div>
                         <div className="mt-1 flex items-center gap-4 text-xs" style={{ color: 'var(--winui-text-tertiary)' }}>
-                          {displayVendor && <span>{displayVendor}</span>}
+                          {device?.vendor || device?.vendor_guess ? (
+                            <span>{device.vendor || device.vendor_guess}</span>
+                          ) : null}
                           {attack.duration > 0 && (
                             <span className="flex items-center gap-1">
                               <Clock className="h-3 w-3" />
@@ -474,7 +446,7 @@ export const AttackDashboard: React.FC = () => {
 
       {/* Real-time Logs */}
       <div className="card-winui overflow-hidden">
-        <div
+        <div 
           className="px-4 py-4 border-b sm:px-6 flex items-center justify-between cursor-pointer"
           style={{ borderColor: 'var(--winui-border-subtle)' }}
           onClick={() => setShowLogs(!showLogs)}
@@ -490,7 +462,7 @@ export const AttackDashboard: React.FC = () => {
           </h3>
           {showLogs ? <ChevronUp className="h-5 w-5" /> : <ChevronDown className="h-5 w-5" />}
         </div>
-
+        
         {showLogs && (
           <div className="max-h-64 overflow-y-auto">
             {logs.length > 0 ? (
@@ -505,7 +477,7 @@ export const AttackDashboard: React.FC = () => {
                       <span className="text-xs whitespace-nowrap" style={{ color: 'var(--winui-text-tertiary)' }}>
                         {new Date(log.timestamp).toLocaleTimeString()}
                       </span>
-                      <span
+                      <span 
                         className="flex-1"
                         style={{ color: getLogLevelColor(log.level) }}
                       >
@@ -563,7 +535,7 @@ export const AttackDashboard: React.FC = () => {
                   <span className="flex-1 text-left">{attackTypeMetadata[selectedAttackType].label}</span>
                   <ChevronDown className="h-4 w-4" style={{ color: 'var(--winui-text-tertiary)' }} />
                 </button>
-
+                
                 {showTypeMenu && (
                   <div
                     className="absolute top-full left-0 mt-1 w-56 rounded-lg z-50 py-1 max-h-72 overflow-y-auto"
@@ -581,7 +553,7 @@ export const AttackDashboard: React.FC = () => {
                           setShowTypeMenu(false);
                         }}
                         className="w-full text-left px-3 py-2 text-sm flex items-center gap-2 transition-colors"
-                        style={{
+                        style={{ 
                           color: 'var(--winui-text-primary)',
                           backgroundColor: selectedAttackType === type ? 'var(--winui-bg-tertiary)' : 'transparent'
                         }}
@@ -618,9 +590,9 @@ export const AttackDashboard: React.FC = () => {
                     background: `linear-gradient(to right, #d13438 0%, #d13438 ${(globalIntensity - 1) * 11.1}%, var(--winui-border-subtle) ${(globalIntensity - 1) * 11.1}%, var(--winui-border-subtle) 100%)`
                   }}
                 />
-                <span
+                <span 
                   className="text-sm font-semibold w-8 text-center px-2 py-1 rounded"
-                  style={{
+                  style={{ 
                     backgroundColor: 'rgba(209, 52, 56, 0.1)',
                     color: '#d13438'
                   }}
@@ -683,9 +655,7 @@ export const AttackDashboard: React.FC = () => {
                 const underAttack = isDeviceUnderAttack(device.mac);
                 const isLaunching = launchingMacs.has(device.mac.toLowerCase());
                 const isStopping = stoppingMacs.has(device.mac.toLowerCase());
-                const displayName = getDisplayName(device);
-                const displayVendor = getDisplayVendor(device);
-
+                
                 return (
                   <div
                     key={device.mac}
@@ -701,12 +671,12 @@ export const AttackDashboard: React.FC = () => {
                     }}
                   >
                     {/* Device Icon */}
-                    <div
+                    <div 
                       className={clsx(
                         "flex-shrink-0 h-10 w-10 rounded-full flex items-center justify-center",
                         underAttack && "animate-pulse"
                       )}
-                      style={{
+                      style={{ 
                         backgroundColor: underAttack ? 'rgba(209, 52, 56, 0.15)' : 'var(--winui-bg-tertiary)'
                       }}
                     >
@@ -721,18 +691,18 @@ export const AttackDashboard: React.FC = () => {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <span className="text-sm font-medium truncate" style={{ color: 'var(--winui-text-primary)' }}>
-                          {displayName}
+                          {device.name || device.alias || device.model || device.model_guess || 'Unknown Device'}
                         </span>
-                        <div
+                        <div 
                           className={clsx(
                             "h-2 w-2 rounded-full flex-shrink-0",
                             device.status === DeviceStatus.ONLINE ? "bg-green-500" : "bg-gray-400"
                           )}
                         />
                         {underAttack && (
-                          <span
+                          <span 
                             className="px-2 py-0.5 text-xs font-medium rounded flex-shrink-0"
-                            style={{
+                            style={{ 
                               backgroundColor: 'rgba(209, 52, 56, 0.1)',
                               color: '#d13438'
                             }}
@@ -747,7 +717,7 @@ export const AttackDashboard: React.FC = () => {
                         <span className="font-mono text-[10px]" style={{ color: 'var(--winui-text-tertiary)' }}>{device.mac}</span>
                       </div>
                       <div className="text-xs mt-0.5" style={{ color: 'var(--winui-text-tertiary)' }}>
-                        {displayVendor}
+                        {device.vendor || device.vendor_guess || 'Unknown Vendor'}
                       </div>
                     </div>
 

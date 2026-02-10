@@ -13,6 +13,7 @@ from scapy.all import (
     BOOTP,
     DHCP,
     DNS,
+    DNSQR,
     DNSRR,
     ICMP,
     IP,
@@ -133,9 +134,7 @@ class ScapyAttackEngine(AttackEngine):
                 f"[ScapyEngine] No active attack found for {target_mac} to stop"
             )
 
-    async def scan_network(
-        self, target_subnet: str | None = None
-    ) -> list[tuple[str, str]]:
+    async def scan_network(self, target_subnet: str | None = None) -> list[tuple[str, str]]:
         """
         Perform an ARP scan on the local network.
         Returns list of (IP, MAC) tuples.
@@ -163,7 +162,6 @@ class ScapyAttackEngine(AttackEngine):
             if subnet:
                 try:
                     import ipaddress
-
                     network = ipaddress.IPv4Network(subnet, strict=False)
                     # Common gateway: .1 or .254
                     gw_ip = str(network.network_address + 1)
@@ -220,9 +218,7 @@ class ScapyAttackEngine(AttackEngine):
                         except Exception:
                             # Fallback: use first available interface
                             iface = (
-                                list(conf.ifaces.values())[0].name
-                                if conf.ifaces
-                                else None
+                                list(conf.ifaces.values())[0].name if conf.ifaces else None
                             )
 
                     except Exception as e:
@@ -254,7 +250,9 @@ class ScapyAttackEngine(AttackEngine):
                     octets = gw_ip.split(".")
                     if len(octets) == 4:
                         subnet = f"{octets[0]}.{octets[1]}.{octets[2]}.0/24"
-                        logger.info(f"Calculated subnet from gateway {gw_ip}: {subnet}")
+                        logger.info(
+                            f"Calculated subnet from gateway {gw_ip}: {subnet}"
+                        )
 
             logger.info(f"[ScapyEngine] Scanning subnet {subnet} on interface {iface}")
 
@@ -502,14 +500,10 @@ class ScapyAttackEngine(AttackEngine):
                         # Validate we have the required fields
                         if not packet[DNS].qd:
                             return
-
+                        
                         qname = packet[DNS].qd.qname
-                        qtype = (
-                            packet[DNS].qd.qtype
-                            if hasattr(packet[DNS].qd, "qtype")
-                            else 1
-                        )
-
+                        qtype = packet[DNS].qd.qtype if hasattr(packet[DNS].qd, 'qtype') else 1
+                        
                         # Create spoofed DNS response using DNSRR (Resource Record)
                         # DNSRR is for answers, DNSQR is for questions
                         spoofed_dns = (
@@ -533,9 +527,7 @@ class ScapyAttackEngine(AttackEngine):
                             )
                         )
                         sendp(spoofed_dns, iface=iface, verbose=False)
-                        logger.debug(
-                            f"[ScapyEngine] DNS spoofed: {qname} -> {redirect_ip}"
-                        )
+                        logger.debug(f"[ScapyEngine] DNS spoofed: {qname} -> {redirect_ip}")
                 except Exception as e:
                     logger.debug(f"[ScapyEngine] DNS handle error: {e}")
 
