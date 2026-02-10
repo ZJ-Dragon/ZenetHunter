@@ -3,7 +3,8 @@ import { NetworkTopology } from '../../types/topology';
 
 export const topologyService = {
   getTopology: async (): Promise<NetworkTopology> => {
-    const response = await api.get<NetworkTopology>('/api/topology');
+    // baseURL already includes /api
+    const response = await api.get<NetworkTopology>('/topology');
     return response.data;
   },
 };
