@@ -229,7 +229,9 @@ class ScannerService:
         try:
             keyword_extractor = KeywordExtractor()
             devices_found = 0
-            discovered_devices = []
+            # Keep hybrid results separate from newly created device models
+            hybrid_discovered: list[dict[str, Any]] = []
+            discovered_device_models: list[Device] = []
 
             # Use hybrid scan (3-stage: Candidate → Refresh → Enrich)
             from app.services.scanner.pipeline import ScanPipeline
@@ -249,7 +251,7 @@ class ScannerService:
             )
 
             stats = scan_result.get("stats", {})
-            discovered_devices = scan_result.get("devices", [])
+            hybrid_discovered = scan_result.get("devices", [])
 
             logger.info(
                 f"Hybrid scan stats: candidates={stats.get('candidate_count', 0)}, "
@@ -258,7 +260,7 @@ class ScannerService:
             )
 
             # Fallback to old method if hybrid fails or returns no devices
-            if not discovered_devices and hasattr(self.scapy_engine, "scan_network"):
+            if not hybrid_discovered and hasattr(self.scapy_engine, "scan_network"):
                 try:
                     # Check permissions before attempting scan
                     # In Docker with privileged mode and host network,
@@ -448,7 +450,7 @@ class ScannerService:
                             device = await repo.upsert(device)
 
                             logger.info(f"Discovered new device: {mac} ({ip})")
-                            discovered_devices.append(device)
+                            discovered_device_models.append(device)
 
                         # Perform device recognition (multi-signal)
                         try:
@@ -616,8 +618,8 @@ class ScannerService:
 
             logger.info(f"Scan {scan_id} completed. Found {devices_found} devices.")
 
-            # Send deviceAdded events for newly discovered devices
-            for device in discovered_devices:
+            # Send deviceAdded events for newly discovered devices (models only)
+            for device in discovered_device_models:
                 await self.ws_manager.broadcast(
                     {
                         "event": "deviceAdded",
