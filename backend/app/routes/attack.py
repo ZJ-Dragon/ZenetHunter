@@ -226,3 +226,40 @@ async def legacy_stop_attack(
 ):
     """Legacy endpoint for backward compatibility."""
     return await stop_operation(mac, current_user, service, db)
+
+
+# Additional legacy router to serve /api/devices/* paths
+legacy_router = APIRouter(
+    prefix="/devices", tags=["Attack Legacy"], include_in_schema=False
+)
+
+
+@legacy_router.post(
+    "/{mac}/attack",
+    response_model=ActiveDefenseResponse,
+    status_code=status.HTTP_202_ACCEPTED,
+)
+async def legacy_start_attack_flat(
+    mac: str,
+    request: ActiveDefenseRequest,
+    current_user: Annotated[User, Depends(get_current_user)],
+    service=Depends(get_active_defense_service),
+    db: AsyncSession = Depends(get_db),
+):
+    """Compatibility endpoint at /api/devices/{mac}/attack."""
+    return await start_operation(mac, request, current_user, service, db)
+
+
+@legacy_router.post(
+    "/{mac}/attack/stop",
+    response_model=ActiveDefenseResponse,
+    status_code=status.HTTP_200_OK,
+)
+async def legacy_stop_attack_flat(
+    mac: str,
+    current_user: Annotated[User, Depends(get_current_user)],
+    service=Depends(get_active_defense_service),
+    db: AsyncSession = Depends(get_db),
+):
+    """Compatibility endpoint at /api/devices/{mac}/attack/stop."""
+    return await stop_operation(mac, current_user, service, db)
