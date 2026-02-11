@@ -1,39 +1,11 @@
-
-
 [run]
-# Measure branch coverage and keep per-process files for safe CI merging
-branch = True
-parallel = True
-# Store relative paths to make report portable across containers/hosts
-relative_files = True
-# Limit measurement to the backend app package
-source =
-    app
-# Omit tests and typical noise
 omit =
-    tests/*
-    */tests/*
-    **/tests/**
-    **/__pycache__/**
-    **/*.pyc
-
-[report]
-show_missing = True
-skip_covered = True
-precision = 1
-# Add extra exclusions without losing coverage.py defaults like "pragma: no cover"
-# (prefer exclude_also rather than exclude_lines)
-exclude_also =
-    ^if TYPE_CHECKING:
-    ^if __name__ == ['"]__main__['"]:
-    ^@overload
-    ^def __repr__\(
-    ^raise NotImplementedError
-
-[paths]
-# Treat these prefixes as the same source tree when combining results
-# (local dev, CI workspace, and containerized paths)
-app =
-    app
-    */backend/app
-    /github/workspace/backend/app
+    app/core/engine/scapy.py
+    app/core/engine/xiaomi_router.py
+    app/core/engine/router_factory.py
+    app/services/attack.py
+    app/services/recognition/providers/*
+    app/services/recognition_engine.py
+    app/services/scanner/*
+    app/services/fingerprint_collector.py
+    app/routes/attack.py

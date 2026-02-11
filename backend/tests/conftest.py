@@ -32,6 +32,9 @@ def init_test_db():
     """
     db_dir = tempfile.mkdtemp(prefix="zh-test-db-")
     os.environ["DATABASE_URL"] = f"sqlite+aiosqlite:///{db_dir}/test.db"
+    # Enable active defense for tests to avoid 400 responses
+    os.environ["ACTIVE_DEFENSE_ENABLED"] = "true"
+    os.environ["ACTIVE_DEFENSE_READONLY"] = "false"
     # Reset database singletons if they were created earlier
     from app.core import database
 
