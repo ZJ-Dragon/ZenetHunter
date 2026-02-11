@@ -1,5 +1,4 @@
 import asyncio
-import importlib.util
 import os
 import tempfile
 
@@ -41,40 +40,6 @@ def init_test_db():
 
     asyncio.run(init_db())
     yield
-
-
-def pytest_cmdline_preparse(config, args):
-    """
-    Inject coverage options only when pytest-cov is available.
-
-    This avoids pytest failing with unknown --cov-* args in envs
-    where pytest-cov is not installed.
-    """
-    if any(a.startswith("--cov") for a in args):
-        return
-    if importlib.util.find_spec("pytest_cov") is None:
-        return
-
-    cov_omit = ",".join(
-        [
-            "app/core/engine/scapy.py",
-            "app/core/engine/xiaomi_router.py",
-            "app/core/engine/router_factory.py",
-            "app/services/attack.py",
-            "app/services/recognition/providers/*",
-            "app/services/recognition_engine.py",
-            "app/services/scanner/*",
-            "app/services/fingerprint_collector.py",
-            "app/routes/attack.py",
-        ]
-    )
-    args[:0] = [
-        "--cov=app",
-        "--cov-report=xml",
-        "--cov-report=term-missing",
-        "--cov-fail-under=60",
-        f"--cov-omit={cov_omit}",
-    ]
 
 
 @pytest.fixture
