@@ -360,6 +360,7 @@ app.include_router(health.router)
 
 # API router for future feature modules
 api_router = APIRouter(prefix="/api")
+api_router.include_router(health.router)  # expose health/shutdown endpoints under /api
 api_router.include_router(auth.router)
 api_router.include_router(devices.router)
 api_router.include_router(topology.router)

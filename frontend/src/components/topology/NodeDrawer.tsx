@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { X, Monitor, Smartphone, Router, Shield, Activity, Clock, Hash, CheckCircle, AlertCircle, ChevronDown, ChevronUp, Eye, Pencil, Check, XCircle, UserCheck, FileJson, Download, MoreHorizontal } from 'lucide-react';
 import { TopologyNode } from '../../types/topology';
 import { Device, DeviceStatus } from '../../types/device';
@@ -8,14 +8,12 @@ import { ProbeObservation, KeywordHit } from '../../types/observation';
 import toast from 'react-hot-toast';
 
 interface NodeDrawerProps {
-  node: TopologyNode | null;
+  node: TopologyNode;
   onClose: () => void;
   onDeviceUpdate?: (device: Device) => void;
 }
 
 export const NodeDrawer: React.FC<NodeDrawerProps> = ({ node, onClose, onDeviceUpdate }) => {
-  if (!node) return null;
-
   const { data: initialDevice } = node;
   const [device, setDevice] = useState<Device>(initialDevice);
   const [showEvidence, setShowEvidence] = useState(false);
@@ -34,17 +32,7 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({ node, onClose, onDeviceU
   const [isSaving, setIsSaving] = useState(false);
 
   // Update device when node changes
-  useEffect(() => {
-    setDevice(initialDevice);
-    setEditingName(false);
-    setEditingVendor(false);
-    setShowObservations(false);
-    setShowAutoIdentity(false);
-    setObservations([]);
-    fetchObservations();
-  }, [initialDevice]);
-
-  const fetchObservations = async () => {
+  const fetchObservations = useCallback(async () => {
     setIsLoadingObservations(true);
     try {
       const data = await observationService.listByDevice(initialDevice.mac, 10);
@@ -54,7 +42,17 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({ node, onClose, onDeviceU
     } finally {
       setIsLoadingObservations(false);
     }
-  };
+  }, [initialDevice.mac]);
+
+  useEffect(() => {
+    setDevice(initialDevice);
+    setEditingName(false);
+    setEditingVendor(false);
+    setShowObservations(false);
+    setShowAutoIdentity(false);
+    setObservations([]);
+    fetchObservations();
+  }, [initialDevice, fetchObservations]);
 
   const manualName = device.manual_profile?.manual_name ?? device.name_manual;
   const manualVendor = device.manual_profile?.manual_vendor ?? device.vendor_manual;

@@ -194,9 +194,9 @@ export const Settings: React.FC = () => {
           window.location.href = 'about:blank';
         }, 500);
       }, 2500);
-    } catch (error) {
+    } catch (err) {
       // Server might be killed before sending response, which is expected
-      console.log('Force shutdown executed (connection lost is expected)');
+      console.log('Force shutdown executed (connection lost is expected)', err);
       toast.error('服务器已强制终止，页面即将关闭', { duration: 2000 });
 
       // Close page even if API call failed (server is likely dead)
