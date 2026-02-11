@@ -293,9 +293,6 @@ export const DeviceList: React.FC = () => {
                                   </span>
                                 )}
                               </div>
-                              <div className="text-xxs mt-1" style={{ color: 'var(--winui-text-tertiary)' }}>
-                                Auto: {autoName} • {autoVendor}
-                              </div>
                             </div>
                           </div>
                         </td>
