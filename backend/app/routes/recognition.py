@@ -3,14 +3,14 @@
 import logging
 from typing import Annotated
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends
 
 from app.core.config import get_settings
 from app.core.security import get_current_admin
 from app.models.auth import User
 from app.services.recognition.external_service_policy import get_external_service_policy
-from app.services.recognition.providers.macvendors import MACVendorsProvider
 from app.services.recognition.providers.fingerbank import FingerbankProvider
+from app.services.recognition.providers.macvendors import MACVendorsProvider
 
 logger = logging.getLogger(__name__)
 
@@ -28,7 +28,6 @@ async def get_providers() -> dict:
         - external_lookup_enabled: Global external lookup flag
     """
     policy = get_external_service_policy()
-    settings = get_settings()
 
     providers = []
 

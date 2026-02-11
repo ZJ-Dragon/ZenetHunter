@@ -615,6 +615,16 @@ class ScannerService:
 
             # Send deviceAdded events for newly discovered devices
             for device in discovered_devices:
+                # Normalize payload to Pydantic model (may be ORM or dict)
+                if not hasattr(device, "model_dump"):
+                    try:
+                        device = Device.model_validate(device)
+                    except Exception:
+                        logger.warning(
+                            "deviceAdded payload is not a Device model; skipping: %s",
+                            device,
+                        )
+                        continue
                 await self.ws_manager.broadcast(
                     {
                         "event": "deviceAdded",

@@ -6,7 +6,9 @@ from typing import Any
 from app.core.config import get_settings
 from app.services.recognition.providers.base import RecognitionProvider
 from app.services.recognition.providers.cache import get_recognition_cache
-from app.services.recognition.providers.http_client import create_http_client_for_provider
+from app.services.recognition.providers.http_client import (
+    create_http_client_for_provider,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -71,9 +73,7 @@ class FingerbankProvider(RecognitionProvider):
         """
         return None
 
-    async def lookup_device(
-        self, fingerprint: dict[str, Any]
-    ) -> dict[str, Any] | None:
+    async def lookup_device(self, fingerprint: dict[str, Any]) -> dict[str, Any] | None:
         """
         Lookup device from fingerprint.
 
@@ -88,15 +88,14 @@ class FingerbankProvider(RecognitionProvider):
             return None
 
         # Create fingerprint hash for cache key
-        import json
         import hashlib
+        import json
 
         fp_str = json.dumps(fingerprint, sort_keys=True)
         fp_hash = hashlib.sha256(fp_str.encode()).hexdigest()[:16]
 
         # Check cache
         cached = self.cache.get(self.name, fp_hash)
-        cache_hit = cached is not None
         if cached is not None:
             logger.debug(f"Cache hit for fingerprint {fp_hash}")
             # Audit log (cache hit)
@@ -158,10 +157,16 @@ class FingerbankProvider(RecognitionProvider):
             return None
 
     def _audit_log(
-        self, query_type: str, success: bool, cache_hit: bool = False, error: str | None = None
+        self,
+        query_type: str,
+        success: bool,
+        cache_hit: bool = False,
+        error: str | None = None,
     ):
         """Log external lookup to audit trail (sanitized)."""
-        from app.services.recognition.external_service_policy import get_external_service_policy
+        from app.services.recognition.external_service_policy import (
+            get_external_service_policy,
+        )
 
         policy = get_external_service_policy()
         if policy.should_audit():

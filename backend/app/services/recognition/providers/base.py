@@ -43,9 +43,7 @@ class RecognitionProvider(ABC):
         pass
 
     @abstractmethod
-    async def lookup_device(
-        self, fingerprint: dict[str, Any]
-    ) -> dict[str, Any] | None:
+    async def lookup_device(self, fingerprint: dict[str, Any]) -> dict[str, Any] | None:
         """
         Lookup device model/category from fingerprint (optional, requires key).
 

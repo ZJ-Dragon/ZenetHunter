@@ -62,7 +62,10 @@ async def reset_runtime_data() -> dict[str, Any]:
             context={
                 "database_url": get_database_url(),
                 "removed_rows": counts,
-                "preserved_tables": ["device_manual_profiles", EventLogModel.__tablename__],
+                "preserved_tables": [
+                    "device_manual_profiles",
+                    EventLogModel.__tablename__,
+                ],
             },
         )
         await session.commit()

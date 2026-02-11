@@ -4,11 +4,9 @@ import hashlib
 import json
 import logging
 from collections import OrderedDict
-from datetime import datetime, timedelta, UTC
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
-
-from app.core.config import get_settings
 
 logger = logging.getLogger(__name__)
 
@@ -162,9 +160,7 @@ class RecognitionCache:
     def get_stats(self) -> dict[str, Any]:
         """Get cache statistics."""
         now = datetime.now(UTC)
-        expired_count = sum(
-            1 for expiry, _ in self._cache.values() if expiry < now
-        )
+        expired_count = sum(1 for expiry, _ in self._cache.values() if expiry < now)
         return {
             "size": len(self._cache),
             "max_size": self.max_size,
@@ -181,7 +177,6 @@ def get_recognition_cache() -> RecognitionCache:
     """Get global recognition cache instance."""
     global _cache_instance
     if _cache_instance is None:
-        settings = get_settings()
         # Cache directory: backend/data/cache (gitignored)
         cache_dir = Path(__file__).parent.parent.parent.parent / "data" / "cache"
         _cache_instance = RecognitionCache(

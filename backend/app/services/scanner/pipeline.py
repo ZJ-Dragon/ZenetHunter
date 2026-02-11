@@ -14,10 +14,10 @@ from datetime import UTC, datetime
 from typing import Any
 
 from app.core.config import get_settings
+from app.services.observation_recorder import build_key_fields, build_summary
 from app.services.scanner.candidate import get_arp_candidates, get_dhcp_candidates
 from app.services.scanner.capabilities import get_scanner_capabilities
 from app.services.scanner.network_detection import detect_local_subnet
-from app.services.observation_recorder import build_key_fields, build_summary
 from app.services.scanner.refresh import refresh_candidates
 
 logger = logging.getLogger(__name__)
@@ -67,7 +67,8 @@ class ScanPipeline:
         Stage A: Discover online devices using active probing.
 
         Args:
-            target_subnets: List of CIDR subnets to scan. If None, auto-detects from ARP/gateway.
+            target_subnets: List of CIDR subnets to scan.
+                If None, auto-detects from ARP/gateway.
 
         Returns:
             List of discovered devices (IP/MAC pairs)
@@ -82,9 +83,9 @@ class ScanPipeline:
             )
 
         logger.info(
-            f"Starting discovery stage: "
-            f"subnets={target_subnets}, "
-            f"capabilities={self.capabilities.get_recommended_discovery_method()}"
+            "Starting discovery stage: subnets=%s, capabilities=%s",
+            target_subnets,
+            self.capabilities.get_recommended_discovery_method(),
         )
 
         all_results: list[DiscoveryResult] = []
@@ -202,8 +203,9 @@ class ScanPipeline:
                                         }
                                     )
                                 logger.debug(
-                                    f"mDNS enrichment for {device.ip}: "
-                                    f"found {len(mdns_data.get('mdns_services', []))} services"
+                                    "mDNS enrichment for %s: found %d services",
+                                    device.ip,
+                                    len(mdns_data.get("mdns_services", [])),
                                 )
                         except Exception as e:
                             logger.debug(f"mDNS enrichment failed for {device.ip}: {e}")
@@ -238,14 +240,15 @@ class ScanPipeline:
                                         }
                                     )
                                 logger.debug(
-                                    f"SSDP enrichment for {device.ip}: "
-                                    f"found {len(ssdp_data)} fields"
+                                    "SSDP enrichment for %s: found %d fields",
+                                    device.ip,
+                                    len(ssdp_data),
                                 )
                         except Exception as e:
                             logger.debug(f"SSDP enrichment failed for {device.ip}: {e}")
 
-                    # Active probe enrichment (HTTP, Telnet, SSH, Printer, IoT protocols)
-                    # This simulates normal server connections to get device info
+                    # Active probe enrichment (HTTP/Telnet/SSH/Printer/IoT)
+                    # Simulates normal client connections to get device info
                     if self.settings.feature_active_probe:
                         try:
                             from app.services.scanner.enrich.active_probe import (

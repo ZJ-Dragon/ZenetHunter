@@ -139,7 +139,7 @@ class ExternalServicePolicy:
         Returns:
             Audit entry dictionary
         """
-        from datetime import datetime, UTC
+        from datetime import UTC, datetime
 
         entry = {
             "timestamp": datetime.now(UTC).isoformat(),

@@ -96,9 +96,7 @@ class ActiveDefenseService:
                 if device:
                     # Found in DB, add to state manager for future lookups
                     self.state.update_device(device)
-                    logger.info(
-                        f"Loaded device {mac} from database into state manager"
-                    )
+                    logger.info(f"Loaded device {mac} from database into state manager")
                     return device
         except Exception as e:
             logger.error(f"Failed to load device {mac} from database: {e}")

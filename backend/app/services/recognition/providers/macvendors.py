@@ -6,7 +6,9 @@ from typing import Any
 from app.core.config import get_settings
 from app.services.recognition.providers.base import RecognitionProvider
 from app.services.recognition.providers.cache import get_recognition_cache
-from app.services.recognition.providers.http_client import create_http_client_for_provider
+from app.services.recognition.providers.http_client import (
+    create_http_client_for_provider,
+)
 
 logger = logging.getLogger(__name__)
 
@@ -103,7 +105,6 @@ class MACVendorsProvider(RecognitionProvider):
 
         # Check cache first
         cached = self.cache.get(self.name, oui_normalized)
-        cache_hit = cached is not None
         if cached is not None:
             logger.debug(f"Cache hit for OUI {oui_normalized}")
             # Audit log (cache hit)
@@ -148,10 +149,16 @@ class MACVendorsProvider(RecognitionProvider):
             return None
 
     def _audit_log(
-        self, query_type: str, success: bool, cache_hit: bool = False, error: str | None = None
+        self,
+        query_type: str,
+        success: bool,
+        cache_hit: bool = False,
+        error: str | None = None,
     ):
         """Log external lookup to audit trail (sanitized)."""
-        from app.services.recognition.external_service_policy import get_external_service_policy
+        from app.services.recognition.external_service_policy import (
+            get_external_service_policy,
+        )
 
         policy = get_external_service_policy()
         if policy.should_audit():

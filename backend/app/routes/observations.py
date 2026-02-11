@@ -9,12 +9,12 @@ from fastapi import APIRouter, Depends, Path, Query
 from fastapi.responses import PlainTextResponse
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from app.core.database import get_db
 from app.core.exceptions import AppError, ErrorCode
 from app.core.security import get_current_user
 from app.models.auth import User
 from app.models.observation import ProbeObservation, ProbeObservationList
 from app.repositories.probe_observation import ProbeObservationRepository
-from app.core.database import get_db
 
 router = APIRouter(tags=["observations"])
 

@@ -72,7 +72,8 @@ async def detect_local_subnet() -> NetworkInfo:
     settings = get_settings()
     fallback_subnet = settings.scan_range
     logger.warning(
-        f"Could not detect subnet automatically, using config default: {fallback_subnet}"
+        "Could not detect subnet automatically, using config default: %s",
+        fallback_subnet,
     )
     return NetworkInfo(
         subnet=fallback_subnet,
@@ -112,9 +113,7 @@ def _infer_subnet_from_arp(
             ip_addresses.append(ip)
 
             # Common gateway IPs: .1, .254, .0.1
-            if ip.packed[-1] in (1, 254) or (
-                ip.packed[-2] == 0 and ip.packed[-1] == 1
-            ):
+            if ip.packed[-1] in (1, 254) or (ip.packed[-2] == 0 and ip.packed[-1] == 1):
                 gateway_candidates.append((ip, candidate.mac))
         except ValueError:
             continue
@@ -207,10 +206,8 @@ async def _detect_from_gateway() -> NetworkInfo | None:
                 output = stdout.decode("utf-8", errors="ignore")
                 for line in output.splitlines():
                     if "default" in line.lower():
-                        # Format: default            192.168.31.1        UGSc           en0
-                        match = re.search(
-                            r"default\s+([0-9.]+)\s+.*?\s+(\w+)", line
-                        )
+                        # Format: default 192.168.31.1 UGSc en0
+                        match = re.search(r"default\s+([0-9.]+)\s+.*?\s+(\w+)", line)
                         if match:
                             gateway_ip = match.group(1)
                             interface = match.group(2)
@@ -243,7 +240,9 @@ async def _detect_from_gateway() -> NetworkInfo | None:
                 "0.0.0.0",
                 stdout=asyncio.subprocess.PIPE,
                 stderr=asyncio.subprocess.PIPE,
-                creationflags=subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0,
+                creationflags=(
+                    subprocess.CREATE_NO_WINDOW if sys.platform == "win32" else 0
+                ),
             )
             stdout, _ = await asyncio.wait_for(proc.communicate(), timeout=3.0)
             if proc.returncode == 0:

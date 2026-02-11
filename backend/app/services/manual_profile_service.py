@@ -109,7 +109,8 @@ async def migrate_manual_labels(session: AsyncSession) -> None:
     # Migrate legacy device manual fields
     devices_with_manuals = await session.execute(
         select(DeviceModel).where(
-            (DeviceModel.name_manual.is_not(None)) | (DeviceModel.vendor_manual.is_not(None))
+            (DeviceModel.name_manual.is_not(None))
+            | (DeviceModel.vendor_manual.is_not(None))
         )
     )
     migrated = 0

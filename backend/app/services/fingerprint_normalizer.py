@@ -172,8 +172,8 @@ class FingerprintNormalizer:
                 fingerprint_data["ja3"]
             )
 
-        # Pass through other fields (mdns_services, ssdp_server, evidence, active_probe fields)
-        # These are JSON or structured data and will be handled separately
+        # Pass through other fields (mdns_services, ssdp_server, evidence,
+        # active_probe fields). These are JSON/structured and handled separately.
         pass_through_keys = (
             "mdns_services",
             "ssdp_server",

@@ -8,9 +8,7 @@ simulating normal server connections.
 import asyncio
 import logging
 import re
-import socket
 from typing import Any
-from urllib.parse import urlparse
 
 import httpx
 
@@ -127,7 +125,11 @@ class ActiveProbeEnricher:
                         )
                         break  # Found working port, no need to try others
 
-                    except (httpx.ConnectError, httpx.TimeoutException, httpx.HTTPError):
+                    except (
+                        httpx.ConnectError,
+                        httpx.TimeoutException,
+                        httpx.HTTPError,
+                    ):
                         continue  # Try next port
                     except Exception as e:
                         logger.debug(f"HTTP probe {device_ip}:{port} failed: {e}")
@@ -157,7 +159,9 @@ class ActiveProbeEnricher:
         info: dict[str, Any] = {}
 
         # Extract title
-        title_match = re.search(r"<title[^>]*>(.*?)</title>", html, re.IGNORECASE | re.DOTALL)
+        title_match = re.search(
+            r"<title[^>]*>(.*?)</title>", html, re.IGNORECASE | re.DOTALL
+        )
         if title_match:
             title = title_match.group(1).strip()
             # Clean up title (remove extra whitespace)
@@ -167,9 +171,15 @@ class ActiveProbeEnricher:
 
         # Extract meta tags
         meta_patterns = {
-            "device": r'<meta[^>]*name=["\']device["\'][^>]*content=["\']([^"\']+)["\']',
-            "model": r'<meta[^>]*name=["\']model["\'][^>]*content=["\']([^"\']+)["\']',
-            "product": r'<meta[^>]*name=["\']product["\'][^>]*content=["\']([^"\']+)["\']',
+            "device": (
+                r'<meta[^>]*name=["\']device["\'][^>]*content=["\']([^"\']+)["\']'
+            ),
+            "model": (
+                r'<meta[^>]*name=["\']model["\'][^>]*content=["\']([^"\']+)["\']'
+            ),
+            "product": (
+                r'<meta[^>]*name=["\']product["\'][^>]*content=["\']([^"\']+)["\']'
+            ),
         }
 
         for key, pattern in meta_patterns.items():
@@ -224,14 +234,23 @@ class ActiveProbeEnricher:
 
                     if banner_text:
                         # Clean up banner
-                        banner_text = re.sub(r"\x1b\[[0-9;]*m", "", banner_text)  # Remove ANSI codes
-                        banner_text = re.sub(r"\s+", " ", banner_text)  # Normalize whitespace
+                        banner_text = re.sub(
+                            r"\x1b\[[0-9;]*m", "", banner_text
+                        )  # Remove ANSI codes
+                        banner_text = re.sub(
+                            r"\s+", " ", banner_text
+                        )  # Normalize whitespace
 
                         if len(banner_text) > 5 and len(banner_text) < 200:
                             fingerprint["telnet_banner"] = banner_text
-                            logger.debug(f"Telnet banner from {device_ip}:{port}: {banner_text[:50]}")
+                            logger.debug(
+                                "Telnet banner from %s:%s: %s",
+                                device_ip,
+                                port,
+                                banner_text[:50],
+                            )
 
-                except asyncio.TimeoutError:
+                except TimeoutError:
                     pass
 
                 writer.close()
@@ -240,7 +259,7 @@ class ActiveProbeEnricher:
                 if "telnet_banner" in fingerprint:
                     break  # Found banner, no need to try other ports
 
-            except (ConnectionRefusedError, asyncio.TimeoutError, OSError):
+            except (TimeoutError, ConnectionRefusedError, OSError):
                 continue
             except Exception as e:
                 logger.debug(f"Telnet probe {device_ip}:{port} failed: {e}")
@@ -287,13 +306,13 @@ class ActiveProbeEnricher:
                         # Could be Linux/Unix device
                         fingerprint["ssh_type"] = "OpenSSH"
 
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 pass
 
             writer.close()
             await writer.wait_closed()
 
-        except (ConnectionRefusedError, asyncio.TimeoutError, OSError):
+        except (TimeoutError, ConnectionRefusedError, OSError):
             pass
         except Exception as e:
             logger.debug(f"SSH probe {device_ip} failed: {e}")
@@ -342,18 +361,18 @@ class ActiveProbeEnricher:
 
             try:
                 response = await asyncio.wait_for(reader.read(4096), timeout=1.0)
-                # Parse IPP response (simplified - full parsing would use proper IPP library)
+                # Parse IPP response (simplified; full parsing would use proper IPP lib)
                 response_str = response.decode("utf-8", errors="ignore")
                 if "printer" in response_str.lower() or "ipp" in response_str.lower():
                     fingerprint["printer_protocol"] = "IPP"
                     logger.debug(f"IPP response from {device_ip}")
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 pass
 
             writer.close()
             await writer.wait_closed()
 
-        except (ConnectionRefusedError, asyncio.TimeoutError, OSError):
+        except (TimeoutError, ConnectionRefusedError, OSError):
             pass
         except Exception as e:
             logger.debug(f"IPP probe {device_ip} failed: {e}")
@@ -374,13 +393,13 @@ class ActiveProbeEnricher:
                 if response:
                     fingerprint["printer_protocol"] = "LPD"
                     logger.debug(f"LPD response from {device_ip}")
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 pass
 
             writer.close()
             await writer.wait_closed()
 
-        except (ConnectionRefusedError, asyncio.TimeoutError, OSError):
+        except (TimeoutError, ConnectionRefusedError, OSError):
             pass
         except Exception as e:
             logger.debug(f"LPD probe {device_ip} failed: {e}")
@@ -407,12 +426,20 @@ class ActiveProbeEnricher:
         # Try CoAP (port 5683)
         try:
             # CoAP GET request to /.well-known/core
-            coap_request = bytes([
-                0x40, 0x01, 0x00, 0x00,  # Header: Ver=1, T=CON, Code=GET, MID=0
-                0xb7, 0x2a,  # Token
-                0x00, 0x01,  # Option: Uri-Path: ".well-known"
-                0x00, 0x04,  # Option: Uri-Path: "core"
-            ])
+            coap_request = bytes(
+                [
+                    0x40,
+                    0x01,
+                    0x00,
+                    0x00,  # Header: Ver=1, T=CON, Code=GET, MID=0
+                    0xB7,
+                    0x2A,  # Token
+                    0x00,
+                    0x01,  # Option: Uri-Path: ".well-known"
+                    0x00,
+                    0x04,  # Option: Uri-Path: "core"
+                ]
+            )
 
             reader, writer = await asyncio.wait_for(
                 asyncio.open_connection(device_ip, 5683),
@@ -427,13 +454,13 @@ class ActiveProbeEnricher:
                 if response:
                     fingerprint["iot_protocol"] = "CoAP"
                     logger.debug(f"CoAP response from {device_ip}")
-            except asyncio.TimeoutError:
+            except TimeoutError:
                 pass
 
             writer.close()
             await writer.wait_closed()
 
-        except (ConnectionRefusedError, asyncio.TimeoutError, OSError):
+        except (TimeoutError, ConnectionRefusedError, OSError):
             pass
         except Exception as e:
             logger.debug(f"CoAP probe {device_ip} failed: {e}")

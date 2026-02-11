@@ -1,4 +1,3 @@
-import tempfile
 from pathlib import Path
 
 from app.services.keyword_extractor import KeywordExtractor, apply_confidence_delta

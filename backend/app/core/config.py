@@ -421,11 +421,15 @@ else:
 
         # External Recognition Providers (fallback)
         feature_external_lookup: bool = Field(
-            default_factory=lambda: os.getenv("FEATURE_EXTERNAL_LOOKUP", "false").lower()
+            default_factory=lambda: os.getenv(
+                "FEATURE_EXTERNAL_LOOKUP", "false"
+            ).lower()
             == "true"
         )
         external_lookup_oui_only: bool = Field(
-            default_factory=lambda: os.getenv("EXTERNAL_LOOKUP_OUI_ONLY", "true").lower()
+            default_factory=lambda: os.getenv(
+                "EXTERNAL_LOOKUP_OUI_ONLY", "true"
+            ).lower()
             == "true"
         )
         fingerbank_api_key: str | None = Field(

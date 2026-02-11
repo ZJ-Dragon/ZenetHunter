@@ -1,16 +1,13 @@
 """Unified HTTP client for external recognition providers with security controls."""
 
 import asyncio
-import hashlib
 import logging
 from collections import deque
-from datetime import datetime, timedelta, UTC
+from datetime import UTC, datetime, timedelta
 from typing import Any
 from urllib.parse import urlparse
 
 import httpx
-
-from app.core.config import get_settings
 
 logger = logging.getLogger(__name__)
 
@@ -63,7 +60,9 @@ class RateLimiter:
 
             # Check QPS limit
             if len(self._request_times) >= self.qps:
-                logger.warning(f"QPS limit reached: {len(self._request_times)}/{self.qps}")
+                logger.warning(
+                    f"QPS limit reached: {len(self._request_times)}/{self.qps}"
+                )
                 return False
 
             # Allow request
@@ -126,7 +125,9 @@ class CircuitBreaker:
             # Check if we should attempt recovery
             if self._state == "open":
                 if self._last_failure_time:
-                    elapsed = (datetime.now(UTC) - self._last_failure_time).total_seconds()
+                    elapsed = (
+                        datetime.now(UTC) - self._last_failure_time
+                    ).total_seconds()
                     if elapsed >= self.recovery_timeout:
                         self._state = "half_open"
                         self._half_open_success_count = 0
@@ -232,7 +233,10 @@ class SecureHTTPClient:
             return False
 
     async def get(
-        self, url: str, params: dict[str, Any] | None = None
+        self,
+        url: str,
+        params: dict[str, Any] | None = None,
+        headers: dict[str, str] | None = None,
     ) -> httpx.Response:
         """
         Perform secure GET request.
@@ -261,10 +265,10 @@ class SecureHTTPClient:
             client = await self._get_client()
             for attempt in range(self.max_retries + 1):
                 try:
-                    response = await client.get(url, params=params)
+                    response = await client.get(url, params=params, headers=headers)
                     response.raise_for_status()
                     return response
-                except httpx.HTTPStatusError as e:
+                except httpx.HTTPStatusError:
                     if attempt < self.max_retries:
                         await asyncio.sleep(0.5 * (attempt + 1))
                         continue
@@ -278,53 +282,10 @@ class SecureHTTPClient:
         return await self.circuit_breaker.call(_do_request)
 
     async def post(
-        self, url: str, json: dict[str, Any] | None = None, headers: dict[str, str] | None = None
-    ) -> httpx.Response:
-        """
-        Perform secure GET request.
-
-        Args:
-            url: Request URL
-            params: Query parameters
-
-        Returns:
-            HTTP response
-
-        Raises:
-            ValueError: If domain not whitelisted
-            Exception: If rate limited or circuit breaker open
-        """
-        # Check domain whitelist
-        if not self._check_domain(url):
-            raise ValueError(f"Domain not in whitelist: {urlparse(url).netloc}")
-
-        # Check rate limit
-        if not await self.rate_limiter.acquire():
-            raise Exception("Rate limit exceeded")
-
-        # Execute with circuit breaker
-        async def _do_request():
-            client = await self._get_client()
-            for attempt in range(self.max_retries + 1):
-                try:
-                    response = await client.get(url, params=params)
-                    response.raise_for_status()
-                    return response
-                except httpx.HTTPStatusError as e:
-                    if attempt < self.max_retries:
-                        await asyncio.sleep(0.5 * (attempt + 1))
-                        continue
-                    raise
-                except httpx.TimeoutException:
-                    if attempt < self.max_retries:
-                        await asyncio.sleep(0.5 * (attempt + 1))
-                        continue
-                    raise
-
-        return await self.circuit_breaker.call(_do_request)
-
-    async def post(
-        self, url: str, json: dict[str, Any] | None = None, headers: dict[str, str] | None = None
+        self,
+        url: str,
+        json: dict[str, Any] | None = None,
+        headers: dict[str, str] | None = None,
     ) -> httpx.Response:
         """
         Perform secure POST request.
@@ -357,7 +318,7 @@ class SecureHTTPClient:
                     response = await client.post(url, json=json, headers=headers)
                     response.raise_for_status()
                     return response
-                except httpx.HTTPStatusError as e:
+                except httpx.HTTPStatusError:
                     if attempt < self.max_retries:
                         await asyncio.sleep(0.5 * (attempt + 1))
                         continue
@@ -395,8 +356,6 @@ def create_http_client_for_provider(provider_name: str) -> SecureHTTPClient:
     Returns:
         Configured SecureHTTPClient instance
     """
-    settings = get_settings()
-
     # Provider-specific configurations
     provider_configs = {
         "macvendors": {

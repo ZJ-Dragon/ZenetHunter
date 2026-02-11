@@ -54,7 +54,7 @@ async def get_scan_config():
     Returns current scan settings and feature flags.
     Note: Configuration is read from environment variables,
     this endpoint is read-only for display purposes.
-    
+
     The scan_range shown is the detected/active subnet, not just the config default.
     """
     from app.core.config import get_settings
@@ -70,6 +70,7 @@ async def get_scan_config():
     except Exception as e:
         # If detection fails, use config default
         import logging
+
         logger = logging.getLogger(__name__)
         logger.warning(f"Subnet detection failed, using config default: {e}")
         active_scan_range = settings.scan_range
