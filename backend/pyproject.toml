@@ -67,7 +67,7 @@ target-version = ["py311"]
 
 [tool.pytest.ini_options]
 minversion = "6.0"
-addopts = "-q --cov=app --cov-report=xml"
+addopts = "-q"
 # Keep tests local to the backend package
 testpaths = ["tests"]
 asyncio_mode = "auto"
