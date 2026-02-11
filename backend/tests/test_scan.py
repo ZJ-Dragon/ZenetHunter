@@ -1,11 +1,7 @@
 from fastapi.testclient import TestClient
 
-from app.main import app
 
-client = TestClient(app)
-
-
-def test_start_scan(admin_headers):
+def test_start_scan(client: TestClient, admin_headers):
     # Start scan
     response = client.post(
         "/api/scan/start", json={"type": "quick"}, headers=admin_headers
@@ -18,14 +14,14 @@ def test_start_scan(admin_headers):
     assert "started_at" in data
 
 
-def test_start_scan_invalid_type(admin_headers):
+def test_start_scan_invalid_type(client: TestClient, admin_headers):
     response = client.post(
         "/api/scan/start", json={"type": "invalid"}, headers=admin_headers
     )
     assert response.status_code == 422
 
 
-def test_websocket_connection():
+def test_websocket_connection(client: TestClient):
     with client.websocket_connect("/api/ws"):
         # Connection established
         pass

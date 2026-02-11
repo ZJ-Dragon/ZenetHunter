@@ -1,11 +1,7 @@
 from fastapi.testclient import TestClient
 
-from app.main import app
 
-client = TestClient(app)
-
-
-def test_rate_limit_apply_and_remove(admin_headers):
+def test_rate_limit_apply_and_remove(client: TestClient, admin_headers):
     mac = "AA:BB:CC:DD:EE:FF"
 
     # Apply
@@ -27,7 +23,7 @@ def test_rate_limit_apply_and_remove(admin_headers):
     assert data["status"] == "success"
 
 
-def test_rate_limit_validation(admin_headers):
+def test_rate_limit_validation(client: TestClient, admin_headers):
     mac = "11:22:33:44:55:66"
     # Neither up nor down provided -> 422
     resp = client.post(
@@ -38,7 +34,7 @@ def test_rate_limit_validation(admin_headers):
     assert resp.status_code == 422
 
 
-def test_acl_apply_and_remove(admin_headers):
+def test_acl_apply_and_remove(client: TestClient, admin_headers):
     # Apply deny tcp 80 from any to 192.168.1.0/24
     resp = client.post(
         "/api/integration/router/acl",
@@ -66,7 +62,7 @@ def test_acl_apply_and_remove(admin_headers):
     assert resp.json()["status"] == "success"
 
 
-def test_isolation_and_reintegrate(admin_headers):
+def test_isolation_and_reintegrate(client: TestClient, admin_headers):
     mac = "22:33:44:55:66:77"
     # Isolation with guest VLAN requires vlan_id
     resp = client.post(
@@ -85,7 +81,7 @@ def test_isolation_and_reintegrate(admin_headers):
     assert resp.json()["status"] == "success"
 
 
-def test_isolation_validation(admin_headers):
+def test_isolation_validation(client: TestClient, admin_headers):
     mac = "33:44:55:66:77:88"
     # Missing vlan_id for guest_vlan -> 422
     resp = client.post(

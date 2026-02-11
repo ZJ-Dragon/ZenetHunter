@@ -14,23 +14,21 @@ from app.core.exceptions import AppError, ErrorCode  # noqa: E402
 from app.main import app  # noqa: E402
 
 
-def test_middleware_correlation_id_header():
+def test_middleware_correlation_id_header(client: TestClient):
     """Test middleware adds correlation_id to response headers."""
-    client = TestClient(app)
     response = client.get("/healthz")
     assert "X-Correlation-Id" in response.headers
     assert response.headers["X-Correlation-Id"]  # Not empty
 
 
-def test_middleware_custom_correlation_id():
+def test_middleware_custom_correlation_id(client: TestClient):
     """Test middleware uses X-Correlation-Id from request header."""
-    client = TestClient(app)
     custom_id = "test-correlation-123"
     response = client.get("/healthz", headers={"X-Correlation-Id": custom_id})
     assert response.headers["X-Correlation-Id"] == custom_id
 
 
-def test_middleware_app_error_handling():
+def test_middleware_app_error_handling(client: TestClient):
     """Test middleware handles AppError and returns Problem Details."""
 
     # Create a test endpoint that raises AppError
@@ -38,7 +36,6 @@ def test_middleware_app_error_handling():
     async def test_error_endpoint():
         raise AppError(ErrorCode.AUTH_INVALID_TOKEN, detail="Test error")
 
-    client = TestClient(app)
     response = client.get("/test-error")
 
     assert response.status_code == 401
@@ -51,7 +48,7 @@ def test_middleware_app_error_handling():
     assert "X-Correlation-Id" in response.headers
 
 
-def test_middleware_uncaught_exception():
+def test_middleware_uncaught_exception(client: TestClient):
     """Test middleware handles uncaught exceptions."""
 
     # Create a test endpoint that raises unexpected exception
@@ -59,7 +56,6 @@ def test_middleware_uncaught_exception():
     async def test_uncaught_endpoint():
         raise ValueError("Unexpected error")
 
-    client = TestClient(app)
     response = client.get("/test-uncaught")
 
     assert response.status_code == 500
@@ -70,7 +66,7 @@ def test_middleware_uncaught_exception():
     assert "X-Correlation-Id" in response.headers
 
 
-def test_middleware_problem_details_structure():
+def test_middleware_problem_details_structure(client: TestClient):
     """Test Problem Details response follows RFC 9457 structure."""
 
     @app.get("/test-problem")
@@ -81,7 +77,6 @@ def test_middleware_problem_details_structure():
             extra={"field": "param", "hint": "Check documentation"},
         )
 
-    client = TestClient(app)
     response = client.get("/test-problem")
 
     data = response.json()

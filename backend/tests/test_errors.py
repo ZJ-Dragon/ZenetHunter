@@ -1,11 +1,7 @@
 from fastapi.testclient import TestClient
 
-from app.main import app
 
-client = TestClient(app)
-
-
-def test_problem_details_validation(admin_headers):
+def test_problem_details_validation(client: TestClient, admin_headers):
     # Missing required vlan_id for guest_vlan triggers validation
     r = client.post(
         "/api/integration/router/isolate",
@@ -20,7 +16,7 @@ def test_problem_details_validation(admin_headers):
     assert "correlation_id" in body
 
 
-def test_ws_error_envelope_on_bad_message():
+def test_ws_error_envelope_on_bad_message(client: TestClient):
     with client.websocket_connect("/api/ws") as ws:
         # Send invalid (non-JSON) message to trigger WS.BAD_MESSAGE
         ws.send_text("not-json")

@@ -1,6 +1,11 @@
+import asyncio
+import os
+import tempfile
+
 import pytest
 from fastapi.testclient import TestClient
 
+from app.core.database import init_db
 from app.main import app
 from app.services.auth import create_access_token
 from app.services.state import get_state_manager
@@ -18,9 +23,29 @@ def reset_state():
     state.reset()
 
 
+@pytest.fixture(scope="session", autouse=True)
+def init_test_db():
+    """
+    Ensure the database schema exists before tests run.
+
+    Uses a temporary SQLite file to avoid polluting local data.
+    """
+    db_dir = tempfile.mkdtemp(prefix="zh-test-db-")
+    os.environ["DATABASE_URL"] = f"sqlite+aiosqlite:///{db_dir}/test.db"
+    # Reset database singletons if they were created earlier
+    from app.core import database
+
+    database._engine = None
+    database._session_factory = None
+
+    asyncio.run(init_db())
+    yield
+
+
 @pytest.fixture
 def client():
-    return TestClient(app)
+    with TestClient(app) as test_client:
+        yield test_client
 
 
 @pytest.fixture

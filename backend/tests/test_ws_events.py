@@ -1,11 +1,7 @@
 from fastapi.testclient import TestClient
 
-from app.main import app
 
-client = TestClient(app)
-
-
-def test_ws_events_device_added():
+def test_ws_events_device_added(client: TestClient):
     # Connect to WS
     with client.websocket_connect("/api/ws") as websocket:
         # Trigger device add via API
@@ -32,7 +28,7 @@ def test_ws_events_device_added():
             raise AssertionError("Did not receive deviceAdded event")
 
 
-def test_ws_events_device_status_changed():
+def test_ws_events_device_status_changed(client: TestClient):
     # Add device first
     device_data = {
         "mac": "AA:BB:CC:DD:EE:FF",
@@ -64,7 +60,7 @@ def test_ws_events_device_status_changed():
             raise AssertionError("Did not receive deviceStatusChanged event")
 
 
-def test_ws_events_log_added():
+def test_ws_events_log_added(client: TestClient):
     with client.websocket_connect("/api/ws") as websocket:
         # Trigger log add via API
         log_data = {

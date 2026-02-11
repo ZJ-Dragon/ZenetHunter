@@ -6,9 +6,6 @@ import time
 from fastapi.testclient import TestClient
 
 from app.core.config import get_settings
-from app.main import app
-
-client = TestClient(app)
 
 
 def _sign(secret: str, ts: int, body: bytes) -> str:
@@ -16,7 +13,7 @@ def _sign(secret: str, ts: int, body: bytes) -> str:
     return "sha256=" + hmac.new(secret.encode("utf-8"), msg, hashlib.sha256).hexdigest()
 
 
-def test_webhook_valid_device_online():
+def test_webhook_valid_device_online(client: TestClient):
     s = get_settings()
     ts = int(time.time())
     payload = {
@@ -40,7 +37,7 @@ def test_webhook_valid_device_online():
     assert r.json()["status"] == "ok"
 
 
-def test_webhook_invalid_signature():
+def test_webhook_invalid_signature(client: TestClient):
     ts = int(time.time())
     body = json.dumps(
         {"id": "evt_2", "type": "device.online", "data": {"mac": "11:22:33:44:55:66"}}
@@ -57,7 +54,7 @@ def test_webhook_invalid_signature():
     assert r.status_code in (401, 403)
 
 
-def test_webhook_stale_timestamp():
+def test_webhook_stale_timestamp(client: TestClient):
     s = get_settings()
     ts = int(time.time()) - (int(getattr(s, "webhook_tolerance_sec", 300)) + 10)
     body = json.dumps(
