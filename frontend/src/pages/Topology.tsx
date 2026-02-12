@@ -6,6 +6,7 @@ import { NetworkTopology, TopologyNode } from '../types/topology';
 import { useWebSocketEvent } from '../contexts/WebSocketContext';
 import { WSEventType } from '../types/websocket';
 import { RefreshCw, Network, Terminal } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { ScanButton } from '../components/actions/ScanButton';
 import { RealtimeLogPanel } from '../components/logs/RealtimeLogPanel';
 import { clsx } from 'clsx';
@@ -15,6 +16,7 @@ export const Topology: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [selectedNode, setSelectedNode] = useState<TopologyNode | null>(null);
   const [showLogs, setShowLogs] = useState(false);
+  const { t } = useTranslation();
 
   const fetchTopology = useCallback(async () => {
     try {
@@ -50,7 +52,9 @@ export const Topology: React.FC = () => {
       <div className="flex justify-between items-center mb-4 px-1">
         <div className="flex items-center space-x-2">
           <Network className="h-6 w-6" style={{ color: 'var(--winui-accent)' }} />
-          <h1 className="text-2xl font-semibold" style={{ color: 'var(--winui-text-primary)', letterSpacing: '-0.02em' }}>Network Map</h1>
+          <h1 className="text-2xl font-semibold" style={{ color: 'var(--winui-text-primary)', letterSpacing: '-0.02em' }}>
+            {t('topology.title')}
+          </h1>
         </div>
         <div className="flex space-x-2">
           <ScanButton />
@@ -62,7 +66,7 @@ export const Topology: React.FC = () => {
             )}
           >
             <Terminal className="h-4 w-4 mr-2" />
-            日志
+            {t('topology.logs')}
           </button>
           <button
             onClick={() => {
@@ -72,7 +76,7 @@ export const Topology: React.FC = () => {
             className="btn-winui-secondary inline-flex items-center"
           >
             <RefreshCw className={clsx("h-4 w-4 mr-2", isLoading && "animate-spin")} />
-            Refresh
+            {t('topology.refresh')}
           </button>
         </div>
       </div>
@@ -87,8 +91,12 @@ export const Topology: React.FC = () => {
         {!isLoading && data.nodes.length === 0 && (
           <div className="absolute inset-0 flex flex-col items-center justify-center z-10" style={{ backgroundColor: 'var(--winui-surface)' }}>
             <Network className="h-16 w-16 mb-4" style={{ color: 'var(--winui-text-tertiary)' }} />
-            <h3 className="text-xl font-semibold mb-2" style={{ color: 'var(--winui-text-primary)' }}>Network Map is Empty</h3>
-            <p className="mb-6" style={{ color: 'var(--winui-text-secondary)' }}>Scan your network to visualize the device topology.</p>
+            <h3 className="text-xl font-semibold mb-2" style={{ color: 'var(--winui-text-primary)' }}>
+              {t('topology.emptyTitle')}
+            </h3>
+            <p className="mb-6" style={{ color: 'var(--winui-text-secondary)' }}>
+              {t('topology.emptyHint')}
+            </p>
             <ScanButton />
           </div>
         )}

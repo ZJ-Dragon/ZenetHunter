@@ -15,6 +15,7 @@ import {
 } from 'lucide-react';
 import { clsx } from 'clsx';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 type Theme = 'light' | 'dark' | 'system';
 type Platform = 'windows' | 'macos' | 'linux';
@@ -44,6 +45,8 @@ export const Settings: React.FC = () => {
   const [showForceShutdown, setShowForceShutdown] = useState(false);
   const [showReplayConfirm, setShowReplayConfirm] = useState(false);
   const [isReplaying, setIsReplaying] = useState(false);
+  const [language, setLanguage] = useState(() => localStorage.getItem('locale') || 'en');
+  const { t, i18n } = useTranslation();
 
   const fetchSystemInfo = useCallback(async () => {
     try {
@@ -76,6 +79,11 @@ export const Settings: React.FC = () => {
       console.error('Failed to fetch scan config:', error);
     }
   }, []);
+
+  useEffect(() => {
+    i18n.changeLanguage(language);
+    localStorage.setItem('locale', language);
+  }, [language, i18n]);
 
   useEffect(() => {
     // Load theme from localStorage
@@ -152,19 +160,19 @@ export const Settings: React.FC = () => {
   const handleShutdown = async () => {
     setIsShuttingDown(true);
     try {
-      toast.loading('正在优雅关闭服务器...', { duration: 2000 });
+      toast.loading(t('settings.shutdownProgress'), { duration: 2000 });
 
       await logsService.shutdownServer();
 
-      toast.success('服务器已关闭');
+      toast.success(t('settings.shutdownDone'));
 
       // Wait a moment then show message
       setTimeout(() => {
-        toast.error('与服务器的连接已断开', { duration: 5000 });
+        toast.error(t('settings.shutdownDisconnected'), { duration: 5000 });
       }, 1000);
     } catch (error) {
       console.error('Shutdown failed:', error);
-      toast.error('优雅关闭失败，请尝试强制关闭');
+      toast.error(t('settings.shutdownFailed'));
       setIsShuttingDown(false);
       setShowShutdownConfirm(false);
       // Show force shutdown option
@@ -175,17 +183,17 @@ export const Settings: React.FC = () => {
   const handleForceShutdown = async () => {
     setIsShuttingDown(true);
     try {
-      toast.error('正在强制关闭服务器...', { duration: 1000 });
+      toast.error(t('settings.forceProgress'), { duration: 1000 });
 
       // Call force shutdown API
       await logsService.forceShutdownServer();
 
       // Server will be killed immediately, so we might not get response
-      toast.success('服务器已强制关闭', { duration: 2000 });
+      toast.success(t('settings.forceDone'), { duration: 2000 });
 
       // Wait briefly then close the page
       setTimeout(() => {
-        toast.error('连接已断开，页面将在2秒后关闭', { duration: 2000 });
+        toast.error(t('settings.forceDisconnect'), { duration: 2000 });
       }, 500);
 
       // Close the page after 2.5 seconds
@@ -199,7 +207,7 @@ export const Settings: React.FC = () => {
     } catch (err) {
       // Server might be killed before sending response, which is expected
       console.log('Force shutdown executed (connection lost is expected)', err);
-      toast.error('服务器已强制终止，页面即将关闭', { duration: 2000 });
+      toast.error(t('settings.forceTerminate'), { duration: 2000 });
 
       // Close page even if API call failed (server is likely dead)
       setTimeout(() => {
@@ -222,10 +230,10 @@ export const Settings: React.FC = () => {
       localStorage.setItem('platform', platform);
 
       // Show success message
-      alert('设置已保存');
+      toast.success(t('settings.saveSuccess'));
     } catch (error) {
       console.error('Failed to save settings:', error);
-      alert('保存失败，请重试');
+      toast.error(t('settings.saveFailed'));
     } finally {
       setIsSaving(false);
     }
@@ -235,10 +243,10 @@ export const Settings: React.FC = () => {
     setIsReplaying(true);
     try {
       await logsService.replaySystem();
-      toast.success('Replay executed. App will return to first-run state.', { duration: 3000 });
+      toast.success(t('settings.replaySuccess'), { duration: 3000 });
     } catch (error) {
       console.error('Replay failed:', error);
-      toast.error('Failed to replay. Please try again.');
+      toast.error(t('settings.replayFailed'));
     } finally {
       setIsReplaying(false);
       setShowReplayConfirm(false);
@@ -252,10 +260,10 @@ export const Settings: React.FC = () => {
         <div>
           <h1 className="text-2xl font-semibold flex items-center gap-2" style={{ color: 'var(--winui-text-primary)', letterSpacing: '-0.02em' }}>
             <SettingsIcon className="h-8 w-8" style={{ color: 'var(--winui-accent)' }} />
-            设置
+            {t('settings.title')}
           </h1>
           <p className="mt-1 text-sm" style={{ color: 'var(--winui-text-secondary)' }}>
-            配置应用程序和系统偏好
+            {t('settings.subtitle')}
           </p>
         </div>
         <button
@@ -264,19 +272,19 @@ export const Settings: React.FC = () => {
           className="btn-winui inline-flex items-center"
         >
           <Save className={clsx("h-4 w-4 mr-2", isSaving && "animate-spin")} />
-          {isSaving ? '保存中...' : '保存设置'}
+          {isSaving ? t('common.saving') : t('common.save')}
         </button>
       </div>
 
       {/* Theme Settings */}
       <div className="card-winui p-6">
         <h2 className="text-lg font-semibold mb-4" style={{ color: 'var(--winui-text-primary)' }}>
-          外观设置
+          {t('settings.appearance')}
         </h2>
         <div className="space-y-4">
           <div>
             <label className="text-sm font-medium mb-2 block" style={{ color: 'var(--winui-text-secondary)' }}>
-              主题模式
+              {t('settings.theme')}
             </label>
             <div className="grid grid-cols-3 gap-3">
               <button
@@ -289,7 +297,7 @@ export const Settings: React.FC = () => {
                 )}
               >
                 <Sun className="h-6 w-6 mx-auto mb-2" style={{ color: theme === 'light' ? 'var(--winui-accent)' : 'var(--winui-text-tertiary)' }} />
-                <p className="text-sm font-medium" style={{ color: 'var(--winui-text-primary)' }}>浅色</p>
+                <p className="text-sm font-medium" style={{ color: 'var(--winui-text-primary)' }}>{t('settings.theme')} - Light</p>
               </button>
               <button
                 onClick={() => handleThemeChange('dark')}
@@ -301,7 +309,7 @@ export const Settings: React.FC = () => {
                 )}
               >
                 <Moon className="h-6 w-6 mx-auto mb-2" style={{ color: theme === 'dark' ? 'var(--winui-accent)' : 'var(--winui-text-tertiary)' }} />
-                <p className="text-sm font-medium" style={{ color: 'var(--winui-text-primary)' }}>深色</p>
+                <p className="text-sm font-medium" style={{ color: 'var(--winui-text-primary)' }}>{t('settings.theme')} - Dark</p>
               </button>
               <button
                 onClick={() => handleThemeChange('system')}
@@ -313,9 +321,26 @@ export const Settings: React.FC = () => {
                 )}
               >
                 <Monitor className="h-6 w-6 mx-auto mb-2" style={{ color: theme === 'system' ? 'var(--winui-accent)' : 'var(--winui-text-tertiary)' }} />
-                <p className="text-sm font-medium" style={{ color: 'var(--winui-text-primary)' }}>跟随系统</p>
+                <p className="text-sm font-medium" style={{ color: 'var(--winui-text-primary)' }}>{t('settings.theme')} - System</p>
               </button>
             </div>
+          </div>
+          <div>
+            <label className="text-sm font-medium mb-2 block" style={{ color: 'var(--winui-text-secondary)' }}>
+              {t('settings.language')}
+            </label>
+            <select
+              value={language}
+              onChange={(e) => setLanguage(e.target.value)}
+              className="input-winui w-full"
+            >
+              <option value="en">English</option>
+              <option value="zh-CN">简体中文</option>
+              <option value="ja-JP">日本語</option>
+              <option value="ko-KR">한국어</option>
+              <option value="ru-RU">Русский</option>
+            </select>
+            <p className="text-xs text-gray-500 mt-1">{t('settings.selectLanguage')}</p>
           </div>
         </div>
       </div>
@@ -323,12 +348,12 @@ export const Settings: React.FC = () => {
       {/* Platform Settings */}
       <div className="card-winui p-6">
         <h2 className="text-lg font-semibold mb-4" style={{ color: 'var(--winui-text-primary)' }}>
-          平台配置
+          {t('settings.platformPref')}
         </h2>
         <div className="space-y-4">
           <div>
             <label className="text-sm font-medium mb-2 block" style={{ color: 'var(--winui-text-secondary)' }}>
-              客户端平台
+              {t('settings.platformLabel')}
             </label>
             <select
               value={platform}
@@ -340,7 +365,7 @@ export const Settings: React.FC = () => {
               <option value="linux">Linux</option>
             </select>
             <p className="mt-1 text-xs" style={{ color: 'var(--winui-text-tertiary)' }}>
-              选择运行环境以使用对应的网络脚本
+              {t('settings.platformHint')}
             </p>
           </div>
         </div>
@@ -352,54 +377,54 @@ export const Settings: React.FC = () => {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold flex items-center gap-2" style={{ color: 'var(--winui-text-primary)' }}>
               <Network className="h-5 w-5" style={{ color: 'var(--winui-accent)' }} />
-              扫描配置
+              {t('settings.scanConfig')}
             </h2>
             <button
               onClick={fetchScanConfig}
               className="btn-winui-secondary inline-flex items-center"
             >
               <RefreshCw className={clsx("h-4 w-4 mr-2", isLoading && "animate-spin")} />
-              刷新
+              {t('settings.refresh')}
             </button>
           </div>
           <div className="space-y-4">
             <div className="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2">
               <div>
-                <dt className="text-sm font-medium mb-1" style={{ color: 'var(--winui-text-secondary)' }}>扫描网段</dt>
+                <dt className="text-sm font-medium mb-1" style={{ color: 'var(--winui-text-secondary)' }}>{t('settings.scanRange')}</dt>
                 <dd className="text-sm font-mono" style={{ color: 'var(--winui-text-primary)' }}>
                   {scanConfig.scan_range}
                 </dd>
               </div>
               <div>
-                <dt className="text-sm font-medium mb-1" style={{ color: 'var(--winui-text-secondary)' }}>超时时间</dt>
+                <dt className="text-sm font-medium mb-1" style={{ color: 'var(--winui-text-secondary)' }}>{t('settings.scanTimeout')}</dt>
                 <dd className="text-sm" style={{ color: 'var(--winui-text-primary)' }}>
-                  {scanConfig.scan_timeout_sec} 秒
+                  {scanConfig.scan_timeout_sec} s
                 </dd>
               </div>
               <div>
-                <dt className="text-sm font-medium mb-1" style={{ color: 'var(--winui-text-secondary)' }}>并发数</dt>
+                <dt className="text-sm font-medium mb-1" style={{ color: 'var(--winui-text-secondary)' }}>{t('settings.scanConcurrency')}</dt>
                 <dd className="text-sm" style={{ color: 'var(--winui-text-primary)' }}>
                   {scanConfig.scan_concurrency}
                 </dd>
               </div>
               <div>
-                <dt className="text-sm font-medium mb-1" style={{ color: 'var(--winui-text-secondary)' }}>扫描间隔</dt>
+                <dt className="text-sm font-medium mb-1" style={{ color: 'var(--winui-text-secondary)' }}>{t('settings.scanInterval')}</dt>
                 <dd className="text-sm" style={{ color: 'var(--winui-text-primary)' }}>
-                  {scanConfig.scan_interval_sec ? `${scanConfig.scan_interval_sec} 秒` : '手动扫描'}
+                  {scanConfig.scan_interval_sec ? `${scanConfig.scan_interval_sec} s` : 'manual'}
                 </dd>
               </div>
             </div>
 
             <div className="mt-6 pt-6" style={{ borderTop: '1px solid var(--winui-border-subtle)' }}>
-              <h4 className="text-sm font-semibold mb-4" style={{ color: 'var(--winui-text-primary)' }}>功能开关</h4>
+              <h4 className="text-sm font-semibold mb-4" style={{ color: 'var(--winui-text-primary)' }}>{t('settings.features')}</h4>
               <dl className="grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-2 lg:grid-cols-3">
                 <div className="flex items-center justify-between">
                   <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>mDNS</dt>
                   <dd className="text-sm">
                     {scanConfig.features.mdns ? (
-                      <span className="text-green-600">✓ 启用</span>
+                      <span className="text-green-600">{t('settings.enabled')}</span>
                     ) : (
-                      <span className="text-gray-500">✗ 禁用</span>
+                      <span className="text-gray-500">{t('settings.disabled')}</span>
                     )}
                   </dd>
                 </div>
@@ -407,9 +432,9 @@ export const Settings: React.FC = () => {
                   <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>SSDP</dt>
                   <dd className="text-sm">
                     {scanConfig.features.ssdp ? (
-                      <span className="text-green-600">✓ 启用</span>
+                      <span className="text-green-600">{t('settings.enabled')}</span>
                     ) : (
-                      <span className="text-gray-500">✗ 禁用</span>
+                      <span className="text-gray-500">{t('settings.disabled')}</span>
                     )}
                   </dd>
                 </div>
@@ -417,9 +442,9 @@ export const Settings: React.FC = () => {
                   <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>NBNS</dt>
                   <dd className="text-sm">
                     {scanConfig.features.nbns ? (
-                      <span className="text-green-600">✓ 启用</span>
+                      <span className="text-green-600">{t('settings.enabled')}</span>
                     ) : (
-                      <span className="text-gray-500">✗ 禁用</span>
+                      <span className="text-gray-500">{t('settings.disabled')}</span>
                     )}
                   </dd>
                 </div>
@@ -427,9 +452,9 @@ export const Settings: React.FC = () => {
                   <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>SNMP</dt>
                   <dd className="text-sm">
                     {scanConfig.features.snmp ? (
-                      <span className="text-green-600">✓ 启用</span>
+                      <span className="text-green-600">{t('settings.enabled')}</span>
                     ) : (
-                      <span className="text-gray-500">✗ 禁用</span>
+                      <span className="text-gray-500">{t('settings.disabled')}</span>
                     )}
                   </dd>
                 </div>
@@ -437,15 +462,15 @@ export const Settings: React.FC = () => {
                   <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>Fingerbank</dt>
                   <dd className="text-sm">
                     {scanConfig.features.fingerbank ? (
-                      <span className="text-green-600">✓ 启用</span>
+                      <span className="text-green-600">{t('settings.enabled')}</span>
                     ) : (
-                      <span className="text-gray-500">✗ 禁用</span>
+                      <span className="text-gray-500">{t('settings.disabled')}</span>
                     )}
                   </dd>
                 </div>
               </dl>
               <p className="mt-4 text-xs" style={{ color: 'var(--winui-text-tertiary)' }}>
-                配置通过环境变量设置，修改配置需要重启后端服务
+                {t('settings.subtitle')}
               </p>
             </div>
           </div>
@@ -458,37 +483,37 @@ export const Settings: React.FC = () => {
           <div className="flex items-center justify-between mb-4">
             <h2 className="text-lg font-semibold flex items-center gap-2" style={{ color: 'var(--winui-text-primary)' }}>
               <Server className="h-5 w-5" style={{ color: 'var(--winui-accent)' }} />
-              系统信息
+              {t('settings.capabilities')}
             </h2>
             <button
               onClick={fetchSystemInfo}
               className="btn-winui-secondary inline-flex items-center"
             >
               <RefreshCw className={clsx("h-4 w-4 mr-2", isLoading && "animate-spin")} />
-              刷新
+              {t('settings.refresh')}
             </button>
           </div>
           <dl className="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2">
             <div>
-              <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>平台</dt>
+              <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>{t('settings.platform')}</dt>
               <dd className="mt-1 text-sm font-mono" style={{ color: 'var(--winui-text-primary)' }}>
                 {systemInfo.platform_name || systemInfo.platform}
               </dd>
             </div>
             <div>
-              <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>Python 版本</dt>
+              <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>{t('settings.pythonVersion')}</dt>
               <dd className="mt-1 text-sm font-mono" style={{ color: 'var(--winui-text-primary)' }}>
                 {systemInfo.python_version}
               </dd>
             </div>
             <div>
-              <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>应用版本</dt>
+              <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>{t('settings.appVersion')}</dt>
               <dd className="mt-1 text-sm" style={{ color: 'var(--winui-text-primary)' }}>
                 {systemInfo.app_version}
               </dd>
             </div>
             <div>
-              <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>运行环境</dt>
+              <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>{t('settings.appEnv')}</dt>
               <dd className="mt-1 text-sm">
                 <span
                   className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold"
@@ -502,22 +527,22 @@ export const Settings: React.FC = () => {
               </dd>
             </div>
             <div>
-              <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>Docker 容器</dt>
+              <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>{t('settings.docker')}</dt>
               <dd className="mt-1 text-sm">
                 {systemInfo.docker ? (
-                  <span className="text-green-600">是</span>
+                  <span className="text-green-600">{t('settings.connected')}</span>
                 ) : (
-                  <span className="text-gray-500">否</span>
+                  <span className="text-gray-500">{t('settings.disconnected')}</span>
                 )}
               </dd>
             </div>
             <div>
-              <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>数据库</dt>
+              <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>{t('settings.database')}</dt>
               <dd className="mt-1 text-sm">
                 {systemInfo.database_url ? (
-                  <span className="text-green-600">已连接</span>
+                  <span className="text-green-600">{t('settings.connected')}</span>
                 ) : (
-                  <span className="text-gray-500">未连接</span>
+                  <span className="text-gray-500">{t('settings.disconnected')}</span>
                 )}
               </dd>
             </div>
@@ -525,35 +550,35 @@ export const Settings: React.FC = () => {
 
           {/* Capabilities */}
           <div className="mt-6 pt-6" style={{ borderTop: '1px solid var(--winui-border-subtle)' }}>
-            <h4 className="text-sm font-semibold mb-4" style={{ color: 'var(--winui-text-primary)' }}>功能支持</h4>
+            <h4 className="text-sm font-semibold mb-4" style={{ color: 'var(--winui-text-primary)' }}>{t('settings.featureSupport')}</h4>
             <dl className="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-3">
               <div>
                 <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>Scapy</dt>
                 <dd className="mt-1">
                   {systemInfo.capabilities?.scapy_available ? (
-                    <span className="text-green-600 text-sm">✓ 可用</span>
+                    <span className="text-green-600 text-sm">{t('settings.available')}</span>
                   ) : (
-                    <span className="text-gray-500 text-sm">✗ 不可用</span>
+                    <span className="text-gray-500 text-sm">{t('settings.unavailable')}</span>
                   )}
                 </dd>
               </div>
               <div>
-                <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>Root 权限</dt>
+                <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>{t('settings.root')}</dt>
                 <dd className="mt-1">
                   {systemInfo.capabilities?.root_permissions ? (
-                    <span className="text-green-600 text-sm">✓ 已获取</span>
+                    <span className="text-green-600 text-sm">{t('settings.available')}</span>
                   ) : (
-                    <span className="text-gray-500 text-sm">✗ 未获取</span>
+                    <span className="text-gray-500 text-sm">{t('settings.unavailable')}</span>
                   )}
                 </dd>
               </div>
               <div>
-                <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>网络扫描</dt>
+                <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>{t('settings.networkScan')}</dt>
                 <dd className="mt-1">
                   {systemInfo.capabilities?.network_scan_available ? (
-                    <span className="text-green-600 text-sm">✓ 可用</span>
+                    <span className="text-green-600 text-sm">{t('settings.available')}</span>
                   ) : (
-                    <span className="text-gray-500 text-sm">✗ 不可用</span>
+                    <span className="text-gray-500 text-sm">{t('settings.unavailable')}</span>
                   )}
                 </dd>
               </div>
@@ -573,19 +598,18 @@ export const Settings: React.FC = () => {
               <AlertTriangle className="h-5 w-5 text-red-600 mr-3 mt-0.5" />
               <div className="flex-1">
                 <h4 className="text-sm font-semibold text-red-600 mb-2">
-                  危险区域
+                  {t('common.dangerZone')}
                 </h4>
                 <p className="text-sm text-gray-600 mb-4">
-                  关闭后端服务器将终止所有正在运行的操作，包括扫描和主动防御任务。
-                  所有WebSocket连接将断开。
+                  {t('settings.dangerText')}
                 </p>
                 {showReplayConfirm && (
                   <div className="mb-4 p-3 border border-indigo-300 rounded-lg bg-indigo-50">
                     <p className="text-sm text-indigo-800 font-semibold mb-2">
-                      确定要执行 Replay/Reset 吗？
+                      {t('settings.replayConfirmTitle')}
                     </p>
                     <p className="text-xs text-indigo-700 mb-3">
-                      此操作将清空设备、观测等易变数据，移除现有账户，并重置首启流程。词典文件保留。
+                      {t('settings.replayConfirmDesc')}
                     </p>
                     <div className="flex gap-2">
                       <button
@@ -593,14 +617,14 @@ export const Settings: React.FC = () => {
                         disabled={isReplaying}
                         className="inline-flex items-center px-3 py-1.5 border border-indigo-700 rounded-md shadow-sm text-sm font-medium text-white bg-indigo-700 hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600 disabled:opacity-50"
                       >
-                        {isReplaying ? '执行中...' : '确认 Replay'}
+                        {isReplaying ? t('settings.replaying') : t('settings.replayAction')}
                       </button>
                       <button
                         onClick={() => setShowReplayConfirm(false)}
                         disabled={isReplaying}
                         className="inline-flex items-center px-3 py-1.5 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
                       >
-                        取消
+                        {t('common.cancel')}
                       </button>
                     </div>
                   </div>
@@ -612,10 +636,10 @@ export const Settings: React.FC = () => {
                     className="inline-flex items-center px-4 py-2 border border-indigo-600 rounded-md shadow-sm text-sm font-medium text-indigo-700 bg-white hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <RefreshCw className="h-4 w-4 mr-2" />
-                    {isReplaying ? 'Replaying...' : 'Replay (Reset)'}
+                    {isReplaying ? t('settings.replaying') : t('settings.replay')}
                   </button>
                   <span className="text-xs text-gray-500">
-                    重置到首次启动，清空临时数据并要求重新注册。
+                    {t('settings.replayDesc')}
                   </span>
                 </div>
                 {!showShutdownConfirm ? (
@@ -626,13 +650,13 @@ export const Settings: React.FC = () => {
                       className="inline-flex items-center px-4 py-2 border border-red-600 rounded-md shadow-sm text-sm font-medium text-red-600 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <Power className="h-4 w-4 mr-2" />
-                      优雅关闭服务器
+                      {isShuttingDown ? t('settings.shutdownProgress') : t('settings.gracefulShutdown')}
                     </button>
 
                     {showForceShutdown && (
                       <div className="pt-3 border-t border-red-300">
                         <p className="text-xs text-red-700 mb-2">
-                          ⚠️ 优雅关闭失败？使用强制关闭（会立即终止所有进程）
+                          {t('settings.forceHint')}
                         </p>
                         <button
                           onClick={handleForceShutdown}
@@ -640,7 +664,7 @@ export const Settings: React.FC = () => {
                           className="inline-flex items-center px-4 py-2 border-2 border-red-800 rounded-md shadow-sm text-sm font-medium text-white bg-red-800 hover:bg-red-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                           <Zap className="h-4 w-4 mr-2" />
-                          强制关闭服务器
+                          {isShuttingDown ? t('settings.forceProgress') : t('settings.forceShutdown')}
                         </button>
                       </div>
                     )}
@@ -649,27 +673,27 @@ export const Settings: React.FC = () => {
                   <div className="space-y-3">
                     <div className="flex items-center space-x-3">
                       <p className="text-sm font-medium text-red-600">
-                        确定要关闭服务器吗？
+                        {t('settings.confirmShutdown')}
                       </p>
                       <button
                         onClick={handleShutdown}
                         disabled={isShuttingDown}
                         className="inline-flex items-center px-3 py-1.5 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50"
                       >
-                        {isShuttingDown ? '关闭中...' : '确认关闭'}
+                        {isShuttingDown ? t('settings.shutdownProgress') : t('common.confirm')}
                       </button>
                       <button
                         onClick={() => setShowShutdownConfirm(false)}
                         disabled={isShuttingDown}
                         className="inline-flex items-center px-3 py-1.5 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
                       >
-                        取消
+                        {t('common.cancel')}
                       </button>
                     </div>
 
                     <div className="pt-3 border-t border-red-300">
                       <p className="text-xs text-red-700 mb-2">
-                        💀 如果优雅关闭卡住，点击下方强制关闭（会kill进程）
+                        {t('settings.forceFallback')}
                       </p>
                       <button
                         onClick={handleForceShutdown}
@@ -677,7 +701,7 @@ export const Settings: React.FC = () => {
                         className="inline-flex items-center px-3 py-1.5 border-2 border-red-900 rounded-md shadow-sm text-sm font-medium text-white bg-red-900 hover:bg-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-800 disabled:opacity-50"
                       >
                         <Zap className="h-4 w-4 mr-2" />
-                        {isShuttingDown ? '强制关闭中...' : '强制关闭'}
+                        {isShuttingDown ? t('settings.forceProgress') : t('settings.forceShutdown')}
                       </button>
                     </div>
                   </div>

@@ -2,6 +2,7 @@ import React, { useEffect, useState, useCallback } from 'react';
 import { logsService, SystemLog, SystemInfo } from '../lib/services/logs';
 import { RefreshCw, AlertCircle, Info, AlertTriangle, XCircle, CheckCircle, Terminal, Server } from 'lucide-react';
 import { clsx } from 'clsx';
+import { useTranslation } from 'react-i18next';
 
 const LogLevelIcon: React.FC<{ level: string }> = ({ level }) => {
   const levelLower = level.toLowerCase();
@@ -43,6 +44,7 @@ const LogLevelBadge: React.FC<{ level: string }> = ({ level }) => {
 };
 
 export const Logs: React.FC = () => {
+  const { t } = useTranslation();
   const [logs, setLogs] = useState<SystemLog[]>([]);
   const [systemInfo, setSystemInfo] = useState<SystemInfo | null>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -88,10 +90,10 @@ export const Logs: React.FC = () => {
         <div>
           <h1 className="text-2xl font-semibold flex items-center gap-2" style={{ color: 'var(--winui-text-primary)', letterSpacing: '-0.02em' }}>
             <Terminal className="h-8 w-8" style={{ color: 'var(--winui-accent)' }} />
-            System Logs & Information
+            {t('logsPage.title')}
           </h1>
           <p className="mt-1 text-sm" style={{ color: 'var(--winui-text-secondary)' }}>
-            View application logs and system environment information.
+            {t('logsPage.subtitle')}
           </p>
         </div>
         <button
@@ -103,7 +105,7 @@ export const Logs: React.FC = () => {
           className="btn-winui-secondary inline-flex items-center"
         >
           <RefreshCw className={clsx("h-4 w-4 mr-2", isLoading && "animate-spin")} />
-          Refresh
+          {t('logsPage.refresh')}
         </button>
       </div>
 
@@ -113,43 +115,43 @@ export const Logs: React.FC = () => {
           <div className="px-4 py-5 border-b sm:px-6" style={{ borderColor: 'var(--winui-border-subtle)' }}>
             <h3 className="text-lg leading-6 font-semibold flex items-center gap-2" style={{ color: 'var(--winui-text-primary)' }}>
               <Server className="h-5 w-5" style={{ color: 'var(--winui-text-tertiary)' }} />
-              System Information
+              {t('logsPage.systemInfo')}
             </h3>
           </div>
           <div className="px-4 py-5 sm:p-6">
             <dl className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
               <div>
-                <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>Platform</dt>
+                <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>{t('logsPage.platform')}</dt>
                 <dd className="mt-1 text-sm font-mono" style={{ color: 'var(--winui-text-primary)' }}>{systemInfo.platform}</dd>
               </div>
               <div>
-                <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>Python Version</dt>
+                <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>{t('logsPage.python')}</dt>
                 <dd className="mt-1 text-sm font-mono" style={{ color: 'var(--winui-text-primary)' }}>{systemInfo.python_version}</dd>
               </div>
               <div>
-                <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>App Version</dt>
+                <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>{t('logsPage.appVersion')}</dt>
                 <dd className="mt-1 text-sm" style={{ color: 'var(--winui-text-primary)' }}>{systemInfo.app_version}</dd>
               </div>
               <div>
-                <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>Environment</dt>
+                <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>{t('logsPage.env')}</dt>
                 <dd className="mt-1 text-sm" style={{ color: 'var(--winui-text-primary)' }}>{systemInfo.app_env}</dd>
               </div>
               <div>
-                <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>Docker Container</dt>
+                <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>{t('logsPage.docker')}</dt>
                 <dd className="mt-1 text-sm">
                   {systemInfo.docker ? (
                     <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold" style={{ backgroundColor: 'rgba(0, 120, 212, 0.1)', color: 'var(--winui-accent)' }}>
-                      Yes
+                      {t('common.yes', { defaultValue: 'Yes' })}
                     </span>
                   ) : (
                     <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold" style={{ backgroundColor: 'var(--winui-bg-tertiary)', color: 'var(--winui-text-secondary)' }}>
-                      No
+                      {t('common.no', { defaultValue: 'No' })}
                     </span>
                   )}
                 </dd>
               </div>
               <div>
-                <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>Database</dt>
+                <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>{t('logsPage.database')}</dt>
                 <dd className="mt-1 text-sm">
                   {systemInfo.database_url ? (
                     <CheckCircle className="h-5 w-5" style={{ color: '#107c10' }} />
@@ -162,10 +164,10 @@ export const Logs: React.FC = () => {
 
             {/* Capabilities */}
             <div className="mt-6 pt-6" style={{ borderTop: '1px solid var(--winui-border-subtle)' }}>
-              <h4 className="text-sm font-semibold mb-4" style={{ color: 'var(--winui-text-primary)' }}>Capabilities</h4>
+              <h4 className="text-sm font-semibold mb-4" style={{ color: 'var(--winui-text-primary)' }}>{t('logsPage.capabilities')}</h4>
               <dl className="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-3">
                 <div>
-                  <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>Scapy Available</dt>
+                  <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>{t('logsPage.scapy')}</dt>
                   <dd className="mt-1">
                     {systemInfo.capabilities.scapy_available ? (
                       <CheckCircle className="h-5 w-5" style={{ color: '#107c10' }} />
@@ -175,7 +177,7 @@ export const Logs: React.FC = () => {
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>Root Permissions</dt>
+                  <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>{t('logsPage.root')}</dt>
                   <dd className="mt-1">
                     {systemInfo.capabilities.root_permissions ? (
                       <CheckCircle className="h-5 w-5" style={{ color: '#107c10' }} />
@@ -185,7 +187,7 @@ export const Logs: React.FC = () => {
                   </dd>
                 </div>
                 <div>
-                  <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>Network Scan</dt>
+                  <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>{t('logsPage.network')}</dt>
                   <dd className="mt-1">
                     {systemInfo.capabilities.network_scan_available ? (
                       <CheckCircle className="h-5 w-5" style={{ color: '#107c10' }} />
@@ -203,29 +205,29 @@ export const Logs: React.FC = () => {
       {/* Logs - WinUI3 Style */}
       <div className="card-winui overflow-hidden">
         <div className="px-4 py-5 border-b sm:px-6 flex justify-between items-center" style={{ borderColor: 'var(--winui-border-subtle)' }}>
-          <h3 className="text-lg leading-6 font-semibold" style={{ color: 'var(--winui-text-primary)' }}>System Logs</h3>
+          <h3 className="text-lg leading-6 font-semibold" style={{ color: 'var(--winui-text-primary)' }}>{t('logsPage.logsTitle')}</h3>
           <div className="flex items-center space-x-4">
             <select
               value={filterLevel}
               onChange={(e) => setFilterLevel(e.target.value)}
               className="input-winui block pl-3 pr-10 py-2 text-sm"
             >
-              <option value="all">All Levels</option>
-              <option value="debug">Debug</option>
-              <option value="info">Info</option>
-              <option value="warning">Warning</option>
-              <option value="error">Error</option>
-              <option value="critical">Critical</option>
+              <option value="all">{t('logsPage.levelAll')}</option>
+              <option value="debug">{t('logsPage.levelDebug')}</option>
+              <option value="info">{t('logsPage.levelInfo')}</option>
+              <option value="warning">{t('logsPage.levelWarning')}</option>
+              <option value="error">{t('logsPage.levelError')}</option>
+              <option value="critical">{t('logsPage.levelCritical')}</option>
             </select>
             <select
               value={limit}
               onChange={(e) => setLimit(Number(e.target.value))}
               className="input-winui block pl-3 pr-10 py-2 text-sm"
             >
-              <option value="50">50 logs</option>
-              <option value="100">100 logs</option>
-              <option value="200">200 logs</option>
-              <option value="500">500 logs</option>
+              <option value="50">{t('logsPage.limit', { count: 50 })}</option>
+              <option value="100">{t('logsPage.limit', { count: 100 })}</option>
+              <option value="200">{t('logsPage.limit', { count: 200 })}</option>
+              <option value="500">{t('logsPage.limit', { count: 500 })}</option>
             </select>
           </div>
         </div>
@@ -234,9 +236,9 @@ export const Logs: React.FC = () => {
             <thead className="sticky top-0" style={{ backgroundColor: 'var(--winui-bg-tertiary)' }}>
               <tr>
                 <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--winui-text-secondary)' }}>Time</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--winui-text-secondary)' }}>Level</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--winui-text-secondary)' }}>Module</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--winui-text-secondary)' }}>Message</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--winui-text-secondary)' }}>{t('logsPage.level')}</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--winui-text-secondary)' }}>{t('logsPage.module')}</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--winui-text-secondary)' }}>{t('logsPage.message')}</th>
               </tr>
             </thead>
             <tbody style={{ backgroundColor: 'var(--winui-surface)' }}>
@@ -270,11 +272,11 @@ export const Logs: React.FC = () => {
                         <div>
                           <div>{log.message}</div>
                           {log.device_mac && (
-                            <div className="text-xs mt-1" style={{ color: 'var(--winui-text-tertiary)' }}>Device: {log.device_mac}</div>
+                            <div className="text-xs mt-1" style={{ color: 'var(--winui-text-tertiary)' }}>{t('logsPage.device')}: {log.device_mac}</div>
                           )}
                           {log.context && Object.keys(log.context).length > 0 && (
                             <details className="mt-1">
-                              <summary className="text-xs cursor-pointer" style={{ color: 'var(--winui-text-tertiary)' }}>Context</summary>
+                              <summary className="text-xs cursor-pointer" style={{ color: 'var(--winui-text-tertiary)' }}>{t('logsPage.context')}</summary>
                               <pre className="text-xs mt-1 ml-4 overflow-x-auto" style={{ color: 'var(--winui-text-secondary)' }}>
                                 {JSON.stringify(log.context, null, 2)}
                               </pre>
@@ -288,7 +290,7 @@ export const Logs: React.FC = () => {
               ) : (
                 <tr>
                   <td colSpan={4} className="px-6 py-8 text-center" style={{ color: 'var(--winui-text-secondary)' }}>
-                    No logs found.
+                    {t('logsPage.empty')}
                   </td>
                 </tr>
               )}

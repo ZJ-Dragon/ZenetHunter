@@ -7,6 +7,7 @@ import { clsx } from 'clsx';
 import { useWebSocketEvent } from '../contexts/WebSocketContext';
 import { WSEventType, ActiveDefenseLogEntry, ActiveDefenseStartedData, ActiveDefenseStoppedData } from '../types/websocket';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 // Attack type labels for display
 const attackTypeLabels: Record<string, string> = {
@@ -65,6 +66,7 @@ interface ActiveAttackInfo {
 }
 
 export const AttackDashboard: React.FC = () => {
+  const { t } = useTranslation();
   const [devices, setDevices] = useState<Device[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [activeAttacks, setActiveAttacks] = useState<Map<string, ActiveAttackInfo>>(new Map());
@@ -217,11 +219,11 @@ export const AttackDashboard: React.FC = () => {
 
   const handleStopAttack = async (mac: string) => {
     setStoppingMacs(prev => new Set(prev).add(mac.toLowerCase()));
-    const toastId = toast.loading('Stopping attack...');
+    const toastId = toast.loading(t('attack.stopping'));
 
     try {
       await attackService.stopAttack(mac);
-      toast.success('Attack stopped', { id: toastId });
+      toast.success(t('attack.stopped'), { id: toastId });
 
       // Remove from active attacks
       setActiveAttacks(prev => {
@@ -233,7 +235,7 @@ export const AttackDashboard: React.FC = () => {
       fetchDevices();
     } catch (error) {
       console.error('Failed to stop attack:', error);
-      toast.error('Failed to stop attack', { id: toastId });
+      toast.error(t('attack.stopFailed'), { id: toastId });
     } finally {
       setStoppingMacs(prev => {
         const updated = new Set(prev);
@@ -246,14 +248,14 @@ export const AttackDashboard: React.FC = () => {
   const handleLaunchAttack = async (device: Device) => {
     setLaunchingMacs(prev => new Set(prev).add(device.mac.toLowerCase()));
     const metadata = attackTypeMetadata[selectedAttackType];
-    const toastId = toast.loading(`Launching ${metadata.label} on ${device.name || device.ip}...`);
+    const toastId = toast.loading(t('attack.launching', { type: metadata.label, target: device.name || device.ip }));
 
     try {
       await attackService.startAttack(device.mac, selectedAttackType, globalDuration, globalIntensity);
-      toast.success(`${metadata.label} attack started`, { id: toastId });
+      toast.success(t('attack.started', { type: metadata.label }), { id: toastId });
     } catch (error) {
       console.error('Failed to start attack:', error);
-      toast.error('Failed to start attack', { id: toastId });
+      toast.error(t('attack.startFailed'), { id: toastId });
       setLaunchingMacs(prev => {
         const updated = new Set(prev);
         updated.delete(device.mac.toLowerCase());
@@ -291,10 +293,10 @@ export const AttackDashboard: React.FC = () => {
         <div>
           <h1 className="text-2xl font-semibold flex items-center gap-2" style={{ color: 'var(--winui-text-primary)', letterSpacing: '-0.02em' }}>
             <ShieldAlert className="h-8 w-8" style={{ color: '#d13438' }} />
-            Active Defense Operations
+            {t('attack.title')}
           </h1>
           <p className="mt-1 text-sm" style={{ color: 'var(--winui-text-secondary)' }}>
-            Monitor and control active defense tasks in real-time.
+            {t('attack.subtitle')}
           </p>
         </div>
         <button
@@ -302,7 +304,7 @@ export const AttackDashboard: React.FC = () => {
           className="btn-winui-secondary inline-flex items-center"
         >
           <RefreshCw className={clsx("h-4 w-4 mr-2", isLoading && "animate-spin")} />
-          Refresh
+          {t('attack.refresh')}
         </button>
       </div>
 
@@ -310,7 +312,7 @@ export const AttackDashboard: React.FC = () => {
       <div className="grid grid-cols-1 gap-5 sm:grid-cols-3">
         <div className="card-winui overflow-hidden">
           <div className="px-4 py-5 sm:p-6">
-            <dt className="text-sm font-medium truncate" style={{ color: 'var(--winui-text-secondary)' }}>Active Operations</dt>
+            <dt className="text-sm font-medium truncate" style={{ color: 'var(--winui-text-secondary)' }}>{t('attack.activeOps')}</dt>
             <dd className="mt-1 text-3xl font-semibold" style={{ color: displayAttacks.length > 0 ? '#d13438' : 'var(--winui-text-primary)' }}>
               {displayAttacks.length}
             </dd>
@@ -318,16 +320,16 @@ export const AttackDashboard: React.FC = () => {
         </div>
         <div className="card-winui overflow-hidden">
           <div className="px-4 py-5 sm:p-6">
-            <dt className="text-sm font-medium truncate" style={{ color: 'var(--winui-text-secondary)' }}>Total Devices</dt>
+            <dt className="text-sm font-medium truncate" style={{ color: 'var(--winui-text-secondary)' }}>{t('attack.totalDevices')}</dt>
             <dd className="mt-1 text-3xl font-semibold" style={{ color: 'var(--winui-text-primary)' }}>{devices.length}</dd>
           </div>
         </div>
         <div className="card-winui overflow-hidden">
           <div className="px-4 py-5 sm:p-6">
-            <dt className="text-sm font-medium truncate" style={{ color: 'var(--winui-text-secondary)' }}>System Status</dt>
+            <dt className="text-sm font-medium truncate" style={{ color: 'var(--winui-text-secondary)' }}>{t('attack.systemStatus')}</dt>
             <dd className="mt-1 text-3xl font-semibold flex items-center gap-2" style={{ color: '#107c10' }}>
               <Activity className="h-6 w-6" />
-              Operational
+              {t('attack.operational')}
             </dd>
           </div>
         </div>
@@ -338,7 +340,7 @@ export const AttackDashboard: React.FC = () => {
         <div className="px-4 py-5 border-b sm:px-6" style={{ borderColor: 'var(--winui-border-subtle)' }}>
           <h3 className="text-lg leading-6 font-semibold flex items-center gap-2" style={{ color: 'var(--winui-text-primary)' }}>
             <Zap className="h-5 w-5" style={{ color: '#ffaa44' }} />
-            Targets Under Attack
+            {t('attack.targets')}
           </h3>
         </div>
         <div className="divide-y" style={{ borderColor: 'var(--winui-border-subtle)' }}>
@@ -368,7 +370,7 @@ export const AttackDashboard: React.FC = () => {
                       <div className="ml-4 flex-1">
                         <div className="flex items-center gap-3">
                           <span className="text-sm font-semibold" style={{ color: 'var(--winui-text-primary)' }}>
-                            {device?.name || device?.alias || device?.model || device?.model_guess || 'Unknown Device'}
+                          {device?.name || device?.alias || device?.model || device?.model_guess || t('common.unknown')}
                           </span>
                           <span
                             className="px-2 py-0.5 text-xs font-medium rounded"
@@ -377,11 +379,11 @@ export const AttackDashboard: React.FC = () => {
                               color: '#d13438'
                             }}
                           >
-                            {attackTypeLabels[attack.type] || attack.type || 'Active'}
+                            {attackTypeLabels[attack.type] || attack.type || t('attack.active')}
                           </span>
                         </div>
                         <div className="mt-1 text-sm" style={{ color: 'var(--winui-text-secondary)' }}>
-                          <span className="font-mono">{device?.ip || 'N/A'}</span>
+                          <span className="font-mono">{device?.ip || t('common.unknown')}</span>
                           <span className="mx-2">•</span>
                           <span className="font-mono text-xs">{attack.mac}</span>
                         </div>
@@ -396,7 +398,7 @@ export const AttackDashboard: React.FC = () => {
                             </span>
                           )}
                           {attack.intensity > 0 && (
-                            <span>Intensity: {attack.intensity}/10</span>
+                            <span>{t('attack.intensity', { value: attack.intensity })}</span>
                           )}
                         </div>
                       </div>
@@ -425,7 +427,7 @@ export const AttackDashboard: React.FC = () => {
                         ) : (
                           <Square className="h-4 w-4 mr-2" />
                         )}
-                        Stop Attack
+                        {t('attack.stop')}
                       </button>
                     </div>
                   </div>
@@ -435,9 +437,9 @@ export const AttackDashboard: React.FC = () => {
           ) : (
             <div className="px-4 py-12 text-center">
               <ShieldAlert className="h-12 w-12 mx-auto mb-4" style={{ color: 'var(--winui-text-tertiary)' }} />
-              <h3 className="text-lg font-semibold mb-1" style={{ color: 'var(--winui-text-primary)' }}>No Active Operations</h3>
+              <h3 className="text-lg font-semibold mb-1" style={{ color: 'var(--winui-text-primary)' }}>{t('attack.noActiveTitle')}</h3>
               <p style={{ color: 'var(--winui-text-secondary)' }}>
-                Select a device below to start an attack.
+                {t('attack.noActiveHint')}
               </p>
             </div>
           )}
@@ -453,7 +455,7 @@ export const AttackDashboard: React.FC = () => {
         >
           <h3 className="text-lg leading-6 font-semibold flex items-center gap-2" style={{ color: 'var(--winui-text-primary)' }}>
             <Terminal className="h-5 w-5" style={{ color: 'var(--winui-accent)' }} />
-            Operation Logs
+            {t('attack.logs')}
             {logs.length > 0 && (
               <span className="text-xs px-2 py-0.5 rounded-full" style={{ backgroundColor: 'var(--winui-bg-tertiary)', color: 'var(--winui-text-secondary)' }}>
                 {logs.length}
@@ -493,22 +495,22 @@ export const AttackDashboard: React.FC = () => {
                 ))}
               </div>
             ) : (
-              <div className="px-4 py-8 text-center text-sm" style={{ color: 'var(--winui-text-secondary)' }}>
-                No operation logs yet. Start an attack to see real-time logs.
-              </div>
-            )}
-          </div>
-        )}
+            <div className="px-4 py-8 text-center text-sm" style={{ color: 'var(--winui-text-secondary)' }}>
+              {t('attack.logsEmpty')}
+            </div>
+          )}
+        </div>
+      )}
       </div>
 
       {/* All Devices - Attack Control Center */}
       <div className="card-winui overflow-hidden">
         <div className="px-4 py-5 border-b sm:px-6" style={{ borderColor: 'var(--winui-border-subtle)' }}>
           <h3 className="text-lg leading-6 font-semibold" style={{ color: 'var(--winui-text-primary)' }}>
-            All Network Devices
+            {t('attack.allDevices')}
           </h3>
           <p className="mt-1 text-sm" style={{ color: 'var(--winui-text-secondary)' }}>
-            Select a device to initiate an attack operation.
+            {t('attack.allDevicesHint')}
           </p>
         </div>
 
@@ -517,7 +519,7 @@ export const AttackDashboard: React.FC = () => {
           <div className="flex flex-wrap items-center gap-6">
             {/* Attack Type Selector */}
             <div className="flex items-center gap-3">
-              <label className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>Attack Type</label>
+              <label className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>{t('attack.attackType')}</label>
               <div className="relative" ref={typeMenuRef}>
                 <button
                   onClick={() => setShowTypeMenu(!showTypeMenu)}
@@ -576,7 +578,7 @@ export const AttackDashboard: React.FC = () => {
             {/* Intensity Slider */}
             <div className="flex items-center gap-3 flex-1 min-w-[200px] max-w-[320px]">
               <label className="text-sm font-medium whitespace-nowrap" style={{ color: 'var(--winui-text-secondary)' }}>
-                Intensity
+                {t('attack.intensityLabel')}
               </label>
               <div className="flex-1 flex items-center gap-3">
                 <input
@@ -605,7 +607,7 @@ export const AttackDashboard: React.FC = () => {
             {/* Duration */}
             <div className="flex items-center gap-3">
               <label className="text-sm font-medium whitespace-nowrap" style={{ color: 'var(--winui-text-secondary)' }}>
-                Duration
+                {t('attack.duration')}
               </label>
               <select
                 value={globalDuration}
@@ -633,7 +635,7 @@ export const AttackDashboard: React.FC = () => {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4" style={{ color: 'var(--winui-text-tertiary)' }} />
             <input
               type="text"
-              placeholder="Search devices..."
+              placeholder={t('attack.searchPlaceholder')}
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="w-full pr-4 py-2 text-sm rounded-lg border"
@@ -691,7 +693,7 @@ export const AttackDashboard: React.FC = () => {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <span className="text-sm font-medium truncate" style={{ color: 'var(--winui-text-primary)' }}>
-                          {device.name || device.alias || device.model || device.model_guess || 'Unknown Device'}
+                          {device.name || device.alias || device.model || device.model_guess || t('common.unknown')}
                         </span>
                         <div
                           className={clsx(
@@ -717,7 +719,7 @@ export const AttackDashboard: React.FC = () => {
                         <span className="font-mono text-[10px]" style={{ color: 'var(--winui-text-tertiary)' }}>{device.mac}</span>
                       </div>
                       <div className="text-xs mt-0.5" style={{ color: 'var(--winui-text-tertiary)' }}>
-                        {device.vendor || device.vendor_guess || 'Unknown Vendor'}
+                        {device.vendor || device.vendor_guess || t('devices.unknownVendor')}
                       </div>
                     </div>
 
@@ -747,7 +749,7 @@ export const AttackDashboard: React.FC = () => {
                           ) : (
                             <Square className="h-4 w-4 mr-2" />
                           )}
-                          Stop
+                          {t('attack.stop')}
                         </button>
                       ) : (
                         <button
@@ -773,7 +775,7 @@ export const AttackDashboard: React.FC = () => {
                           ) : (
                             <Play className="h-4 w-4 mr-2" />
                           )}
-                          Attack
+                          {t('attack.attack')}
                         </button>
                       )}
                     </div>
@@ -785,10 +787,10 @@ export const AttackDashboard: React.FC = () => {
             <div className="px-4 py-12 text-center">
               <Search className="h-12 w-12 mx-auto mb-4" style={{ color: 'var(--winui-text-tertiary)' }} />
               <h3 className="text-lg font-semibold mb-1" style={{ color: 'var(--winui-text-primary)' }}>
-                {searchQuery ? 'No devices match your search' : 'No devices found'}
+                {searchQuery ? t('attack.searchEmpty') : t('attack.emptyTitle')}
               </h3>
               <p style={{ color: 'var(--winui-text-secondary)' }}>
-                {searchQuery ? 'Try a different search term.' : 'Run a network scan first to discover devices.'}
+                {searchQuery ? t('attack.searchHint') : t('attack.emptyHint')}
               </p>
             </div>
           )}

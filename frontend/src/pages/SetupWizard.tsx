@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { WizardLayout } from '../components/layout/WizardLayout';
 import { configService } from '../lib/services/config';
 import { useNavigate } from 'react-router-dom';
 import toast from 'react-hot-toast';
 import { useAuth } from '../contexts/AuthContext';
 import { OOBERegisterRequest, OOBEStatus } from '../types/config';
+import { useTranslation } from 'react-i18next';
 
 export const SetupWizard: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -19,9 +19,10 @@ export const SetupWizard: React.FC = () => {
   const [hasScrolled, setHasScrolled] = useState(false);
   const [secondsLeft, setSecondsLeft] = useState(30);
   const scrollRef = useRef<HTMLDivElement | null>(null);
-  const timerRef = useRef<NodeJS.Timeout | null>(null);
+  const timerRef = useRef<ReturnType<typeof setInterval> | null>(null);
   const navigate = useNavigate();
   const { login, isAuthenticated } = useAuth();
+  const { t } = useTranslation();
 
   useEffect(() => {
     const loadStatus = async () => {
@@ -80,11 +81,11 @@ export const SetupWizard: React.FC = () => {
     try {
       const result = await configService.register(formData);
       login(result.access_token);
-      toast.success('Admin account created. Please review the safety notice.');
+      toast.success(t('setup.createAdmin'));
       setShowDisclaimer(true);
     } catch (error) {
       console.error(error);
-      toast.error('Failed to create admin account. Please try again.');
+      toast.error(t('login.resetFailed'));
     } finally {
       setLoading(false);
     }
@@ -94,11 +95,11 @@ export const SetupWizard: React.FC = () => {
     setLoading(true);
     try {
       await configService.acknowledge({ acknowledged: true });
-      toast.success('Safety notice acknowledged. Welcome!');
+      toast.success(t('setup.modalTitle'));
       navigate('/', { replace: true });
     } catch (error) {
       console.error(error);
-      toast.error('Failed to complete acknowledgment. Please retry.');
+      toast.error(t('login.resetFailed'));
     } finally {
       setLoading(false);
     }
@@ -122,10 +123,10 @@ export const SetupWizard: React.FC = () => {
       </div>
       <div className="relative max-w-5xl mx-auto px-4 py-12">
         <div className="text-center mb-10">
-          <p className="text-sm font-semibold text-indigo-600 tracking-wide">Welcome to ZenetHunter</p>
-          <h1 className="mt-2 text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight">First-time Setup</h1>
+          <p className="text-sm font-semibold text-indigo-600 tracking-wide">{t('setup.welcomeTag')}</p>
+          <h1 className="mt-2 text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight">{t('setup.welcomeTitle')}</h1>
           <p className="mt-3 text-base text-gray-600">
-            Create your administrator account to secure the console. You’ll review a safety notice before continuing.
+            {t('setup.welcomeDesc')}
           </p>
         </div>
 
@@ -137,13 +138,13 @@ export const SetupWizard: React.FC = () => {
                   1
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-indigo-700">Account</p>
-                  <p className="text-sm text-gray-600">Set up admin credentials</p>
+                  <p className="text-sm font-semibold text-indigo-700">{t('setup.accountStep')}</p>
+                  <p className="text-sm text-gray-600">{t('setup.accountSub')}</p>
                 </div>
               </div>
               <div className="p-6 space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Admin Username</label>
+                  <label className="block text-sm font-medium text-gray-700">{t('setup.username')}</label>
                   <input
                     type="text"
                     className="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-brand-500 focus:border-brand-500 sm:text-sm"
@@ -152,10 +153,10 @@ export const SetupWizard: React.FC = () => {
                     placeholder="admin"
                     required
                   />
-                  <p className="mt-1 text-xs text-gray-500">Choose a unique admin username.</p>
+                  <p className="mt-1 text-xs text-gray-500">{t('setup.accountSub')}</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Admin Password</label>
+                  <label className="block text-sm font-medium text-gray-700">{t('setup.password')}</label>
                   <input
                     type="password"
                     className="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-brand-500 focus:border-brand-500 sm:text-sm"
@@ -166,11 +167,11 @@ export const SetupWizard: React.FC = () => {
                     minLength={8}
                   />
                   <p className="mt-2 text-sm text-gray-500">
-                    Passwords are stored with modern hashing. Minimum 8 characters.
+                    {t('setup.passwordNote')}
                   </p>
                   {status?.admin_exists && (
                     <p className="mt-2 text-sm text-red-600">
-                      An admin already exists. Please contact the administrator to continue.
+                      {t('setup.adminExists')}
                     </p>
                   )}
                 </div>
@@ -185,7 +186,7 @@ export const SetupWizard: React.FC = () => {
                     }
                     className="btn-winui px-6 py-2 text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    {loading ? 'Creating...' : 'Create Admin'}
+                    {loading ? t('setup.creating') : t('setup.createAdmin')}
                   </button>
                 </div>
               </div>
@@ -199,20 +200,20 @@ export const SetupWizard: React.FC = () => {
                   2
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-blue-700">Safety Notice</p>
-                  <p className="text-sm text-gray-600">Acknowledgement required</p>
+                  <p className="text-sm font-semibold text-blue-700">{t('setup.safetyStep')}</p>
+                  <p className="text-sm text-gray-600">{t('setup.safetySub')}</p>
                 </div>
               </div>
               <p className="text-sm text-gray-600">
-                After creating the admin, you must read and acknowledge the safety disclaimer. You’ll need to scroll the notice and wait 30 seconds before continuing.
+                {t('setup.safetyDesc')}
               </p>
               <ul className="text-sm text-gray-600 space-y-1 list-disc list-inside">
-                <li>Operate only on authorized networks.</li>
-                <li>Use disruptive actions responsibly.</li>
-                <li>Close the app if you do not agree.</li>
+                <li>{t('setup.safetyList1')}</li>
+                <li>{t('setup.safetyList2')}</li>
+                <li>{t('setup.safetyList3')}</li>
               </ul>
               <div className="rounded-lg bg-indigo-50 border border-indigo-100 p-4 text-sm text-indigo-800">
-                The setup will return you to the dashboard after you accept the notice.
+                {t('setup.safetyInfo')}
               </div>
             </div>
           </div>
@@ -229,9 +230,9 @@ export const SetupWizard: React.FC = () => {
         >
           <div className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full outline-none overflow-hidden">
             <div className="p-6 bg-gradient-to-r from-indigo-600 to-blue-500">
-              <h2 className="text-xl font-semibold text-white">Safety &amp; Disclaimer</h2>
+              <h2 className="text-xl font-semibold text-white">{t('setup.modalTitle')}</h2>
               <p className="text-sm text-indigo-50 mt-2">
-                Please review this notice before using ZenetHunter in your environment.
+                {t('setup.modalLead')}
               </p>
             </div>
             <div
@@ -242,36 +243,35 @@ export const SetupWizard: React.FC = () => {
               tabIndex={0}
             >
               <div className="space-y-2">
-                <p className="text-base font-semibold text-gray-900">Purpose</p>
-                <p>
-                  ZenetHunter is designed for authorized, private networks to improve visibility and mitigate misuse.
-                  Capabilities focus on monitoring, policy enforcement, and protective actions under appropriate oversight.
-                </p>
+                <p className="text-base font-semibold text-gray-900">{t('setup.modalPurpose')}</p>
+                <p>{t('setup.modalPurposeDesc')}</p>
               </div>
               <div className="space-y-2">
-                <p className="text-base font-semibold text-gray-900">Your responsibilities</p>
+                <p className="text-base font-semibold text-gray-900">{t('setup.modalResp')}</p>
                 <ul className="list-disc list-inside space-y-1">
-                  <li>Operate only with proper authorization and within approved network segments.</li>
-                  <li>Follow applicable laws, internal security policies, and acceptable use guidelines.</li>
-                  <li>Use disruptive features responsibly; notify stakeholders per your policy.</li>
+                  <li>{t('setup.modalResp1')}</li>
+                  <li>{t('setup.modalResp2')}</li>
+                  <li>{t('setup.modalResp3')}</li>
                 </ul>
               </div>
               <div className="space-y-2">
-                <p className="text-base font-semibold text-gray-900">Safety notes</p>
+                <p className="text-base font-semibold text-gray-900">{t('setup.modalSafety')}</p>
                 <ul className="list-disc list-inside space-y-1">
-                  <li>Some actions interact with devices on the network; review before execution.</li>
-                  <li>Logging is retained locally; avoid including sensitive personal data.</li>
-                  <li>If you disagree with these terms, close the application now.</li>
+                  <li>{t('setup.modalSafety1')}</li>
+                  <li>{t('setup.modalSafety2')}</li>
+                  <li>{t('setup.modalSafety3')}</li>
                 </ul>
               </div>
               <p className="text-xs text-gray-500">
-                Implementation details of sensitive capabilities are intentionally omitted from this notice.
+                {t('setup.modalFooterHint')}
               </p>
             </div>
             <div className="px-6 pb-6 pt-3 flex items-center justify-between border-t border-gray-200">
               <div className="text-sm text-gray-700">
-                <div>Timer: {timerReady ? 'Ready' : `${secondsLeft}s remaining`}</div>
-                <div className="text-xs text-gray-500">Use scroll or mouse wheel to confirm you have read this notice.</div>
+                <div>
+                  {t('setup.timerLabel')}: {timerReady ? t('setup.timerReady') : t('setup.timerRemaining', { seconds: secondsLeft })}
+                </div>
+                <div className="text-xs text-gray-500">{t('setup.modalFooterHint')}</div>
               </div>
               <button
                 className="btn-winui px-6 py-2 text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
@@ -279,7 +279,7 @@ export const SetupWizard: React.FC = () => {
                 disabled={!readyToAcknowledge || loading || !isAuthenticated}
                 autoFocus
               >
-                I Understand
+                {t('setup.iUnderstand')}
               </button>
             </div>
           </div>
