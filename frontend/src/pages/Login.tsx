@@ -3,12 +3,14 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../lib/api';
 import { Lock, User, ShieldAlert } from 'lucide-react';
+import { logsService } from '../lib/services/logs';
 
 export const Login: React.FC = () => {
   const [username, setUsername] = useState('admin');  // Pre-fill default username
   const [password, setPassword] = useState('');  // Don't pre-fill password for security
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+  const [isResetting, setIsResetting] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -49,6 +51,25 @@ export const Login: React.FC = () => {
       console.error(err);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleReset = async () => {
+    if (!window.confirm('Reset to first-run state? This will clear runtime data and accounts.')) {
+      return;
+    }
+    setIsResetting(true);
+    setError('');
+    try {
+      await logsService.replaySystem();
+      setUsername('');
+      setPassword('');
+      navigate('/setup', { replace: true });
+    } catch (err) {
+      console.error(err);
+      setError('Reset failed. Please try again.');
+    } finally {
+      setIsResetting(false);
     }
   };
 
@@ -117,16 +138,22 @@ export const Login: React.FC = () => {
               {isLoading ? 'Signing in...' : 'Sign In'}
             </button>
 
-            <div className="mt-4 pt-4" style={{ borderTop: '1px solid var(--winui-border-subtle)' }}>
+            <div className="mt-4 pt-4 space-y-3" style={{ borderTop: '1px solid var(--winui-border-subtle)' }}>
               <div className="p-3 rounded-lg" style={{ backgroundColor: 'rgba(0, 120, 212, 0.1)', border: '1px solid rgba(0, 120, 212, 0.3)' }}>
                 <p className="text-xs font-semibold mb-1" style={{ color: 'var(--winui-accent)' }}>首次使用？</p>
                 <p className="text-xs" style={{ color: 'var(--winui-text-secondary)' }}>
-                  管理员账户由首次启动时创建，请使用您设定的凭据登录。
-                </p>
-                <p className="text-xs mt-1" style={{ color: 'var(--winui-text-tertiary)' }}>
-                  如果尚未完成初次设置，请返回 Setup 页面完成注册和安全确认。
+                  管理员账户需在首启时注册。如果尚未完成，请进入 Setup 完成注册和安全确认。
                 </p>
               </div>
+
+              <button
+                type="button"
+                onClick={handleReset}
+                disabled={isResetting}
+                className="w-full inline-flex items-center justify-center px-3 py-2 text-xs font-medium rounded-lg border border-red-500 text-red-600 hover:bg-red-50 disabled:opacity-50"
+              >
+                {isResetting ? 'Resetting...' : 'Reset to First Run'}
+              </button>
             </div>
           </form>
         </div>
