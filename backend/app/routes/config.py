@@ -8,11 +8,13 @@ from app.models.setup import (
     RegisterAdminResponse,
     SetupStatus,
 )
+from app.services.reset import ResetService
 from app.services.setup import SetupService
 from app.services.state import StateManager, get_state_manager
 
 router = APIRouter(prefix="/config", tags=["config"])
 setup_service = SetupService()
+reset_service = ResetService()
 
 
 @router.get("/status", response_model=SetupStatus)
@@ -120,6 +122,12 @@ async def acknowledge_disclaimer(
 ):
     """Mark disclaimer acknowledged and finish first-run gating."""
     await setup_service.acknowledge_disclaimer(username=current_user.username)
+
+
+@router.post("/replay", status_code=status.HTTP_204_NO_CONTENT)
+async def replay_system(current_user: User = Depends(get_current_admin)):
+    """Reset app to first-run state and clear volatile data."""
+    await reset_service.replay()
 
 
 @router.get("/lists", response_model=dict[str, list[str]])
