@@ -42,6 +42,8 @@ export const Settings: React.FC = () => {
   const [isShuttingDown, setIsShuttingDown] = useState(false);
   const [showShutdownConfirm, setShowShutdownConfirm] = useState(false);
   const [showForceShutdown, setShowForceShutdown] = useState(false);
+  const [showReplayConfirm, setShowReplayConfirm] = useState(false);
+  const [isReplaying, setIsReplaying] = useState(false);
 
   const fetchSystemInfo = useCallback(async () => {
     try {
@@ -226,6 +228,20 @@ export const Settings: React.FC = () => {
       alert('保存失败，请重试');
     } finally {
       setIsSaving(false);
+    }
+  };
+
+  const handleReplay = async () => {
+    setIsReplaying(true);
+    try {
+      await logsService.replaySystem();
+      toast.success('Replay executed. App will return to first-run state.', { duration: 3000 });
+    } catch (error) {
+      console.error('Replay failed:', error);
+      toast.error('Failed to replay. Please try again.');
+    } finally {
+      setIsReplaying(false);
+      setShowReplayConfirm(false);
     }
   };
 
@@ -544,7 +560,7 @@ export const Settings: React.FC = () => {
             </dl>
           </div>
 
-          {/* Danger Zone - Server Shutdown */}
+          {/* Danger Zone - Server Shutdown & Replay */}
           <div
             className="mt-6 pt-6 px-4 py-4 rounded-lg"
             style={{
@@ -563,6 +579,45 @@ export const Settings: React.FC = () => {
                   关闭后端服务器将终止所有正在运行的操作，包括扫描和主动防御任务。
                   所有WebSocket连接将断开。
                 </p>
+                {showReplayConfirm && (
+                  <div className="mb-4 p-3 border border-indigo-300 rounded-lg bg-indigo-50">
+                    <p className="text-sm text-indigo-800 font-semibold mb-2">
+                      确定要执行 Replay/Reset 吗？
+                    </p>
+                    <p className="text-xs text-indigo-700 mb-3">
+                      此操作将清空设备、观测等易变数据，移除现有账户，并重置首启流程。词典文件保留。
+                    </p>
+                    <div className="flex gap-2">
+                      <button
+                        onClick={handleReplay}
+                        disabled={isReplaying}
+                        className="inline-flex items-center px-3 py-1.5 border border-indigo-700 rounded-md shadow-sm text-sm font-medium text-white bg-indigo-700 hover:bg-indigo-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-600 disabled:opacity-50"
+                      >
+                        {isReplaying ? '执行中...' : '确认 Replay'}
+                      </button>
+                      <button
+                        onClick={() => setShowReplayConfirm(false)}
+                        disabled={isReplaying}
+                        className="inline-flex items-center px-3 py-1.5 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                      >
+                        取消
+                      </button>
+                    </div>
+                  </div>
+                )}
+                <div className="flex items-center gap-3 mb-4">
+                  <button
+                    onClick={() => setShowReplayConfirm(true)}
+                    disabled={isReplaying}
+                    className="inline-flex items-center px-4 py-2 border border-indigo-600 rounded-md shadow-sm text-sm font-medium text-indigo-700 bg-white hover:bg-indigo-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <RefreshCw className="h-4 w-4 mr-2" />
+                    {isReplaying ? 'Replaying...' : 'Replay (Reset)'}
+                  </button>
+                  <span className="text-xs text-gray-500">
+                    重置到首次启动，清空临时数据并要求重新注册。
+                  </span>
+                </div>
                 {!showShutdownConfirm ? (
                   <div className="space-y-3">
                     <button
