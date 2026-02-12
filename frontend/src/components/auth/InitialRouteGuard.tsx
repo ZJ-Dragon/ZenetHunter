@@ -28,12 +28,10 @@ export const InitialRouteGuard: React.FC<InitialRouteGuardProps> = ({ children }
 
       try {
         const status = await configService.getStatus();
-        if (!status.is_configured) {
-          // System not configured - redirect to setup (no auth required)
+        if (!status.first_run_completed) {
           navigate('/setup', { replace: true });
           return;
         }
-        // System is configured - if not authenticated, RequireAuth will handle redirect to /login
       } catch (error) {
         // If status check fails (e.g., network error), allow normal flow
         // For MVP, if status endpoint fails, assume system is configured and proceed

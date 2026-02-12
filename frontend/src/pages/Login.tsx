@@ -121,10 +121,10 @@ export const Login: React.FC = () => {
               <div className="p-3 rounded-lg" style={{ backgroundColor: 'rgba(0, 120, 212, 0.1)', border: '1px solid rgba(0, 120, 212, 0.3)' }}>
                 <p className="text-xs font-semibold mb-1" style={{ color: 'var(--winui-accent)' }}>首次使用？</p>
                 <p className="text-xs" style={{ color: 'var(--winui-text-secondary)' }}>
-                  默认账号已预填，请输入密码 <span className="font-mono font-semibold">zenethunter</span> 登录
+                  管理员账户由首次启动时创建，请使用您设定的凭据登录。
                 </p>
                 <p className="text-xs mt-1" style={{ color: 'var(--winui-text-tertiary)' }}>
-                  MVP 版本使用默认凭据，生产环境请修改密码！
+                  如果尚未完成初次设置，请返回 Setup 页面完成注册和安全确认。
                 </p>
               </div>
             </div>

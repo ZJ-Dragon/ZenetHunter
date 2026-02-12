@@ -1,14 +1,23 @@
 import { api } from '../api';
-import { OOBEConfig, OOBESetupRequest } from '../../types/config';
+import {
+  OOBEStatus,
+  OOBERegisterRequest,
+  OOBERegisterResponse,
+  OOBEAcknowledgeRequest,
+} from '../../types/config';
 
 export const configService = {
-  getStatus: async (): Promise<OOBEConfig> => {
-    // This endpoint checks if system is already initialized
-    const response = await api.get<OOBEConfig>('/config/status');
+  getStatus: async (): Promise<OOBEStatus> => {
+    const response = await api.get<OOBEStatus>('/config/status');
     return response.data;
   },
 
-  setup: async (data: OOBESetupRequest): Promise<void> => {
-    await api.post('/config/setup', data);
+  register: async (data: OOBERegisterRequest): Promise<OOBERegisterResponse> => {
+    const response = await api.post<OOBERegisterResponse>('/config/register', data);
+    return response.data;
+  },
+
+  acknowledge: async (data: OOBEAcknowledgeRequest): Promise<void> => {
+    await api.post('/config/acknowledge', data);
   },
 };
