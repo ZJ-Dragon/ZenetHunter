@@ -1,4 +1,8 @@
 [run]
+branch = True
+parallel = True
+relative_files = True
+source = app
 omit =
     app/core/engine/scapy.py
     app/core/engine/xiaomi_router.py
@@ -9,3 +13,17 @@ omit =
     app/services/scanner/*
     app/services/fingerprint_collector.py
     app/routes/attack.py
+
+[report]
+exclude_lines =
+    pragma: no cover
+    if TYPE_CHECKING:
+    raise NotImplementedError
+    if __name__ == "__main__":
+    if False:
+
+[paths]
+source =
+    app
+    */ZenetHunter/backend/app
+    */site-packages/app
