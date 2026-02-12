@@ -80,7 +80,7 @@ export const SetupWizard: React.FC = () => {
     setLoading(true);
     try {
       const result = await configService.register(formData);
-      login(result.access_token);
+      login(result.access_token, { limitedAdmin: false });
       toast.success(t('setup.createAdmin'));
       setShowDisclaimer(true);
     } catch (error) {
@@ -116,38 +116,38 @@ export const SetupWizard: React.FC = () => {
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden" style={{ background: 'radial-gradient(circle at 20% 20%, rgba(99,102,241,0.15), transparent 35%), radial-gradient(circle at 80% 0%, rgba(59,130,246,0.18), transparent 30%), linear-gradient(135deg, #f5f7fb 0%, #edf2ff 100%)' }}>
+    <div className="min-h-screen relative overflow-hidden" style={{ backgroundColor: 'var(--winui-bg-primary)' }}>
       <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-10 left-10 w-24 h-24 bg-indigo-200 rounded-full blur-3xl opacity-40"></div>
-        <div className="absolute bottom-10 right-10 w-32 h-32 bg-blue-200 rounded-full blur-3xl opacity-30"></div>
+        <div className="absolute top-10 left-10 w-24 h-24 rounded-full blur-3xl opacity-20" style={{ backgroundColor: 'var(--winui-accent)' }}></div>
+        <div className="absolute bottom-10 right-10 w-32 h-32 rounded-full blur-3xl opacity-15" style={{ backgroundColor: 'var(--winui-text-tertiary)' }}></div>
       </div>
       <div className="relative max-w-5xl mx-auto px-4 py-12">
         <div className="text-center mb-10">
-          <p className="text-sm font-semibold text-indigo-600 tracking-wide">{t('setup.welcomeTag')}</p>
-          <h1 className="mt-2 text-3xl sm:text-4xl font-bold text-gray-900 tracking-tight">{t('setup.welcomeTitle')}</h1>
-          <p className="mt-3 text-base text-gray-600">
+          <p className="text-sm font-semibold tracking-wide" style={{ color: 'var(--winui-accent)' }}>{t('setup.welcomeTag')}</p>
+          <h1 className="mt-2 text-3xl sm:text-4xl font-bold" style={{ color: 'var(--winui-text-primary)' }}>{t('setup.welcomeTitle')}</h1>
+          <p className="mt-3 text-base" style={{ color: 'var(--winui-text-secondary)' }}>
             {t('setup.welcomeDesc')}
           </p>
         </div>
 
         <div className="grid md:grid-cols-5 gap-6 items-start">
           <div className="md:col-span-3">
-            <div className="bg-white shadow-xl rounded-2xl border border-indigo-100">
-              <div className="px-6 py-4 border-b border-indigo-50 flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-semibold">
+            <div className="card-winui shadow-xl rounded-2xl">
+              <div className="px-6 py-4 border-b flex items-center gap-3" style={{ borderColor: 'var(--winui-border-subtle)' }}>
+                <div className="h-10 w-10 rounded-full flex items-center justify-center font-semibold" style={{ backgroundColor: 'var(--winui-bg-tertiary)', color: 'var(--winui-accent)' }}>
                   1
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-indigo-700">{t('setup.accountStep')}</p>
-                  <p className="text-sm text-gray-600">{t('setup.accountSub')}</p>
+                  <p className="text-sm font-semibold" style={{ color: 'var(--winui-text-primary)' }}>{t('setup.accountStep')}</p>
+                  <p className="text-sm" style={{ color: 'var(--winui-text-secondary)' }}>{t('setup.accountSub')}</p>
                 </div>
               </div>
               <div className="p-6 space-y-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">{t('setup.username')}</label>
+                  <label className="block text-sm font-medium" style={{ color: 'var(--winui-text-primary)' }}>{t('setup.username')}</label>
                   <input
                     type="text"
-                    className="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-brand-500 focus:border-brand-500 sm:text-sm"
+                    className="mt-1 input-winui block w-full"
                     value={formData.username}
                     onChange={(e) => setFormData({ ...formData, username: e.target.value })}
                     placeholder="admin"
@@ -156,21 +156,21 @@ export const SetupWizard: React.FC = () => {
                   <p className="mt-1 text-xs text-gray-500">{t('setup.accountSub')}</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">{t('setup.password')}</label>
+                  <label className="block text-sm font-medium" style={{ color: 'var(--winui-text-primary)' }}>{t('setup.password')}</label>
                   <input
                     type="password"
-                    className="mt-1 block w-full border-gray-300 rounded-lg shadow-sm focus:ring-brand-500 focus:border-brand-500 sm:text-sm"
+                    className="mt-1 input-winui block w-full"
                     value={formData.password}
                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                     placeholder="Enter a strong password"
                     required
                     minLength={8}
                   />
-                  <p className="mt-2 text-sm text-gray-500">
+                  <p className="mt-2 text-sm" style={{ color: 'var(--winui-text-secondary)' }}>
                     {t('setup.passwordNote')}
                   </p>
                   {status?.admin_exists && (
-                    <p className="mt-2 text-sm text-red-600">
+                    <p className="mt-2 text-sm" style={{ color: '#d13438' }}>
                       {t('setup.adminExists')}
                     </p>
                   )}
@@ -194,25 +194,25 @@ export const SetupWizard: React.FC = () => {
           </div>
 
           <div className="md:col-span-2">
-            <div className="bg-white border border-gray-200 shadow-lg rounded-2xl p-6 space-y-4">
+            <div className="card-winui shadow-lg rounded-2xl p-6 space-y-4">
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-700 font-semibold">
+                <div className="h-10 w-10 rounded-full flex items-center justify-center font-semibold" style={{ backgroundColor: 'var(--winui-bg-tertiary)', color: 'var(--winui-accent)' }}>
                   2
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-blue-700">{t('setup.safetyStep')}</p>
-                  <p className="text-sm text-gray-600">{t('setup.safetySub')}</p>
+                  <p className="text-sm font-semibold" style={{ color: 'var(--winui-text-primary)' }}>{t('setup.safetyStep')}</p>
+                  <p className="text-sm" style={{ color: 'var(--winui-text-secondary)' }}>{t('setup.safetySub')}</p>
                 </div>
               </div>
-              <p className="text-sm text-gray-600">
+              <p className="text-sm" style={{ color: 'var(--winui-text-secondary)' }}>
                 {t('setup.safetyDesc')}
               </p>
-              <ul className="text-sm text-gray-600 space-y-1 list-disc list-inside">
+              <ul className="text-sm space-y-1 list-disc list-inside" style={{ color: 'var(--winui-text-secondary)' }}>
                 <li>{t('setup.safetyList1')}</li>
                 <li>{t('setup.safetyList2')}</li>
                 <li>{t('setup.safetyList3')}</li>
               </ul>
-              <div className="rounded-lg bg-indigo-50 border border-indigo-100 p-4 text-sm text-indigo-800">
+              <div className="rounded-lg p-4 text-sm" style={{ backgroundColor: 'var(--winui-bg-tertiary)', color: 'var(--winui-text-secondary)', border: '1px solid var(--winui-border-subtle)' }}>
                 {t('setup.safetyInfo')}
               </div>
             </div>
@@ -228,26 +228,27 @@ export const SetupWizard: React.FC = () => {
           aria-label="Safety and Disclaimer"
           style={{ backgroundColor: 'rgba(0,0,0,0.4)' }}
         >
-          <div className="bg-white rounded-2xl shadow-2xl max-w-3xl w-full outline-none overflow-hidden">
-            <div className="p-6 bg-gradient-to-r from-indigo-600 to-blue-500">
+          <div className="rounded-2xl shadow-2xl max-w-3xl w-full outline-none overflow-hidden" style={{ backgroundColor: 'var(--winui-surface)', color: 'var(--winui-text-primary)' }}>
+            <div className="p-6" style={{ backgroundColor: 'var(--winui-accent)' }}>
               <h2 className="text-xl font-semibold text-white">{t('setup.modalTitle')}</h2>
               <p className="text-sm text-indigo-50 mt-2">
                 {t('setup.modalLead')}
               </p>
             </div>
             <div
-              className="p-6 max-h-96 overflow-y-auto space-y-4 text-sm text-gray-700"
+              className="p-6 max-h-96 overflow-y-auto space-y-4 text-sm"
               onScroll={handleScroll}
               onWheel={handleScroll}
               ref={scrollRef}
               tabIndex={0}
+              style={{ color: 'var(--winui-text-secondary)' }}
             >
               <div className="space-y-2">
-                <p className="text-base font-semibold text-gray-900">{t('setup.modalPurpose')}</p>
+                <p className="text-base font-semibold" style={{ color: 'var(--winui-text-primary)' }}>{t('setup.modalPurpose')}</p>
                 <p>{t('setup.modalPurposeDesc')}</p>
               </div>
               <div className="space-y-2">
-                <p className="text-base font-semibold text-gray-900">{t('setup.modalResp')}</p>
+                <p className="text-base font-semibold" style={{ color: 'var(--winui-text-primary)' }}>{t('setup.modalResp')}</p>
                 <ul className="list-disc list-inside space-y-1">
                   <li>{t('setup.modalResp1')}</li>
                   <li>{t('setup.modalResp2')}</li>
@@ -255,23 +256,23 @@ export const SetupWizard: React.FC = () => {
                 </ul>
               </div>
               <div className="space-y-2">
-                <p className="text-base font-semibold text-gray-900">{t('setup.modalSafety')}</p>
+                <p className="text-base font-semibold" style={{ color: 'var(--winui-text-primary)' }}>{t('setup.modalSafety')}</p>
                 <ul className="list-disc list-inside space-y-1">
                   <li>{t('setup.modalSafety1')}</li>
                   <li>{t('setup.modalSafety2')}</li>
                   <li>{t('setup.modalSafety3')}</li>
                 </ul>
               </div>
-              <p className="text-xs text-gray-500">
+              <p className="text-xs" style={{ color: 'var(--winui-text-tertiary)' }}>
                 {t('setup.modalFooterHint')}
               </p>
             </div>
             <div className="px-6 pb-6 pt-3 flex items-center justify-between border-t border-gray-200">
-              <div className="text-sm text-gray-700">
+              <div className="text-sm" style={{ color: 'var(--winui-text-secondary)' }}>
                 <div>
                   {t('setup.timerLabel')}: {timerReady ? t('setup.timerReady') : t('setup.timerRemaining', { seconds: secondsLeft })}
                 </div>
-                <div className="text-xs text-gray-500">{t('setup.modalFooterHint')}</div>
+                <div className="text-xs" style={{ color: 'var(--winui-text-tertiary)' }}>{t('setup.modalFooterHint')}</div>
               </div>
               <button
                 className="btn-winui px-6 py-2 text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed"

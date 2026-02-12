@@ -249,5 +249,8 @@
     "searchHint": "请尝试其他搜索条件。",
     "emptyTitle": "暂无设备",
     "emptyHint": "请先运行网络扫描以发现设备。"
+  },
+  "auth": {
+    "accessDenied": "权限不足，被拒绝。"
   }
 }

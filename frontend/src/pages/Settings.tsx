@@ -16,6 +16,8 @@ import {
 import { clsx } from 'clsx';
 import toast from 'react-hot-toast';
 import { useTranslation } from 'react-i18next';
+import { useAuth } from '../contexts/AuthContext';
+import { useNavigate } from 'react-router-dom';
 
 type Theme = 'light' | 'dark' | 'system';
 type Platform = 'windows' | 'macos' | 'linux';
@@ -47,6 +49,8 @@ export const Settings: React.FC = () => {
   const [isReplaying, setIsReplaying] = useState(false);
   const [language, setLanguage] = useState(() => localStorage.getItem('locale') || 'en');
   const { t, i18n } = useTranslation();
+  const { logout } = useAuth();
+  const navigate = useNavigate();
 
   const fetchSystemInfo = useCallback(async () => {
     try {
@@ -244,6 +248,8 @@ export const Settings: React.FC = () => {
     try {
       await logsService.replaySystem();
       toast.success(t('settings.replaySuccess'), { duration: 3000 });
+      logout();
+      navigate('/setup', { replace: true });
     } catch (error) {
       console.error('Replay failed:', error);
       toast.error(t('settings.replayFailed'));

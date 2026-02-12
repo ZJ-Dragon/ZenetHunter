@@ -249,5 +249,8 @@
     "searchHint": "Try a different search term.",
     "emptyTitle": "No devices found",
     "emptyHint": "Run a network scan first to discover devices."
+  },
+  "auth": {
+    "accessDenied": "Access denied: insufficient permissions."
   }
 }

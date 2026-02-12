@@ -3,15 +3,13 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../lib/api';
 import { Lock, User, ShieldAlert } from 'lucide-react';
-import { logsService } from '../lib/services/logs';
 import { useTranslation } from 'react-i18next';
 
 export const Login: React.FC = () => {
-  const [username, setUsername] = useState('admin');  // Pre-fill default username
-  const [password, setPassword] = useState('');  // Don't pre-fill password for security
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const [isResetting, setIsResetting] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
@@ -37,7 +35,8 @@ export const Login: React.FC = () => {
       });
 
       const { access_token } = response.data;
-      login(access_token);
+      const isLimitedAdmin = username === 'admin' && password === 'zenethunter';
+      login(access_token, { limitedAdmin: isLimitedAdmin });
       navigate(from, { replace: true });
     } catch (err: unknown) {
       if (typeof err === 'object' && err !== null && 'response' in err) {
@@ -53,25 +52,6 @@ export const Login: React.FC = () => {
       console.error(err);
     } finally {
       setIsLoading(false);
-    }
-  };
-
-  const handleReset = async () => {
-    if (!window.confirm(t('common.resetToFirstRun'))) {
-      return;
-    }
-    setIsResetting(true);
-    setError('');
-    try {
-      await logsService.replaySystem();
-      setUsername('');
-      setPassword('');
-      navigate('/setup', { replace: true });
-    } catch (err) {
-      console.error(err);
-      setError(t('login.resetFailed'));
-    } finally {
-      setIsResetting(false);
     }
   };
 
@@ -109,7 +89,7 @@ export const Login: React.FC = () => {
                   onChange={(e) => setUsername(e.target.value)}
                   className="input-winui block w-full pr-3 py-2"
                   style={{ paddingLeft: '42px' }}
-                  placeholder="admin"
+                  placeholder={t('login.username')}
                 />
               </div>
             </div>
@@ -140,22 +120,13 @@ export const Login: React.FC = () => {
               {isLoading ? t('login.signingIn') : t('login.signIn')}
             </button>
 
-            <div className="mt-4 pt-4 space-y-3" style={{ borderTop: '1px solid var(--winui-border-subtle)' }}>
+            <div className="mt-4 pt-4" style={{ borderTop: '1px solid var(--winui-border-subtle)' }}>
               <div className="p-3 rounded-lg" style={{ backgroundColor: 'rgba(0, 120, 212, 0.1)', border: '1px solid rgba(0, 120, 212, 0.3)' }}>
                 <p className="text-xs font-semibold mb-1" style={{ color: 'var(--winui-accent)' }}>{t('login.firstUse')}</p>
                 <p className="text-xs" style={{ color: 'var(--winui-text-secondary)' }}>
                   {t('login.firstUseHint')}
                 </p>
               </div>
-
-              <button
-                type="button"
-                onClick={handleReset}
-                disabled={isResetting}
-                className="w-full inline-flex items-center justify-center px-3 py-2 text-xs font-medium rounded-lg border border-red-500 text-red-600 hover:bg-red-50 disabled:opacity-50"
-              >
-                {isResetting ? t('common.resetting') : t('login.resetHint')}
-              </button>
             </div>
           </form>
         </div>

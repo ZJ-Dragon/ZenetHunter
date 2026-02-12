@@ -186,6 +186,10 @@ export const AttackDashboard: React.FC = () => {
   useWebSocketEvent(WSEventType.ATTACK_STARTED, fetchDevices);
   useWebSocketEvent(WSEventType.ATTACK_STOPPED, fetchDevices);
   useWebSocketEvent(WSEventType.ATTACK_FINISHED, fetchDevices);
+  useWebSocketEvent(WSEventType.DEVICE_UPDATED, fetchDevices);
+  useWebSocketEvent(WSEventType.DEVICE_RECOGNITION_UPDATED, fetchDevices);
+  useWebSocketEvent(WSEventType.DEVICE_ADDED, fetchDevices);
+  useWebSocketEvent(WSEventType.DEVICE_STATUS_CHANGED, fetchDevices);
 
   // Get devices with running attacks (from device status)
   const devicesWithAttacks = devices.filter(d => d.attack_status === AttackStatus.RUNNING);
@@ -208,12 +212,25 @@ export const AttackDashboard: React.FC = () => {
   const filteredDevices = devices.filter(device => {
     if (!searchQuery) return true;
     const query = searchQuery.toLowerCase();
+    const names = [
+      device.display_name,
+      device.name,
+      device.alias,
+      device.model,
+      device.model_guess,
+      device.manual_profile?.manual_name,
+    ].filter(Boolean) as string[];
+    const vendors = [
+      device.display_vendor,
+      device.vendor,
+      device.vendor_guess,
+      device.manual_profile?.manual_vendor,
+    ].filter(Boolean) as string[];
     return (
-      device.name?.toLowerCase().includes(query) ||
+      names.some((n) => n.toLowerCase().includes(query)) ||
+      vendors.some((v) => v.toLowerCase().includes(query)) ||
       device.ip.toLowerCase().includes(query) ||
-      device.mac.toLowerCase().includes(query) ||
-      device.vendor?.toLowerCase().includes(query) ||
-      device.vendor_guess?.toLowerCase().includes(query)
+      device.mac.toLowerCase().includes(query)
     );
   });
 
@@ -245,10 +262,13 @@ export const AttackDashboard: React.FC = () => {
     }
   };
 
+  const getDisplayName = (device: Device) =>
+    device.display_name || device.manual_profile?.manual_name || device.name || device.alias || device.model || device.model_guess || device.ip || t('common.unknown');
+
   const handleLaunchAttack = async (device: Device) => {
     setLaunchingMacs(prev => new Set(prev).add(device.mac.toLowerCase()));
     const metadata = attackTypeMetadata[selectedAttackType];
-    const toastId = toast.loading(t('attack.launching', { type: metadata.label, target: device.name || device.ip }));
+    const toastId = toast.loading(t('attack.launching', { type: metadata.label, target: getDisplayName(device) }));
 
     try {
       await attackService.startAttack(device.mac, selectedAttackType, globalDuration, globalIntensity);
@@ -347,6 +367,8 @@ export const AttackDashboard: React.FC = () => {
           {displayAttacks.length > 0 ? (
             displayAttacks.map((attack) => {
               const device = attack.device || devices.find(d => d.mac.toLowerCase() === attack.mac.toLowerCase());
+              const displayName = device ? getDisplayName(device) : t('common.unknown');
+              const displayVendor = device?.display_vendor || device?.manual_profile?.manual_vendor || device?.vendor || device?.vendor_guess;
               const isStopping = stoppingMacs.has(attack.mac.toLowerCase());
 
               return (
@@ -370,7 +392,7 @@ export const AttackDashboard: React.FC = () => {
                       <div className="ml-4 flex-1">
                         <div className="flex items-center gap-3">
                           <span className="text-sm font-semibold" style={{ color: 'var(--winui-text-primary)' }}>
-                          {device?.name || device?.alias || device?.model || device?.model_guess || t('common.unknown')}
+                            {displayName}
                           </span>
                           <span
                             className="px-2 py-0.5 text-xs font-medium rounded"
@@ -388,8 +410,8 @@ export const AttackDashboard: React.FC = () => {
                           <span className="font-mono text-xs">{attack.mac}</span>
                         </div>
                         <div className="mt-1 flex items-center gap-4 text-xs" style={{ color: 'var(--winui-text-tertiary)' }}>
-                          {device?.vendor || device?.vendor_guess ? (
-                            <span>{device.vendor || device.vendor_guess}</span>
+                          {displayVendor ? (
+                            <span>{displayVendor}</span>
                           ) : null}
                           {attack.duration > 0 && (
                             <span className="flex items-center gap-1">
@@ -657,6 +679,8 @@ export const AttackDashboard: React.FC = () => {
                 const underAttack = isDeviceUnderAttack(device.mac);
                 const isLaunching = launchingMacs.has(device.mac.toLowerCase());
                 const isStopping = stoppingMacs.has(device.mac.toLowerCase());
+                const displayName = getDisplayName(device);
+                const displayVendor = device.display_vendor || device.manual_profile?.manual_vendor || device.vendor || device.vendor_guess || t('devices.unknownVendor');
 
                 return (
                   <div
@@ -693,7 +717,7 @@ export const AttackDashboard: React.FC = () => {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2">
                         <span className="text-sm font-medium truncate" style={{ color: 'var(--winui-text-primary)' }}>
-                          {device.name || device.alias || device.model || device.model_guess || t('common.unknown')}
+                          {displayName}
                         </span>
                         <div
                           className={clsx(
@@ -709,7 +733,7 @@ export const AttackDashboard: React.FC = () => {
                               color: '#d13438'
                             }}
                           >
-                            Under Attack
+                            {t('attack.active')}
                           </span>
                         )}
                       </div>
@@ -719,7 +743,7 @@ export const AttackDashboard: React.FC = () => {
                         <span className="font-mono text-[10px]" style={{ color: 'var(--winui-text-tertiary)' }}>{device.mac}</span>
                       </div>
                       <div className="text-xs mt-0.5" style={{ color: 'var(--winui-text-tertiary)' }}>
-                        {device.vendor || device.vendor_guess || t('devices.unknownVendor')}
+                        {displayVendor}
                       </div>
                     </div>
 
