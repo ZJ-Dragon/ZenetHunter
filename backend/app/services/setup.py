@@ -35,7 +35,6 @@ class SetupService:
     async def register_admin(self, username: str, password: str) -> str:
         """Register first admin; returns access token."""
         async with self.session_factory() as session:
-            settings_repo = AppSettingRepository(session)
             user_repo = UserAccountRepository(session)
 
             if await user_repo.has_admin():

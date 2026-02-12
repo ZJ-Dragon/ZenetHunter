@@ -107,7 +107,9 @@ async def register_admin(payload: RegisterAdminRequest):
     except ValueError as e:
         from fastapi import HTTPException
 
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)
+        ) from None
     return {"access_token": token, "token_type": "bearer"}
 
 
