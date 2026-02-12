@@ -14,6 +14,7 @@ from alembic import context
 
 # Import all models to ensure they are registered with Base.metadata
 from app.core.database import Base
+from app.models.db.app_setting import AppSettingModel  # noqa: F401
 from app.models.db.device import DeviceModel  # noqa: F401
 from app.models.db.device_fingerprint import DeviceFingerprintModel  # noqa: F401
 from app.models.db.device_manual_profile import DeviceManualProfileModel  # noqa: F401
@@ -21,6 +22,7 @@ from app.models.db.event_log import EventLogModel  # noqa: F401
 from app.models.db.manual_override import ManualOverrideModel  # noqa: F401
 from app.models.db.probe_observation import ProbeObservationModel  # noqa: F401
 from app.models.db.trust_list import TrustListModel  # noqa: F401
+from app.models.db.user_account import UserAccountModel  # noqa: F401
 
 # Alembic Config object
 config = context.config
