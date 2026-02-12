@@ -112,6 +112,8 @@ out/
 .svelte-kit/
 .docusaurus/
 .vite/
+dist/
+build/
 **/.vitepress/dist
 **/.vitepress/cache
 
@@ -220,7 +222,9 @@ nohup.out
 /.idea/compiler.xml
 
 # Temp files
-backend/=3.0.0
+# Frontend build artifacts
+frontend/dist/
+frontend/build/
 
 ############################
 # Database files (CRITICAL: Must not be committed to prevent data leakage)
