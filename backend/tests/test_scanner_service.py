@@ -14,7 +14,13 @@ async def test_start_scan_returns_immediately():
     service = ScannerService()
 
     request = ScanRequest(type="quick")
-    result = await service.start_scan(request)
+    # Avoid long-running network operations in CI
+    with patch.object(
+        service, "_run_scan_task", new=AsyncMock(return_value=None)
+    ) as mock_task:
+        result = await service.start_scan(request)
+        # Ensure the background task was scheduled
+        mock_task.assert_called_once()
 
     assert result.status.value == "running"
     assert result.id is not None
@@ -26,7 +32,7 @@ async def test_clear_device_cache():
     service = ScannerService()
 
     # Mock database operations
-    with patch("app.services.scanner.get_session_factory") as mock_factory:
+    with patch("app.services.scanner_service.get_session_factory") as mock_factory:
         mock_session = AsyncMock()
         mock_repo = MagicMock()
         mock_repo.clear_all = AsyncMock(return_value=5)
@@ -36,7 +42,9 @@ async def test_clear_device_cache():
 
         # Mock repository creation
         with patch.object(DeviceRepository, "__init__", return_value=None):
-            with patch("app.services.scanner.DeviceRepository", return_value=mock_repo):
+            with patch(
+                "app.services.scanner_service.DeviceRepository", return_value=mock_repo
+            ):
                 mock_factory.return_value = lambda: mock_session
 
                 await service._clear_device_cache()
