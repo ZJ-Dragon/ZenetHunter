@@ -7,8 +7,8 @@ import os
 import subprocess
 import sys
 import time
-from typing import ClassVar
 from ipaddress import ip_network
+from typing import ClassVar
 
 from scapy.all import (
     ARP,
