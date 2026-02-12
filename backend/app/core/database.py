@@ -165,6 +165,7 @@ async def init_db() -> None:
             EventLogModel,
             ManualOverrideModel,
             ProbeObservationModel,
+            UserAccountModel,
             TrustListModel,
         )
         from app.services.manual_profile_service import migrate_manual_labels
