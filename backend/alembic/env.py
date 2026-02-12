@@ -16,7 +16,10 @@ from alembic import context
 from app.core.database import Base
 from app.models.db.device import DeviceModel  # noqa: F401
 from app.models.db.device_fingerprint import DeviceFingerprintModel  # noqa: F401
+from app.models.db.device_manual_profile import DeviceManualProfileModel  # noqa: F401
 from app.models.db.event_log import EventLogModel  # noqa: F401
+from app.models.db.manual_override import ManualOverrideModel  # noqa: F401
+from app.models.db.probe_observation import ProbeObservationModel  # noqa: F401
 from app.models.db.trust_list import TrustListModel  # noqa: F401
 
 # Alembic Config object
