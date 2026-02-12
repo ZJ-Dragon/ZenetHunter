@@ -20,8 +20,8 @@ from __future__ import annotations
 import argparse
 import json
 import re
+from collections.abc import Iterable
 from pathlib import Path
-from typing import Iterable
 
 NON_ASCII_PATTERN = re.compile(r"[^\x00-\x7F]")
 
@@ -47,7 +47,12 @@ def find_non_english_lines(path: Path) -> list[tuple[int, str]]:
 
 def main() -> None:
     parser = argparse.ArgumentParser(description="Scan for non-English strings.")
-    parser.add_argument("--root", type=Path, required=True, help="Root directory to scan (e.g., frontend/src)")
+    parser.add_argument(
+        "--root",
+        type=Path,
+        required=True,
+        help="Root directory to scan (e.g., frontend/src)",
+    )
     parser.add_argument(
         "--exts",
         nargs="+",
@@ -55,7 +60,9 @@ def main() -> None:
         help="File extensions to include",
     )
     parser.add_argument("--output", type=Path, help="Optional path to write the report")
-    parser.add_argument("--export-json", type=Path, help="Optional path to export JSON template")
+    parser.add_argument(
+        "--export-json", type=Path, help="Optional path to export JSON template"
+    )
     args = parser.parse_args()
 
     report_lines: list[str] = []
@@ -84,7 +91,9 @@ def main() -> None:
         print(report)
 
     if args.export_json:
-        args.export_json.write_text(json.dumps(export_entries, ensure_ascii=False, indent=2), encoding="utf-8")
+        args.export_json.write_text(
+            json.dumps(export_entries, ensure_ascii=False, indent=2), encoding="utf-8"
+        )
         print(f"JSON export written to {args.export_json}")
 
 
