@@ -1,11 +1,7 @@
 from fastapi.testclient import TestClient
 
-from app.main import app
 
-client = TestClient(app)
-
-
-def test_get_topology_structure():
+def test_get_topology_structure(client: TestClient):
     # Add a device first to make topology interesting
     device_data = {
         "mac": "AA:BB:CC:DD:EE:FF",

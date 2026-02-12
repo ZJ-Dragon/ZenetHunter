@@ -4,14 +4,18 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 from enum import Enum
+from typing import TYPE_CHECKING
 
-from sqlalchemy import DateTime, String, Text
+from sqlalchemy import DateTime, ForeignKey, Integer, String, Text
 from sqlalchemy import Enum as SQLEnum
-from sqlalchemy.orm import Mapped, mapped_column
+from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
-from app.models.attack import AttackStatus
-from app.models.defender import DefenseStatus, DefenseType
+from app.models.attack import ActiveDefenseStatus
+from app.models.db.device_manual_profile import DeviceManualProfileModel
+
+if TYPE_CHECKING:
+    from app.models.db.device_fingerprint import DeviceFingerprintModel
 
 
 class DeviceTypeEnum(str, Enum):
@@ -55,17 +59,9 @@ class DeviceModel(Base):
     status: Mapped[DeviceStatusEnum] = mapped_column(
         SQLEnum(DeviceStatusEnum), default=DeviceStatusEnum.ONLINE, nullable=False
     )
-    # Attack status
-    attack_status: Mapped[AttackStatus] = mapped_column(
-        SQLEnum(AttackStatus), default=AttackStatus.IDLE, nullable=False
-    )
-    # Defense status
-    defense_status: Mapped[DefenseStatus] = mapped_column(
-        SQLEnum(DefenseStatus), default=DefenseStatus.INACTIVE, nullable=False
-    )
-    # Active defense policy
-    active_defense_policy: Mapped[DefenseType | None] = mapped_column(
-        SQLEnum(DefenseType), nullable=True
+    # Active defense operation status
+    active_defense_status: Mapped[ActiveDefenseStatus] = mapped_column(
+        SQLEnum(ActiveDefenseStatus), default=ActiveDefenseStatus.IDLE, nullable=False
     )
     # Timestamps
     first_seen: Mapped[datetime] = mapped_column(
@@ -82,3 +78,51 @@ class DeviceModel(Base):
     alias: Mapped[str | None] = mapped_column(
         String(255), nullable=True
     )  # User-friendly alias
+    # Recognition fields (denormalized from fingerprint for quick access)
+    vendor_guess: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    model_guess: Mapped[str | None] = mapped_column(String(255), nullable=True)
+    recognition_confidence: Mapped[int | None] = mapped_column(
+        Integer, nullable=True
+    )  # 0-100
+    recognition_evidence: Mapped[str | None] = mapped_column(
+        Text, nullable=True
+    )  # JSON
+    recognition_manual_override: Mapped[bool] = mapped_column(
+        default=False, nullable=False, server_default="0"
+    )  # Admin manually confirmed recognition
+    manual_profile_id: Mapped[int | None] = mapped_column(
+        Integer, ForeignKey("device_manual_profiles.id"), nullable=True, index=True
+    )
+
+    # Manual override fields (user-provided labels)
+    name_manual: Mapped[str | None] = mapped_column(
+        String(255), nullable=True
+    )  # User-provided device name
+    vendor_manual: Mapped[str | None] = mapped_column(
+        String(255), nullable=True
+    )  # User-provided vendor name
+    manual_override_at: Mapped[datetime | None] = mapped_column(
+        DateTime(timezone=True), nullable=True
+    )  # When manual override was applied
+    manual_override_by: Mapped[str | None] = mapped_column(
+        String(100), nullable=True
+    )  # Who applied the manual override
+
+    # Scanning metadata (hybrid scanner)
+    discovery_source: Mapped[str | None] = mapped_column(
+        String(50), nullable=True
+    )  # candidate-cache, dhcp, active-refresh, enrich, full-scan
+    freshness_score: Mapped[int | None] = mapped_column(
+        Integer, nullable=True
+    )  # 0-100: how fresh/reliable is this data
+
+    # Relationship to fingerprint (optional)
+    fingerprint: Mapped[DeviceFingerprintModel | None] = relationship(
+        "DeviceFingerprintModel",
+        back_populates="device",
+        uselist=False,
+        cascade="all, delete-orphan",
+    )
+    manual_profile: Mapped[DeviceManualProfileModel | None] = relationship(
+        "DeviceManualProfileModel", lazy="joined"
+    )

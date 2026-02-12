@@ -1,11 +1,7 @@
 from fastapi.testclient import TestClient
 
-from app.main import app
 
-client = TestClient(app)
-
-
-def test_config_lists(admin_headers):
+def test_config_lists(client: TestClient, admin_headers):
     mac = "11:22:33:44:55:66"
 
     # Initial state empty

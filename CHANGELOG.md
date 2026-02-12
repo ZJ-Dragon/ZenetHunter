@@ -47,13 +47,9 @@ This project **adheres to**:
 - **Backend**: FastAPI entrypoint with `/healthz`, CORS, and router scaffold (`app.main:app`).
 - **Backend Tooling**: `pyproject.toml` with PEP 621 metadata; `ruff`/`black`/`pytest` config; minimal `tests/test_healthz.py`.
 - **Frontend**: Vite + React + TypeScript scaffold (`index.html`, `vite.config.ts`, `src/main.tsx`, `src/App.tsx`), ESLint v9 Flat Config and Prettier setup, TS configs.
-- **Deploy**: Multi-stage Dockerfiles for backend & frontend; `docker-compose.yml` with healthchecks, named network & volumes; `.env.example`.
 - **CI**: Monorepo-aware GitHub Actions workflow for backend (Python) & frontend (Node), with caching and pre-commit.
 - **Repo Hygiene**: `.editorconfig`, `.gitignore`, `.dockerignore`, `.pre-commit-config.yaml`, `commitlint.config.cjs`.
 - **Governance & Docs**: `README.md` (EN), backend README (EN/zh-CN), `CONTRIBUTING.md` (EN), `SECURITY.md` / `SECURITY.zh-CN`, `CODEOWNERS`, docs index, and `mkdocs.yml`.
-
-### Docs
-- Established documentation landing page and deployment guide for local & UGREEN NAS.
 
 ---
 

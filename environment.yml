@@ -1,0 +1,119 @@
+# Conda Environment Configuration for ZenetHunter
+#
+# Create environment:
+#   conda env create -f environment.yml
+#
+# Update existing environment:
+#   conda env update -f environment.yml --prune
+#
+# Activate environment:
+#   conda activate zenethunter
+#
+# Remove environment:
+#   conda env remove -n zenethunter
+#
+# Export updated environment:
+#   conda env export > environment.yml --no-builds
+
+name: zenethunter
+
+channels:
+  - conda-forge
+  - defaults
+
+dependencies:
+  # ============================================================
+  # Python Runtime
+  # ============================================================
+  - python>=3.11,<3.13
+
+  # ============================================================
+  # Core Web Framework
+  # ============================================================
+  - fastapi>=0.104.0
+  - uvicorn>=0.24.0
+  - pydantic>=2.0
+  - python-dotenv>=1.0.0
+
+  # ============================================================
+  # Database & ORM
+  # ============================================================
+  - sqlalchemy>=2.0
+  - greenlet>=3.0.0
+  - aiosqlite>=0.19.0
+  - alembic>=1.13.0
+
+  # ============================================================
+  # Authentication & Security
+  # ============================================================
+  - pyjwt>=2.8.0
+
+  # ============================================================
+  # Network Tools (Core Feature)
+  # ============================================================
+  - scapy>=2.5.0
+
+  # ============================================================
+  # Development Tools
+  # ============================================================
+  - pytest>=7.0
+  - pytest-cov>=4.0
+  - pytest-asyncio>=0.21.0
+  - httpx>=0.24.0
+  - ruff
+  - black
+  - pre-commit
+
+  # ============================================================
+  # Optional Tools
+  # ============================================================
+  - ipython>=8.0  # Better REPL
+  - rich>=13.0  # Terminal formatting
+
+  # ============================================================
+  # Dependencies via pip (not available in conda)
+  # ============================================================
+  - pip
+  - pip:
+      # Pydantic settings (if not in conda)
+      - pydantic-settings>=2.0
+      # Python multipart (if not in conda)
+      - python-multipart>=0.0.6
+      # PostgreSQL async driver
+      - asyncpg>=0.29.0
+
+# ============================================================
+# Platform-specific notes
+# ============================================================
+#
+# macOS:
+#   - Scapy requires root/sudo for raw packet operations
+#   - Recommended: run backend with sudo for full functionality
+#
+# Linux:
+#   - Scapy requires root or CAP_NET_RAW capability
+#   - Alternative: sudo setcap cap_net_raw+ep $(which python)
+#
+# Windows:
+#   - Scapy requires Npcap or WinPcap
+#   - Download: https://npcap.com/
+#   - Run backend as Administrator
+#
+# ============================================================
+# Post-installation
+# ============================================================
+#
+# After creating the environment, install the backend package:
+#   conda activate zenethunter
+#   cd backend
+#   pip install -e .
+#
+# Verify installation:
+#   python -c "from app.main import app; print('✅ Import successful')"
+#
+# Run database migrations:
+#   alembic upgrade head
+#
+# Start the server:
+#   cd ..
+#   ./start-local.sh

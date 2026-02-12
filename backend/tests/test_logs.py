@@ -1,11 +1,7 @@
 from fastapi.testclient import TestClient
 
-from app.main import app
 
-client = TestClient(app)
-
-
-def test_logs_api():
+def test_logs_api(client: TestClient):
     # Test empty logs
     response = client.get("/api/logs")
     assert response.status_code == 200

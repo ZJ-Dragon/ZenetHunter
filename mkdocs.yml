@@ -4,7 +4,7 @@
 # Docs: https://www.mkdocs.org/user-guide/configuration/
 
 site_name: ZenetHunter Docs
-site_description: Developer documentation for ZenetHunter (architecture, APIs, deployment)
+site_description: Developer documentation for ZenetHunter (architecture, APIs, runtime guides)
 site_url:
 
 # Repository (adjust when you publish the repo)

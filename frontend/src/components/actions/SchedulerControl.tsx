@@ -32,7 +32,7 @@ export const SchedulerControl: React.FC<SchedulerControlProps> = ({ device, clas
     }
   };
 
-  if (device.type === 'router') return null;
+  // Allow scheduler on all devices (removed router restriction)
 
   return (
     <button

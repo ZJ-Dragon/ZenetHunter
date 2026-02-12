@@ -1,9 +1,6 @@
 from fastapi.testclient import TestClient
 
-from app.main import app
 from app.services.auth import create_access_token
-
-client = TestClient(app)
 
 
 def get_admin_token():
@@ -14,7 +11,7 @@ def get_guest_token():
     return create_access_token(data={"sub": "guest", "role": "guest"})
 
 
-def test_login_success():
+def test_login_success(client: TestClient):
     response = client.post(
         "/api/auth/login",
         data={"username": "admin", "password": "zenethunter"},
@@ -25,7 +22,7 @@ def test_login_success():
     assert data["token_type"] == "bearer"
 
 
-def test_login_failure():
+def test_login_failure(client: TestClient):
     response = client.post(
         "/api/auth/login",
         data={"username": "admin", "password": "wrongpassword"},
@@ -33,7 +30,7 @@ def test_login_failure():
     assert response.status_code == 401
 
 
-def test_protected_route_admin():
+def test_protected_route_admin(client: TestClient):
     token = get_admin_token()
     headers = {"Authorization": f"Bearer {token}"}
     # Try starting a scan
@@ -42,7 +39,7 @@ def test_protected_route_admin():
     assert response.status_code == 202
 
 
-def test_protected_route_guest():
+def test_protected_route_guest(client: TestClient):
     token = get_guest_token()
     headers = {"Authorization": f"Bearer {token}"}
     # Try starting a scan - should fail with 403 (guest not allowed)
@@ -51,7 +48,7 @@ def test_protected_route_guest():
     assert response.status_code == 403
 
 
-def test_protected_route_no_token():
+def test_protected_route_no_token(client: TestClient):
     # Try starting a scan without header
     response = client.post("/api/scan/start", json={"type": "quick"})
     # No token -> guest -> admin check fails -> 403

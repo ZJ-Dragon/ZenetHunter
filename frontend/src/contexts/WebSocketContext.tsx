@@ -106,11 +106,28 @@ export const useWebSocketEvent = <T = unknown>(
   handler: (data: T) => void
 ) => {
   const { lastMessage } = useWebSocket();
+  // Use ref to store the handler to avoid re-triggering effect on handler change
+  const handlerRef = useRef(handler);
+  // Track last processed message to prevent duplicates
+  const lastProcessedRef = useRef<string | null>(null);
+
+  // Keep handler ref up to date
+  useEffect(() => {
+    handlerRef.current = handler;
+  }, [handler]);
 
   useEffect(() => {
     if (lastMessage && lastMessage.event === eventType) {
-      // Assuming backend data matches T
-      handler(lastMessage.data as T);
+      // Create a unique ID for this message to prevent duplicate processing
+      const messageId = JSON.stringify(lastMessage);
+
+      // Skip if we already processed this exact message
+      if (lastProcessedRef.current === messageId) {
+        return;
+      }
+
+      lastProcessedRef.current = messageId;
+      handlerRef.current(lastMessage.data as T);
     }
-  }, [lastMessage, eventType, handler]);
+  }, [lastMessage, eventType]);
 };

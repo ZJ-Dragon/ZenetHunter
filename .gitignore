@@ -112,11 +112,10 @@ out/
 .svelte-kit/
 .docusaurus/
 .vite/
-**/.vitepress/dist
-**/.vitepress/cache
-
 dist/
 build/
+**/.vitepress/dist
+**/.vitepress/cache
 
 # dotenv files
 .env
@@ -162,6 +161,7 @@ nohup.out
 ############################
 # JetBrains IDEs (subset of Global/JetBrains.gitignore)
 ############################
+.idea/*
 .idea/**/workspace.xml
 .idea/**/tasks.xml
 .idea/**/usage.statistics.xml
@@ -189,6 +189,14 @@ nohup.out
 # SQLite sample databases
 *.sqlite
 *.sqlite3
+*.db
+*.db-wal
+*.db-shm
+*-wal
+*-shm
+/backend/data/*.db
+/backend/data/*.db-wal
+/backend/data/*.db-shm
 
 # Cache cleanup scripts (keep in repo, but ignore any generated files)
 # clean-cache.py, clean-cache.sh, clean-cache.bat are tracked
@@ -212,3 +220,28 @@ nohup.out
 /docs/secrets/branches/
 /PROJECT_SUMMARY.md
 /.idea/compiler.xml
+
+# Temp files
+# Frontend build artifacts
+frontend/dist/
+frontend/build/
+
+############################
+# Database files (CRITICAL: Must not be committed to prevent data leakage)
+############################
+# SQLite database files
+backend/data/*.db
+backend/data/*.sqlite
+backend/data/*.sqlite3
+
+# SQLite WAL mode temporary files (can contain recent data)
+# These files are created when SQLite uses Write-Ahead Logging
+backend/data/*-wal
+backend/data/*-shm
+
+# Also ignore any .db files elsewhere that might contain user data
+**/*.db-wal
+**/*.db-shm
+
+# Recognition provider cache (contains potentially sensitive lookup data)
+backend/data/cache/

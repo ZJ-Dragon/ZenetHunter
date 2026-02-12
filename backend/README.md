@@ -44,7 +44,7 @@ ruff check --fix . && ruff format . && black .
 ---
 
 ## 2) Configuration & Environment Variables
-We follow the **12‑Factor** principle: config is provided via **environment variables**. Example variables below are **placeholders**; adjust to your environment. A sample file lives at `../deploy/env/.env.example`.
+We follow the **12‑Factor** principle: config is provided via **environment variables**. Example variables below are **placeholders**; adjust to your environment. Create `backend/.env` locally if you prefer file-based values (gitignored).
 
 > Never commit secrets to the repo. Prefer real environment variables in production; `.env` is only for local dev.
 
@@ -96,7 +96,6 @@ backend/
 
 ## 5) Production Notes (pointer)
 - For production, prefer a process manager (e.g., `gunicorn -k uvicorn.workers.UvicornWorker`) and **disable** `--reload`.
-- Containerization and NAS deployment are defined in `../deploy/`. Images use multi‑stage builds and non‑root where feasible.
 
 ---
 

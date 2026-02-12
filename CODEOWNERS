@@ -20,9 +20,7 @@
 /defender/                           @ZJ-Dragon/defender @ZJ-Dragon/maintainers
 /defender/**                         @ZJ-dragon/defender @ZJ-Dragon/maintainers
 
-# ---- Deploy / CI / Ops ----
-/deploy/                             @ZJ-Dragon/ops @ZJ-Dragon/maintainers
-/deploy/**                           @ZJ-Dragon/ops @ZJ-Dragon/maintainers
+# ---- CI / Ops ----
 /.github/workflows/**                @ZJ-Dragon/ci @ZJ-Dragon/maintainers
 
 # ---- Documentation ----
@@ -39,6 +37,5 @@
 # Only root-level files (no subdirectories):
 # /*                                  @ZJ-Dragon/maintainers
 # Specific file types:
-# /deploy/**/Dockerfile               @ZJ-Dragon/ops
 # /backend/**.py                      @ZJ-Dragon/backend
 # /frontend/**.{ts,tsx,js,jsx}        @ZJ-Dragon/frontend

@@ -85,6 +85,24 @@ if _HAVE_PYDANTIC_SETTINGS:
             validation_alias="SECRET_KEY",
         )
 
+        # Active Defense Kill-Switch (Safety Control)
+        active_defense_enabled: bool = Field(
+            default=False,
+            validation_alias="ACTIVE_DEFENSE_ENABLED",
+            description=(
+                "Global kill-switch for active defense operations. "
+                "Must be explicitly enabled."
+            ),
+        )
+        active_defense_readonly: bool = Field(
+            default=False,
+            validation_alias="ACTIVE_DEFENSE_READONLY",
+            description=(
+                "Read-only mode: allows querying but "
+                "prevents execution of operations"
+            ),
+        )
+
         # External services (optional in early project phases)
         database_url: str | None = Field(default=None, validation_alias="DATABASE_URL")
 
@@ -105,6 +123,109 @@ if _HAVE_PYDANTIC_SETTINGS:
         )
         webhook_tolerance_sec: int = Field(
             default=300, validation_alias="WEBHOOK_TOLERANCE_SEC"
+        )
+
+        # Hybrid Scanning Configuration
+        scan_mode: str = Field(
+            default="hybrid",
+            validation_alias="SCAN_MODE",
+            description="Scan mode: 'hybrid' (cache-based) or 'full' (full subnet)",
+        )
+        scan_allow_full_subnet: bool = Field(
+            default=False,
+            validation_alias="SCAN_ALLOW_FULL_SUBNET",
+            description="Allow full subnet scanning (high resource usage)",
+        )
+        scan_refresh_window: int = Field(
+            default=10,
+            validation_alias="SCAN_REFRESH_WINDOW",
+            description="Candidate refresh window in seconds",
+        )
+        scan_refresh_concurrency: int = Field(
+            default=10,
+            validation_alias="SCAN_REFRESH_CONCURRENCY",
+            description="Max concurrent refresh probes",
+        )
+        scan_refresh_timeout: float = Field(
+            default=1.0,
+            validation_alias="SCAN_REFRESH_TIMEOUT",
+            description="Refresh probe timeout per device",
+        )
+
+        # Legacy/Advanced Scanning Configuration
+        scan_range: str = Field(
+            default="192.168.1.0/24",
+            validation_alias="SCAN_RANGE",
+            description="CIDR range for full subnet scanning (advanced mode only)",
+        )
+        scan_timeout_sec: int = Field(
+            default=30,
+            validation_alias="SCAN_TIMEOUT_SEC",
+            description="Full scan timeout",
+        )
+        scan_concurrency: int = Field(
+            default=10,
+            validation_alias="SCAN_CONCURRENCY",
+            description="Max concurrent probes (full scan)",
+        )
+        scan_interval_sec: int | None = Field(
+            default=None,
+            validation_alias="SCAN_INTERVAL_SEC",
+            description="Interval for periodic scans (None = manual only)",
+        )
+
+        # Feature Flags for Enrichment
+        feature_mdns: bool = Field(
+            default=True, validation_alias="FEATURE_MDNS", description="Enable mDNS"
+        )
+        feature_ssdp: bool = Field(
+            default=True, validation_alias="FEATURE_SSDP", description="Enable SSDP"
+        )
+        feature_nbns: bool = Field(
+            default=False,
+            validation_alias="FEATURE_NBNS",
+            description="Enable NBNS (Windows)",
+        )
+        feature_snmp: bool = Field(
+            default=False,
+            validation_alias="FEATURE_SNMP",
+            description="Enable SNMP (requires credentials)",
+        )
+        feature_fingerbank: bool = Field(
+            default=False,
+            validation_alias="FEATURE_FINGERBANK",
+            description="Enable Fingerbank API (external, default off)",
+        )
+        feature_active_probe: bool = Field(
+            default=True,
+            validation_alias="FEATURE_ACTIVE_PROBE",
+            description=(
+                "Enable active probing (HTTP, Telnet, SSH, Printer, IoT protocols). "
+                "Simulates normal server connections to get device info."
+            ),
+        )
+
+        # External Recognition Providers
+        feature_external_lookup: bool = Field(
+            default=False,
+            validation_alias="FEATURE_EXTERNAL_LOOKUP",
+            description=(
+                "Enable external recognition providers (MACVendors, Fingerbank). "
+                "Default: False (safe default). UI and software add soft restrictions."
+            ),
+        )
+        external_lookup_oui_only: bool = Field(
+            default=True,
+            validation_alias="EXTERNAL_LOOKUP_OUI_ONLY",
+            description=(
+                "OUI-only mode: send only OUI prefix (first 3 octets), not full MAC. "
+                "Privacy protection (default: True)"
+            ),
+        )
+        fingerbank_api_key: str | None = Field(
+            default=None,
+            validation_alias="FINGERBANK_API_KEY",
+            description="Fingerbank API key (required for Fingerbank provider)",
         )
 
         # CORS: comma‑separated list → list[str]
@@ -256,6 +377,63 @@ else:
         )
         router_password: str | None = Field(
             default_factory=lambda: os.getenv("ROUTER_PASSWORD")
+        )
+
+        # Active Scanning Configuration (fallback)
+        scan_range: str = Field(
+            default_factory=lambda: os.getenv("SCAN_RANGE", "192.168.1.0/24")
+        )
+        scan_timeout_sec: int = Field(
+            default_factory=lambda: int(os.getenv("SCAN_TIMEOUT_SEC", "30"))
+        )
+        scan_concurrency: int = Field(
+            default_factory=lambda: int(os.getenv("SCAN_CONCURRENCY", "10"))
+        )
+        scan_interval_sec: int | None = Field(
+            default_factory=lambda: (
+                int(os.getenv("SCAN_INTERVAL_SEC"))
+                if os.getenv("SCAN_INTERVAL_SEC")
+                else None
+            )
+        )
+
+        # Feature Flags for Enrichment (fallback)
+        feature_mdns: bool = Field(
+            default_factory=lambda: os.getenv("FEATURE_MDNS", "true").lower() == "true"
+        )
+        feature_ssdp: bool = Field(
+            default_factory=lambda: os.getenv("FEATURE_SSDP", "true").lower() == "true"
+        )
+        feature_nbns: bool = Field(
+            default_factory=lambda: os.getenv("FEATURE_NBNS", "false").lower() == "true"
+        )
+        feature_snmp: bool = Field(
+            default_factory=lambda: os.getenv("FEATURE_SNMP", "false").lower() == "true"
+        )
+        feature_fingerbank: bool = Field(
+            default_factory=lambda: os.getenv("FEATURE_FINGERBANK", "false").lower()
+            == "true"
+        )
+        feature_active_probe: bool = Field(
+            default_factory=lambda: os.getenv("FEATURE_ACTIVE_PROBE", "true").lower()
+            == "true"
+        )
+
+        # External Recognition Providers (fallback)
+        feature_external_lookup: bool = Field(
+            default_factory=lambda: os.getenv(
+                "FEATURE_EXTERNAL_LOOKUP", "false"
+            ).lower()
+            == "true"
+        )
+        external_lookup_oui_only: bool = Field(
+            default_factory=lambda: os.getenv(
+                "EXTERNAL_LOOKUP_OUI_ONLY", "true"
+            ).lower()
+            == "true"
+        )
+        fingerbank_api_key: str | None = Field(
+            default_factory=lambda: os.getenv("FINGERBANK_API_KEY")
         )
 
         # Integration: Webhook verification (fallback)

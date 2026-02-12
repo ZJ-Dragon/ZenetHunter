@@ -1,62 +1,30 @@
-
-
 # ZenetHunter Documentation
 
-> Home for developers and collaborators. This site links to **Getting Started**, **Architecture**, **APIs**, **AI Scheduler**, **Defender**, **Data Model**, **Errors & Exceptions**, and **Deployment** guides. All content targets **lawful use on your own network**.
+Entry point for ZenetHunter docs (active defense research platform). Use the language pairs to jump to Chinese content when available.
+
+## Root references
+- Project overview: [README.md](../README.md) / [中文](../README.zh-CN.md)
+- Security & contribution: [SECURITY.md](../SECURITY.md), [CONTRIBUTING.md](../CONTRIBUTING.md)
+- License: [LICENSE](../LICENSE)
+
+## Core modules
+- Active defense engine: [active-defense/README.md](active-defense/README.md) / [中文](active-defense/README.zh-CN.md)
+- Active probe device identification: [active-probe/ACTIVE_PROBE.md](active-probe/ACTIVE_PROBE.md) / [中文](active-probe/ACTIVE_PROBE.zh-CN.md)
+- API reference (REST + WS): [api/README.md](api/README.md) / [中文](api/README.zh-CN.md)
+
+## Guides
+- Platform setup: macOS ([guides/README-MACOS.md](guides/README-MACOS.md) / [中文](guides/README-MACOS.zh-CN.md)), Windows ([guides/README-WINDOWS.md](guides/README-WINDOWS.md) / [中文](guides/README-WINDOWS.zh-CN.md))
+- Runtime configuration: [guides/ENVIRONMENT.md](guides/ENVIRONMENT.md) / [中文](guides/ENVIRONMENT.zh-CN.md)
+- Conda environment setup (zh): [guides/CONDA_SETUP.md](guides/CONDA_SETUP.md)
+- Force-shutdown operations (zh): [guides/FORCE_SHUTDOWN_GUIDE.md](guides/FORCE_SHUTDOWN_GUIDE.md)
+
+## External services
+- Device recognition providers: [external-services/EXTERNAL_SERVICES.md](external-services/EXTERNAL_SERVICES.md) / [中文](external-services/EXTERNAL_SERVICES.zh-CN.md)
+- Privacy guardrails: [external-services/PRIVACY.md](external-services/PRIVACY.md) / [中文](external-services/PRIVACY.zh-CN.md)
+
+## Internal documents
+- Research artifacts and PDFs live in `docs/secrets/` (not indexed; access-controlled).
 
 ---
 
-## Quick Links
-
-- **Getting Started** / 入门  
-  - English: [docs/getting-started.md](./getting-started.md)  
-  - 中文： [docs/getting-start.zh-CN.md](./getting-start.zh-CN.md)
-- **Architecture** / 架构  
-  - English: [docs/architecture.md](./architecture.md)  
-  - 中文： [docs/architecture.zh-CN.md](./architecture.zh-CN.md)
-- **Module Interface Spec** / 模块接口  
-  - English: [docs/module-apis.md](./module-apis.md)  
-  - 中文： [docs/module-apis.zh-CN.md](./module-apis.zh-CN.md)
-- **AI Scheduler** / AI 调度器  
-  - English: [docs/ai-dispatcher.md](./ai-dispatcher.md)  
-  - 中文： [docs/ai-dispatcher.zh-CN.md](./ai-dispatcher.zh-CN.md)
-- **Defender Module** / 防御模块  
-  - English: [docs/defender.md](./defender.md)  
-  - 中文： [docs/defender.zh-CN.md](./defender.zh-CN.md)
-- **Data Structures & DB Model** / 数据结构与数据库模型  
-  - English: [docs/data-model.md](./data-model.md)  
-  - 中文： [docs/data-model.zh-CN.md](./data-model.zh-CN.md)
-- **Errors & Exceptions** / 错误与异常处理规范  
-  - English: [docs/errors-and-exceptions.md](./errors-and-exceptions.md)  
-  - 中文： [docs/errors-and-exceptions.zh-CN.md](./errors-and-exceptions.zh-CN.md)
-- **Deployment (Ugreen / Docker)** / 部署  
-  - English: [deploy/README.md](../deploy/README.md)
-
----
-
-## Project Map
-
-```
-.
-├─ backend/           # FastAPI app, APIs, state/config
-├─ frontend/          # Vite + React + TypeScript SPA
-├─ deploy/            # Dockerfiles, Compose, env samples
-├─ docs/              # You are here — guides & references
-└─ .github/           # CI workflows
-```
-
----
-
-## Contribution & Policies
-
-- **Contributing Guide**: [CONTRIBUTING.md](../CONTRIBUTING.md)  
-- **Security Policy**: [SECURITY.md](../SECURITY.md) · [SECURITY.zh-CN.md](../SECURITY.zh-CN.md)  
-- **Code Owners**: [CODEOWNERS](../CODEOWNERS)  
-- **License**: [MIT](../LICENSE)
-
----
-
-## Notes
-
-- Documentation structure follows a **task‑focused** approach (tutorials/how‑tos/reference/explanations).  
-- Links marked in both English and Chinese indicate parallel tracks; keep them in sync during reviews.
+**Last Updated**: 2026-11-25

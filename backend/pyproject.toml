@@ -22,6 +22,8 @@ dependencies = [
   "asyncpg>=0.29.0",  # For PostgreSQL async support
   "alembic>=1.13.0",  # For database migrations
   "scapy>=2.5.0",  # For network packet manipulation (attack/scan engine)
+  "httpx>=0.25.0",  # For external API calls (recognition providers)
+  "pyyaml>=6.0",  # For keyword dictionary loading
 ]
 
 [project.optional-dependencies]
@@ -65,7 +67,7 @@ target-version = ["py311"]
 
 [tool.pytest.ini_options]
 minversion = "6.0"
-addopts = "-q --cov=app --cov-report=xml"
+addopts = "-q"
 # Keep tests local to the backend package
 testpaths = ["tests"]
 asyncio_mode = "auto"

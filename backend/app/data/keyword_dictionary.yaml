@@ -1,0 +1,665 @@
+# Keyword dictionary for probe observations.
+# Format (see docs/active-probe/OBSERVABILITY*.md):
+# - Root fields: version, updated, rules[]
+# - Rule: id, priority, match.any_contains[] (lowercase), optional match.any_regex[],
+#         infer.vendor/product/category/os, confidence_delta (int), notes (one-line)
+version: "2.2.0"
+updated: "2025-03-01"
+rules:
+  # =========================
+  # UGREEN / UGOS
+  # =========================
+  - id: ugreen-ugos
+    priority: 100
+    match:
+      any_contains: ["ugos", "ugos pro", "nas.ugreen", "nasync", "ugreen"]
+    infer:
+      vendor: "UGREEN"
+      os: "UGOS Pro"
+      category: "NAS"
+    confidence_delta: 30
+    notes: "UGOS Pro keyword strongly suggests UGREEN NAS."
+
+  - id: ugreen-dxp-series
+    priority: 90
+    match:
+      any_contains: ["dxp4800", "dxp4800plus", "dxp6800", "dxp8800", "dxp"]
+    infer:
+      vendor: "UGREEN"
+      category: "NAS"
+    confidence_delta: 18
+    notes: "UGREEN DXP/NASync series hint."
+
+  # =========================
+  # Huawei (HUAWEI) ecosystem
+  # =========================
+  - id: huawei-harmonyos
+    priority: 100
+    match:
+      any_contains: ["harmonyos", "hongmeng", "鸿蒙", "华为鸿蒙", "hmos"]
+    infer:
+      vendor: "HUAWEI"
+      os: "HarmonyOS"
+      category: "Mobile/IoT"
+    confidence_delta: 28
+    notes: "HarmonyOS is Huawei's operating system."
+
+  - id: huawei-emui
+    priority: 95
+    match:
+      any_contains: ["emui", "emui 13", "emui13"]
+    infer:
+      vendor: "HUAWEI"
+      os: "EMUI"
+      category: "Mobile/Tablet"
+    confidence_delta: 22
+    notes: "EMUI is Huawei's smartphone system branding."
+
+  - id: huawei-ai-life
+    priority: 85
+    match:
+      any_contains: ["huawei ai life", "ai life", "ailife"]
+    infer:
+      vendor: "HUAWEI"
+      category: "Smart Home"
+      product: "AI Life"
+    confidence_delta: 12
+    notes: "AI Life is Huawei's smart device management app."
+
+  - id: huawei-hilink-weak
+    priority: 30
+    match:
+      any_contains: ["hilink", "huawei hilink"]
+    infer:
+      vendor: "HUAWEI (weak hint)"
+      category: "Smart Home (possible)"
+    confidence_delta: 6
+    notes: "HiLink-related tokens may indicate Huawei ecosystem; can be noisy."
+
+  - id: weak-huawei-hostname-prefix
+    priority: 10
+    match:
+      any_regex: ["\\bhuawei[-_ ]?[a-z0-9]{2,}\\b"]
+    infer:
+      vendor: "HUAWEI (weak hint)"
+      category: "Device hostname (possible)"
+    confidence_delta: 3
+    notes: "Weak heuristic: hostname contains 'huawei-*' patterns; false positives possible."
+
+  # =========================
+  # HONOR ecosystem
+  # =========================
+  - id: honor-magicos
+    priority: 98
+    match:
+      any_contains: ["magicos", "magic os", "magicui", "magic ui"]
+    infer:
+      vendor: "HONOR"
+      os: "MagicOS"
+      category: "Mobile/Tablet"
+    confidence_delta: 24
+    notes: "MagicOS is HONOR's operating system branding."
+
+  - id: honor-connect-suite
+    priority: 70
+    match:
+      any_contains: ["honor connect", "super workbench", "honor super workbench"]
+    infer:
+      vendor: "HONOR"
+      category: "Cross-device"
+      product: "HONOR Connect/Suite"
+    confidence_delta: 10
+    notes: "HONOR cross-device collaboration keywords."
+
+  - id: weak-honor-hostname-prefix
+    priority: 10
+    match:
+      any_regex: ["\\bhonor[-_ ]?[a-z0-9]{2,}\\b"]
+    infer:
+      vendor: "HONOR (weak hint)"
+      category: "Device hostname (possible)"
+    confidence_delta: 3
+    notes: "Weak heuristic: hostname contains 'honor-*' patterns; false positives possible."
+
+  # =========================
+  # OPPO ecosystem
+  # =========================
+  - id: oppo-coloros
+    priority: 98
+    match:
+      any_contains: ["coloros", "color os", "coloros 15", "coloros15", "coloros 16", "coloros16"]
+    infer:
+      vendor: "OPPO"
+      os: "ColorOS"
+      category: "Mobile/Tablet"
+    confidence_delta: 24
+    notes: "ColorOS is OPPO's operating system branding."
+
+  - id: oppo-breeno
+    priority: 80
+    match:
+      any_contains: ["breeno", "oppo breeno"]
+    infer:
+      vendor: "OPPO"
+      category: "Assistant/AI"
+      product: "Breeno"
+    confidence_delta: 10
+    notes: "Breeno is OPPO's assistant branding."
+
+  - id: oppo-heytap
+    priority: 75
+    match:
+      any_contains: ["heytap", "heytap cloud"]
+    infer:
+      vendor: "OPPO ecosystem"
+      category: "Cloud/Account"
+      product: "HeyTap"
+    confidence_delta: 10
+    notes: "HeyTap keywords relate to OPPO/realme ecosystem services."
+
+  - id: weak-oppo-hostname-prefix
+    priority: 10
+    match:
+      any_regex: ["\\boppo[-_ ]?[a-z0-9]{2,}\\b"]
+    infer:
+      vendor: "OPPO (weak hint)"
+      category: "Device hostname (possible)"
+    confidence_delta: 3
+    notes: "Weak heuristic: hostname contains 'oppo-*' patterns; false positives possible."
+
+  # =========================
+  # OnePlus ecosystem
+  # =========================
+  - id: oneplus-oxygenos
+    priority: 98
+    match:
+      any_contains: ["oxygenos", "oxygen os", "oxygenos 15", "oxygenos15", "oxygenos 16", "oxygenos16"]
+    infer:
+      vendor: "OnePlus"
+      os: "OxygenOS"
+      category: "Mobile/Tablet"
+    confidence_delta: 24
+    notes: "OxygenOS is OnePlus's operating system branding."
+
+  - id: oneplus-oplus-connect
+    priority: 75
+    match:
+      any_contains: ["o+ connect", "oplus connect", "o plus connect"]
+    infer:
+      vendor: "OnePlus/OPPO/realme ecosystem"
+      category: "Cross-device"
+      product: "O+ Connect"
+    confidence_delta: 10
+    notes: "O+ Connect is official cross-device collaboration app."
+
+  - id: weak-oneplus-hostname-prefix
+    priority: 10
+    match:
+      any_regex: ["\\boneplus[-_ ]?[a-z0-9]{2,}\\b"]
+    infer:
+      vendor: "OnePlus (weak hint)"
+      category: "Device hostname (possible)"
+    confidence_delta: 3
+    notes: "Weak heuristic: hostname contains 'oneplus-*' patterns; false positives possible."
+
+  # =========================
+  # vivo ecosystem
+  # =========================
+  - id: vivo-originos
+    priority: 95
+    match:
+      any_contains: ["originos", "origin os", "originos 6", "originos6"]
+    infer:
+      vendor: "vivo"
+      os: "OriginOS"
+      category: "Mobile/Tablet"
+    confidence_delta: 22
+    notes: "OriginOS is vivo's OS branding."
+
+  - id: vivo-funtouch
+    priority: 80
+    match:
+      any_contains: ["funtouch", "funtouch os", "funtouchos"]
+    infer:
+      vendor: "vivo"
+      os: "Funtouch OS"
+      category: "Mobile/Tablet"
+    confidence_delta: 16
+    notes: "Funtouch OS is vivo's global system branding."
+
+  - id: vivo-iqoo
+    priority: 70
+    match:
+      any_contains: ["iqoo", "i-qoo"]
+    infer:
+      vendor: "iQOO (vivo)"
+      category: "Mobile"
+    confidence_delta: 12
+    notes: "iQOO is vivo's sub-brand; often appears in device identifiers."
+
+  - id: weak-vivo-hostname-prefix
+    priority: 10
+    match:
+      any_regex: ["\\bvivo[-_ ]?[a-z0-9]{2,}\\b"]
+    infer:
+      vendor: "vivo (weak hint)"
+      category: "Device hostname (possible)"
+    confidence_delta: 3
+    notes: "Weak heuristic: hostname contains 'vivo-*' patterns; false positives possible."
+
+  # =========================
+  # Xiaomi / Mi Ecosystem
+  # =========================
+  - id: xiaomi-hyperos
+    priority: 100
+    match:
+      any_contains: ["hyperos", "xiaomi hyperos", "pengpai", "澎湃os"]
+    infer:
+      vendor: "Xiaomi"
+      os: "HyperOS"
+      category: "Mobile/IoT"
+    confidence_delta: 28
+    notes: "HyperOS suggests Xiaomi ecosystem."
+
+  - id: xiaomi-miio-mdns
+    priority: 95
+    match:
+      any_contains: ["_miio._udp", "miio"]
+    infer:
+      vendor: "Xiaomi"
+      category: "Smart Home (Mi Ecosystem)"
+      product: "Mi IO device"
+    confidence_delta: 24
+    notes: "Mi ecosystem devices may advertise _miio._udp via mDNS."
+
+  - id: xiaomi-mijia
+    priority: 80
+    match:
+      any_contains: ["mijia", "米家", "mihome", "mi home"]
+    infer:
+      vendor: "Xiaomi"
+      category: "Smart Home (Mi Ecosystem)"
+    confidence_delta: 12
+    notes: "MiJia / Mi Home ecosystem keyword."
+
+  - id: roborock-model
+    priority: 85
+    match:
+      any_contains: ["roborock.", "roborock"]
+    infer:
+      vendor: "Roborock (Xiaomi ecosystem)"
+      category: "Robot Vacuum"
+    confidence_delta: 18
+    notes: "Roborock model strings often appear in discovery outputs."
+
+  - id: weak-mi-dot-pattern
+    priority: 10
+    match:
+      any_regex: ["\\bmi\\.[a-z0-9_-]+\\.[a-z0-9_-]+\\b"]
+    infer:
+      vendor: "Xiaomi (weak hint)"
+      category: "Smart Home (possible)"
+    confidence_delta: 4
+    notes: "Weak heuristic: 'mi.xxx.xxx' may indicate Xiaomi, can be false positive."
+
+  # =========================
+  # Lenovo ecosystem
+  # =========================
+  - id: lenovo-thinkpad
+    priority: 70
+    match:
+      any_contains: ["thinkpad", "thinkpad x1", "thinkpad t", "thinkpad p", "thinkpad x"]
+    infer:
+      vendor: "Lenovo"
+      category: "PC/Laptop"
+      product: "ThinkPad"
+    confidence_delta: 12
+    notes: "ThinkPad is a Lenovo laptop line."
+
+  - id: lenovo-yoga
+    priority: 65
+    match:
+      any_contains: ["lenovo yoga", "yoga 9", "yoga", "yoga slim"]
+    infer:
+      vendor: "Lenovo"
+      category: "PC/Laptop"
+      product: "Yoga"
+    confidence_delta: 10
+    notes: "Yoga is a Lenovo laptop line."
+
+  - id: lenovo-legion
+    priority: 65
+    match:
+      any_contains: ["lenovo legion", "legion"]
+    infer:
+      vendor: "Lenovo"
+      category: "PC/Laptop"
+      product: "Legion"
+    confidence_delta: 10
+    notes: "Legion is Lenovo's gaming line."
+
+  - id: lenovo-ideapad-weak
+    priority: 30
+    match:
+      any_contains: ["ideapad", "idea pad"]
+    infer:
+      vendor: "Lenovo (weak hint)"
+      category: "PC/Laptop"
+      product: "IdeaPad"
+    confidence_delta: 6
+    notes: "IdeaPad tokens indicate Lenovo consumer laptops; can be noisy."
+
+  - id: weak-lenovo-hostname-prefix
+    priority: 10
+    match:
+      any_regex: ["\\blenovo[-_ ]?[a-z0-9]{2,}\\b"]
+    infer:
+      vendor: "Lenovo (weak hint)"
+      category: "Device hostname (possible)"
+    confidence_delta: 3
+    notes: "Weak heuristic: hostname contains 'lenovo-*' patterns; false positives possible."
+
+  # =========================
+  # ASUS ecosystem
+  # =========================
+  - id: asus-asuswrt
+    priority: 85
+    match:
+      any_contains: ["asuswrt", "asus wrt"]
+    infer:
+      vendor: "ASUS"
+      category: "Router/AP"
+      os: "ASUSWRT"
+    confidence_delta: 18
+    notes: "ASUSWRT keywords indicate ASUS router firmware."
+
+  - id: asus-aimesh
+    priority: 80
+    match:
+      any_contains: ["aimesh", "ai mesh"]
+    infer:
+      vendor: "ASUS"
+      category: "Router/AP"
+      product: "AiMesh"
+    confidence_delta: 14
+    notes: "AiMesh indicates ASUS mesh networking ecosystem."
+
+  - id: asus-aicloud
+    priority: 60
+    match:
+      any_contains: ["aicloud", "ai cloud"]
+    infer:
+      vendor: "ASUS"
+      category: "Router/AP"
+      product: "AiCloud"
+    confidence_delta: 10
+    notes: "AiCloud is an ASUS router feature branding."
+
+  - id: asus-zenwifi
+    priority: 60
+    match:
+      any_contains: ["zenwifi", "zen wi-fi", "zen wi fi"]
+    infer:
+      vendor: "ASUS"
+      category: "Router/AP"
+      product: "ZenWiFi"
+    confidence_delta: 10
+    notes: "ZenWiFi indicates ASUS mesh router products."
+
+  - id: asus-rog-tuf-weak
+    priority: 25
+    match:
+      any_contains: ["rog", "tuf", "tuf gaming"]
+    infer:
+      vendor: "ASUS (weak hint)"
+      category: "PC/Device (possible)"
+    confidence_delta: 4
+    notes: "ROG/TUF tokens may appear in hostnames; weak vendor hint."
+
+  - id: weak-asus-hostname-prefix
+    priority: 10
+    match:
+      any_regex: ["\\basus[-_ ]?[a-z0-9]{2,}\\b"]
+    infer:
+      vendor: "ASUS (weak hint)"
+      category: "Device hostname (possible)"
+    confidence_delta: 3
+    notes: "Weak heuristic: hostname contains 'asus-*' patterns; false positives possible."
+
+  # =========================
+  # Apple / Bonjour ecosystem
+  # =========================
+  - id: apple-airplay
+    priority: 90
+    match:
+      any_contains: ["_airplay._tcp"]
+    infer:
+      vendor: "Apple (or AirPlay-compatible)"
+      category: "Media/Streaming"
+      product: "AirPlay"
+    confidence_delta: 18
+    notes: "AirPlay devices advertise _airplay._tcp via mDNS."
+
+  - id: apple-raop
+    priority: 85
+    match:
+      any_contains: ["_raop._tcp", "raop"]
+    infer:
+      vendor: "Apple (or RAOP-compatible)"
+      category: "Audio/Streaming"
+      product: "RAOP (AirTunes/AirPlay audio)"
+    confidence_delta: 16
+    notes: "RAOP (_raop._tcp) is used for AirPlay audio discovery."
+
+  - id: apple-homekit-hap
+    priority: 80
+    match:
+      any_contains: ["_hap._tcp", "homekit", "hap"]
+    infer:
+      vendor: "Apple ecosystem (HomeKit)"
+      category: "Smart Home"
+      product: "HomeKit Accessory"
+    confidence_delta: 14
+    notes: "HomeKit accessories often advertise _hap._tcp via mDNS."
+
+  - id: apple-airprint
+    priority: 75
+    match:
+      any_contains: ["_ipp._tcp", "_ipps._tcp", "_printer._tcp", "airprint"]
+    infer:
+      vendor: "Printer (AirPrint/Bonjour)"
+      category: "Printer"
+      product: "IPP/AirPrint"
+    confidence_delta: 12
+    notes: "AirPrint/IPP printers commonly advertise via mDNS."
+
+  # =========================
+  # Google Cast / Chromecast
+  # =========================
+  - id: google-cast-mdns
+    priority: 85
+    match:
+      any_contains: ["_googlecast._tcp", "chromecast", "google cast"]
+    infer:
+      vendor: "Google (or Cast-compatible)"
+      category: "Media/Streaming"
+      product: "Google Cast"
+    confidence_delta: 18
+    notes: "Google Cast uses _googlecast._tcp for mDNS discovery."
+
+  # =========================
+  # Router / firmware hints
+  # =========================
+  - id: openwrt-luci
+    priority: 70
+    match:
+      any_contains: ["openwrt", "luci", "lede"]
+    infer:
+      vendor: "OpenWrt-based"
+      category: "Router/AP"
+      os: "OpenWrt"
+    confidence_delta: 14
+    notes: "OpenWrt/LuCI keyword indicates router firmware."
+
+  - id: openwrt-miniupnpd
+    priority: 60
+    match:
+      any_contains: ["miniupnpd"]
+    infer:
+      vendor: "Router/AP (UPnP IGD)"
+      category: "Router/AP"
+    confidence_delta: 8
+    notes: "miniupnpd is common on OpenWrt/routers providing UPnP."
+
+  - id: mikrotik-routeros
+    priority: 70
+    match:
+      any_contains: ["mikrotik", "routeros"]
+    infer:
+      vendor: "MikroTik"
+      category: "Router/Switch"
+      os: "RouterOS"
+    confidence_delta: 16
+    notes: "MikroTik RouterOS keyword."
+
+  - id: pfsense-opnsense
+    priority: 65
+    match:
+      any_contains: ["pfsense", "opnsense"]
+    infer:
+      vendor: "Firewall appliance"
+      category: "Firewall/Router"
+    confidence_delta: 12
+    notes: "pfSense/OPNsense keyword indicates firewall/router."
+
+  # =========================
+  # NAS families
+  # =========================
+  - id: synology-dsm
+    priority: 80
+    match:
+      any_contains: ["synology", "diskstation", "dsm"]
+    infer:
+      vendor: "Synology"
+      category: "NAS"
+      os: "DSM"
+    confidence_delta: 18
+    notes: "Synology DSM keyword."
+
+  - id: truenas
+    priority: 80
+    match:
+      any_contains: ["truenas", "freenas", "truenas.local"]
+    infer:
+      vendor: "TrueNAS"
+      category: "NAS"
+      os: "TrueNAS"
+    confidence_delta: 18
+    notes: "TrueNAS keyword / common mDNS hostname."
+
+  - id: qnap-qts
+    priority: 75
+    match:
+      any_contains: ["qnap", "qts", "quts"]
+    infer:
+      vendor: "QNAP"
+      category: "NAS"
+      os: "QTS/QuTS"
+    confidence_delta: 16
+    notes: "QNAP QTS/QuTS keyword."
+
+  - id: unraid
+    priority: 70
+    match:
+      any_contains: ["unraid"]
+    infer:
+      vendor: "Unraid"
+      category: "NAS"
+      os: "Unraid"
+    confidence_delta: 14
+    notes: "Unraid keyword."
+
+  - id: proxmox
+    priority: 65
+    match:
+      any_contains: ["proxmox", "pve"]
+    infer:
+      vendor: "Proxmox"
+      category: "Server/Virtualization"
+      os: "Proxmox VE"
+    confidence_delta: 12
+    notes: "Proxmox virtualization platform keyword."
+
+  # =========================
+  # IoT platforms / firmware
+  # =========================
+  - id: home-assistant
+    priority: 60
+    match:
+      any_contains: ["home assistant", "homeassistant", "hass", "supervisor"]
+    infer:
+      vendor: "Home Assistant ecosystem"
+      category: "Smart Home"
+    confidence_delta: 10
+    notes: "Home Assistant keyword."
+
+  - id: esphome
+    priority: 55
+    match:
+      any_contains: ["esphome"]
+    infer:
+      vendor: "ESPHome ecosystem"
+      category: "IoT firmware"
+    confidence_delta: 8
+    notes: "ESPHome keyword."
+
+  - id: tasmota
+    priority: 55
+    match:
+      any_contains: ["tasmota"]
+    infer:
+      vendor: "Tasmota ecosystem"
+      category: "IoT firmware"
+    confidence_delta: 8
+    notes: "Tasmota keyword."
+
+  - id: shelly
+    priority: 55
+    match:
+      any_contains: ["shelly"]
+    infer:
+      vendor: "Shelly"
+      category: "Smart Home"
+    confidence_delta: 10
+    notes: "Shelly devices keyword."
+
+  - id: tuya
+    priority: 50
+    match:
+      any_contains: ["tuya", "smartlife", "smart life"]
+    infer:
+      vendor: "Tuya ecosystem"
+      category: "Smart Home"
+    confidence_delta: 8
+    notes: "Tuya/Smart Life ecosystem keyword."
+
+  # =========================
+  # Generic protocol hints
+  # =========================
+  - id: ssdp-upnp
+    priority: 20
+    match:
+      any_contains: ["ssdp", "upnp", "m-search"]
+    infer:
+      category: "UPnP/SSDP device (generic)"
+    confidence_delta: 3
+    notes: "Generic UPnP/SSDP discovery tokens (low specificity)."
+
+  - id: bonjour-mdns
+    priority: 20
+    match:
+      any_contains: ["bonjour", "mdns", "dns-sd"]
+    infer:
+      category: "mDNS/Bonjour device (generic)"
+    confidence_delta: 3
+    notes: "Generic mDNS/Bonjour tokens (low specificity)."

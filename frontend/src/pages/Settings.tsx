@@ -1,7 +1,20 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { logsService } from '../lib/services/logs';
-import { Settings as SettingsIcon, Moon, Sun, Monitor, Server, Save, RefreshCw } from 'lucide-react';
+import { logsService, ScanConfig } from '../lib/services/logs';
+import {
+  Settings as SettingsIcon,
+  Moon,
+  Sun,
+  Monitor,
+  Server,
+  Save,
+  RefreshCw,
+  Network,
+  Power,
+  AlertTriangle,
+  Zap,
+} from 'lucide-react';
 import { clsx } from 'clsx';
+import toast from 'react-hot-toast';
 
 type Theme = 'light' | 'dark' | 'system';
 type Platform = 'windows' | 'macos' | 'linux';
@@ -23,8 +36,12 @@ export const Settings: React.FC = () => {
       network_scan_available?: boolean;
     };
   } | null>(null);
+  const [scanConfig, setScanConfig] = useState<ScanConfig | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [isShuttingDown, setIsShuttingDown] = useState(false);
+  const [showShutdownConfirm, setShowShutdownConfirm] = useState(false);
+  const [showForceShutdown, setShowForceShutdown] = useState(false);
 
   const fetchSystemInfo = useCallback(async () => {
     try {
@@ -49,6 +66,15 @@ export const Settings: React.FC = () => {
     }
   }, []);
 
+  const fetchScanConfig = useCallback(async () => {
+    try {
+      const config = await logsService.getScanConfig();
+      setScanConfig(config);
+    } catch (error) {
+      console.error('Failed to fetch scan config:', error);
+    }
+  }, []);
+
   useEffect(() => {
     // Load theme from localStorage
     const savedTheme = localStorage.getItem('theme') as Theme;
@@ -66,9 +92,10 @@ export const Settings: React.FC = () => {
       setPlatform(savedPlatform);
     }
 
-    // Fetch system info
+    // Fetch system info and scan config
     fetchSystemInfo();
-  }, [fetchSystemInfo]);
+    fetchScanConfig();
+  }, [fetchSystemInfo, fetchScanConfig]);
 
   // Listen for system theme changes when using system theme
   useEffect(() => {
@@ -118,6 +145,68 @@ export const Settings: React.FC = () => {
   const handlePlatformChange = (newPlatform: Platform) => {
     setPlatform(newPlatform);
     localStorage.setItem('platform', newPlatform);
+  };
+
+  const handleShutdown = async () => {
+    setIsShuttingDown(true);
+    try {
+      toast.loading('正在优雅关闭服务器...', { duration: 2000 });
+
+      await logsService.shutdownServer();
+
+      toast.success('服务器已关闭');
+
+      // Wait a moment then show message
+      setTimeout(() => {
+        toast.error('与服务器的连接已断开', { duration: 5000 });
+      }, 1000);
+    } catch (error) {
+      console.error('Shutdown failed:', error);
+      toast.error('优雅关闭失败，请尝试强制关闭');
+      setIsShuttingDown(false);
+      setShowShutdownConfirm(false);
+      // Show force shutdown option
+      setShowForceShutdown(true);
+    }
+  };
+
+  const handleForceShutdown = async () => {
+    setIsShuttingDown(true);
+    try {
+      toast.error('正在强制关闭服务器...', { duration: 1000 });
+
+      // Call force shutdown API
+      await logsService.forceShutdownServer();
+
+      // Server will be killed immediately, so we might not get response
+      toast.success('服务器已强制关闭', { duration: 2000 });
+
+      // Wait briefly then close the page
+      setTimeout(() => {
+        toast.error('连接已断开，页面将在2秒后关闭', { duration: 2000 });
+      }, 500);
+
+      // Close the page after 2.5 seconds
+      setTimeout(() => {
+        window.close();
+        // If window.close() doesn't work (browser security), redirect to a blank page
+        setTimeout(() => {
+          window.location.href = 'about:blank';
+        }, 500);
+      }, 2500);
+    } catch (err) {
+      // Server might be killed before sending response, which is expected
+      console.log('Force shutdown executed (connection lost is expected)', err);
+      toast.error('服务器已强制终止，页面即将关闭', { duration: 2000 });
+
+      // Close page even if API call failed (server is likely dead)
+      setTimeout(() => {
+        window.close();
+        setTimeout(() => {
+          window.location.href = 'about:blank';
+        }, 500);
+      }, 2000);
+    }
   };
 
   const handleSave = async () => {
@@ -241,6 +330,112 @@ export const Settings: React.FC = () => {
         </div>
       </div>
 
+      {/* Scan Configuration */}
+      {scanConfig && (
+        <div className="card-winui p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold flex items-center gap-2" style={{ color: 'var(--winui-text-primary)' }}>
+              <Network className="h-5 w-5" style={{ color: 'var(--winui-accent)' }} />
+              扫描配置
+            </h2>
+            <button
+              onClick={fetchScanConfig}
+              className="btn-winui-secondary inline-flex items-center"
+            >
+              <RefreshCw className={clsx("h-4 w-4 mr-2", isLoading && "animate-spin")} />
+              刷新
+            </button>
+          </div>
+          <div className="space-y-4">
+            <div className="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-2">
+              <div>
+                <dt className="text-sm font-medium mb-1" style={{ color: 'var(--winui-text-secondary)' }}>扫描网段</dt>
+                <dd className="text-sm font-mono" style={{ color: 'var(--winui-text-primary)' }}>
+                  {scanConfig.scan_range}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-sm font-medium mb-1" style={{ color: 'var(--winui-text-secondary)' }}>超时时间</dt>
+                <dd className="text-sm" style={{ color: 'var(--winui-text-primary)' }}>
+                  {scanConfig.scan_timeout_sec} 秒
+                </dd>
+              </div>
+              <div>
+                <dt className="text-sm font-medium mb-1" style={{ color: 'var(--winui-text-secondary)' }}>并发数</dt>
+                <dd className="text-sm" style={{ color: 'var(--winui-text-primary)' }}>
+                  {scanConfig.scan_concurrency}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-sm font-medium mb-1" style={{ color: 'var(--winui-text-secondary)' }}>扫描间隔</dt>
+                <dd className="text-sm" style={{ color: 'var(--winui-text-primary)' }}>
+                  {scanConfig.scan_interval_sec ? `${scanConfig.scan_interval_sec} 秒` : '手动扫描'}
+                </dd>
+              </div>
+            </div>
+
+            <div className="mt-6 pt-6" style={{ borderTop: '1px solid var(--winui-border-subtle)' }}>
+              <h4 className="text-sm font-semibold mb-4" style={{ color: 'var(--winui-text-primary)' }}>功能开关</h4>
+              <dl className="grid grid-cols-1 gap-x-4 gap-y-3 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="flex items-center justify-between">
+                  <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>mDNS</dt>
+                  <dd className="text-sm">
+                    {scanConfig.features.mdns ? (
+                      <span className="text-green-600">✓ 启用</span>
+                    ) : (
+                      <span className="text-gray-500">✗ 禁用</span>
+                    )}
+                  </dd>
+                </div>
+                <div className="flex items-center justify-between">
+                  <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>SSDP</dt>
+                  <dd className="text-sm">
+                    {scanConfig.features.ssdp ? (
+                      <span className="text-green-600">✓ 启用</span>
+                    ) : (
+                      <span className="text-gray-500">✗ 禁用</span>
+                    )}
+                  </dd>
+                </div>
+                <div className="flex items-center justify-between">
+                  <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>NBNS</dt>
+                  <dd className="text-sm">
+                    {scanConfig.features.nbns ? (
+                      <span className="text-green-600">✓ 启用</span>
+                    ) : (
+                      <span className="text-gray-500">✗ 禁用</span>
+                    )}
+                  </dd>
+                </div>
+                <div className="flex items-center justify-between">
+                  <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>SNMP</dt>
+                  <dd className="text-sm">
+                    {scanConfig.features.snmp ? (
+                      <span className="text-green-600">✓ 启用</span>
+                    ) : (
+                      <span className="text-gray-500">✗ 禁用</span>
+                    )}
+                  </dd>
+                </div>
+                <div className="flex items-center justify-between">
+                  <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>Fingerbank</dt>
+                  <dd className="text-sm">
+                    {scanConfig.features.fingerbank ? (
+                      <span className="text-green-600">✓ 启用</span>
+                    ) : (
+                      <span className="text-gray-500">✗ 禁用</span>
+                    )}
+                  </dd>
+                </div>
+              </dl>
+              <p className="mt-4 text-xs" style={{ color: 'var(--winui-text-tertiary)' }}>
+                配置通过环境变量设置，修改配置需要重启后端服务
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* System Information */}
       {systemInfo && (
         <div className="card-winui p-6">
@@ -347,6 +542,93 @@ export const Settings: React.FC = () => {
                 </dd>
               </div>
             </dl>
+          </div>
+
+          {/* Danger Zone - Server Shutdown */}
+          <div
+            className="mt-6 pt-6 px-4 py-4 rounded-lg"
+            style={{
+              borderTop: '1px solid var(--winui-border-subtle)',
+              backgroundColor: 'rgba(220, 38, 38, 0.05)',
+              border: '1px solid rgba(220, 38, 38, 0.2)',
+            }}
+          >
+            <div className="flex items-start">
+              <AlertTriangle className="h-5 w-5 text-red-600 mr-3 mt-0.5" />
+              <div className="flex-1">
+                <h4 className="text-sm font-semibold text-red-600 mb-2">
+                  危险区域
+                </h4>
+                <p className="text-sm text-gray-600 mb-4">
+                  关闭后端服务器将终止所有正在运行的操作，包括扫描和主动防御任务。
+                  所有WebSocket连接将断开。
+                </p>
+                {!showShutdownConfirm ? (
+                  <div className="space-y-3">
+                    <button
+                      onClick={() => setShowShutdownConfirm(true)}
+                      disabled={isShuttingDown}
+                      className="inline-flex items-center px-4 py-2 border border-red-600 rounded-md shadow-sm text-sm font-medium text-red-600 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      <Power className="h-4 w-4 mr-2" />
+                      优雅关闭服务器
+                    </button>
+
+                    {showForceShutdown && (
+                      <div className="pt-3 border-t border-red-300">
+                        <p className="text-xs text-red-700 mb-2">
+                          ⚠️ 优雅关闭失败？使用强制关闭（会立即终止所有进程）
+                        </p>
+                        <button
+                          onClick={handleForceShutdown}
+                          disabled={isShuttingDown}
+                          className="inline-flex items-center px-4 py-2 border-2 border-red-800 rounded-md shadow-sm text-sm font-medium text-white bg-red-800 hover:bg-red-900 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                          <Zap className="h-4 w-4 mr-2" />
+                          强制关闭服务器
+                        </button>
+                      </div>
+                    )}
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <div className="flex items-center space-x-3">
+                      <p className="text-sm font-medium text-red-600">
+                        确定要关闭服务器吗？
+                      </p>
+                      <button
+                        onClick={handleShutdown}
+                        disabled={isShuttingDown}
+                        className="inline-flex items-center px-3 py-1.5 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-red-600 hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 disabled:opacity-50"
+                      >
+                        {isShuttingDown ? '关闭中...' : '确认关闭'}
+                      </button>
+                      <button
+                        onClick={() => setShowShutdownConfirm(false)}
+                        disabled={isShuttingDown}
+                        className="inline-flex items-center px-3 py-1.5 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500"
+                      >
+                        取消
+                      </button>
+                    </div>
+
+                    <div className="pt-3 border-t border-red-300">
+                      <p className="text-xs text-red-700 mb-2">
+                        💀 如果优雅关闭卡住，点击下方强制关闭（会kill进程）
+                      </p>
+                      <button
+                        onClick={handleForceShutdown}
+                        disabled={isShuttingDown}
+                        className="inline-flex items-center px-3 py-1.5 border-2 border-red-900 rounded-md shadow-sm text-sm font-medium text-white bg-red-900 hover:bg-black focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-800 disabled:opacity-50"
+                      >
+                        <Zap className="h-4 w-4 mr-2" />
+                        {isShuttingDown ? '强制关闭中...' : '强制关闭'}
+                      </button>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
         </div>
       )}

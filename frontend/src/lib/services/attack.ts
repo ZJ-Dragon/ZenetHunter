@@ -16,16 +16,43 @@ export enum AttackType {
 export interface AttackRequest {
   type: AttackType;
   duration: number;
+  intensity?: number;
 }
 
 export const attackService = {
-  startAttack: async (mac: string, type: AttackType = AttackType.KICK, duration: number = 60) => {
-    const response = await api.post(`/devices/${mac}/attack/start`, { type, duration });
+  /**
+   * Start an active defense operation on a target device
+   * @param mac Target device MAC address
+   * @param type Attack type (kick, block, etc.)
+   * @param duration Duration in seconds
+   * @param intensity Intensity level 1-10 (default: 5)
+   */
+  startAttack: async (mac: string, type: AttackType = AttackType.KICK, duration: number = 60, intensity: number = 5) => {
+    // API endpoint: POST /api/active-defense/{mac}/start
+    const response = await api.post(`/active-defense/${mac}/start`, {
+      type,
+      duration,
+      intensity
+    });
     return response.data;
   },
 
+  /**
+   * Stop an active defense operation on a target device
+   * @param mac Target device MAC address
+   */
   stopAttack: async (mac: string) => {
-    const response = await api.post(`/devices/${mac}/attack/stop`);
+    // API endpoint: POST /api/active-defense/{mac}/stop
+    const response = await api.post(`/active-defense/${mac}/stop`);
+    return response.data;
+  },
+
+  /**
+   * Get available attack types
+   */
+  getAttackTypes: async () => {
+    // API endpoint: GET /api/active-defense/types
+    const response = await api.get('/active-defense/types');
     return response.data;
   },
 };

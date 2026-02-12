@@ -1,16 +1,18 @@
 """Device repository for database operations."""
 
 import json
+import logging
 from datetime import UTC, datetime
-from typing import Any
 
 from sqlalchemy import select, update
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.attack import AttackStatus
+from app.models.attack import ActiveDefenseStatus
 from app.models.db.device import DeviceModel, DeviceStatusEnum, DeviceTypeEnum
-from app.models.defender import DefenseStatus, DefenseType
 from app.models.device import Device, DeviceStatus, DeviceType
+from app.models.manual_profile import DeviceManualProfile
+
+logger = logging.getLogger(__name__)
 
 
 class DeviceRepository:
@@ -29,17 +31,12 @@ class DeviceRepository:
             model=device.model,
             type=DeviceTypeEnum(device.type.value),
             status=DeviceStatusEnum(device.status.value),
-            attack_status=device.attack_status.value,
-            defense_status=device.defense_status.value,
-            active_defense_policy=(
-                device.active_defense_policy.value
-                if device.active_defense_policy
-                else None
-            ),
+            active_defense_status=device.active_defense_status.value,
             first_seen=device.first_seen,
             last_seen=device.last_seen,
             tags=json.dumps(device.tags) if device.tags else None,
             alias=device.alias,
+            manual_profile_id=getattr(device, "manual_profile_id", None),
         )
         self.session.add(device_model)
         await self.session.flush()
@@ -78,16 +75,35 @@ class DeviceRepository:
             db_device.model = device.model
             db_device.type = DeviceTypeEnum(device.type.value)
             db_device.status = DeviceStatusEnum(device.status.value)
-            db_device.attack_status = device.attack_status.value
-            db_device.defense_status = device.defense_status.value
-            db_device.active_defense_policy = (
-                device.active_defense_policy.value
-                if device.active_defense_policy
-                else None
-            )
+            db_device.active_defense_status = device.active_defense_status.value
             db_device.last_seen = device.last_seen
             db_device.tags = json.dumps(device.tags) if device.tags else None
             db_device.alias = device.alias
+            db_device.vendor_guess = device.vendor_guess
+            db_device.model_guess = device.model_guess
+            db_device.recognition_confidence = device.recognition_confidence
+            db_device.recognition_evidence = (
+                json.dumps(device.recognition_evidence)
+                if device.recognition_evidence
+                else None
+            )
+            db_device.manual_profile_id = getattr(device, "manual_profile_id", None)
+            if db_device.manual_profile_id:
+                db_device.name_manual = None
+                db_device.vendor_manual = None
+            else:
+                # Manual override fields - only update if provided (don't overwrite)
+                if hasattr(device, "name_manual") and device.name_manual is not None:
+                    db_device.name_manual = device.name_manual
+                if (
+                    hasattr(device, "vendor_manual")
+                    and device.vendor_manual is not None
+                ):
+                    db_device.vendor_manual = device.vendor_manual
+            if hasattr(device, "manual_override_at") and device.manual_override_at:
+                db_device.manual_override_at = device.manual_override_at
+            if hasattr(device, "manual_override_by") and device.manual_override_by:
+                db_device.manual_override_by = device.manual_override_by
             # Update first_seen only if it's earlier than current
             # Ensure both datetimes are timezone-aware before comparison
             device_first_seen = (
@@ -112,21 +128,44 @@ class DeviceRepository:
                 model=device.model,
                 type=DeviceTypeEnum(device.type.value),
                 status=DeviceStatusEnum(device.status.value),
-                attack_status=device.attack_status.value,
-                defense_status=device.defense_status.value,
-                active_defense_policy=(
-                    device.active_defense_policy.value
-                    if device.active_defense_policy
-                    else None
-                ),
+                active_defense_status=device.active_defense_status.value,
                 first_seen=device.first_seen,
                 last_seen=device.last_seen,
                 tags=json.dumps(device.tags) if device.tags else None,
                 alias=device.alias,
+                vendor_guess=device.vendor_guess,
+                model_guess=device.model_guess,
+                recognition_confidence=device.recognition_confidence,
+                recognition_evidence=(
+                    json.dumps(device.recognition_evidence)
+                    if device.recognition_evidence
+                    else None
+                ),
+                manual_profile_id=getattr(device, "manual_profile_id", None),
+                # Manual override fields (legacy; cleared when manual_profile_id is set)
+                name_manual=(
+                    None
+                    if getattr(device, "manual_profile_id", None)
+                    else getattr(device, "name_manual", None)
+                ),
+                vendor_manual=(
+                    None
+                    if getattr(device, "manual_profile_id", None)
+                    else getattr(device, "vendor_manual", None)
+                ),
+                manual_override_at=getattr(device, "manual_override_at", None),
+                manual_override_by=getattr(device, "manual_override_by", None),
             )
             self.session.add(db_device)
 
         await self.session.flush()
+        if getattr(db_device, "manual_profile_id", None):
+            try:
+                await self.session.refresh(
+                    db_device, attribute_names=["manual_profile"]
+                )
+            except Exception:
+                logger.debug("Manual profile refresh skipped for %s", mac_lower)
         return self.to_domain_model(db_device)
 
     async def get_all(self) -> list[Device]:
@@ -150,11 +189,7 @@ class DeviceRepository:
         device_model.model = device.model
         device_model.type = DeviceTypeEnum(device.type.value)
         device_model.status = DeviceStatusEnum(device.status.value)
-        device_model.attack_status = device.attack_status.value
-        device_model.defense_status = device.defense_status.value
-        device_model.active_defense_policy = (
-            device.active_defense_policy.value if device.active_defense_policy else None
-        )
+        device_model.active_defense_status = device.active_defense_status.value
         device_model.last_seen = device.last_seen
         device_model.tags = json.dumps(device.tags) if device.tags else None
         device_model.alias = device.alias
@@ -177,11 +212,14 @@ class DeviceRepository:
 
     async def clear_all(self) -> int:
         """Clear all devices from the database."""
+        from sqlalchemy import delete
+
+        # Count devices before deletion
         result = await self.session.execute(select(DeviceModel))
-        devices = result.scalars().all()
-        count = len(devices)
-        for device in devices:
-            await self.session.delete(device)
+        count = len(result.scalars().all())
+
+        # Use bulk delete for efficiency
+        await self.session.execute(delete(DeviceModel))
         await self.session.flush()
         return count
 
@@ -199,39 +237,138 @@ class DeviceRepository:
         await self.session.flush()
 
     async def update_attack_status(
-        self, mac: str, status: AttackStatus
+        self, mac: str, status: ActiveDefenseStatus | str
     ) -> DeviceModel | None:
-        """Update attack status for a device."""
+        """Update active defense status for a device."""
+        status_value = status.value if hasattr(status, "value") else status
         result = await self.session.execute(
             update(DeviceModel)
             .where(DeviceModel.mac == mac.lower())
-            .values(attack_status=status.value)
+            .values(active_defense_status=status_value)
             .returning(DeviceModel)
         )
         await self.session.flush()
         return result.scalar_one_or_none()
 
-    async def update_defense_status(
-        self, mac: str, status: DefenseStatus, policy: DefenseType | None = None
-    ) -> DeviceModel | None:
-        """Update defense status and policy for a device."""
-        update_values: dict[str, Any] = {"defense_status": status.value}
-        if policy is not None:
-            update_values["active_defense_policy"] = policy.value
-        elif status == DefenseStatus.INACTIVE:
-            update_values["active_defense_policy"] = None
+    # Defense status methods removed in v2.0 (active defense refactor)
+    # Use update_attack_status() instead
 
+    async def update_manual_labels(
+        self,
+        mac: str,
+        name_manual: str | None = None,
+        vendor_manual: str | None = None,
+        updated_by: str | None = None,
+    ) -> DeviceModel | None:
+        """Update manual labels for a device.
+
+        Args:
+            mac: Device MAC address
+            name_manual: User-provided device name (None to clear)
+            vendor_manual: User-provided vendor name (None to clear)
+            updated_by: Username who made the update
+
+        Returns:
+            Updated DeviceModel or None if not found
+        """
         result = await self.session.execute(
-            update(DeviceModel)
-            .where(DeviceModel.mac == mac.lower())
-            .values(**update_values)
-            .returning(DeviceModel)
+            select(DeviceModel).where(DeviceModel.mac == mac.lower())
         )
+        device_model = result.scalar_one_or_none()
+        if not device_model:
+            return None
+
+        # Update manual override fields
+        device_model.name_manual = name_manual
+        device_model.vendor_manual = vendor_manual
+        device_model.manual_override_at = datetime.now(UTC)
+        device_model.manual_override_by = updated_by
+
+        # Set the recognition_manual_override flag
+        has_manual = bool(name_manual or vendor_manual)
+        device_model.recognition_manual_override = has_manual
+
         await self.session.flush()
-        return result.scalar_one_or_none()
+        return device_model
+
+    async def bind_manual_profile(
+        self,
+        mac: str,
+        profile_id: int,
+        updated_by: str | None = None,
+        manual_name: str | None = None,
+        manual_vendor: str | None = None,
+    ) -> DeviceModel | None:
+        """Bind a device to a manual profile and clear legacy manual columns."""
+        result = await self.session.execute(
+            select(DeviceModel).where(DeviceModel.mac == mac.lower())
+        )
+        device_model = result.scalar_one_or_none()
+        if not device_model:
+            return None
+
+        device_model.manual_profile_id = profile_id
+        device_model.name_manual = None
+        device_model.vendor_manual = None
+        device_model.manual_override_at = datetime.now(UTC)
+        device_model.manual_override_by = updated_by
+        device_model.recognition_manual_override = bool(manual_name or manual_vendor)
+        await self.session.flush()
+        return device_model
+
+    async def clear_manual_profile(
+        self, mac: str, updated_by: str | None = None
+    ) -> DeviceModel | None:
+        """Unbind manual profile and clear manual flags on a device."""
+        result = await self.session.execute(
+            select(DeviceModel).where(DeviceModel.mac == mac.lower())
+        )
+        device_model = result.scalar_one_or_none()
+        if not device_model:
+            return None
+
+        device_model.manual_profile_id = None
+        device_model.name_manual = None
+        device_model.vendor_manual = None
+        device_model.manual_override_at = datetime.now(UTC)
+        device_model.manual_override_by = updated_by
+        device_model.recognition_manual_override = False
+        await self.session.flush()
+        return device_model
 
     def to_domain_model(self, device_model: DeviceModel) -> Device:
         """Convert database model to domain model."""
+        manual_profile = (
+            DeviceManualProfile.model_validate(device_model.manual_profile)
+            if getattr(device_model, "manual_profile", None)
+            else None
+        )
+        name_auto = device_model.name
+        vendor_auto = device_model.vendor or device_model.vendor_guess
+        display_name = (
+            (manual_profile.manual_name if manual_profile else None)
+            or device_model.name_manual
+            or device_model.alias
+            or name_auto
+            or device_model.model
+            or device_model.model_guess
+        )
+        display_vendor = (
+            (manual_profile.manual_vendor if manual_profile else None)
+            or device_model.vendor_manual
+            or vendor_auto
+            or device_model.vendor_guess
+        )
+        name_manual = (
+            manual_profile.manual_name
+            if manual_profile
+            else getattr(device_model, "name_manual", None)
+        )
+        vendor_manual = (
+            manual_profile.manual_vendor
+            if manual_profile
+            else getattr(device_model, "vendor_manual", None)
+        )
         return Device(
             mac=device_model.mac,
             ip=device_model.ip,
@@ -240,17 +377,33 @@ class DeviceRepository:
             model=device_model.model,
             type=DeviceType(device_model.type.value),
             status=DeviceStatus(device_model.status.value),
-            attack_status=AttackStatus(device_model.attack_status),
-            defense_status=DefenseStatus(device_model.defense_status),
-            active_defense_policy=(
-                DefenseType(device_model.active_defense_policy)
-                if device_model.active_defense_policy
-                else None
+            active_defense_status=ActiveDefenseStatus(
+                device_model.active_defense_status
             ),
             first_seen=device_model.first_seen,
             last_seen=device_model.last_seen,
             tags=json.loads(device_model.tags) if device_model.tags else [],
             alias=device_model.alias,
+            manual_profile_id=getattr(device_model, "manual_profile_id", None),
+            manual_profile=manual_profile,
+            vendor_guess=getattr(device_model, "vendor_guess", None),
+            model_guess=getattr(device_model, "model_guess", None),
+            recognition_confidence=getattr(
+                device_model, "recognition_confidence", None
+            ),
+            recognition_evidence=(
+                json.loads(device_model.recognition_evidence)
+                if getattr(device_model, "recognition_evidence", None)
+                else None
+            ),
+            name_manual=name_manual,
+            vendor_manual=vendor_manual,
+            manual_override_at=getattr(device_model, "manual_override_at", None),
+            manual_override_by=getattr(device_model, "manual_override_by", None),
+            display_name=display_name,
+            display_vendor=display_vendor,
+            name_auto=name_auto,
+            vendor_auto=vendor_auto,
         )
 
 

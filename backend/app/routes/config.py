@@ -47,6 +47,53 @@ async def get_platform_config():
     }
 
 
+@router.get("/scan")
+async def get_scan_config():
+    """
+    Get scan configuration settings.
+    Returns current scan settings and feature flags.
+    Note: Configuration is read from environment variables,
+    this endpoint is read-only for display purposes.
+
+    The scan_range shown is the detected/active subnet, not just the config default.
+    """
+    from app.core.config import get_settings
+    from app.services.scanner.network_detection import detect_local_subnet
+
+    settings = get_settings()
+
+    # Detect actual subnet (will fallback to config if detection fails)
+    try:
+        network_info = await detect_local_subnet()
+        active_scan_range = network_info.subnet
+        detection_method = network_info.method
+    except Exception as e:
+        # If detection fails, use config default
+        import logging
+
+        logger = logging.getLogger(__name__)
+        logger.warning(f"Subnet detection failed, using config default: {e}")
+        active_scan_range = settings.scan_range
+        detection_method = "config"
+
+    return {
+        "scan_range": active_scan_range,  # Show detected subnet, not config default
+        "scan_range_config": settings.scan_range,  # Original config value
+        "detection_method": detection_method,
+        "scan_timeout_sec": settings.scan_timeout_sec,
+        "scan_concurrency": settings.scan_concurrency,
+        "scan_interval_sec": settings.scan_interval_sec,
+        "features": {
+            "mdns": settings.feature_mdns,
+            "ssdp": settings.feature_ssdp,
+            "nbns": settings.feature_nbns,
+            "snmp": settings.feature_snmp,
+            "fingerbank": settings.feature_fingerbank,
+            "active_probe": getattr(settings, "feature_active_probe", True),
+        },
+    }
+
+
 @router.post("/setup", status_code=status.HTTP_204_NO_CONTENT)
 async def setup_system(
     data: dict = Body(...),
@@ -61,15 +108,15 @@ async def setup_system(
     Currently accepts setup data but doesn't persist admin credentials.
     Users can still login with default credentials (admin/zenethunter).
     """
-    # MVP: Placeholder - in future, create admin user in DB with hashed password
-    # For now, just accept the setup request
-    # The admin_password from data will be used in future to create admin user
-    # TODO: Implement admin user creation with password hashing in DB
-    # These variables are kept for future use
-    _ = data.get("admin_password", "")
-    _ = data.get("target_subnets", [])
-    _ = data.get("scan_interval", 300)
-    _ = data.get("default_policy", "monitor")
+    # MVP Implementation: Setup wizard accepts configuration but uses
+    # default credentials. For production deployment, admin user creation
+    # with hashed passwords should be implemented
+    # Current behavior: Users login with default credentials (admin/zenethunter)
+    # Future enhancement: Create admin user in database with bcrypt-hashed password
+    _ = data.get("admin_password", "")  # Reserved for future implementation
+    _ = data.get("target_subnets", [])  # Reserved for scan configuration
+    _ = data.get("scan_interval", 300)  # Reserved for auto-scan intervals
+    _ = data.get("default_policy", "monitor")  # Reserved for default policy
 
     # Log setup completion (in future, persist to DB)
     # For now, setup is considered complete if this endpoint is called successfully

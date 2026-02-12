@@ -1,36 +1,64 @@
-# ZenetHunter — Python requirements (runtime + dev/test)
+# ZenetHunter — Python Dependencies (Complete List)
 #
 # Usage:
 #   pip install -r requirements.txt
 #
-# Notes:
-# - Runtime includes FastAPI and Uvicorn with the "standard" extras (uvloop, httptools,
-#   websockets, watchfiles) for better performance & dev reload. Pydantic Settings v2
-#   is included to support env‑driven config. `python-dotenv` is optional for local .env.
-# - Dev/test tools (pytest, httpx, ruff, black) can be skipped in production images.
+# For conda users:
+#   conda env create -f environment.yml
 #
-# ------------------------------------------------------------
-# Runtime (required)
-# ------------------------------------------------------------
-fastapi
-uvicorn[standard]
+# Notes:
+# - This file includes ALL dependencies from backend/pyproject.toml
+# - Runtime dependencies are required for production
+# - Dev/test tools can be skipped in production (use --no-dev flag if supported)
+#
+# Python version requirement: >=3.11, <3.13
+
+# ============================================================
+# Core Web Framework
+# ============================================================
+fastapi>=0.104.0
+uvicorn[standard]>=0.24.0  # Includes uvloop, httptools, websockets
+pydantic>=2.0
 pydantic-settings>=2.0
-sqlalchemy>=2.0
-greenlet>=3.0.0  # Required for SQLAlchemy async operations
-aiosqlite>=0.19.0
-asyncpg>=0.29.0
-alembic>=1.13.0
-scapy>=2.5.0
+python-dotenv>=1.0.0
 
-# ------------------------------------------------------------
-# Optional runtime (local dev convenience)
-# ------------------------------------------------------------
-python-dotenv
+# ============================================================
+# Authentication & Security
+# ============================================================
+pyjwt>=2.8.0  # JWT token generation and validation
+python-multipart>=0.0.6  # Form data parsing for OAuth2
 
-# ------------------------------------------------------------
-# Dev / Test (install when developing or running tests)
-# ------------------------------------------------------------
-pytest
-httpx
-ruff
-black
+# ============================================================
+# Database & ORM
+# ============================================================
+sqlalchemy>=2.0  # Async ORM
+greenlet>=3.0.0  # Required for SQLAlchemy async operations (DO NOT REMOVE)
+aiosqlite>=0.19.0  # SQLite async driver
+asyncpg>=0.29.0  # PostgreSQL async driver (production recommended)
+alembic>=1.13.0  # Database migrations
+
+# ============================================================
+# Network & Security Research (Core Feature)
+# ============================================================
+scapy>=2.5.0  # Raw packet manipulation for active defense
+
+# ============================================================
+# Development & Testing
+# ============================================================
+# Linting and formatting
+ruff>=0.1.0  # Fast Python linter
+black>=23.0  # Code formatter
+pre-commit>=3.0  # Git hooks
+
+# Testing framework
+pytest>=7.0
+pytest-cov>=4.0  # Coverage reporting
+pytest-asyncio>=0.21.0  # Async test support
+httpx>=0.24.0  # HTTP client for FastAPI TestClient
+pyyaml>=6.0  # Keyword dictionary loader
+
+# ============================================================
+# Optional but Recommended
+# ============================================================
+# ipython>=8.0  # Better REPL for debugging
+# rich>=13.0  # Beautiful terminal output

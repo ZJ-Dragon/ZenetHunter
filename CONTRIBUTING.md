@@ -82,7 +82,7 @@ Reference: pre‑commit quick start docs.
   - Dev: `npm run dev`
   - Build: `npm run build`
 
-See each subdirectory’s `README.md` for detailed instructions. Production/container deploys live under `deploy/`.
+See each subdirectory’s `README.md` for detailed instructions.
 
 ---
 
@@ -96,7 +96,7 @@ See each subdirectory’s `README.md` for detailed instructions. Production/cont
 - [ ] Commit messages follow **Conventional Commits**.
 - [ ] Code passes local **pre‑commit** hooks and CI.
 - [ ] API/behavior changes documented (docs updated).
-- [ ] Config/security‑relevant changes reflected in `/SECURITY.md` and deploy docs.
+- [ ] Config/security‑relevant changes reflected in `/SECURITY.md` and docs.
 - [ ] PR description is clear; attach screenshots/log snippets when helpful.
 
 ---

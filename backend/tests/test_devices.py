@@ -3,13 +3,10 @@ import asyncio
 from fastapi.testclient import TestClient
 
 from app.core.database import get_session_factory
-from app.main import app
 from app.repositories.device import DeviceRepository
 
-client = TestClient(app)
 
-
-def test_list_devices_empty(reset_state):
+def test_list_devices_empty(client: TestClient, reset_state):
     # Clear all devices from database before test
     # Note: TestClient uses sync API, so we use asyncio.run for async cleanup
     async def clear_db():
@@ -26,7 +23,7 @@ def test_list_devices_empty(reset_state):
     assert response.json() == []
 
 
-def test_add_and_get_device():
+def test_add_and_get_device(client: TestClient):
     device_data = {
         "mac": "00:11:22:33:44:55",
         "ip": "192.168.1.100",
@@ -52,6 +49,6 @@ def test_add_and_get_device():
     assert response.json()["mac"] == device_data["mac"]
 
 
-def test_get_nonexistent_device():
+def test_get_nonexistent_device(client: TestClient):
     response = client.get("/api/devices/FF:FF:FF:FF:FF:FF")
     assert response.status_code == 404
