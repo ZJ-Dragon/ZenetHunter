@@ -16,7 +16,7 @@
 #   sudo ./start-local.sh         # recommended for full network features
 # ============================================================
 
-set -e
+# Intentionally not using `set -e` to avoid exiting on non-critical warnings
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 cd "$SCRIPT_DIR"
