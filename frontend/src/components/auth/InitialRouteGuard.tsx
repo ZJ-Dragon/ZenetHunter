@@ -13,13 +13,23 @@ interface InitialRouteGuardProps {
  * If system is configured but user is not authenticated, allows RequireAuth to handle redirect.
  */
 export const InitialRouteGuard: React.FC<InitialRouteGuardProps> = ({ children }) => {
-  const { isLoading: authLoading } = useAuth();
+  const { isLoading: authLoading, isLimitedAdmin } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   const [isChecking, setIsChecking] = useState(true);
 
   useEffect(() => {
     const checkInitialStatus = async () => {
+      // Limited admin: always land on settings, skip OOBE checks
+      if (isLimitedAdmin) {
+        if (location.pathname !== '/settings') {
+          navigate('/settings', { replace: true });
+        } else {
+          setIsChecking(false);
+        }
+        return;
+      }
+
       // Skip check if already on setup or login page
       if (location.pathname === '/setup' || location.pathname === '/login') {
         setIsChecking(false);
@@ -43,7 +53,7 @@ export const InitialRouteGuard: React.FC<InitialRouteGuardProps> = ({ children }
 
     // Don't wait for auth - check status immediately on mount
     checkInitialStatus();
-  }, [location.pathname, navigate]);
+  }, [isLimitedAdmin, location.pathname, navigate]);
 
   // Show loading while checking initial status
   if (isChecking || authLoading) {
