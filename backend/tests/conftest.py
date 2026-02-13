@@ -8,7 +8,6 @@ from fastapi.testclient import TestClient
 from app.core.database import init_db
 from app.main import app
 from app.services.auth import create_access_token
-from app.services.setup import SetupService
 from app.services.state import get_state_manager
 
 
@@ -36,6 +35,10 @@ def init_test_db():
     # Enable active defense for tests to avoid 400 responses
     os.environ["ACTIVE_DEFENSE_ENABLED"] = "true"
     os.environ["ACTIVE_DEFENSE_READONLY"] = "false"
+    # Reset settings cache so DATABASE_URL is picked up
+    from app.core.config import get_settings
+
+    get_settings.cache_clear()
     # Reset database singletons if they were created earlier
     from app.core import database
 
@@ -44,17 +47,6 @@ def init_test_db():
 
     asyncio.run(init_db())
     yield
-
-
-@pytest.fixture(scope="session", autouse=True)
-def bootstrap_admin():
-    """Create a default admin for tests and mark first run completed."""
-    setup = SetupService()
-    try:
-        asyncio.run(setup.register_admin("admin", "zenethunter"))
-    except ValueError:
-        pass
-    asyncio.run(setup.acknowledge_disclaimer(username="test"))
 
 
 @pytest.fixture

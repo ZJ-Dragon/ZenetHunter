@@ -3,7 +3,6 @@
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.models.auth import UserRole
 from app.models.db.user_account import UserAccountModel
 
 
@@ -19,11 +18,14 @@ class UserAccountRepository:
         )
         return result.scalar_one_or_none()
 
-    async def create_admin(self, username: str, password_hash: str) -> UserAccountModel:
+    async def create_admin(
+        self, username: str, password_hash: str, is_builtin: bool = False
+    ) -> UserAccountModel:
         model = UserAccountModel(
             username=username,
             password_hash=password_hash,
-            role=UserRole.ADMIN,
+            role="admin",
+            is_builtin=is_builtin,
         )
         self.session.add(model)
         await self.session.flush()
@@ -31,6 +33,6 @@ class UserAccountRepository:
 
     async def has_admin(self) -> bool:
         result = await self.session.execute(
-            select(UserAccountModel.id).where(UserAccountModel.role == UserRole.ADMIN)
+            select(UserAccountModel.username).where(UserAccountModel.role == "admin")
         )
         return result.first() is not None

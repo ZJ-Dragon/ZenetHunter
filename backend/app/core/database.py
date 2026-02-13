@@ -309,6 +309,29 @@ async def init_db() -> None:
                     logger.debug(
                         f"Could not check/add manual_profile_id column on sqlite: {e}"
                     )
+                # Ensure is_builtin column exists on user_accounts
+                try:
+                    result = await conn.execute(
+                        text(
+                            """
+                            SELECT COUNT(*) as count
+                            FROM pragma_table_info('user_accounts')
+                            WHERE name = 'is_builtin'
+                            """
+                        )
+                    )
+                    row = result.fetchone()
+                    if row and row[0] == 0:
+                        logger.info("Adding is_builtin column to user_accounts table")
+                        await conn.execute(
+                            text(
+                                "ALTER TABLE user_accounts "
+                                "ADD COLUMN is_builtin BOOLEAN NOT NULL DEFAULT 0"
+                            )
+                        )
+                        await conn.commit()
+                except Exception as e:
+                    logger.debug(f"Could not check/add is_builtin column: {e}")
             elif db_url.startswith("postgresql"):
                 # For PostgreSQL, check if model column exists
                 try:

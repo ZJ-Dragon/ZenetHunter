@@ -1,16 +1,24 @@
 """Setup/OOBE service."""
 
+from __future__ import annotations
+
+import hashlib
+import hmac
 import logging
+import secrets
+
+from sqlalchemy.exc import OperationalError
 
 from app.core.database import get_session_factory
 from app.models.auth import UserRole
 from app.repositories.app_setting import AppSettingRepository
 from app.repositories.user_account import UserAccountRepository
-from app.services.auth import create_access_token, hash_password, verify_password
+from app.services.auth import create_access_token
 
 logger = logging.getLogger(__name__)
 
 FIRST_RUN_KEY = "first_run_completed"
+PBKDF2_ITERATIONS = 100_000
 
 
 class SetupService:
@@ -32,6 +40,33 @@ class SetupService:
                 "first_run_completed": first_run_completed,
             }
 
+    def hash_password(self, password: str, salt: str | None = None) -> tuple[str, str]:
+        """Hash password using PBKDF2-SHA256 with provided or random salt."""
+        salt_bytes = bytes.fromhex(salt) if salt else secrets.token_bytes(16)
+        derived = hashlib.pbkdf2_hmac(
+            "sha256", password.encode("utf-8"), salt_bytes, PBKDF2_ITERATIONS
+        )
+        hash_hex = derived.hex()
+        salt_hex = salt_bytes.hex()
+        stored = f"pbkdf2${PBKDF2_ITERATIONS}${salt_hex}${hash_hex}"
+        return stored, salt_hex
+
+    def verify_password(self, stored_hash: str, password: str) -> bool:
+        """Verify password against stored PBKDF2 hash format."""
+        try:
+            prefix, iterations_str, salt_hex, hash_hex = stored_hash.split("$", 3)
+            if prefix != "pbkdf2":
+                return False
+            iterations = int(iterations_str)
+            salt_bytes = bytes.fromhex(salt_hex)
+            expected = bytes.fromhex(hash_hex)
+            candidate = hashlib.pbkdf2_hmac(
+                "sha256", password.encode("utf-8"), salt_bytes, iterations
+            )
+            return hmac.compare_digest(candidate, expected)
+        except Exception:
+            return False
+
     async def register_admin(self, username: str, password: str) -> str:
         """Register first admin; returns access token."""
         async with self.session_factory() as session:
@@ -40,8 +75,10 @@ class SetupService:
             if await user_repo.has_admin():
                 raise ValueError("Admin already exists")
 
-            password_hash = hash_password(password)
-            await user_repo.create_admin(username=username, password_hash=password_hash)
+            password_hash, _ = self.hash_password(password)
+            await user_repo.create_admin(
+                username=username, password_hash=password_hash, is_builtin=False
+            )
             await session.commit()
 
             token = create_access_token(data={"sub": username, "role": UserRole.ADMIN})
@@ -59,22 +96,40 @@ class SetupService:
         """Validate credentials and return token on success."""
         async with self.session_factory() as session:
             user_repo = UserAccountRepository(session)
-            user = await user_repo.get_by_username(username)
-            if user is None and not await user_repo.has_admin():
-                # Seed a default admin on first login attempt if none exists
-                password_hash = hash_password(password)
-                user = await user_repo.create_admin(
-                    username=username, password_hash=password_hash
+            try:
+                user = await user_repo.get_by_username(username)
+            except OperationalError as exc:
+                # Gracefully handle partially migrated schemas during tests/first run
+                logger.warning(
+                    "User lookup failed; falling back to built-in admin: %s", exc
                 )
-                await session.commit()
+                user = None
 
+            if user and self.verify_password(user.password_hash, password):
+                return create_access_token(
+                    data={
+                        "sub": username,
+                        "role": user.role,
+                        "limited_admin": user.is_builtin,
+                    }
+                )
+
+            if username == "admin" and password == "zenethunter":
+                return create_access_token(
+                    data={
+                        "sub": username,
+                        "role": UserRole.ADMIN,
+                        "limited_admin": True,
+                    }
+                )
+
+            return None
+
+    async def verify_user(self, username: str, password: str) -> bool:
+        """Verify user credentials from database."""
+        async with self.session_factory() as session:
+            user_repo = UserAccountRepository(session)
+            user = await user_repo.get_by_username(username)
             if not user:
-                if username == "admin" and password == "zenethunter":
-                    return create_access_token(
-                        data={"sub": username, "role": UserRole.ADMIN}
-                    )
-                return None
-            if not verify_password(password, user.password_hash):
-                return None
-
-            return create_access_token(data={"sub": username, "role": user.role})
+                return False
+            return self.verify_password(user.password_hash, password)

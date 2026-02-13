@@ -27,20 +27,16 @@ def upgrade() -> None:
     if not inspector.has_table("user_accounts"):
         op.create_table(
             "user_accounts",
-            sa.Column("id", sa.String(length=36), primary_key=True),
-            sa.Column("username", sa.String(length=255), nullable=False, unique=True),
+            sa.Column("username", sa.String(length=100), primary_key=True),
             sa.Column("password_hash", sa.String(length=255), nullable=False),
             sa.Column(
-                "role",
-                sa.Enum("admin", "guest", name="userrole"),
-                nullable=False,
-                server_default="admin",
+                "role", sa.String(length=50), nullable=False, server_default="admin"
+            ),
+            sa.Column(
+                "is_builtin", sa.Boolean(), nullable=False, server_default=sa.text("0")
             ),
             sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
             sa.Column("updated_at", sa.DateTime(timezone=True), nullable=False),
-        )
-        op.create_index(
-            "ix_user_accounts_username", "user_accounts", ["username"], unique=True
         )
 
     # device_manual_profiles table
@@ -73,7 +69,7 @@ def upgrade() -> None:
     if "manual_profile_id" not in device_columns:
         op.add_column(
             "devices",
-            sa.Column("manual_profile_id", sa.Integer(), nullable=True, index=True),
+            sa.Column("manual_profile_id", sa.Integer(), nullable=True),
         )
 
     # probe_observations table
