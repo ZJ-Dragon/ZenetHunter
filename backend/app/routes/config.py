@@ -2,27 +2,28 @@ from fastapi import APIRouter, Body, Depends, status
 
 from app.core.security import get_current_admin
 from app.models.auth import User
+from app.models.setup import (
+    AcknowledgeRequest,
+    RegisterAdminRequest,
+    RegisterAdminResponse,
+    SetupStatus,
+)
+from app.services.reset import ResetService
+from app.services.setup import SetupService
 from app.services.state import StateManager, get_state_manager
 
 router = APIRouter(prefix="/config", tags=["config"])
+setup_service = SetupService()
+reset_service = ResetService()
 
 
-@router.get("/status")
-async def get_config_status(state: StateManager = Depends(get_state_manager)):
-    """
-    Check if system is configured (OOBE check).
-
-    For MVP: Always returns is_configured=True to allow immediate login
-    with default credentials.
-    Users can login with admin/zenethunter without going through setup wizard.
-
-    In future: Should check DB for admin user existence to determine if setup is needed.
-    """
-    # MVP: Always return configured - users can login with default
-    # credentials immediately
-    # This allows users to bypass setup wizard and use default admin/zenethunter
+@router.get("/status", response_model=SetupStatus)
+async def get_config_status():
+    """Check if admin exists and whether first-run is completed."""
+    status_flags = await setup_service.get_status()
     return {
-        "is_configured": True,
+        "admin_exists": status_flags["admin_exists"],
+        "first_run_completed": status_flags["first_run_completed"],
     }
 
 
@@ -94,32 +95,39 @@ async def get_scan_config():
     }
 
 
-@router.post("/setup", status_code=status.HTTP_204_NO_CONTENT)
-async def setup_system(
-    data: dict = Body(...),
-    state: StateManager = Depends(get_state_manager),
+@router.post(
+    "/register",
+    response_model=RegisterAdminResponse,
+    status_code=status.HTTP_201_CREATED,
+)
+async def register_admin(payload: RegisterAdminRequest):
+    """Bootstrap admin account on first run."""
+    try:
+        token = await setup_service.register_admin(
+            username=payload.username, password=payload.password
+        )
+    except ValueError as e:
+        from fastapi import HTTPException
+
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST, detail=str(e)
+        ) from None
+    return {"access_token": token, "token_type": "bearer"}
+
+
+@router.post("/acknowledge", status_code=status.HTTP_204_NO_CONTENT)
+async def acknowledge_disclaimer(
+    _: AcknowledgeRequest,
+    current_user: User = Depends(get_current_admin),
 ):
-    """
-    Initial system setup (OOBE).
-    Creates admin account and configures basic settings.
-    This endpoint does NOT require authentication (called during initial setup).
+    """Mark disclaimer acknowledged and finish first-run gating."""
+    await setup_service.acknowledge_disclaimer(username=current_user.username)
 
-    For MVP, this is a placeholder - admin account creation will be implemented later.
-    Currently accepts setup data but doesn't persist admin credentials.
-    Users can still login with default credentials (admin/zenethunter).
-    """
-    # MVP Implementation: Setup wizard accepts configuration but uses
-    # default credentials. For production deployment, admin user creation
-    # with hashed passwords should be implemented
-    # Current behavior: Users login with default credentials (admin/zenethunter)
-    # Future enhancement: Create admin user in database with bcrypt-hashed password
-    _ = data.get("admin_password", "")  # Reserved for future implementation
-    _ = data.get("target_subnets", [])  # Reserved for scan configuration
-    _ = data.get("scan_interval", 300)  # Reserved for auto-scan intervals
-    _ = data.get("default_policy", "monitor")  # Reserved for default policy
 
-    # Log setup completion (in future, persist to DB)
-    # For now, setup is considered complete if this endpoint is called successfully
+@router.post("/replay", status_code=status.HTTP_204_NO_CONTENT)
+async def replay_system(current_user: User = Depends(get_current_admin)):
+    """Reset app to first-run state and clear volatile data."""
+    await reset_service.replay()
 
 
 @router.get("/lists", response_model=dict[str, list[str]])

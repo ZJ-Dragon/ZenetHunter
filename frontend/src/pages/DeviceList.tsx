@@ -8,6 +8,7 @@ import { Search, Filter, RefreshCw, Laptop, Smartphone, Router, Shield, Wifi, Ch
 import { clsx } from 'clsx';
 import { useWebSocketEvent } from '../contexts/WebSocketContext';
 import { WSEventType } from '../types/websocket';
+import { useTranslation } from 'react-i18next';
 
 const DeviceIcon = ({ type }: { type: DeviceType }) => {
   switch (type) {
@@ -48,6 +49,7 @@ const StatusBadge = ({ status }: { status: DeviceStatus }) => {
 };
 
 export const DeviceList: React.FC = () => {
+  const { t } = useTranslation();
   const [devices, setDevices] = useState<Device[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [search, setSearch] = useState('');
@@ -159,7 +161,7 @@ export const DeviceList: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-        <h1 className="text-2xl font-semibold" style={{ color: 'var(--winui-text-primary)', letterSpacing: '-0.02em' }}>Network Devices</h1>
+        <h1 className="text-2xl font-semibold" style={{ color: 'var(--winui-text-primary)', letterSpacing: '-0.02em' }}>{t('devices.title')}</h1>
         <div className="flex items-center gap-2">
           <ScanButton />
           <button
@@ -167,7 +169,7 @@ export const DeviceList: React.FC = () => {
             className="btn-winui-secondary inline-flex items-center"
           >
             <RefreshCw className={clsx("h-4 w-4 mr-2", isLoading && "animate-spin")} />
-            Refresh
+            {t('devices.refresh')}
           </button>
         </div>
       </div>
@@ -182,7 +184,7 @@ export const DeviceList: React.FC = () => {
             type="text"
             className="input-winui"
             style={{ paddingLeft: '42px' }}
-            placeholder="Search by Name, IP, MAC or Vendor..."
+            placeholder={t('devices.searchPlaceholder')}
             value={search}
             onChange={(e) => setSearch(e.target.value)}
           />
@@ -198,10 +200,10 @@ export const DeviceList: React.FC = () => {
               value={filterStatus}
               onChange={(e) => setFilterStatus(e.target.value as DeviceStatus | 'all')}
             >
-              <option value="all">All Status</option>
-              <option value={DeviceStatus.ONLINE}>Online</option>
-              <option value={DeviceStatus.OFFLINE}>Offline</option>
-              <option value={DeviceStatus.BLOCKED}>Blocked</option>
+              <option value="all">{t('devices.statusAll')}</option>
+              <option value={DeviceStatus.ONLINE}>{t('devices.statusOnline')}</option>
+              <option value={DeviceStatus.OFFLINE}>{t('devices.statusOffline')}</option>
+              <option value={DeviceStatus.BLOCKED}>{t('devices.statusBlocked')}</option>
             </select>
           </div>
         </div>
@@ -213,12 +215,12 @@ export const DeviceList: React.FC = () => {
           <table className="min-w-full" style={{ borderCollapse: 'separate', borderSpacing: 0 }}>
             <thead style={{ backgroundColor: 'var(--winui-bg-tertiary)' }}>
               <tr>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--winui-text-secondary)' }}>Device</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--winui-text-secondary)' }}>IP Address</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--winui-text-secondary)' }}>MAC Address</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--winui-text-secondary)' }}>Status</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--winui-text-secondary)' }}>Last Seen</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--winui-text-secondary)' }}>More</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--winui-text-secondary)' }}>{t('devices.colDevice')}</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--winui-text-secondary)' }}>{t('devices.colIp')}</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--winui-text-secondary)' }}>{t('devices.colMac')}</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--winui-text-secondary)' }}>{t('devices.colStatus')}</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--winui-text-secondary)' }}>{t('devices.colLastSeen')}</th>
+                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--winui-text-secondary)' }}>{t('devices.colMore')}</th>
               </tr>
             </thead>
             <tbody style={{ backgroundColor: 'var(--winui-surface)' }}>
@@ -227,7 +229,7 @@ export const DeviceList: React.FC = () => {
                   const manualName = device.manual_profile?.manual_name ?? device.name_manual;
                   const manualVendor = device.manual_profile?.manual_vendor ?? device.vendor_manual;
                   const displayName = device.display_name || manualName || device.name || device.alias || device.model || device.model_guess || 'Unknown Device';
-                  const displayVendor = device.display_vendor || manualVendor || device.vendor || device.vendor_guess || 'Unknown Vendor';
+                  const displayVendor = device.display_vendor || manualVendor || device.vendor || device.vendor_guess || t('devices.unknownVendor');
                   const hasManual = Boolean(manualName || manualVendor || device.manual_profile_id);
 
                   return (
@@ -254,7 +256,7 @@ export const DeviceList: React.FC = () => {
                                 {displayName}
                                 {hasManual && (
                                   <span className="text-xxs px-2 py-0.5 rounded-full" style={{ backgroundColor: 'rgba(16, 124, 16, 0.1)', color: '#107c10' }}>
-                                    Manual
+                                    {t('devices.manualTag')}
                                   </span>
                                 )}
                               </div>
@@ -280,7 +282,7 @@ export const DeviceList: React.FC = () => {
                                         ? '#f59e0b'
                                         : '#6b7280',
                                     }}
-                                    title={`Recognition confidence: ${device.recognition_confidence}%`}
+                                    title={t('devices.confidenceTitle', { value: device.recognition_confidence })}
                                   >
                                     {device.recognition_confidence >= 70 ? (
                                       <CheckCircle className="h-3 w-3" />
@@ -312,7 +314,7 @@ export const DeviceList: React.FC = () => {
                             className="btn-winui-secondary inline-flex items-center gap-1"
                           >
                             <MoreHorizontal className="h-4 w-4" />
-                            More
+                            {t('devices.more')}
                           </button>
                         </td>
                       </tr>
@@ -321,15 +323,15 @@ export const DeviceList: React.FC = () => {
                           <td colSpan={6} className="px-6 py-3" style={{ backgroundColor: 'var(--winui-bg-tertiary)' }}>
                             <div className="flex items-center justify-between mb-2">
                               <div className="text-xs font-semibold" style={{ color: 'var(--winui-text-secondary)' }}>
-                                Probe observations
+                                {t('devices.probeObservations')}
                               </div>
                               {observationsLoading && <Loader2 className="h-4 w-4 animate-spin" />}
                             </div>
                             {observationsLoading && (
-                              <p className="text-xs" style={{ color: 'var(--winui-text-secondary)' }}>Loading...</p>
+                              <p className="text-xs" style={{ color: 'var(--winui-text-secondary)' }}>{t('devices.loading')}</p>
                             )}
                             {!observationsLoading && (!observationsByMac[device.mac] || observationsByMac[device.mac].length === 0) && (
-                              <p className="text-xs" style={{ color: 'var(--winui-text-secondary)' }}>No observations yet.</p>
+                              <p className="text-xs" style={{ color: 'var(--winui-text-secondary)' }}>{t('devices.noObservations')}</p>
                             )}
                             {!observationsLoading && observationsByMac[device.mac] && observationsByMac[device.mac].length > 0 && (
                               <div className="space-y-2">
@@ -347,17 +349,17 @@ export const DeviceList: React.FC = () => {
                                       <button
                                         onClick={() => copyObservation(device.mac)}
                                         className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800"
-                                        title="Copy first observation JSON"
+                                        title={t('devices.copyObservation')}
                                       >
                                         <FileJson className="h-4 w-4" />
                                       </button>
                                     </div>
                                     <div className="mt-1 text-xs" style={{ color: 'var(--winui-text-primary)' }}>
-                                      {obs.raw_summary || 'No summary'}
+                                      {obs.raw_summary || t('devices.noSummary')}
                                     </div>
                                     {obs.keyword_hits && obs.keyword_hits.length > 0 && (
                                       <div className="mt-1 text-xxs" style={{ color: 'var(--winui-text-secondary)' }}>
-                                        {obs.keyword_hits.length} keyword hits (top: {obs.keyword_hits[0].infer_summary || obs.keyword_hits[0].rule_id})
+                                        {t('devices.keywordHits', { count: obs.keyword_hits.length, top: obs.keyword_hits[0].infer_summary || obs.keyword_hits[0].rule_id })}
                                       </div>
                                     )}
                                     <div className="mt-1 flex flex-wrap gap-1">
@@ -382,8 +384,8 @@ export const DeviceList: React.FC = () => {
                   <td colSpan={6} className="px-6 py-12 text-center">
                     <div className="flex flex-col items-center justify-center">
                       <Search className="h-12 w-12 mb-4" style={{ color: 'var(--winui-text-tertiary)' }} />
-                      <h3 className="text-lg font-semibold mb-1" style={{ color: 'var(--winui-text-primary)' }}>No devices found</h3>
-                      <p className="mb-6" style={{ color: 'var(--winui-text-secondary)' }}>Start a network scan to discover devices on your network.</p>
+                      <h3 className="text-lg font-semibold mb-1" style={{ color: 'var(--winui-text-primary)' }}>{t('devices.emptyTitle')}</h3>
+                      <p className="mb-6" style={{ color: 'var(--winui-text-secondary)' }}>{t('devices.emptyHint')}</p>
                       <ScanButton />
                     </div>
                   </td>

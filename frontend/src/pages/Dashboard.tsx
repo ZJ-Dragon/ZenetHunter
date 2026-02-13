@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { ScanButton } from '../components/actions/ScanButton';
 import { clsx } from 'clsx';
+import { useTranslation } from 'react-i18next';
 
 interface StatCardProps {
   title: string;
@@ -58,6 +59,7 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, icon: Icon, trend, co
 
 export const Dashboard: React.FC = () => {
   const navigate = useNavigate();
+  const { t } = useTranslation();
   const [devices, setDevices] = useState<Device[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [stats, setStats] = useState({
@@ -121,10 +123,10 @@ export const Dashboard: React.FC = () => {
         <div>
           <h1 className="text-2xl font-semibold flex items-center gap-2" style={{ color: 'var(--winui-text-primary)', letterSpacing: '-0.02em' }}>
             <LayoutDashboard className="h-8 w-8" style={{ color: 'var(--winui-accent)' }} />
-            Dashboard
+            {t('dashboard.title')}
           </h1>
           <p className="mt-1 text-sm" style={{ color: 'var(--winui-text-secondary)' }}>
-            网络概览和快速操作
+            {t('dashboard.subtitle')}
           </p>
         </div>
         <div className="flex space-x-2">
@@ -137,7 +139,7 @@ export const Dashboard: React.FC = () => {
             className="btn-winui-secondary inline-flex items-center"
           >
             <RefreshCw className={clsx("h-4 w-4 mr-2", isLoading && "animate-spin")} />
-            Refresh
+            {t('dashboard.refresh')}
           </button>
         </div>
       </div>
@@ -145,25 +147,25 @@ export const Dashboard: React.FC = () => {
       {/* Statistics Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
         <StatCard
-          title="总设备数"
+          title={t('dashboard.totalDevices')}
           value={stats.totalDevices}
           icon={Network}
           color="var(--winui-accent)"
         />
         <StatCard
-          title="在线设备"
+          title={t('dashboard.onlineDevices')}
           value={stats.onlineDevices}
           icon={CheckCircle}
           color="#10b981"
         />
         <StatCard
-          title="已拦截设备"
+          title={t('dashboard.blockedDevices')}
           value={stats.blockedDevices}
           icon={Shield}
           color="#dc2626"
         />
         <StatCard
-          title="活跃攻击"
+          title={t('dashboard.runningAttacks')}
           value={stats.recentAttacks}
           icon={Activity}
           color="#f59e0b"
@@ -176,7 +178,7 @@ export const Dashboard: React.FC = () => {
         <div className="card-winui p-6">
           <h2 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ color: 'var(--winui-text-primary)' }}>
             <Activity className="h-5 w-5" style={{ color: 'var(--winui-accent)' }} />
-            快速操作
+            {t('dashboard.quickActions')}
           </h2>
           <div className="space-y-3">
             <ScanButton className="w-full" />
@@ -185,21 +187,21 @@ export const Dashboard: React.FC = () => {
               onClick={() => navigate('/devices')}
             >
               <Network className="h-4 w-4 mr-2" />
-              查看所有设备
+              {t('dashboard.viewDevices')}
             </button>
             <button
               className="btn-winui-secondary w-full inline-flex items-center justify-center"
               onClick={() => navigate('/topology')}
             >
               <Activity className="h-4 w-4 mr-2" />
-              查看网络拓扑
+              {t('dashboard.viewTopology')}
             </button>
             <button
               className="btn-winui-secondary w-full inline-flex items-center justify-center"
               onClick={() => navigate('/attacks')}
             >
               <Shield className="h-4 w-4 mr-2" />
-              查看攻击记录
+              {t('dashboard.viewAttacks')}
             </button>
           </div>
         </div>
@@ -208,12 +210,12 @@ export const Dashboard: React.FC = () => {
         <div className="card-winui p-6">
           <h2 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ color: 'var(--winui-text-primary)' }}>
             <Clock className="h-5 w-5" style={{ color: 'var(--winui-accent)' }} />
-            最近设备
+            {t('dashboard.recentDevices')}
           </h2>
           <div className="space-y-2">
             {recentDevices.length === 0 ? (
               <p className="text-sm text-center py-4" style={{ color: 'var(--winui-text-tertiary)' }}>
-                暂无设备
+                {t('dashboard.noDevices')}
               </p>
             ) : (
               recentDevices.map((device) => (
@@ -237,7 +239,7 @@ export const Dashboard: React.FC = () => {
                         {device.name || device.alias || device.model || device.model_guess || device.mac}
                       </p>
                       <p className="text-xs" style={{ color: 'var(--winui-text-secondary)' }}>
-                        {device.ip} • {device.vendor || device.vendor_guess || 'Unknown'}
+                        {device.ip} • {device.vendor || device.vendor_guess || t('common.unknown')}
                         {(device.model || device.model_guess) && ` • ${device.model || device.model_guess}`}
                       </p>
                     </div>
@@ -257,7 +259,7 @@ export const Dashboard: React.FC = () => {
         <div className="card-winui p-6">
           <h2 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ color: 'var(--winui-text-primary)' }}>
             <Shield className="h-5 w-5" style={{ color: '#dc2626' }} />
-            活跃攻击 ({attackedDevices.length})
+            {t('dashboard.activeAttacks', { count: attackedDevices.length })}
           </h2>
           <div className="space-y-2">
             {attackedDevices.map((device) => (
@@ -272,16 +274,16 @@ export const Dashboard: React.FC = () => {
                 <div className="flex items-center space-x-3">
                   <Activity className="h-5 w-5 text-red-500" />
                   <div>
-                    <p className="text-sm font-medium" style={{ color: 'var(--winui-text-primary)' }}>
-                      {device.name || device.mac}
-                    </p>
-                    <p className="text-xs" style={{ color: 'var(--winui-text-secondary)' }}>
-                      {device.ip} • {device.attack_status || 'Unknown'}
-                    </p>
-                  </div>
+                  <p className="text-sm font-medium" style={{ color: 'var(--winui-text-primary)' }}>
+                    {device.name || device.mac}
+                  </p>
+                  <p className="text-xs" style={{ color: 'var(--winui-text-secondary)' }}>
+                    {device.ip} • {device.attack_status || t('common.unknown')}
+                  </p>
                 </div>
-                <button
-                  className="btn-winui text-sm px-3 py-1"
+              </div>
+              <button
+                className="btn-winui text-sm px-3 py-1"
                   onClick={async () => {
                     try {
                       await attackService.stopAttack(device.mac);
@@ -291,7 +293,7 @@ export const Dashboard: React.FC = () => {
                     }
                   }}
                 >
-                  停止
+                  {t('dashboard.stop')}
                 </button>
               </div>
             ))}

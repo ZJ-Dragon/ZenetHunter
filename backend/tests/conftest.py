@@ -35,6 +35,10 @@ def init_test_db():
     # Enable active defense for tests to avoid 400 responses
     os.environ["ACTIVE_DEFENSE_ENABLED"] = "true"
     os.environ["ACTIVE_DEFENSE_READONLY"] = "false"
+    # Reset settings cache so DATABASE_URL is picked up
+    from app.core.config import get_settings
+
+    get_settings.cache_clear()
     # Reset database singletons if they were created earlier
     from app.core import database
 

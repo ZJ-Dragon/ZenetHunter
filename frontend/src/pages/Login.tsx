@@ -3,15 +3,17 @@ import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../lib/api';
 import { Lock, User, ShieldAlert } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 
 export const Login: React.FC = () => {
-  const [username, setUsername] = useState('admin');  // Pre-fill default username
-  const [password, setPassword] = useState('');  // Don't pre-fill password for security
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
+  const { t } = useTranslation();
 
   const from = location.state?.from?.pathname || '/';
 
@@ -33,18 +35,20 @@ export const Login: React.FC = () => {
       });
 
       const { access_token } = response.data;
-      login(access_token);
-      navigate(from, { replace: true });
+      const isLimitedAdmin = username === 'admin' && password === 'zenethunter';
+      login(access_token, { limitedAdmin: isLimitedAdmin });
+      const target = isLimitedAdmin ? '/settings' : from;
+      navigate(target, { replace: true });
     } catch (err: unknown) {
       if (typeof err === 'object' && err !== null && 'response' in err) {
         // Use type assertion to access error response
         const errorResponse = err as { response?: { data?: { detail?: string } } };
         setError(
           errorResponse.response?.data?.detail ||
-            'Login failed. Please check your credentials.'
+            t('login.resetFailed')
         );
       } else {
-        setError('Login failed. Please check your credentials.');
+        setError(t('login.resetFailed'));
       }
       console.error(err);
     } finally {
@@ -61,8 +65,8 @@ export const Login: React.FC = () => {
               <ShieldAlert className="w-8 h-8" style={{ color: 'var(--winui-accent)' }} />
             </div>
           </div>
-          <h1 className="text-2xl font-semibold text-white">ZenetHunter</h1>
-          <p className="mt-2 text-sm" style={{ color: 'rgba(255, 255, 255, 0.9)' }}>Local Network Defense System</p>
+          <h1 className="text-2xl font-semibold text-white">{t('login.title')}</h1>
+          <p className="mt-2 text-sm" style={{ color: 'rgba(255, 255, 255, 0.9)' }}>{t('login.subtitle')}</p>
         </div>
 
         <div className="p-8">
@@ -74,7 +78,7 @@ export const Login: React.FC = () => {
             )}
 
             <div>
-              <label className="block text-sm font-medium mb-1" style={{ color: 'var(--winui-text-primary)' }}>Username</label>
+              <label className="block text-sm font-medium mb-1" style={{ color: 'var(--winui-text-primary)' }}>{t('login.username')}</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <User className="h-5 w-5" style={{ color: 'var(--winui-text-tertiary)' }} />
@@ -86,13 +90,13 @@ export const Login: React.FC = () => {
                   onChange={(e) => setUsername(e.target.value)}
                   className="input-winui block w-full pr-3 py-2"
                   style={{ paddingLeft: '42px' }}
-                  placeholder="admin"
+                  placeholder={t('login.username')}
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium mb-1" style={{ color: 'var(--winui-text-primary)' }}>Password</label>
+              <label className="block text-sm font-medium mb-1" style={{ color: 'var(--winui-text-primary)' }}>{t('login.password')}</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                   <Lock className="h-5 w-5" style={{ color: 'var(--winui-text-tertiary)' }} />
@@ -114,18 +118,23 @@ export const Login: React.FC = () => {
               disabled={isLoading}
               className="btn-winui w-full flex justify-center py-2 px-4 text-sm font-medium text-white transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
             >
-              {isLoading ? 'Signing in...' : 'Sign In'}
+              {isLoading ? t('login.signingIn') : t('login.signIn')}
             </button>
 
             <div className="mt-4 pt-4" style={{ borderTop: '1px solid var(--winui-border-subtle)' }}>
               <div className="p-3 rounded-lg" style={{ backgroundColor: 'rgba(0, 120, 212, 0.1)', border: '1px solid rgba(0, 120, 212, 0.3)' }}>
-                <p className="text-xs font-semibold mb-1" style={{ color: 'var(--winui-accent)' }}>首次使用？</p>
-                <p className="text-xs" style={{ color: 'var(--winui-text-secondary)' }}>
-                  默认账号已预填，请输入密码 <span className="font-mono font-semibold">zenethunter</span> 登录
-                </p>
-                <p className="text-xs mt-1" style={{ color: 'var(--winui-text-tertiary)' }}>
-                  MVP 版本使用默认凭据，生产环境请修改密码！
-                </p>
+                <p className="text-xs font-semibold mb-1" style={{ color: 'var(--winui-accent)' }}>{t('login.firstUse')}</p>
+                <div className="text-xs flex items-start gap-2" style={{ color: 'var(--winui-text-secondary)' }}>
+                  <span>{t('login.firstUseHint')}</span>
+                  <button
+                    type="button"
+                    onClick={() => navigate('/setup')}
+                    className="font-semibold underline"
+                    style={{ color: 'var(--winui-accent)' }}
+                  >
+                    {t('login.setupLink')}
+                  </button>
+                </div>
               </div>
             </div>
           </form>

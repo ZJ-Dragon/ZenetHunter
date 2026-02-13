@@ -1,14 +1,18 @@
-export interface OOBEConfig {
-  is_configured: boolean;
-  network_interface?: string;
-  target_subnets?: string[];
-  scan_interval?: number;
-  default_policy?: 'monitor' | 'block_unknown';
+export interface OOBEStatus {
+  admin_exists: boolean;
+  first_run_completed: boolean;
 }
 
-export interface OOBESetupRequest {
-  target_subnets: string[];
-  scan_interval: number;
-  default_policy: 'monitor' | 'block_unknown';
-  admin_password?: string; // Optional if we enforce reset
+export interface OOBERegisterRequest {
+  username: string;
+  password: string;
+}
+
+export interface OOBERegisterResponse {
+  access_token: string;
+  token_type: string;
+}
+
+export interface OOBEAcknowledgeRequest {
+  acknowledged: boolean;
 }

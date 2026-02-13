@@ -18,7 +18,7 @@ export const OOBEGuard: React.FC<OOBEGuardProps> = ({ children }) => {
         // but usually OOBE happens before auth or with a temporary token.
         // For this MVP, let's assume we check it on root load.
         const status = await configService.getStatus();
-        if (!status.is_configured && window.location.pathname !== '/setup') {
+        if (!status.first_run_completed && window.location.pathname !== '/setup') {
           navigate('/setup');
         }
       } catch (error) {

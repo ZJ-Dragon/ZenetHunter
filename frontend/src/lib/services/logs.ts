@@ -73,4 +73,8 @@ export const logsService = {
     );
     return response.data;
   },
+
+  replaySystem: async (): Promise<void> => {
+    await api.post('/config/replay');
+  },
 };

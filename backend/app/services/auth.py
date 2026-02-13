@@ -1,3 +1,7 @@
+import base64
+import hashlib
+import hmac
+import secrets
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
@@ -8,6 +12,29 @@ from app.models.auth import TokenData, UserRole
 
 settings = get_settings()
 ALGORITHM = "HS256"
+PBKDF2_ITERATIONS = 200_000
+
+
+def hash_password(password: str) -> str:
+    """Hash password using PBKDF2-HMAC-SHA256 with random salt."""
+    salt = secrets.token_bytes(16)
+    derived = hashlib.pbkdf2_hmac(
+        "sha256", password.encode("utf-8"), salt, PBKDF2_ITERATIONS
+    )
+    return base64.b64encode(salt + derived).decode("utf-8")
+
+
+def verify_password(password: str, stored_hash: str) -> bool:
+    """Verify password against stored PBKDF2 hash."""
+    try:
+        decoded = base64.b64decode(stored_hash.encode("utf-8"))
+        salt, digest = decoded[:16], decoded[16:]
+        candidate = hashlib.pbkdf2_hmac(
+            "sha256", password.encode("utf-8"), salt, PBKDF2_ITERATIONS
+        )
+        return hmac.compare_digest(candidate, digest)
+    except Exception:
+        return False
 
 
 def create_access_token(

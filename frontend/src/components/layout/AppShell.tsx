@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link, useLocation, Outlet, useNavigate } from 'react-router-dom';
+import { useLocation, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import {
   LayoutDashboard,
@@ -13,16 +13,34 @@ import {
   Terminal
 } from 'lucide-react';
 import { clsx } from 'clsx';
+import { useTranslation } from 'react-i18next';
+import toast from 'react-hot-toast';
 
-const NavItem: React.FC<{ to: string; icon: React.ElementType; children: React.ReactNode }> = ({ to, icon: Icon, children }) => {
+const NavItem: React.FC<{
+  to: string;
+  icon: React.ElementType;
+  children: React.ReactNode;
+  disabled?: boolean;
+  onBlocked?: () => void;
+}> = ({ to, icon: Icon, children, disabled, onBlocked }) => {
   const location = useLocation();
+  const navigate = useNavigate();
   const isActive = location.pathname === to;
 
+  const handleClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (disabled) {
+      onBlocked?.();
+      return;
+    }
+    navigate(to);
+  };
+
   return (
-    <Link
-      to={to}
+    <button
+      onClick={handleClick}
       className={clsx(
-        'flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200',
+        'w-full text-left flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200',
         isActive
           ? 'text-white'
           : 'hover:bg-gray-100 dark:hover:bg-gray-800'
@@ -30,6 +48,7 @@ const NavItem: React.FC<{ to: string; icon: React.ElementType; children: React.R
       style={{
         backgroundColor: isActive ? 'var(--winui-accent)' : 'transparent',
         color: isActive ? '#ffffff' : 'var(--winui-text-secondary)',
+        cursor: disabled ? 'not-allowed' : 'pointer'
       }}
     >
       <Icon
@@ -37,18 +56,23 @@ const NavItem: React.FC<{ to: string; icon: React.ElementType; children: React.R
         style={{ color: isActive ? '#ffffff' : 'var(--winui-text-tertiary)' }}
       />
       {children}
-    </Link>
+    </button>
   );
 };
 
 export const AppShell: React.FC = () => {
-  const { logout } = useAuth();
+  const { logout, isLimitedAdmin } = useAuth();
+  const { t } = useTranslation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const navigate = useNavigate();
 
   const handleLogout = () => {
     logout();
     navigate('/login');
+  };
+
+  const handleBlockedNav = () => {
+    toast.error(t('auth.accessDenied'));
   };
 
   return (
@@ -82,11 +106,11 @@ export const AppShell: React.FC = () => {
         </div>
 
         <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-          <NavItem to="/" icon={LayoutDashboard}>Dashboard</NavItem>
-          <NavItem to="/devices" icon={Network}>Devices</NavItem>
-          <NavItem to="/topology" icon={Activity}>Topology</NavItem>
-          <NavItem to="/attacks" icon={Shield}>Interference</NavItem>
-          <NavItem to="/logs" icon={Terminal}>Logs</NavItem>
+          <NavItem to="/" icon={LayoutDashboard} disabled={isLimitedAdmin} onBlocked={handleBlockedNav}>Dashboard</NavItem>
+          <NavItem to="/devices" icon={Network} disabled={isLimitedAdmin} onBlocked={handleBlockedNav}>Devices</NavItem>
+          <NavItem to="/topology" icon={Activity} disabled={isLimitedAdmin} onBlocked={handleBlockedNav}>Topology</NavItem>
+          <NavItem to="/attacks" icon={Shield} disabled={isLimitedAdmin} onBlocked={handleBlockedNav}>Interference</NavItem>
+          <NavItem to="/logs" icon={Terminal} disabled={isLimitedAdmin} onBlocked={handleBlockedNav}>Logs</NavItem>
           <NavItem to="/settings" icon={Settings}>Settings</NavItem>
         </nav>
 

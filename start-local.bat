@@ -1,24 +1,26 @@
 @echo off
 REM ============================================================
-REM ZenetHunter 本地启动脚本 (Windows)
+REM ZenetHunter local startup script (Windows)
 REM ============================================================
-REM 功能：
-REM   - 自动清理残留进程和端口
-REM   - 清理 Python/前端/OS 缓存
-REM   - 智能环境检测和依赖安装
-REM   - 数据库检查和自动修复
-REM   - 前后端一键启动
+REM Features:
+REM   - Kill leftover processes/ports
+REM   - Clear caches/logs (optional deep clean)
+REM   - Detect Python venv and install backend deps
+REM   - Quick DB sanity check and runtime reset
+REM   - Launch backend (uvicorn) and frontend (Vite)
 REM
-REM 用法：
-REM   start-local.bat              # 正常启动
-REM   start-local.bat --clean      # 深度清理后启动（清理缓存）
-REM   start-local.bat --clean-all  # 完全清理后启动（包括数据库和虚拟环境）
+REM Usage:
+REM   start-local.bat              # normal start
+REM   start-local.bat --clean      # clear caches before start
+REM   start-local.bat --clean-all  # deep clean (caches + DB + venv)
 REM ============================================================
 
 setlocal enabledelayedexpansion
 cd /d "%~dp0"
 
-REM 参数解析
+REM ------------------------------------------------------------
+REM Args
+REM ------------------------------------------------------------
 set CLEAN_MODE=0
 set CLEAN_ALL=0
 
@@ -37,81 +39,76 @@ if "%1"=="--clean-all" (
 )
 if "%1"=="-h" goto show_help
 if "%1"=="--help" goto show_help
-echo 未知参数: %1
-echo 使用 --help 查看帮助
+echo Unknown option: %1
+echo Use --help for usage
 exit /b 1
 
 :show_help
-echo 用法: %0 [选项]
+echo Usage: %0 [options]
 echo.
-echo 选项:
-echo   --clean       启动前清理缓存（Python、前端、日志等）
-echo   --clean-all   启动前完全清理（包括数据库和虚拟环境）
-echo   -h, --help    显示此帮助信息
-echo.
-echo 示例:
-echo   start-local.bat              # 正常启动
-echo   start-local.bat --clean      # 清理缓存后启动
+echo Options:
+echo   --clean       Clear caches before start
+echo   --clean-all   Deep clean (caches + DB + virtualenv)
+echo   -h, --help    Show this help
 exit /b 0
 
 :args_done
 
 echo.
 echo ============================================================
-echo         ZenetHunter 本地启动脚本 v2.0 (Windows)
-echo     集成：清理、检测、依赖、数据库、前后端启动
+echo         ZenetHunter local starter v2.0 (Windows)
+echo     Cleanup ^| Checks ^| Deps ^| DB ^| Frontend ^| Backend
 echo ============================================================
 echo.
 
-REM ============================================================
-REM 步骤 1: 清理残留进程
-REM ============================================================
-echo === 步骤 1/6: 清理残留进程 ===
+REM ------------------------------------------------------------
+REM Step 1: cleanup
+REM ------------------------------------------------------------
+echo === Step 1/6: Clean leftover processes ===
 
-echo   清理 uvicorn 进程...
+echo   Killing uvicorn processes...
 for /f "tokens=2" %%a in ('tasklist /FI "IMAGENAME eq python.exe" /FO LIST 2^>nul ^| findstr /C:"PID:"') do (
     wmic process where "ProcessId=%%a" get CommandLine 2>nul | findstr /C:"uvicorn" >nul && (
         taskkill /F /PID %%a >nul 2>&1
-        echo     已终止进程 %%a
+        echo     terminated %%a
     )
 )
-echo   √ 后端进程清理完成
+echo   √ Backend processes cleared
 
-echo   清理 vite 进程...
+echo   Killing vite processes...
 taskkill /F /FI "WINDOWTITLE eq vite*" >nul 2>&1
 for /f "tokens=2" %%a in ('tasklist /FI "IMAGENAME eq node.exe" /FO LIST 2^>nul ^| findstr /C:"PID:"') do (
     wmic process where "ProcessId=%%a" get CommandLine 2>nul | findstr /C:"vite" >nul && (
         taskkill /F /PID %%a >nul 2>&1
-        echo     已终止进程 %%a
+        echo     terminated %%a
     )
 )
-echo   √ 前端进程清理完成
+echo   √ Frontend processes cleared
 
-REM 清理端口占用
-echo   检查端口占用...
+echo   Checking ports...
 for /f "tokens=5" %%a in ('netstat -ano 2^>nul ^| findstr ":8000.*LISTENING"') do (
-    echo     端口 8000 被占用 (PID: %%a)，正在释放...
+    echo     Port 8000 in use (PID: %%a), freeing...
     taskkill /F /PID %%a >nul 2>&1
 )
 for /f "tokens=5" %%a in ('netstat -ano 2^>nul ^| findstr ":5173.*LISTENING"') do (
-    echo     端口 5173 被占用 (PID: %%a)，正在释放...
+    echo     Port 5173 in use (PID: %%a), freeing...
     taskkill /F /PID %%a >nul 2>&1
 )
-echo   √ 端口清理完成
+echo   √ Ports cleared
 echo.
 
-REM ============================================================
-REM 步骤 2: 清理缓存（可选）
-REM ============================================================
+REM ------------------------------------------------------------
+REM Step 2: caches
+REM ------------------------------------------------------------
 if %CLEAN_MODE%==1 goto clean_caches
-echo === 步骤 2/6: 跳过缓存清理（使用 --clean 启用）===
+echo === Step 2/6: Skip cache clean (use --clean to enable) ===
 echo.
 goto check_python
 
 :clean_caches
-echo === 步骤 2/6: 清理缓存 ===
+echo === Step 2/6: Clear caches ===
 
-echo   清理 Python 缓存...
+echo   Python caches...
 for /d /r . %%d in (__pycache__) do @if exist "%%d" rd /s /q "%%d" 2>nul
 for /r . %%f in (*.pyc) do @if exist "%%f" del /q "%%f" 2>nul
 for /r . %%f in (*.pyo) do @if exist "%%f" del /q "%%f" 2>nul
@@ -120,9 +117,9 @@ for /d /r . %%d in (.pytest_cache) do @if exist "%%d" rd /s /q "%%d" 2>nul
 for /d /r . %%d in (.mypy_cache) do @if exist "%%d" rd /s /q "%%d" 2>nul
 for /d /r . %%d in (.ruff_cache) do @if exist "%%d" rd /s /q "%%d" 2>nul
 for /d /r . %%d in (*.egg-info) do @if exist "%%d" rd /s /q "%%d" 2>nul
-echo   √ Python 缓存已清理
+echo   √ Python caches cleared
 
-echo   清理前端缓存...
+echo   Frontend caches...
 if exist "frontend" (
     if exist "frontend\dist" rd /s /q "frontend\dist" 2>nul
     if exist "frontend\.vite" rd /s /q "frontend\.vite" 2>nul
@@ -131,61 +128,61 @@ if exist "frontend" (
     for /r frontend %%f in (*.tsbuildinfo) do @if exist "%%f" del /q "%%f" 2>nul
     for /r frontend %%f in (.eslintcache) do @if exist "%%f" del /q "%%f" 2>nul
 )
-echo   √ 前端缓存已清理
+echo   √ Frontend caches cleared
 
-echo   清理日志文件...
+echo   Log files...
 for /r . %%f in (*.log) do @if exist "%%f" del /q "%%f" 2>nul
 for /r . %%f in (*.log.*) do @if exist "%%f" del /q "%%f" 2>nul
-echo   √ 日志文件已清理
+echo   √ Logs removed
 
-echo   清理系统缓存...
+echo   OS junk...
 for /r . %%f in (Thumbs.db) do @if exist "%%f" del /q "%%f" 2>nul
 for /r . %%f in (desktop.ini) do @if exist "%%f" del /q "%%f" 2>nul
-echo   √ 系统缓存已清理
+echo   √ OS junk removed
 
-echo   清理 IDE 缓存...
+echo   IDE swap...
 for /r . %%f in (*.swp) do @if exist "%%f" del /q "%%f" 2>nul
 for /r . %%f in (*.swo) do @if exist "%%f" del /q "%%f" 2>nul
-echo   √ IDE 缓存已清理
+echo   √ IDE swap removed
 
-echo   清理数据库锁文件...
+echo   DB lock files...
 if exist "backend\data\zenethunter.db-shm" del /q "backend\data\zenethunter.db-shm" 2>nul
 if exist "backend\data\zenethunter.db-wal" del /q "backend\data\zenethunter.db-wal" 2>nul
-echo   √ 数据库锁文件已清理
+echo   √ DB lock files cleared
 
 if %CLEAN_ALL%==0 goto check_python
 
 echo.
-echo ⚠ 警告: 将清理数据库和虚拟环境！
-set /p confirm="确认继续? (yes/no): "
+echo ⚠ Warning: DB and virtualenv will be removed!
+set /p confirm="Continue? (yes/no): "
 if /i not "%confirm%"=="yes" if /i not "%confirm%"=="y" (
-    echo 已取消深度清理
+    echo Deep clean cancelled
     goto check_python
 )
 
-echo   清理数据库文件...
+echo   Removing database files...
 for /r . %%f in (*.db) do @if exist "%%f" del /q "%%f" 2>nul
 for /r . %%f in (*.sqlite) do @if exist "%%f" del /q "%%f" 2>nul
 for /r . %%f in (*.sqlite3) do @if exist "%%f" del /q "%%f" 2>nul
-echo   √ 数据库文件已清理
+echo   √ Database files removed
 
-echo   清理虚拟环境...
+echo   Removing virtualenv...
 if exist ".venv" rd /s /q ".venv" 2>nul
 if exist "venv" rd /s /q "venv" 2>nul
 if exist "backend\.venv" rd /s /q "backend\.venv" 2>nul
 if exist "backend\venv" rd /s /q "backend\venv" 2>nul
-echo   √ 虚拟环境已清理
+echo   √ Virtualenv removed
 echo.
 
-REM ============================================================
-REM 步骤 3: 检查 Python 环境
-REM ============================================================
+REM ------------------------------------------------------------
+REM Step 3: Python env
+REM ------------------------------------------------------------
 :check_python
-echo === 步骤 3/6: 检查 Python 环境 ===
+echo === Step 3/6: Check Python ===
 
 python --version >nul 2>&1
 if errorlevel 1 (
-    echo ✗ 错误: 未找到 Python
+    echo ✗ Error: python not found
     pause
     exit /b 1
 )
@@ -195,87 +192,82 @@ echo   √ %PYTHON_VERSION%
 
 cd backend
 
-REM 检查/创建虚拟环境
 if not exist ".venv" (
-    echo   创建虚拟环境...
+    echo   Creating virtualenv...
     python -m venv .venv
 )
 
-REM 激活虚拟环境
 call .venv\Scripts\activate.bat
-echo   √ 虚拟环境已激活
+echo   √ Virtualenv activated
 echo.
 
-REM ============================================================
-REM 步骤 4: 安装依赖
-REM ============================================================
-echo === 步骤 4/6: 安装/更新依赖 ===
+REM ------------------------------------------------------------
+REM Step 4: deps
+REM ------------------------------------------------------------
+echo === Step 4/6: Install/update backend deps ===
 
 python -m pip install -q --upgrade pip
 python -m pip install -q -e . || (
-    echo   警告: editable 安装失败，尝试直接安装依赖...
+    echo   Warning: editable install failed, trying fallback...
     python -m pip install -q greenlet>=3.0.0
     python -m pip install -q -e .
 )
-echo   √ 依赖安装完成
+echo   √ Dependencies installed
 echo.
 
-REM ============================================================
-REM 步骤 5: 检查数据库
-REM ============================================================
-echo === 步骤 5/6: 检查数据库 ===
+REM ------------------------------------------------------------
+REM Step 5: DB check
+REM ------------------------------------------------------------
+echo === Step 5/6: Database check ===
 
 if "%DATABASE_URL%"=="" (
     set DATABASE_URL=sqlite+aiosqlite:///./data/zenethunter.db
-    echo   √ 使用默认 SQLite 数据库
+    echo   √ Using default SQLite database
 )
 
 if not exist "data" mkdir data
 
 if exist "data\zenethunter.db" (
-    echo   √ 数据库已存在
+    echo   √ Database exists
 ) else (
-    echo   √ 将在首次启动时创建数据库
+    echo   √ Database will be created on first run
 )
 echo.
 
-REM ============================================================
-REM 步骤 5.5: 重置本地运行态（保留手动库）
-REM ============================================================
-echo === 步骤 5.5/6: 重置本地运行态（保留手动库） ===
+REM ------------------------------------------------------------
+REM Step 5.5: reset runtime
+REM ------------------------------------------------------------
+echo === Step 5.5/6: Reset volatile runtime data (keep manual library) ===
 if "%APP_ENV%"=="" set APP_ENV=development
 python -m app.maintenance.reset_runtime_data
 if errorlevel 1 (
-    echo ✗ 本地运行态重置失败（仅允许 APP_ENV=development）
+    echo ✗ Runtime reset failed (allowed only for APP_ENV=development)
     exit /b 1
 )
-echo   √ 已清空 devices/指纹/观测等运行态数据（手动库保留）
+echo   √ Runtime tables cleared (manual library kept)
 echo.
 
-REM ============================================================
-REM 步骤 6: 启动服务
-REM ============================================================
-echo === 步骤 6/6: 启动服务 ===
+REM ------------------------------------------------------------
+REM Step 6: start services
+REM ------------------------------------------------------------
+echo === Step 6/6: Start services ===
 
-REM 设置环境变量
 set APP_ENV=development
 set APP_HOST=0.0.0.0
 set APP_PORT=8000
 set LOG_LEVEL=info
 set CORS_ALLOW_ORIGINS=null,http://localhost:8000,http://localhost:5173,http://127.0.0.1:5173
 
-REM 检测管理员权限
 set IS_ADMIN=0
 net session >nul 2>&1
 if %errorlevel%==0 (
     set IS_ADMIN=1
-    echo   √ 检测到管理员权限，将启用所有网络功能
+    echo   √ Admin privileges detected: full network features enabled
 ) else (
-    echo   ⚠ 当前未使用管理员权限，某些功能可能受限
-    echo     提示: 右键点击，选择"以管理员身份运行"
+    echo   ⚠ Not running as admin; some probes may be limited
+    echo     Tip: right-click and "Run as administrator"
 )
 
-REM 获取本地 IP
 for /f "tokens=2 delims=:" %%a in ('ipconfig ^| findstr /c:"IPv4"') do (
     set LOCAL_IP=%%a
     set LOCAL_IP=!LOCAL_IP:~1!
@@ -286,43 +278,40 @@ if defined LOCAL_IP (
     set CORS_ALLOW_ORIGINS=%CORS_ALLOW_ORIGINS%,http://%LOCAL_IP%:5173
 )
 
-REM 启动前端
 cd /d "%~dp0"
 if exist "frontend" (
     cd frontend
     if not exist "node_modules" (
-        echo   安装前端依赖...
+        echo   Installing frontend dependencies...
         call npm install
     )
-    echo   启动 React 前端服务器...
+    echo   Starting React dev server...
     start /B npm run dev >nul 2>&1
     timeout /t 2 /nobreak >nul
-    echo   √ 前端服务器已启动 (端口: 5173)
+    echo   √ Frontend started (port: 5173)
     cd /d "%~dp0"
 ) else (
-    echo   ⚠ 未找到 frontend 目录，跳过前端启动
+    echo   ⚠ frontend directory not found; skipping frontend start
 )
 
 echo.
 echo ============================================================
-echo                    服务启动完成
+echo                    Services are up
 echo ============================================================
-echo   后端 API:  http://localhost:8000
-echo   API 文档:  http://localhost:8000/docs
-echo   前端页面:  http://localhost:5173
+echo   Backend API:  http://localhost:8000
+echo   API Docs:     http://localhost:8000/docs
+echo   Frontend:     http://localhost:5173
 if defined LOCAL_IP (
-echo   网络访问:  http://%LOCAL_IP%:5173
+echo   LAN access:   http://%LOCAL_IP%:5173
 )
 echo ============================================================
-echo   按 Ctrl+C 关闭所有服务
+echo   Press Ctrl+C to stop all services
 echo ============================================================
 echo.
 
-REM 启动后端
 cd backend
 uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 
-REM 清理：停止前端服务器（当后端停止时）
 cd /d "%~dp0"
 taskkill /F /FI "WINDOWTITLE eq vite*" >nul 2>&1
 for /f "tokens=2" %%a in ('tasklist /FI "IMAGENAME eq node.exe" /FO LIST 2^>nul ^| findstr /C:"PID:"') do (
