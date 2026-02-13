@@ -332,6 +332,69 @@ async def init_db() -> None:
                         await conn.commit()
                 except Exception as e:
                     logger.debug(f"Could not check/add is_builtin column: {e}")
+                # Rebuild user_accounts if missing autoincrement id primary key
+                try:
+                    result = await conn.execute(
+                        text("SELECT name, pk FROM pragma_table_info('user_accounts')")
+                    )
+                    cols = result.fetchall()
+                    col_names = {c[0] for c in cols}
+                    id_info = next((c for c in cols if c[0] == "id"), None)
+                    needs_rebuild = (
+                        "id" not in col_names or id_info is None or id_info[1] == 0
+                    )
+                    if needs_rebuild:
+                        logger.warning(
+                            "Rebuilding user_accounts with autoincrement id primary key"
+                        )
+                        await conn.execute(
+                            text(
+                                """
+                                CREATE TABLE IF NOT EXISTS user_accounts_new (
+                                    id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                                    username VARCHAR(100) NOT NULL UNIQUE,
+                                    password_hash VARCHAR(255) NOT NULL,
+                                    role VARCHAR(50) NOT NULL DEFAULT 'admin',
+                                    is_builtin BOOLEAN NOT NULL DEFAULT 0,
+                                    created_at DATETIME NOT NULL,
+                                    updated_at DATETIME NOT NULL
+                                )
+                                """
+                            )
+                        )
+                        await conn.execute(
+                            text(
+                                """
+                                INSERT OR IGNORE INTO user_accounts_new
+                                (
+                                    username,
+                                    password_hash,
+                                    role,
+                                    is_builtin,
+                                    created_at,
+                                    updated_at
+                                )
+                                SELECT
+                                    username,
+                                    password_hash,
+                                    role,
+                                    COALESCE(is_builtin, 0),
+                                    COALESCE(created_at, CURRENT_TIMESTAMP),
+                                    COALESCE(updated_at, CURRENT_TIMESTAMP)
+                                FROM user_accounts
+                                """
+                            )
+                        )
+                        await conn.execute(text("DROP TABLE user_accounts"))
+                        await conn.execute(
+                            text(
+                                "ALTER TABLE user_accounts_new RENAME TO user_accounts"
+                            )
+                        )
+                        await conn.commit()
+                        logger.info("user_accounts rebuilt with id primary key")
+                except Exception as e:
+                    logger.debug(f"Could not rebuild user_accounts table: {e}")
             elif db_url.startswith("postgresql"):
                 # For PostgreSQL, check if model column exists
                 try:
