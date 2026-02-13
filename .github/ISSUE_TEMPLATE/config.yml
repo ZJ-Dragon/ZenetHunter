@@ -1,0 +1,8 @@
+blank_issues_enabled: false
+contact_links:
+  - name: Security vulnerability report
+    url: mailto:zjdragon.personal@outlook.com
+    about: Please email details privately (do not post publicly) if you believe you've found a security issue.
+  - name: Q&A / Usage
+    url: https://github.com/ZJ-Dragon/ZenetHunter/discussions
+    about: Questions, usage help, and troubleshooting belong in Discussions.

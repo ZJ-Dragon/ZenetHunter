@@ -1,0 +1,75 @@
+name: "Bug report"
+description: "Report a reproducible defect in ZenetHunter"
+title: "[Bug] <short summary>"
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping improve ZenetHunter. Please fill out all fields so we can reproduce and fix the issue quickly.
+
+  - type: input
+    id: environment
+    attributes:
+      label: Environment
+      description: OS / version, hardware (e.g., NAS model), CPU/arch, Python/Node versions, and whether running from source or packaged build.
+      placeholder: "e.g., macOS 14.6.1 (M3), Python 3.12.2, Node 22, source checkout"
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Reproduction steps
+      description: Numbered steps to reproduce from a clean state.
+      placeholder: |
+        1. ...
+        2. ...
+        3. ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+      placeholder: "What you expected to happen"
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior
+      placeholder: "What actually happened"
+    validations:
+      required: true
+
+  - type: textarea
+    id: logs
+    attributes:
+      label: Relevant logs/output
+      description: Include stack traces, console output, and screenshots if applicable. Redact secrets.
+      render: shell
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: Version/commit
+      description: Git commit hash or tag; include frontend/backend build versions if relevant.
+      placeholder: "e.g., 3f2c1d0 or v0.1.0"
+    validations:
+      required: true
+
+  - type: dropdown
+    id: authorized_network
+    attributes:
+      label: Tested on an authorized network?
+      description: ZenetHunter tooling (scans/active interference) must only be used on networks you own or are explicitly authorized to test.
+      options:
+        - "Yes — own/authorized network"
+        - "No / not sure (please clarify)"
+    validations:
+      required: true

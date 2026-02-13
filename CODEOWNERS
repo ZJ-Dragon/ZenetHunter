@@ -16,10 +16,6 @@
 /frontend/                           @ZJ-Dragon/frontend @ZJ-Dragon/maintainers
 /frontend/**                         @ZJ-Dragon/frontend @ZJ-Dragon/maintainers
 
-# ---- Defender (future subdir if separated) ----
-/defender/                           @ZJ-Dragon/defender @ZJ-Dragon/maintainers
-/defender/**                         @ZJ-dragon/defender @ZJ-Dragon/maintainers
-
 # ---- CI / Ops ----
 /.github/workflows/**                @ZJ-Dragon/ci @ZJ-Dragon/maintainers
 
@@ -39,3 +35,7 @@
 # Specific file types:
 # /backend/**.py                      @ZJ-Dragon/backend
 # /frontend/**.{ts,tsx,js,jsx}        @ZJ-Dragon/frontend
+
+
+# ---- Global Setting ----
+* @ZJ-Dragon
