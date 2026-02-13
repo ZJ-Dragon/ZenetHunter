@@ -7,9 +7,10 @@ import hmac
 import logging
 import secrets
 
+from sqlalchemy import text
 from sqlalchemy.exc import IntegrityError, OperationalError
 
-from app.core.database import get_session_factory
+from app.core.database import get_engine, get_session_factory
 from app.models.auth import UserRole
 from app.repositories.app_setting import AppSettingRepository
 from app.repositories.user_account import UserAccountRepository
@@ -90,8 +91,21 @@ class SetupService:
                 await session.commit()
             except IntegrityError as exc:
                 await session.rollback()
-                logger.warning("Failed to create admin: %s", exc)
-                raise ValueError("Username already exists") from None
+                message = str(exc)
+                logger.warning("Failed to create admin: %s", message)
+                if "user_accounts.id" in message and "NOT NULL" in message:
+                    await self._rebuild_user_accounts_table()
+                    # retry once after rebuild
+                    async with self.session_factory() as retry_session:
+                        retry_repo = UserAccountRepository(retry_session)
+                        await retry_repo.create_admin(
+                            username=username_clean,
+                            password_hash=password_hash,
+                            is_builtin=False,
+                        )
+                        await retry_session.commit()
+                else:
+                    raise ValueError("Username already exists") from None
 
             token = create_access_token(
                 data={"sub": username_clean, "role": UserRole.ADMIN}
@@ -147,3 +161,49 @@ class SetupService:
             if not user:
                 return False
             return self.verify_password(user.password_hash, password)
+
+    async def _rebuild_user_accounts_table(self) -> None:
+        """Recreate user_accounts with autoincrement id if schema is legacy."""
+        engine = get_engine()
+        db_url = str(engine.url)
+        if not db_url.startswith("sqlite"):
+            return
+        logger.warning("Rebuilding legacy user_accounts table (sqlite)")
+        async with engine.begin() as conn:
+            await conn.execute(
+                text(
+                    """
+                    CREATE TABLE IF NOT EXISTS user_accounts_new (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        username VARCHAR(100) NOT NULL UNIQUE,
+                        password_hash VARCHAR(255) NOT NULL,
+                        role VARCHAR(50) NOT NULL DEFAULT 'admin',
+                        is_builtin BOOLEAN NOT NULL DEFAULT 0,
+                        created_at DATETIME NOT NULL,
+                        updated_at DATETIME NOT NULL
+                    )
+                    """
+                )
+            )
+            await conn.execute(
+                text(
+                    """
+                    INSERT OR IGNORE INTO user_accounts_new
+                    (username, password_hash, role, is_builtin, created_at, updated_at)
+                    SELECT
+                        username,
+                        password_hash,
+                        role,
+                        COALESCE(is_builtin, 0),
+                        COALESCE(created_at, CURRENT_TIMESTAMP),
+                        COALESCE(updated_at, CURRENT_TIMESTAMP)
+                    FROM user_accounts
+                    """
+                )
+            )
+            await conn.execute(text("DROP TABLE IF EXISTS user_accounts"))
+            await conn.execute(
+                text("ALTER TABLE user_accounts_new RENAME TO user_accounts")
+            )
+            await conn.commit()
+        logger.info("user_accounts table rebuilt (sqlite)")
