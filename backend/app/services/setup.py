@@ -69,6 +69,11 @@ class SetupService:
 
     async def register_admin(self, username: str, password: str) -> str:
         """Register first admin; returns access token."""
+        username_clean = username.strip()
+        if not username_clean or username_clean.lower() == "admin":
+            raise ValueError(
+                "Username 'admin' is reserved for the limited debug account"
+            )
         async with self.session_factory() as session:
             user_repo = UserAccountRepository(session)
 
@@ -77,11 +82,13 @@ class SetupService:
 
             password_hash, _ = self.hash_password(password)
             await user_repo.create_admin(
-                username=username, password_hash=password_hash, is_builtin=False
+                username=username_clean, password_hash=password_hash, is_builtin=False
             )
             await session.commit()
 
-            token = create_access_token(data={"sub": username, "role": UserRole.ADMIN})
+            token = create_access_token(
+                data={"sub": username_clean, "role": UserRole.ADMIN}
+            )
             return token
 
     async def acknowledge_disclaimer(self, username: str) -> None:

@@ -11,7 +11,7 @@ export const SetupWizard: React.FC = () => {
   const [status, setStatus] = useState<OOBEStatus | null>(null);
   const [statusLoading, setStatusLoading] = useState(true);
   const [formData, setFormData] = useState<OOBERegisterRequest>({
-    username: 'admin',
+    username: '',
     password: '',
   });
   const [showDisclaimer, setShowDisclaimer] = useState(false);
@@ -77,9 +77,14 @@ export const SetupWizard: React.FC = () => {
   };
 
   const handleRegister = async () => {
+    const username = formData.username.trim();
+    if (!username || username.toLowerCase() === 'admin') {
+      toast.error(t('setup.adminReserved'));
+      return;
+    }
     setLoading(true);
     try {
-      const result = await configService.register(formData);
+      const result = await configService.register({ ...formData, username });
       login(result.access_token, { limitedAdmin: false });
       toast.success(t('setup.createAdmin'));
       setShowDisclaimer(true);
@@ -106,6 +111,14 @@ export const SetupWizard: React.FC = () => {
   };
 
   const readyToAcknowledge = hasScrolled && timerReady;
+  const usernameTrimmed = formData.username.trim();
+  const isAdminReserved = usernameTrimmed.toLowerCase() === 'admin';
+  const registerDisabled =
+    loading ||
+    formData.password.length < 8 ||
+    !usernameTrimmed ||
+    (status?.admin_exists ?? false) ||
+    isAdminReserved;
 
   if (statusLoading) {
     return (
@@ -150,10 +163,15 @@ export const SetupWizard: React.FC = () => {
                     className="mt-1 input-winui block w-full"
                     value={formData.username}
                     onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                    placeholder="admin"
+                    placeholder={t('setup.usernamePlaceholder')}
                     required
                   />
                   <p className="mt-1 text-xs text-gray-500">{t('setup.accountSub')}</p>
+                  {isAdminReserved && (
+                    <p className="mt-2 text-sm" style={{ color: '#d13438' }}>
+                      {t('setup.adminReserved')}
+                    </p>
+                  )}
                 </div>
                 <div>
                   <label className="block text-sm font-medium" style={{ color: 'var(--winui-text-primary)' }}>{t('setup.password')}</label>
@@ -178,12 +196,7 @@ export const SetupWizard: React.FC = () => {
                 <div className="flex items-center justify-end">
                   <button
                     onClick={handleRegister}
-                    disabled={
-                      loading ||
-                      formData.password.length < 8 ||
-                      !formData.username ||
-                      (status?.admin_exists ?? false)
-                    }
+                    disabled={registerDisabled}
                     className="btn-winui px-6 py-2 text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {loading ? t('setup.creating') : t('setup.createAdmin')}

@@ -123,9 +123,17 @@ export const Login: React.FC = () => {
             <div className="mt-4 pt-4" style={{ borderTop: '1px solid var(--winui-border-subtle)' }}>
               <div className="p-3 rounded-lg" style={{ backgroundColor: 'rgba(0, 120, 212, 0.1)', border: '1px solid rgba(0, 120, 212, 0.3)' }}>
                 <p className="text-xs font-semibold mb-1" style={{ color: 'var(--winui-accent)' }}>{t('login.firstUse')}</p>
-                <p className="text-xs" style={{ color: 'var(--winui-text-secondary)' }}>
-                  {t('login.firstUseHint')}
-                </p>
+                <div className="text-xs flex items-start gap-2" style={{ color: 'var(--winui-text-secondary)' }}>
+                  <span>{t('login.firstUseHint')}</span>
+                  <button
+                    type="button"
+                    onClick={() => navigate('/setup')}
+                    className="font-semibold underline"
+                    style={{ color: 'var(--winui-accent)' }}
+                  >
+                    {t('login.setupLink')}
+                  </button>
+                </div>
               </div>
             </div>
           </form>
