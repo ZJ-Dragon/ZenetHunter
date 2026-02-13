@@ -8,6 +8,7 @@ Create Date: 2026-02-12 17:00:00
 from collections.abc import Sequence
 
 import sqlalchemy as sa
+
 from alembic import op
 
 # revision identifiers, used by Alembic.
@@ -118,11 +119,13 @@ def downgrade() -> None:
     inspector = sa.inspect(bind)
 
     if inspector.has_table("probe_observations"):
+        op.drop_index("ix_probe_observations_protocol", table_name="probe_observations")
         op.drop_index(
-            "ix_probe_observations_protocol", table_name="probe_observations"
+            "ix_probe_observations_scan_run_id", table_name="probe_observations"
         )
-        op.drop_index("ix_probe_observations_scan_run_id", table_name="probe_observations")
-        op.drop_index("ix_probe_observations_device_mac", table_name="probe_observations")
+        op.drop_index(
+            "ix_probe_observations_device_mac", table_name="probe_observations"
+        )
         op.drop_table("probe_observations")
 
     if inspector.has_table("user_accounts"):
@@ -134,7 +137,9 @@ def downgrade() -> None:
             "ix_device_manual_profiles_fingerprint_key",
             table_name="device_manual_profiles",
         )
-        op.drop_index("ix_device_manual_profiles_mac", table_name="device_manual_profiles")
+        op.drop_index(
+            "ix_device_manual_profiles_mac", table_name="device_manual_profiles"
+        )
         op.drop_table("device_manual_profiles")
 
     device_columns = {col["name"] for col in inspector.get_columns("devices")}
