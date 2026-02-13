@@ -83,6 +83,8 @@ chore(gitignore): exclude venv and node_modules
 
 > 详细运行方式见各子目录 `README.md`。
 
+> 安全提示：仓库包含网络扫描/主动干扰脚本，仅在**自有或获授权的网络/实验环境**使用，未授权使用可能违法。
+
 ---
 
 ## 5. 版本与变更日志

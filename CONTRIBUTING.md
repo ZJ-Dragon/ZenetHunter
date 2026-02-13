@@ -84,6 +84,10 @@ Reference: pre‑commit quick start docs.
 
 See each subdirectory’s `README.md` for detailed instructions.
 
+> Safety: repo includes network scanning / active interference scripts; use only on networks you own or are explicitly authorized to test (treat like Kali tooling).
+
+> Safety: repo包含网络扫描/主动干扰脚本，仅在自有或获授权网络使用；遵循与 Kali 工具类似的合规要求。
+
 ---
 
 ## 5) Versioning & Changelog

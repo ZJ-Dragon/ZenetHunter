@@ -2,6 +2,8 @@
 
 > Device visibility + adaptive orchestration for small/home LANs. Includes a network **Scanner**, **Dispatcher**, **Interference Engine (interface layer)**, **Defender**, **Config/State Manager**, and a **Frontend SPA**. The project focuses on **observability, access control, and lawful network defense** for your own network.
 
+> Safety notice: the repo includes network-scanning and active-interference scripts. Use only on networks you own or are expressly authorized to test—misuse may be illegal.
+
 ---
 
 ## Repository Layout (Monorepo)

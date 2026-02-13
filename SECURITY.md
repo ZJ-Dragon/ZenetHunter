@@ -2,7 +2,7 @@
 
 # Security Policy
 
-ZenetHunter is intended for **your own networks** and focuses on observability, access control, and lawful defensive measures. This document explains **how to report vulnerabilities** and our **response timeline**.
+ZenetHunter is intended for **your own networks** and focuses on observability, access control, and lawful defensive measures. The repository includes network scanning and active-interference code; run it only on networks you own or are explicitly authorized to test. This document explains **how to report vulnerabilities** and our **response timeline**.
 
 ---
 
