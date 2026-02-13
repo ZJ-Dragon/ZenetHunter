@@ -27,7 +27,8 @@ def upgrade() -> None:
     if not inspector.has_table("user_accounts"):
         op.create_table(
             "user_accounts",
-            sa.Column("username", sa.String(length=100), primary_key=True),
+            sa.Column("id", sa.Integer(), primary_key=True, autoincrement=True),
+            sa.Column("username", sa.String(length=100), nullable=False),
             sa.Column("password_hash", sa.String(length=255), nullable=False),
             sa.Column(
                 "role", sa.String(length=50), nullable=False, server_default="admin"
@@ -37,7 +38,25 @@ def upgrade() -> None:
             ),
             sa.Column("created_at", sa.DateTime(timezone=True), nullable=False),
             sa.Column("updated_at", sa.DateTime(timezone=True), nullable=False),
+            sa.UniqueConstraint("username", name="uq_user_accounts_username"),
         )
+    else:
+        cols = {c["name"] for c in inspector.get_columns("user_accounts")}
+        if "id" not in cols:
+            # Best-effort add id column for legacy tables (non-PK)
+            op.add_column(
+                "user_accounts",
+                sa.Column("id", sa.Integer(), autoincrement=True, nullable=True),
+            )
+        if not any(
+            uc["name"] == "uq_user_accounts_username"
+            for uc in inspector.get_unique_constraints("user_accounts")
+        ):
+            op.create_unique_constraint(
+                "uq_user_accounts_username",
+                "user_accounts",
+                ["username"],
+            )
 
     # device_manual_profiles table
     if not inspector.has_table("device_manual_profiles"):

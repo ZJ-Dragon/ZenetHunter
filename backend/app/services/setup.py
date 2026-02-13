@@ -7,7 +7,7 @@ import hmac
 import logging
 import secrets
 
-from sqlalchemy.exc import OperationalError
+from sqlalchemy.exc import IntegrityError, OperationalError
 
 from app.core.database import get_session_factory
 from app.models.auth import UserRole
@@ -81,10 +81,17 @@ class SetupService:
                 raise ValueError("Admin already exists")
 
             password_hash, _ = self.hash_password(password)
-            await user_repo.create_admin(
-                username=username_clean, password_hash=password_hash, is_builtin=False
-            )
-            await session.commit()
+            try:
+                await user_repo.create_admin(
+                    username=username_clean,
+                    password_hash=password_hash,
+                    is_builtin=False,
+                )
+                await session.commit()
+            except IntegrityError as exc:
+                await session.rollback()
+                logger.warning("Failed to create admin: %s", exc)
+                raise ValueError("Username already exists") from None
 
             token = create_access_token(
                 data={"sub": username_clean, "role": UserRole.ADMIN}
