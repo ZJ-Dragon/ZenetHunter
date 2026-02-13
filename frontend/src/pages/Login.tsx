@@ -37,7 +37,8 @@ export const Login: React.FC = () => {
       const { access_token } = response.data;
       const isLimitedAdmin = username === 'admin' && password === 'zenethunter';
       login(access_token, { limitedAdmin: isLimitedAdmin });
-      navigate(from, { replace: true });
+      const target = isLimitedAdmin ? '/settings' : from;
+      navigate(target, { replace: true });
     } catch (err: unknown) {
       if (typeof err === 'object' && err !== null && 'response' in err) {
         // Use type assertion to access error response

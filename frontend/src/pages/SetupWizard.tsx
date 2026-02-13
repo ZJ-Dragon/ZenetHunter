@@ -90,7 +90,12 @@ export const SetupWizard: React.FC = () => {
       setShowDisclaimer(true);
     } catch (error) {
       console.error(error);
-      toast.error(t('login.resetFailed'));
+      if (typeof error === 'object' && error !== null && 'response' in error) {
+        const errResp = error as { response?: { data?: { detail?: string } } };
+        toast.error(errResp.response?.data?.detail || t('login.resetFailed'));
+      } else {
+        toast.error(t('login.resetFailed'));
+      }
     } finally {
       setLoading(false);
     }
