@@ -5,8 +5,11 @@ import { router } from './router';
 import { AuthProvider } from './contexts/AuthContext';
 import { WebSocketProvider } from './contexts/WebSocketContext';
 import { ToastProvider } from './components/ui/ToastProvider';
+import { applyStoredTheme } from './lib/theme';
 import './index.css';
 import './i18n';
+
+applyStoredTheme();
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>

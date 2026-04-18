@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { useLocation, Outlet, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../contexts/AuthContext';
 import {
@@ -10,22 +10,30 @@ import {
   Menu,
   X,
   Activity,
-  Terminal
+  Terminal,
+  ShieldCheck,
+  ShieldAlert,
 } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useTranslation } from 'react-i18next';
 import toast from 'react-hot-toast';
+import { useWebSocket } from '../../contexts/WebSocketContext';
+import { Button } from '../ui/Button';
+import { Surface } from '../ui/Surface';
 
 const NavItem: React.FC<{
+  hint?: string;
   to: string;
   icon: React.ElementType;
   children: React.ReactNode;
   disabled?: boolean;
   onBlocked?: () => void;
-}> = ({ to, icon: Icon, children, disabled, onBlocked }) => {
+}> = ({ to, icon: Icon, children, disabled, hint, onBlocked }) => {
   const location = useLocation();
   const navigate = useNavigate();
-  const isActive = location.pathname === to;
+  const isActive =
+    location.pathname === to ||
+    (to !== '/' && location.pathname.startsWith(`${to}/`));
 
   const handleClick = (e: React.MouseEvent) => {
     e.preventDefault();
@@ -39,32 +47,29 @@ const NavItem: React.FC<{
   return (
     <button
       onClick={handleClick}
+      aria-current={isActive ? 'page' : undefined}
       className={clsx(
-        'w-full text-left flex items-center px-3 py-2.5 text-sm font-medium rounded-lg transition-all duration-200',
-        isActive
-          ? 'text-white'
-          : 'hover:bg-gray-100 dark:hover:bg-gray-800'
+        'zh-nav-button',
+        isActive && 'zh-nav-button--active'
       )}
-      style={{
-        backgroundColor: isActive ? 'var(--winui-accent)' : 'transparent',
-        color: isActive ? '#ffffff' : 'var(--winui-text-secondary)',
-        cursor: disabled ? 'not-allowed' : 'pointer'
-      }}
+      style={{ cursor: disabled ? 'not-allowed' : 'pointer', opacity: disabled ? 0.65 : 1 }}
     >
-      <Icon
-        className="mr-3 h-5 w-5"
-        style={{ color: isActive ? '#ffffff' : 'var(--winui-text-tertiary)' }}
-      />
-      {children}
+      <Icon className="zh-nav-button__icon h-5 w-5" />
+      <span className="zh-nav-button__copy">
+        <span className="zh-nav-button__label">{children}</span>
+        {hint ? <span className="zh-nav-button__hint">{hint}</span> : null}
+      </span>
     </button>
   );
 };
 
 export const AppShell: React.FC = () => {
   const { logout, isLimitedAdmin } = useAuth();
+  const { isConnected } = useWebSocket();
   const { t } = useTranslation();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const navigate = useNavigate();
+  const location = useLocation();
 
   const handleLogout = () => {
     logout();
@@ -75,74 +80,172 @@ export const AppShell: React.FC = () => {
     toast.error(t('auth.accessDenied'));
   };
 
+  useEffect(() => {
+    setIsSidebarOpen(false);
+  }, [location.pathname]);
+
+  const navItems = useMemo(
+    () => [
+      {
+        to: '/',
+        icon: LayoutDashboard,
+        label: t('dashboard.title'),
+        hint: t('dashboard.subtitle'),
+      },
+      {
+        to: '/devices',
+        icon: Network,
+        label: t('devices.title'),
+        hint: 'Inventory, recognition, and probe evidence',
+      },
+      {
+        to: '/topology',
+        icon: Activity,
+        label: t('topology.title'),
+        hint: 'Graph view with device detail drawer',
+      },
+      {
+        to: '/attacks',
+        icon: Shield,
+        label: t('attack.title'),
+        hint: t('attack.subtitle'),
+      },
+      {
+        to: '/logs',
+        icon: Terminal,
+        label: t('logsPage.title'),
+        hint: t('logsPage.subtitle'),
+      },
+      {
+        to: '/settings',
+        icon: Settings,
+        label: t('settings.title'),
+        hint: t('settings.subtitle'),
+      },
+    ],
+    [t]
+  );
+
+  const activeItem =
+    navItems.find(
+      (item) =>
+        location.pathname === item.to ||
+        (item.to !== '/' && location.pathname.startsWith(`${item.to}/`))
+    ) || navItems[0];
+
   return (
-    <div className="min-h-screen flex" style={{ backgroundColor: 'var(--winui-bg-primary)' }}>
-      {/* Mobile Sidebar Backdrop */}
+    <div className="zh-shell">
       {isSidebarOpen && (
         <div
-          className="fixed inset-0 z-20 lg:hidden"
-          style={{ backgroundColor: 'rgba(0, 0, 0, 0.4)', backdropFilter: 'blur(4px)' }}
+          className="zh-shell__overlay lg:hidden"
           onClick={() => setIsSidebarOpen(false)}
         />
       )}
 
-      {/* Sidebar - WinUI3 Style */}
-      <div className={clsx(
-        'fixed inset-y-0 left-0 z-30 w-64 transform transition-transform duration-200 ease-out lg:translate-x-0 lg:static lg:inset-auto',
-        'card-winui lg:shadow-none lg:border-r lg:rounded-none',
-        isSidebarOpen ? 'translate-x-0' : '-translate-x-full'
-      )}>
-        <div className="flex items-center justify-between h-16 px-6" style={{ backgroundColor: 'var(--winui-accent)', color: '#ffffff' }}>
-          <div className="flex items-center space-x-2">
-            <Activity className="h-6 w-6" />
-            <span className="text-lg font-semibold">ZenetHunter</span>
+      <Surface
+        className="zh-shell__nav"
+        data-open={isSidebarOpen}
+        tone="raised"
+      >
+        <div className="flex items-start justify-between gap-3">
+          <div className="zh-brand">
+            <div className="zh-brand__mark">
+              <Activity className="h-6 w-6" />
+            </div>
+            <div>
+              <p className="zh-kicker">Security Console</p>
+              <h1 className="zh-brand__title">ZenetHunter</h1>
+              <p className="zh-brand__copy">WinUI-inspired network operations workspace</p>
+            </div>
           </div>
-          <button
+          <Button
+            aria-label="Close navigation"
+            className="lg:hidden"
             onClick={() => setIsSidebarOpen(false)}
-            className="lg:hidden p-1 rounded-lg hover:bg-white/20 focus:outline-none transition-colors"
+            size="icon"
+            variant="ghost"
           >
-            <X className="h-6 w-6" />
-          </button>
+            <X className="h-5 w-5" />
+          </Button>
         </div>
 
-        <nav className="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
-          <NavItem to="/" icon={LayoutDashboard} disabled={isLimitedAdmin} onBlocked={handleBlockedNav}>Dashboard</NavItem>
-          <NavItem to="/devices" icon={Network} disabled={isLimitedAdmin} onBlocked={handleBlockedNav}>Devices</NavItem>
-          <NavItem to="/topology" icon={Activity} disabled={isLimitedAdmin} onBlocked={handleBlockedNav}>Topology</NavItem>
-          <NavItem to="/attacks" icon={Shield} disabled={isLimitedAdmin} onBlocked={handleBlockedNav}>Interference</NavItem>
-          <NavItem to="/logs" icon={Terminal} disabled={isLimitedAdmin} onBlocked={handleBlockedNav}>Logs</NavItem>
-          <NavItem to="/settings" icon={Settings}>Settings</NavItem>
+        <Surface className="p-4" tone="subtle">
+          <div className="zh-toolbar zh-toolbar--spread">
+            <div>
+              <p className="zh-kicker">Session</p>
+              <p className="mt-2 text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
+                {isLimitedAdmin ? 'Limited access mode' : 'Full console access'}
+              </p>
+            </div>
+            {isLimitedAdmin ? (
+              <ShieldAlert className="h-5 w-5" style={{ color: 'var(--warning)' }} />
+            ) : (
+              <ShieldCheck className="h-5 w-5" style={{ color: 'var(--success)' }} />
+            )}
+          </div>
+          <div className="zh-status-strip mt-4">
+            <span className={clsx('zh-status-chip', isConnected && 'zh-status-chip--live')}>
+              <span className="zh-status-chip__dot" />
+              {isConnected ? t('settings.connected') : t('settings.disconnected')}
+            </span>
+            <span className="zh-status-chip">
+              {isLimitedAdmin ? 'Settings only' : 'All routes available'}
+            </span>
+          </div>
+        </Surface>
+
+        <nav className="zh-nav-list flex-1 overflow-y-auto" aria-label="Primary">
+          {navItems.map((item) => (
+            <NavItem
+              key={item.to}
+              disabled={isLimitedAdmin && item.to !== '/settings'}
+              hint={item.hint}
+              icon={item.icon}
+              onBlocked={handleBlockedNav}
+              to={item.to}
+            >
+              {item.label}
+            </NavItem>
+          ))}
         </nav>
 
-        <div className="p-4 border-t" style={{ borderColor: 'var(--winui-border-subtle)' }}>
-          <button
+        <div className="zh-divider pt-4">
+          <Button
             onClick={handleLogout}
-            className="flex items-center w-full px-4 py-2 text-sm font-medium rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-            style={{ color: 'var(--winui-text-secondary)' }}
+            leadingIcon={<LogOut className="h-4 w-4" />}
+            variant="secondary"
+            fullWidth
           >
-            <LogOut className="mr-3 h-5 w-5" style={{ color: 'var(--winui-text-tertiary)' }} />
             Sign Out
-          </button>
+          </Button>
         </div>
-      </div>
+      </Surface>
 
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <header className="lg:hidden" style={{ backgroundColor: 'var(--winui-surface)', borderBottom: '1px solid var(--winui-border-subtle)' }}>
-          <div className="flex items-center justify-between h-16 px-4 sm:px-6 lg:px-8">
-            <button
+      <div className="zh-shell__main">
+        <Surface className="zh-shell__topbar" tone="raised">
+          <div className="zh-toolbar__group">
+            <Button
               onClick={() => setIsSidebarOpen(true)}
-              className="p-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 focus:outline-none transition-colors"
-              style={{ color: 'var(--winui-text-secondary)' }}
+              className="lg:hidden"
+              size="icon"
+              variant="ghost"
             >
-              <Menu className="h-6 w-6" />
-            </button>
-            <span className="text-lg font-semibold" style={{ color: 'var(--winui-text-primary)' }}>ZenetHunter</span>
-            <div className="w-6" />
+              <Menu className="h-5 w-5" />
+            </Button>
+            <div className="zh-shell__topbar-title">
+              <p className="zh-kicker">Workspace</p>
+              <h2>{activeItem.label}</h2>
+            </div>
           </div>
-        </header>
-
-        <main className="flex-1 overflow-y-auto p-4 sm:p-6 lg:p-8">
+          <div className="zh-status-strip">
+            <span className={clsx('zh-status-chip', isConnected && 'zh-status-chip--live')}>
+              <span className="zh-status-chip__dot" />
+              {isConnected ? 'Live backend' : 'Reconnecting'}
+            </span>
+            {isLimitedAdmin ? <span className="zh-status-chip">Limited admin</span> : null}
+          </div>
+        </Surface>
+        <main className="zh-shell__content">
           <Outlet />
         </main>
       </div>
