@@ -75,7 +75,7 @@ class _DummyManualOverrideService:
 
 @pytest.mark.asyncio
 async def test_scan_workflow_persists_display_fields_and_state(monkeypatch):
-    """The explicit workflow should persist discovered devices and canonical display fields."""
+    """The explicit workflow should persist devices and canonical display fields."""
     session_factory = get_session_factory()
     async with session_factory() as session:
         await DeviceRepository(session).clear_all()

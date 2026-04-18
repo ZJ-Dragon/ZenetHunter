@@ -49,7 +49,9 @@ class CompositeProbeProvider(ProbeProvider):
             _append_observation(observations, "ssdp", data)
 
         if self.settings.feature_active_probe:
-            from app.services.scanner.enrich.active_probe import enrich_with_active_probe
+            from app.services.scanner.enrich.active_probe import (
+                enrich_with_active_probe,
+            )
 
             data = await _safe_probe(
                 enrich_with_active_probe(

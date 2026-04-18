@@ -68,5 +68,10 @@ Refactor the backend into a stable layered architecture with replaceable low-lev
 - Completed: Subtask 1 (`refactor(backend): add layered bootstrap and provider contracts`)
 - Completed: Subtask 2 (`refactor(backend): unify capability reporting and defense execution`)
 - Completed: Subtask 3 (explicit scan orchestration, shared scanner singleton, candidate fallback, final scan status updates)
-- In progress: Subtask 4 (recognition/manual/display pipeline cleanup and broken device routes)
-- Pending: Subtasks 5-6
+- Completed: Subtask 4 (recognition/manual/display pipeline cleanup and broken device routes)
+- Completed: Subtask 5 (defense executor abstraction and coherent capability reporting)
+- Completed: Subtask 6 (bridge synchronization, legacy compatibility aliasing, validation pass)
+
+## Remaining Follow-up
+- Frontend helper drift still exists in unused service wrappers such as `deviceService.update()` using `PUT /devices/{mac}` and `scanService.getScanStatus()` using `GET /scan/{id}`.
+- CI still only triggers on `push` to `main` and `pull_request` targeting `main`; branch pushes require manual local validation.

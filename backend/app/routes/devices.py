@@ -12,8 +12,9 @@ from app.core.database import get_db
 from app.core.exceptions import AppError, ErrorCode
 from app.core.security import get_current_user
 from app.models.auth import User
-from app.models.device import Device
-from app.repositories.device import DeviceRepository
+from app.models.device import Device, DeviceType
+from app.repositories.device import UNSET, DeviceRepository
+from app.repositories.device_fingerprint import DeviceFingerprintRepository
 from app.repositories.event_log import EventLogRepository
 from app.services.fingerprint_key import generate_fingerprint_key
 from app.services.manual_profile_service import (
@@ -81,6 +82,45 @@ class RecognitionOverrideRequest(BaseModel):
     device_type: str | None = Field(None, description="Manually confirmed device type")
 
 
+def _load_recognition_evidence(device: Device) -> dict:
+    """Return recognition evidence as a mutable dictionary."""
+    if isinstance(device.recognition_evidence, dict):
+        return dict(device.recognition_evidence)
+    if isinstance(device.recognition_evidence, str):
+        try:
+            return json.loads(device.recognition_evidence)
+        except json.JSONDecodeError:
+            return {}
+    return {}
+
+
+def _fingerprint_model_to_payload(record) -> dict | None:
+    """Serialize a persisted fingerprint row into the matching payload shape."""
+    if record is None:
+        return None
+
+    def _maybe_json(value):
+        if not value:
+            return None
+        if isinstance(value, str):
+            try:
+                return json.loads(value)
+            except json.JSONDecodeError:
+                return value
+        return value
+
+    payload = {
+        "dhcp_opt12_hostname": record.dhcp_opt12_hostname,
+        "dhcp_opt55_prl": record.dhcp_opt55_prl,
+        "dhcp_opt60_vci": record.dhcp_opt60_vci,
+        "user_agent": record.user_agent,
+        "mdns_services": _maybe_json(record.mdns_services),
+        "ssdp_server": _maybe_json(record.ssdp_server),
+        "ja3": record.ja3,
+    }
+    return {key: value for key, value in payload.items() if value is not None}
+
+
 @router.get("", response_model=list[Device])
 async def list_devices(db: AsyncSession = Depends(get_db)):
     """List all tracked devices from database."""
@@ -139,27 +179,22 @@ async def patch_device(
         Updated device object
     """
     repo = DeviceRepository(db)
-    device = await repo.get_by_mac(mac)
-    if not device:
+    updated_device = await repo.update_metadata(
+        mac,
+        alias=request.alias if request.alias is not None else UNSET,
+        tags=request.tags if request.tags is not None else UNSET,
+    )
+    if not updated_device:
         raise AppError(
             ErrorCode.CONFIG_NOT_FOUND,
             f"Device with MAC {mac} not found",
             extra={"mac": mac},
         )
 
-    # Update fields
-    if request.alias is not None:
-        device.alias = request.alias
-    if request.tags is not None:
-        import json
-
-        device.tags = json.dumps(request.tags)
-
     await db.commit()
-    await db.refresh(device)
 
     # Update state manager
-    state.update_device(device)
+    state.update_device(updated_device)
 
     # Broadcast device updated event
     await ws.broadcast(
@@ -167,13 +202,15 @@ async def patch_device(
             "event": "deviceUpdated",
             "data": {
                 "mac": mac,
-                "alias": device.alias,
-                "tags": request.tags,
+                "alias": updated_device.alias,
+                "tags": updated_device.tags,
+                "display_name": updated_device.display_name,
+                "display_vendor": updated_device.display_vendor,
             },
         }
     )
 
-    return device
+    return updated_device
 
 
 @router.post(
@@ -211,33 +248,18 @@ async def override_recognition(
             extra={"mac": mac},
         )
 
-    # Apply manual overrides
-    if request.vendor is not None:
-        device.vendor_guess = request.vendor
-        device.vendor = request.vendor  # Also update main vendor field
-    if request.model is not None:
-        device.model_guess = request.model
-        device.model = request.model  # Also update main model field
+    device_type = None
     if request.device_type is not None:
-        from app.models.db.device import DeviceTypeEnum
-
         try:
-            device.type = DeviceTypeEnum(request.device_type.lower())
+            device_type = DeviceType(request.device_type.lower())
         except ValueError:
             raise AppError(
                 ErrorCode.API_BAD_REQUEST,
                 f"Invalid device type: {request.device_type}",
-                extra={"valid_types": [t.value for t in DeviceTypeEnum]},
+                extra={"valid_types": [t.value for t in DeviceType]},
             ) from None
 
-    # Mark as manually overridden
-    device.recognition_manual_override = True
-    device.recognition_confidence = 100  # Manual confirmation = 100% confidence
-
-    # Update recognition evidence
-    from datetime import UTC, datetime
-
-    evidence = json.loads(device.recognition_evidence or "{}")
+    evidence = _load_recognition_evidence(device)
     evidence["manual_override"] = {
         "timestamp": datetime.now(UTC).isoformat(),
         "user": current_user.username,
@@ -245,13 +267,25 @@ async def override_recognition(
         "model": request.model,
         "device_type": request.device_type,
     }
-    device.recognition_evidence = json.dumps(evidence)
+
+    updated_device = await repo.apply_recognition_override(
+        mac,
+        vendor=request.vendor,
+        model=request.model,
+        device_type=device_type,
+        evidence=evidence,
+    )
+    if not updated_device:
+        raise AppError(
+            ErrorCode.CONFIG_NOT_FOUND,
+            f"Failed to update device {mac}",
+            extra={"mac": mac},
+        )
 
     await db.commit()
-    await db.refresh(device)
 
     # Update state manager
-    state.update_device(device)
+    state.update_device(updated_device)
 
     # Broadcast recognition override event
     await ws.broadcast(
@@ -259,16 +293,16 @@ async def override_recognition(
             "event": "recognitionOverridden",
             "data": {
                 "mac": mac,
-                "vendor": device.vendor,
-                "model": device.model,
-                "device_type": device.type.value,
+                "vendor": updated_device.vendor,
+                "model": updated_device.model,
+                "device_type": updated_device.type.value,
                 "confidence": 100,
                 "manual_override": True,
             },
         }
     )
 
-    return device
+    return updated_device
 
 
 @router.put(
@@ -301,6 +335,7 @@ async def update_manual_label(
         ManualLabelResponse with updated device and fingerprint key
     """
     device_repo = DeviceRepository(db)
+    fingerprint_repo = DeviceFingerprintRepository(db)
     manual_profile_service = ManualProfileService(db)
     event_repo = EventLogRepository(db)
 
@@ -313,11 +348,10 @@ async def update_manual_label(
             extra={"mac": mac},
         )
 
-    # Generate fingerprint key from device characteristics
-    # Try to get fingerprint data if available
-    fingerprint_data = None
-    if device.recognition_evidence:
-        fingerprint_data = device.recognition_evidence
+    # Generate fingerprint key from persisted fingerprint signals if available.
+    fingerprint_data = _fingerprint_model_to_payload(
+        await fingerprint_repo.get_by_mac(mac)
+    )
 
     fingerprint_key, components = generate_fingerprint_key(
         fingerprint_data=fingerprint_data,

@@ -2,7 +2,7 @@ from datetime import UTC, datetime
 from enum import Enum
 from typing import Any
 
-from pydantic import BaseModel, ConfigDict, Field, IPvAnyAddress
+from pydantic import BaseModel, ConfigDict, Field, IPvAnyAddress, model_validator
 
 from app.models.attack import ActiveDefenseStatus
 from app.models.manual_profile import DeviceManualProfile
@@ -20,6 +20,13 @@ class DeviceStatus(str, Enum):
     ONLINE = "online"
     OFFLINE = "offline"
     BLOCKED = "blocked"
+
+
+class DefenseStatus(str, Enum):
+    ACTIVE = "active"
+    INACTIVE = "inactive"
+    PENDING = "pending"
+    ERROR = "error"
 
 
 class Device(BaseModel):
@@ -45,6 +52,18 @@ class Device(BaseModel):
     active_defense_status: ActiveDefenseStatus = Field(
         default=ActiveDefenseStatus.IDLE,
         description="Current active defense operation status",
+    )
+    attack_status: ActiveDefenseStatus | None = Field(
+        default=None,
+        description="Legacy compatibility alias for active_defense_status",
+    )
+    defense_status: DefenseStatus | None = Field(
+        default=None,
+        description="Legacy compatibility status derived from active defense state",
+    )
+    active_defense_policy: str | None = Field(
+        default=None,
+        description="Reserved compatibility field for legacy clients",
     )
     first_seen: datetime = Field(
         default_factory=lambda: datetime.now(UTC),
@@ -116,6 +135,18 @@ class Device(BaseModel):
     vendor_auto: str | None = Field(None, description="Automatically derived vendor")
 
     model_config = ConfigDict(from_attributes=True)
+
+    @model_validator(mode="after")
+    def apply_legacy_compatibility_fields(self):
+        """Keep legacy frontend fields aligned with canonical backend state."""
+        self.attack_status = self.active_defense_status
+        if self.active_defense_status == ActiveDefenseStatus.RUNNING:
+            self.defense_status = DefenseStatus.ACTIVE
+        elif self.active_defense_status == ActiveDefenseStatus.FAILED:
+            self.defense_status = DefenseStatus.ERROR
+        elif self.defense_status is None:
+            self.defense_status = DefenseStatus.INACTIVE
+        return self
 
 
 class DeviceUpdateRequest(BaseModel):

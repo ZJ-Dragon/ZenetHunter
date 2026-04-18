@@ -10,3 +10,6 @@
 - Added discovery/probe/fingerprint provider adapters plus device-domain identity helpers so low-level scan capabilities are replaceable without changing upper layers
 - Fixed structural scan bugs by making `ScannerService` a shared singleton, updating final scan status consistently, and falling back to unconfirmed cached candidates instead of silently returning zero devices
 - Added backend tests for scan-workflow persistence/display-field generation and hybrid-discovery candidate fallback
+- Reworked `routes/devices.py` to update alias/tags and recognition overrides through repository methods instead of treating domain models as ORM rows
+- Switched manual-label fingerprint matching to persisted fingerprint records and refreshed manual-profile-backed display fields in the same session
+- Added legacy device payload compatibility for frontend consumers that still read `attack_status` while keeping `active_defense_status` canonical

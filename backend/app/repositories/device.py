@@ -13,6 +13,7 @@ from app.models.device import Device, DeviceStatus, DeviceType
 from app.models.manual_profile import DeviceManualProfile
 
 logger = logging.getLogger(__name__)
+UNSET = object()
 
 
 class DeviceRepository:
@@ -47,7 +48,9 @@ class DeviceRepository:
     async def get_by_mac(self, mac: str) -> Device | None:
         """Get a device by MAC address."""
         result = await self.session.execute(
-            select(DeviceModel).where(DeviceModel.mac == mac.lower())
+            select(DeviceModel)
+            .where(DeviceModel.mac == mac.lower())
+            .execution_options(populate_existing=True)
         )
         model = result.scalar_one_or_none()
         if model is None:
@@ -205,6 +208,66 @@ class DeviceRepository:
         await self.session.flush()
         return self.to_domain_model(device_model)
 
+    async def update_metadata(
+        self,
+        mac: str,
+        *,
+        alias: str | None | object = UNSET,
+        tags: list[str] | None | object = UNSET,
+    ) -> Device | None:
+        """Update mutable display metadata.
+
+        This keeps repository writes on ORM models instead of mutating domain objects
+        as if they were SQLAlchemy rows.
+        """
+        result = await self.session.execute(
+            select(DeviceModel).where(DeviceModel.mac == mac.lower())
+        )
+        device_model = result.scalar_one_or_none()
+        if not device_model:
+            return None
+
+        if alias is not UNSET:
+            device_model.alias = alias
+        if tags is not UNSET:
+            device_model.tags = json.dumps(tags) if tags else None
+
+        await self.session.flush()
+        return self.to_domain_model(device_model)
+
+    async def apply_recognition_override(
+        self,
+        mac: str,
+        *,
+        vendor: str | None,
+        model: str | None,
+        device_type: DeviceType | None,
+        evidence: dict | None,
+    ) -> Device | None:
+        """Persist an operator-confirmed recognition override."""
+        result = await self.session.execute(
+            select(DeviceModel).where(DeviceModel.mac == mac.lower())
+        )
+        device_model = result.scalar_one_or_none()
+        if not device_model:
+            return None
+
+        if vendor is not None:
+            device_model.vendor_guess = vendor
+            device_model.vendor = vendor
+        if model is not None:
+            device_model.model_guess = model
+            device_model.model = model
+        if device_type is not None:
+            device_model.type = DeviceTypeEnum(device_type.value)
+
+        device_model.recognition_manual_override = True
+        device_model.recognition_confidence = 100
+        device_model.recognition_evidence = json.dumps(evidence) if evidence else None
+
+        await self.session.flush()
+        return self.to_domain_model(device_model)
+
     async def delete(self, mac: str) -> bool:
         """Delete a device by MAC address."""
         result = await self.session.execute(
@@ -322,6 +385,10 @@ class DeviceRepository:
         device_model.manual_override_by = updated_by
         device_model.recognition_manual_override = bool(manual_name or manual_vendor)
         await self.session.flush()
+        try:
+            await self.session.refresh(device_model, attribute_names=["manual_profile"])
+        except Exception:
+            logger.debug("Manual profile refresh skipped for %s", mac.lower())
         return device_model
 
     async def clear_manual_profile(
@@ -342,6 +409,10 @@ class DeviceRepository:
         device_model.manual_override_by = updated_by
         device_model.recognition_manual_override = False
         await self.session.flush()
+        try:
+            await self.session.refresh(device_model, attribute_names=["manual_profile"])
+        except Exception:
+            logger.debug("Manual profile clear refresh skipped for %s", mac.lower())
         return device_model
 
     def to_domain_model(self, device_model: DeviceModel) -> Device:

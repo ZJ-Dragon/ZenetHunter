@@ -26,8 +26,10 @@ This file records the REST and WebSocket contracts that agents should treat as s
 ## Devices
 - `GET /api/devices`
   - Returns `list[Device]`
+  - Device payload includes canonical display helpers plus the legacy compatibility alias `attack_status`
 - `GET /api/devices/{mac}`
   - Returns a single canonical `Device`
+  - Device payload includes canonical display helpers plus the legacy compatibility alias `attack_status`
 - `POST /api/devices`
   - Internal/scanner-oriented device upsert path
 - `PATCH /api/devices/{mac}`

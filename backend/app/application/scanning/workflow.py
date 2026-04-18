@@ -98,7 +98,9 @@ class ScanWorkflowService:
                 "scanProgress",
                 {
                     "stage": "observations",
-                    "message": f"Collecting observations for {len(discovered)} devices...",
+                    "message": (
+                        "Collecting observations for " f"{len(discovered)} devices..."
+                    ),
                     "discovered_count": len(discovered),
                 },
             )
@@ -127,7 +129,9 @@ class ScanWorkflowService:
                 fingerprint = self.fingerprint_extractor.extract(
                     discovered_device, observations
                 )
-                recognition = await self._recognize_device(discovered_device, fingerprint)
+                recognition = await self._recognize_device(
+                    discovered_device, fingerprint
+                )
                 if recognition.get("confidence", 0) > 0:
                     stats["recognized_count"] += 1
 
@@ -158,11 +162,13 @@ class ScanWorkflowService:
 
                 baseline_device = await repo.upsert(baseline_device)
 
-                manual_override = await manual_override_service.check_and_apply_override(
-                    mac=discovered_device.mac,
-                    fingerprint_data=fingerprint,
-                    vendor_guess=baseline_device.vendor_guess,
-                    model_guess=baseline_device.model_guess,
+                manual_override = (
+                    await manual_override_service.check_and_apply_override(
+                        mac=discovered_device.mac,
+                        fingerprint_data=fingerprint,
+                        vendor_guess=baseline_device.vendor_guess,
+                        model_guess=baseline_device.model_guess,
+                    )
                 )
                 if manual_override:
                     stats["manual_match_count"] += 1
@@ -264,9 +270,9 @@ class ScanWorkflowService:
             or lookup_model
             or recognition.get("best_guess_model")
         )
-        name = (existing_device and existing_device.name) or discovered_device.metadata.get(
-            "hostname"
-        )
+        name = (
+            existing_device and existing_device.name
+        ) or discovered_device.metadata.get("hostname")
         device_type = guess_device_type(
             ip=discovered_device.ip,
             vendor=vendor or vendor_guess,

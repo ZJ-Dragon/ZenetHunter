@@ -11,10 +11,11 @@
 - Auth token is stored in `localStorage` key `token` and attached by the Axios interceptor
 - Limited-admin client gating is tracked in `localStorage` key `limited_admin`
 - Backend now exposes additive normalized capability details through `capability_state`; legacy boolean capability maps remain for compatibility
+- Backend device payloads expose canonical `active_defense_status` and the legacy alias `attack_status` together so existing UI code does not have to remap defense state client-side
 
 ## Known Naming Drift
 - Backend canonical field: `active_defense_status`
-- Frontend legacy field usage still appears as `attack_status` in several pages/components
+- Frontend legacy field usage still appears as `attack_status` in several pages/components; backend now ships it as a compatibility alias
 - Backend canonical terminology prefers "active defense"; frontend still uses "attack" in filenames, route names, and parts of the UI
 
 ## Known Service Drift

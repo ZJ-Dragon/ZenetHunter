@@ -10,8 +10,8 @@ from app.domain.interfaces.providers import (
     DiscoveryProvider,
     DiscoveryRequest,
 )
-from app.services.scanner.capabilities import get_scanner_capabilities
 from app.services.scanner.candidate import get_arp_candidates, get_dhcp_candidates
+from app.services.scanner.capabilities import get_scanner_capabilities
 from app.services.scanner.discovery.arp_sweep import ARPSweep
 from app.services.scanner.refresh import refresh_candidates
 
