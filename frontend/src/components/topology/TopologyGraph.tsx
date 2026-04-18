@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import ForceGraph2D, {
   ForceGraphMethods,
   NodeObject,
@@ -28,6 +29,7 @@ export const TopologyGraph: React.FC<TopologyGraphProps> = ({
   data,
   onNodeClick,
 }) => {
+  const { t } = useTranslation();
   const graphRef = useRef<ForceGraphMethods | undefined>(undefined);
   const containerRef = useRef<HTMLDivElement>(null);
   const [dimensions, setDimensions] = useState({ width: 800, height: 600 });
@@ -66,7 +68,7 @@ export const TopologyGraph: React.FC<TopologyGraphProps> = ({
         x: number;
         y: number;
       };
-      const label = topologyNode.label || topologyNode.id || 'Unknown';
+      const label = topologyNode.label || topologyNode.id || t('topology.unknownNode');
       const radius = 10 / Math.max(0.65, globalScale);
       const fontSize = Math.max(10, 13 / globalScale);
       const hovered = hoveredNode?.id === topologyNode.id;
@@ -126,7 +128,7 @@ export const TopologyGraph: React.FC<TopologyGraphProps> = ({
 
       ctx.shadowBlur = 0;
     },
-    [hoveredNode]
+    [hoveredNode, t]
   );
 
   const linkPaint = useCallback(

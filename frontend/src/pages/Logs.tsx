@@ -116,7 +116,7 @@ export const Logs: React.FC = () => {
             {t('logsPage.refresh')}
           </Button>
         }
-        eyebrow="Observability"
+        eyebrow={t('logsPage.eyebrow')}
         icon={Terminal}
         subtitle={t('logsPage.subtitle')}
         title={t('logsPage.title')}
@@ -124,19 +124,19 @@ export const Logs: React.FC = () => {
 
       <div className="zh-stat-grid">
         <StatCard
-          hint={systemInfo?.platform || 'Waiting for backend information'}
+          hint={systemInfo?.platform || t('logsPage.systemInfoHint')}
           icon={Server}
           label={t('logsPage.systemInfo')}
           value={systemInfo?.app_version || '--'}
         />
         <StatCard
-          hint={systemInfo?.app_env || 'Unknown environment'}
+          hint={systemInfo?.app_env || t('logsPage.databaseHint')}
           icon={Database}
           label={t('logsPage.database')}
           value={systemInfo?.database_url ? t('settings.connected') : t('settings.disconnected')}
         />
         <StatCard
-          hint="Reported capabilities from backend diagnostics"
+          hint={t('logsPage.capabilitiesHint')}
           icon={CheckCircle2}
           label={t('logsPage.capabilities')}
           tone="var(--success)"
@@ -145,12 +145,12 @@ export const Logs: React.FC = () => {
       </div>
 
       {systemInfo ? (
-        <Surface className="p-6 lg:p-7" tone="raised">
+        <Surface className="p-5 lg:p-6" tone="raised">
           <div className="zh-toolbar zh-toolbar--spread">
             <div>
               <p className="zh-kicker">{t('logsPage.systemInfo')}</p>
-              <h2 className="mt-2 text-2xl font-semibold" style={{ color: 'var(--text-primary)' }}>
-                Runtime diagnostics
+              <h2 className="mt-2 text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
+                {t('logsPage.diagnosticsTitle')}
               </h2>
             </div>
             <div className="zh-status-strip">
@@ -200,12 +200,12 @@ export const Logs: React.FC = () => {
         </Surface>
       ) : null}
 
-      <Surface className="p-6 lg:p-7" tone="raised">
+      <Surface className="p-5 lg:p-6" tone="raised">
         <div className="zh-toolbar zh-toolbar--spread">
           <div>
             <p className="zh-kicker">{t('logsPage.logsTitle')}</p>
-            <h2 className="mt-2 text-2xl font-semibold" style={{ color: 'var(--text-primary)' }}>
-              Recent events
+            <h2 className="mt-2 text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
+              {t('logsPage.eventsTitle')}
             </h2>
           </div>
           <div className="zh-toolbar__group">
@@ -313,7 +313,7 @@ export const Logs: React.FC = () => {
                       <EmptyState
                         description={t('logsPage.empty')}
                         icon={Terminal}
-                        title="No log entries"
+                        title={t('logsPage.emptyTitle')}
                       />
                     </td>
                   </tr>

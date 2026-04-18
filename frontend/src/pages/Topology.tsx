@@ -114,35 +114,35 @@ export const Topology: React.FC = () => {
             </Button>
           </>
         }
-        eyebrow="Visualization"
+        eyebrow={t('topology.eyebrow')}
         icon={Network}
-        subtitle="Trace relationships between gateways and observed hosts with an editable detail pane."
+        subtitle={t('topology.subtitle')}
         title={t('topology.title')}
       />
 
       <div className="zh-stat-grid">
         <StatCard
-          hint="Detected graph nodes"
+          hint={t('topology.nodesHint')}
           icon={Network}
-          label="Nodes"
+          label={t('topology.nodesLabel')}
           value={data.nodes.length}
         />
         <StatCard
-          hint="Topology relationships"
+          hint={t('topology.linksHint')}
           icon={Activity}
-          label="Links"
+          label={t('topology.linksLabel')}
           tone="var(--accent)"
           value={data.links.length}
         />
         <StatCard
-          hint="Currently reachable devices"
+          hint={t('topology.onlineHint')}
           icon={Activity}
           label={t('devices.statusOnline')}
           tone="var(--success)"
           value={onlineCount}
         />
         <StatCard
-          hint="Blocked or isolated hosts"
+          hint={t('topology.blockedHint')}
           icon={Activity}
           label={t('devices.statusBlocked')}
           tone="var(--danger)"
@@ -150,30 +150,30 @@ export const Topology: React.FC = () => {
         />
       </div>
 
-      <Surface className="p-6 lg:p-7" tone="raised">
+      <Surface className="p-5 lg:p-6" tone="raised">
         <div className="zh-toolbar zh-toolbar--spread">
           <div>
-            <p className="zh-kicker">Canvas</p>
-            <h2 className="mt-2 text-2xl font-semibold" style={{ color: 'var(--text-primary)' }}>
-              Network relationship map
+            <p className="zh-kicker">{t('topology.canvasKicker')}</p>
+            <h2 className="mt-2 text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
+              {t('topology.canvasTitle')}
             </h2>
           </div>
           <div className="zh-legend">
             <div className="zh-legend__item">
               <span className="zh-legend__swatch" style={{ background: '#7c4dff' }} />
-              Router
+              {t('topology.legendRouter')}
             </div>
             <div className="zh-legend__item">
               <span className="zh-legend__swatch" style={{ background: 'var(--success)' }} />
-              Online
+              {t('topology.legendOnline')}
             </div>
             <div className="zh-legend__item">
               <span className="zh-legend__swatch" style={{ background: 'var(--danger)' }} />
-              Blocked
+              {t('topology.legendBlocked')}
             </div>
             <div className="zh-legend__item">
               <span className="zh-legend__swatch" style={{ background: 'var(--text-tertiary)' }} />
-              Offline
+              {t('topology.legendOffline')}
             </div>
           </div>
         </div>

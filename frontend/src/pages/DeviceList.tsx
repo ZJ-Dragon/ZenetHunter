@@ -24,14 +24,14 @@ import { Device, DeviceStatus } from '../types/device';
 import { ProbeObservation } from '../types/observation';
 import { WSEventType } from '../types/websocket';
 
-const getDeviceName = (device: Device) =>
+const getDeviceName = (device: Device, fallback: string) =>
   device.display_name ||
   device.manual_profile?.manual_name ||
   device.name ||
   device.alias ||
   device.model ||
   device.model_guess ||
-  'Unknown Device';
+  fallback;
 
 const getDeviceVendor = (device: Device, fallback: string) =>
   device.display_vendor ||
@@ -110,10 +110,10 @@ export const DeviceList: React.FC = () => {
 
     try {
       await navigator.clipboard.writeText(JSON.stringify(observations[0], null, 2));
-      toast.success('Observation copied');
+      toast.success(t('devices.observationCopied'));
     } catch (error) {
       console.error('Failed to copy observation', error);
-      toast.error('Copy failed');
+      toast.error(t('devices.copyFailed'));
     }
   };
 
@@ -178,16 +178,16 @@ export const DeviceList: React.FC = () => {
             </Button>
           </>
         }
-        eyebrow="Inventory"
+        eyebrow={t('devices.eyebrow')}
         icon={Network}
-        subtitle="Inspect recognition confidence, manual overrides, and recent probe evidence."
+        subtitle={t('devices.subtitle')}
         title={t('devices.title')}
       />
 
       <div className="zh-status-strip">
-        <Badge tone="accent">{filteredDevices.length} visible</Badge>
-        <Badge tone="success">{onlineCount} online</Badge>
-        <Badge tone="danger">{blockedCount} blocked</Badge>
+        <Badge tone="accent">{t('devices.visibleCount', { count: filteredDevices.length })}</Badge>
+        <Badge tone="success">{t('devices.onlineCount', { count: onlineCount })}</Badge>
+        <Badge tone="danger">{t('devices.blockedCount', { count: blockedCount })}</Badge>
       </div>
 
       <Surface className="p-5 lg:p-6" tone="raised">
@@ -256,7 +256,7 @@ export const DeviceList: React.FC = () => {
                                   className="truncate text-sm font-semibold"
                                   style={{ color: 'var(--text-primary)' }}
                                 >
-                                  {getDeviceName(device)}
+                                  {getDeviceName(device, t('devices.unknownDevice'))}
                                 </p>
                                 {hasManual ? (
                                   <Badge tone="success">{t('devices.manualTag')}</Badge>
@@ -300,7 +300,7 @@ export const DeviceList: React.FC = () => {
                             size="sm"
                             variant="secondary"
                           >
-                            {expandedMac === device.mac ? 'Hide' : t('devices.more')}
+                            {expandedMac === device.mac ? t('devices.hide') : t('devices.more')}
                           </Button>
                         </td>
                       </tr>
@@ -315,7 +315,7 @@ export const DeviceList: React.FC = () => {
                                     className="mt-2 text-sm"
                                     style={{ color: 'var(--text-secondary)' }}
                                   >
-                                    Recent fingerprint and keyword evidence for this device.
+                                    {t('devices.observationsDesc')}
                                   </p>
                                 </div>
                                 {observationsLoading ? (

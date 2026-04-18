@@ -103,7 +103,7 @@ export const Dashboard: React.FC = () => {
             </Button>
           </>
         }
-        eyebrow="Overview"
+        eyebrow={t('dashboard.eyebrow')}
         icon={LayoutDashboard}
         subtitle={t('dashboard.subtitle')}
         title={t('dashboard.title')}
@@ -111,27 +111,46 @@ export const Dashboard: React.FC = () => {
 
       <div className="zh-stat-grid">
         <StatCard
-          hint={stats.totalDevices > 0 ? 'Visible in current inventory' : 'Run a scan to populate'}
+          hint={
+            stats.totalDevices > 0
+              ? t('dashboard.totalDevicesHintActive')
+              : t('dashboard.totalDevicesHintEmpty')
+          }
           icon={Network}
           label={t('dashboard.totalDevices')}
           value={stats.totalDevices}
         />
         <StatCard
-          hint={stats.totalDevices > 0 ? `${stats.onlineDevices}/${stats.totalDevices} currently active` : 'Awaiting discovery'}
+          hint={
+            stats.totalDevices > 0
+              ? t('dashboard.onlineDevicesHintActive', {
+                  online: stats.onlineDevices,
+                  total: stats.totalDevices,
+                })
+              : t('dashboard.onlineDevicesHintEmpty')
+          }
           icon={Activity}
           label={t('dashboard.onlineDevices')}
           tone="var(--success)"
           value={stats.onlineDevices}
         />
         <StatCard
-          hint={stats.blockedDevices > 0 ? 'Review blocked hosts and policies' : 'No host is currently blocked'}
+          hint={
+            stats.blockedDevices > 0
+              ? t('dashboard.blockedDevicesHintActive')
+              : t('dashboard.blockedDevicesHintEmpty')
+          }
           icon={Shield}
           label={t('dashboard.blockedDevices')}
           tone="var(--danger)"
           value={stats.blockedDevices}
         />
         <StatCard
-          hint={attackedDevices.length > 0 ? 'Intervention in progress' : 'System idle'}
+          hint={
+            attackedDevices.length > 0
+              ? t('dashboard.runningAttacksHintActive')
+              : t('dashboard.runningAttacksHintIdle')
+          }
           icon={ShieldAlert}
           label={t('dashboard.runningAttacks')}
           tone="var(--warning)"
@@ -140,15 +159,15 @@ export const Dashboard: React.FC = () => {
       </div>
 
       <div className="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
-        <Surface className="p-6 lg:p-7" tone="raised">
+        <Surface className="p-5 lg:p-6" tone="raised">
           <p className="zh-kicker">{t('dashboard.quickActions')}</p>
-          <h2 className="mt-2 text-2xl font-semibold" style={{ color: 'var(--text-primary)' }}>
-            Operator shortcuts
+          <h2 className="mt-2 text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
+            {t('dashboard.shortcutsTitle')}
           </h2>
-          <p className="mt-3 text-sm leading-7" style={{ color: 'var(--text-secondary)' }}>
-            Move between inventory, topology, and response pages without losing context.
+          <p className="mt-2 text-sm leading-6" style={{ color: 'var(--text-secondary)' }}>
+            {t('dashboard.shortcutsDesc')}
           </p>
-          <div className="mt-6 grid gap-3">
+          <div className="mt-5 grid gap-3">
             <ScanButton className="w-full" />
             <Button
               fullWidth
@@ -180,25 +199,25 @@ export const Dashboard: React.FC = () => {
           </div>
         </Surface>
 
-        <Surface className="p-6 lg:p-7" tone="raised">
+        <Surface className="p-5 lg:p-6" tone="raised">
           <div className="zh-toolbar zh-toolbar--spread">
             <div>
               <p className="zh-kicker">{t('dashboard.recentDevices')}</p>
-              <h2 className="mt-2 text-2xl font-semibold" style={{ color: 'var(--text-primary)' }}>
-                Live inventory snapshot
+              <h2 className="mt-2 text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
+                {t('dashboard.snapshotTitle')}
               </h2>
             </div>
             <Button onClick={() => navigate('/devices')} variant="ghost">
               {t('dashboard.viewDevices')}
             </Button>
           </div>
-          <div className="mt-6">
+          <div className="mt-5">
             {recentDevices.length === 0 ? (
               <EmptyState
                 action={<ScanButton />}
                 description={t('dashboard.noDevices')}
                 icon={Network}
-                title="No recent devices"
+                title={t('dashboard.noRecentTitle')}
               />
             ) : (
               <div className="zh-list">
@@ -219,7 +238,7 @@ export const Dashboard: React.FC = () => {
                         {device.ip} • {device.display_vendor || device.vendor || device.vendor_guess || t('common.unknown')}
                       </p>
                       <p className="mt-1 text-xs" style={{ color: 'var(--text-tertiary)' }}>
-                        Last seen {new Date(device.last_seen).toLocaleString()}
+                        {t('dashboard.lastSeenPrefix')} {new Date(device.last_seen).toLocaleString()}
                       </p>
                     </div>
                     {device.attack_status === 'running' ? (
@@ -246,24 +265,24 @@ export const Dashboard: React.FC = () => {
         </Surface>
       </div>
 
-      <Surface className="p-6 lg:p-7" tone="raised">
+      <Surface className="p-5 lg:p-6" tone="raised">
         <div className="zh-toolbar zh-toolbar--spread">
           <div>
-            <p className="zh-kicker">Response</p>
-            <h2 className="mt-2 text-2xl font-semibold" style={{ color: 'var(--text-primary)' }}>
-              Active interventions
+            <p className="zh-kicker">{t('dashboard.responseEyebrow')}</p>
+            <h2 className="mt-2 text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
+              {t('dashboard.responseTitle')}
             </h2>
           </div>
           <Button onClick={() => navigate('/attacks')} variant="secondary">
-            Open operations
+            {t('dashboard.openOperations')}
           </Button>
         </div>
-        <div className="mt-6">
+        <div className="mt-5">
           {attackedDevices.length === 0 ? (
             <EmptyState
-              description={t('dashboard.noDevices')}
+              description={t('dashboard.noInterventionsDesc')}
               icon={Shield}
-              title="No running interventions"
+              title={t('dashboard.noInterventionsTitle')}
             />
           ) : (
             <div className="zh-list">

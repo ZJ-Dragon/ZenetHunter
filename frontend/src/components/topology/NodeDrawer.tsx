@@ -13,6 +13,7 @@ import {
   XCircle,
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 import { observationService } from '../../lib/services/observations';
 import { deviceService } from '../../lib/services/device';
 import { Device } from '../../types/device';
@@ -61,6 +62,7 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({
   onClose,
   onDeviceUpdate,
 }) => {
+  const { t } = useTranslation();
   const { data: initialDevice } = node;
   const [device, setDevice] = useState<Device>(initialDevice);
   const [showEvidence, setShowEvidence] = useState(false);
@@ -106,9 +108,12 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({
     device.alias ||
     device.model ||
     device.model_guess ||
-    'Unknown Device';
+    t('topologyDrawer.unknownDevice');
   const autoVendor =
-    device.vendor_auto || device.vendor || device.vendor_guess || 'Unknown Vendor';
+    device.vendor_auto ||
+    device.vendor ||
+    device.vendor_guess ||
+    t('topologyDrawer.unknownVendor');
   const displayName = device.display_name || manualName || autoName;
   const displayVendor = device.display_vendor || manualVendor || autoVendor;
   const hasManualOverride = Boolean(
@@ -151,7 +156,7 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({
 
   const saveManualLabel = async (field: 'name' | 'vendor') => {
     setIsSaving(true);
-    const toastId = toast.loading('Saving...');
+    const toastId = toast.loading(t('topologyDrawer.saving'));
 
     try {
       const response = await deviceService.updateManualLabel(device.mac, {
@@ -162,7 +167,7 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({
 
       setDevice(response.device);
       onDeviceUpdate?.(response.device);
-      toast.success('Label saved successfully', { id: toastId });
+      toast.success(t('topologyDrawer.labelSaved'), { id: toastId });
 
       if (field === 'name') {
         setEditingName(false);
@@ -171,7 +176,7 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({
       }
     } catch (error) {
       console.error('Failed to save label:', error);
-      toast.error('Failed to save label', { id: toastId });
+      toast.error(t('topologyDrawer.labelSaveFailed'), { id: toastId });
     } finally {
       setIsSaving(false);
     }
@@ -182,24 +187,22 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({
       return;
     }
 
-    const confirmed = window.confirm(
-      'Clear manual labels and revert to auto-detected values?'
-    );
+    const confirmed = window.confirm(t('topologyDrawer.clearManualConfirm'));
     if (!confirmed) {
       return;
     }
 
     setIsSaving(true);
-    const toastId = toast.loading('Clearing labels...');
+    const toastId = toast.loading(t('topologyDrawer.clearing'));
 
     try {
       const updatedDevice = await deviceService.clearManualLabel(device.mac);
       setDevice(updatedDevice);
       onDeviceUpdate?.(updatedDevice);
-      toast.success('Manual labels cleared', { id: toastId });
+      toast.success(t('topologyDrawer.cleared'), { id: toastId });
     } catch (error) {
       console.error('Failed to clear labels:', error);
-      toast.error('Failed to clear labels', { id: toastId });
+      toast.error(t('topologyDrawer.clearFailed'), { id: toastId });
     } finally {
       setIsSaving(false);
     }
@@ -208,10 +211,10 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({
   const copyObservationJson = async (observation: ProbeObservation) => {
     try {
       await navigator.clipboard.writeText(JSON.stringify(observation, null, 2));
-      toast.success('Observation copied');
+      toast.success(t('topologyDrawer.observationCopied'));
     } catch (error) {
       console.error(error);
-      toast.error('Copy failed');
+      toast.error(t('topologyDrawer.copyFailed'));
     }
   };
 
@@ -220,10 +223,10 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({
     try {
       const ndjson = await observationService.exportDeviceNdjson(device.mac, 100);
       await navigator.clipboard.writeText(ndjson);
-      toast.success('NDJSON copied');
+      toast.success(t('topologyDrawer.ndjsonCopied'));
     } catch (error) {
       console.error(error);
-      toast.error('Export failed');
+      toast.error(t('topologyDrawer.exportFailed'));
     } finally {
       setIsExporting(false);
     }
@@ -238,7 +241,7 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({
         <div className="flex items-start gap-4">
           <DeviceAvatar size="lg" status={device.status} type={device.type} />
           <div className="min-w-0">
-            <p className="zh-kicker">Device Details</p>
+            <p className="zh-kicker">{t('topologyDrawer.titleKicker')}</p>
 
             {editingName ? (
               <div className="mt-3 flex items-center gap-2">
@@ -250,7 +253,7 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({
                     if (event.key === 'Enter') saveManualLabel('name');
                     if (event.key === 'Escape') cancelEditing('name');
                   }}
-                  placeholder="Enter device name..."
+                  placeholder={t('topologyDrawer.namePlaceholder')}
                   type="text"
                   value={nameValue}
                 />
@@ -282,7 +285,7 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({
                 <Button onClick={startEditingName} size="icon" variant="ghost">
                   <Pencil className="h-4 w-4" />
                 </Button>
-                {manualName ? <Badge tone="success">Manual</Badge> : null}
+                {manualName ? <Badge tone="success">{t('devices.manualTag')}</Badge> : null}
               </div>
             )}
 
@@ -296,7 +299,7 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({
                     if (event.key === 'Enter') saveManualLabel('vendor');
                     if (event.key === 'Escape') cancelEditing('vendor');
                   }}
-                  placeholder="Enter vendor name..."
+                  placeholder={t('topologyDrawer.vendorPlaceholder')}
                   type="text"
                   value={vendorValue}
                 />
@@ -350,18 +353,18 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({
             </div>
           </div>
         </div>
-        <Button aria-label="Close drawer" onClick={onClose} size="icon" variant="ghost">
+        <Button aria-label={t('topologyDrawer.closeDrawer')} onClick={onClose} size="icon" variant="ghost">
           <X className="h-4 w-4" />
         </Button>
       </div>
 
-      <div className="flex-1 space-y-4 overflow-y-auto p-6">
+      <div className="flex-1 space-y-4 overflow-y-auto p-5">
         <Surface className="p-5" tone="subtle">
           <div className="zh-toolbar zh-toolbar--spread">
             <div>
-              <p className="zh-kicker">Identity</p>
+              <p className="zh-kicker">{t('topologyDrawer.identityKicker')}</p>
               <h3 className="mt-2 text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
-                Display and override
+                {t('topologyDrawer.identityTitle')}
               </h3>
             </div>
             <Button
@@ -369,7 +372,9 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({
               size="sm"
               variant="secondary"
             >
-              {showAutoIdentity ? 'Hide auto identity' : 'Show auto identity'}
+              {showAutoIdentity
+                ? t('topologyDrawer.hideAutoIdentity')
+                : t('topologyDrawer.showAutoIdentity')}
               {showAutoIdentity ? (
                 <ChevronUp className="h-4 w-4" />
               ) : (
@@ -381,11 +386,11 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({
           {showAutoIdentity ? (
             <div className="mt-4 space-y-3">
               <Surface className="p-4" tone="inset">
-                <p className="zh-detail-card__label">Name (auto)</p>
+                <p className="zh-detail-card__label">{t('topologyDrawer.autoName')}</p>
                 <p className="zh-detail-card__value text-sm">{autoName}</p>
               </Surface>
               <Surface className="p-4" tone="inset">
-                <p className="zh-detail-card__label">Vendor (auto)</p>
+                <p className="zh-detail-card__label">{t('topologyDrawer.autoVendor')}</p>
                 <p className="zh-detail-card__value text-sm">{autoVendor}</p>
               </Surface>
             </div>
@@ -395,32 +400,38 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({
             <div className="mt-4">
               <Button onClick={clearManualLabel} size="sm" variant="ghost">
                 <XCircle className="h-4 w-4" />
-                Clear manual labels
+                {t('topologyDrawer.clearManual')}
               </Button>
             </div>
           ) : null}
         </Surface>
 
         <Surface className="p-5" tone="raised">
-          <p className="zh-kicker">Overview</p>
+          <p className="zh-kicker">{t('topologyDrawer.overviewKicker')}</p>
           <div className="mt-4 zh-detail-grid">
-            <DetailCard label="IP Address" value={device.ip || 'Unavailable'} />
-            <DetailCard label="MAC Address" value={<span className="font-mono">{device.mac}</span>} />
             <DetailCard
-              label="Last Seen"
+              label={t('topologyDrawer.ipAddress')}
+              value={device.ip || t('topologyDrawer.unavailable')}
+            />
+            <DetailCard
+              label={t('topologyDrawer.macAddress')}
+              value={<span className="font-mono">{device.mac}</span>}
+            />
+            <DetailCard
+              label={t('topologyDrawer.lastSeen')}
               value={new Date(device.last_seen).toLocaleString()}
             />
-            <DetailCard label="Attack Status" value={device.attack_status} />
+            <DetailCard label={t('topologyDrawer.attackStatus')} value={device.attack_status} />
             {device.manual_override_at ? (
               <DetailCard
-                label="Manual Override"
+                label={t('topologyDrawer.manualOverride')}
                 value={
                   <>
                     {new Date(device.manual_override_at).toLocaleString()}
                     {device.manual_override_by ? (
                       <span style={{ color: 'var(--text-tertiary)' }}>
                         {' '}
-                        by {device.manual_override_by}
+                        {t('topologyDrawer.by')} {device.manual_override_by}
                       </span>
                     ) : null}
                   </>
@@ -438,12 +449,12 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({
           <Surface className="p-5" tone="raised">
             <div className="zh-toolbar zh-toolbar--spread">
               <div>
-                <p className="zh-kicker">Detection</p>
+                <p className="zh-kicker">{t('topologyDrawer.detectionKicker')}</p>
                 <h3
                   className="mt-2 text-xl font-semibold"
                   style={{ color: 'var(--text-primary)' }}
                 >
-                  Auto-detected identity
+                  {t('topologyDrawer.detectionTitle')}
                 </h3>
               </div>
               {device.recognition_evidence ? (
@@ -453,7 +464,7 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({
                   variant="ghost"
                 >
                   <Eye className="h-4 w-4" />
-                  Evidence
+                  {t('topologyDrawer.evidence')}
                   {showEvidence ? (
                     <ChevronUp className="h-4 w-4" />
                   ) : (
@@ -463,16 +474,26 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({
               ) : null}
             </div>
             <div className="mt-4 zh-detail-grid">
-              {device.name_auto ? <DetailCard label="Name" value={device.name_auto} /> : null}
+              {device.name_auto ? (
+                <DetailCard label={t('topologyDrawer.name')} value={device.name_auto} />
+              ) : null}
               {device.vendor || device.vendor_guess ? (
                 <DetailCard
-                  label={device.vendor ? 'Vendor' : 'Vendor Guess'}
+                  label={
+                    device.vendor
+                      ? t('topologyDrawer.vendor')
+                      : t('topologyDrawer.vendorGuess')
+                  }
                   value={device.vendor || device.vendor_guess}
                 />
               ) : null}
               {device.model || device.model_guess ? (
                 <DetailCard
-                  label={device.model ? 'Model' : 'Model Guess'}
+                  label={
+                    device.model
+                      ? t('topologyDrawer.model')
+                      : t('topologyDrawer.modelGuess')
+                  }
                   value={device.model || device.model_guess}
                 />
               ) : null}
@@ -482,27 +503,31 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({
                 <div className="space-y-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
                   {device.recognition_evidence.sources?.length ? (
                     <p>
-                      <strong style={{ color: 'var(--text-primary)' }}>Sources:</strong>{' '}
+                      <strong style={{ color: 'var(--text-primary)' }}>
+                        {t('topologyDrawer.sources')}:
+                      </strong>{' '}
                       {device.recognition_evidence.sources.join(', ')}
                     </p>
                   ) : null}
                   {device.recognition_evidence.matched_fields?.length ? (
                     <p>
-                      <strong style={{ color: 'var(--text-primary)' }}>Matched Fields:</strong>{' '}
+                      <strong style={{ color: 'var(--text-primary)' }}>
+                        {t('topologyDrawer.matchedFields')}:
+                      </strong>{' '}
                       {device.recognition_evidence.matched_fields.join(', ')}
                     </p>
                   ) : null}
                   {device.recognition_evidence.confidence_breakdown ? (
                     <p>
                       <strong style={{ color: 'var(--text-primary)' }}>
-                        Confidence Breakdown:
+                        {t('topologyDrawer.confidenceBreakdown')}:
                       </strong>{' '}
                       {device.recognition_evidence.confidence_breakdown.active_probe !==
                       undefined
-                        ? `Active Probe ${device.recognition_evidence.confidence_breakdown.active_probe}% • `
+                        ? `${t('topologyDrawer.activeProbe')} ${device.recognition_evidence.confidence_breakdown.active_probe}% • `
                         : ''}
                       OUI {device.recognition_evidence.confidence_breakdown.oui}% • DHCP{' '}
-                      {device.recognition_evidence.confidence_breakdown.dhcp}% • Combined{' '}
+                      {device.recognition_evidence.confidence_breakdown.dhcp}% • {t('topologyDrawer.combined')}{' '}
                       {device.recognition_evidence.confidence_breakdown.combined}%
                     </p>
                   ) : null}
@@ -515,9 +540,9 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({
         <Surface className="p-5" tone="raised">
           <div className="zh-toolbar zh-toolbar--spread">
             <div>
-              <p className="zh-kicker">Intelligence</p>
+              <p className="zh-kicker">{t('topologyDrawer.intelligenceKicker')}</p>
               <h3 className="mt-2 text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
-                Keyword inference
+                {t('topologyDrawer.intelligenceTitle')}
               </h3>
             </div>
             <Button
@@ -526,7 +551,7 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({
               size="sm"
               variant="secondary"
             >
-              {showKeywordIntel ? 'Collapse' : 'Expand'}
+              {showKeywordIntel ? t('common.collapse') : t('common.expand')}
             </Button>
           </div>
 
@@ -534,16 +559,16 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({
             <div className="mt-4 space-y-3">
               {keywordHits.length === 0 ? (
                 <EmptyState
-                  description="No keyword inference has been generated for this device yet."
+                  description={t('topologyDrawer.noKeywordDesc')}
                   icon={Shield}
-                  title="No keyword hits"
+                  title={t('topologyDrawer.noKeywordTitle')}
                 />
               ) : (
                 <>
                   <Surface className="p-4" tone="subtle">
                     <div className="flex flex-wrap items-center gap-2">
                       <Badge tone="accent">
-                        Delta {dictionaryDelta >= 0 ? '+' : ''}
+                        {t('topologyDrawer.delta')} {dictionaryDelta >= 0 ? '+' : ''}
                         {dictionaryDelta}
                       </Badge>
                       {topHit ? (
@@ -558,11 +583,12 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({
                           {hit.rule_id}
                         </p>
                         <Badge tone="accent">
-                          Delta {hit.confidence_delta ?? 0}
+                          {t('topologyDrawer.delta')} {hit.confidence_delta ?? 0}
                         </Badge>
                       </div>
                       <p className="mt-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
-                        Matched token: <span className="font-mono">{hit.matched_token}</span>
+                        {t('topologyDrawer.matchedToken')}:{' '}
+                        <span className="font-mono">{hit.matched_token}</span>
                       </p>
                       {formatHitInfer(hit) ? (
                         <p className="mt-2 text-sm" style={{ color: 'var(--text-primary)' }}>
@@ -582,10 +608,13 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({
           ) : (
             <p className="mt-4 text-sm" style={{ color: 'var(--text-secondary)' }}>
               {keywordHits.length
-                ? `${keywordHits.length} hits available${
-                    topHit ? ` • ${formatHitInfer(topHit) || topHit.rule_id}` : ''
-                  }`
-                : 'No keyword hits yet.'}
+                ? topHit
+                  ? t('topologyDrawer.hitsAvailableWithTop', {
+                      count: keywordHits.length,
+                      top: formatHitInfer(topHit) || topHit.rule_id,
+                    })
+                  : t('topologyDrawer.hitsAvailable', { count: keywordHits.length })
+                : t('topologyDrawer.noHitsYet')}
             </p>
           )}
         </Surface>
@@ -593,9 +622,9 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({
         <Surface className="p-5" tone="raised">
           <div className="zh-toolbar zh-toolbar--spread">
             <div>
-              <p className="zh-kicker">Observations</p>
+              <p className="zh-kicker">{t('topologyDrawer.observationsKicker')}</p>
               <h3 className="mt-2 text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
-                Probe details
+                {t('topologyDrawer.observationsTitle')}
               </h3>
               {latestObservation && !showObservations ? (
                 <p className="mt-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
@@ -614,7 +643,7 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({
               size="sm"
               variant="secondary"
             >
-              {showObservations ? 'Collapse' : 'Expand'}
+              {showObservations ? t('common.collapse') : t('common.expand')}
             </Button>
           </div>
 
@@ -622,14 +651,14 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({
             <div className="mt-4 space-y-3">
               {isLoadingObservations ? (
                 <p className="text-sm" style={{ color: 'var(--text-secondary)' }}>
-                  Loading observations...
+                  {t('topologyDrawer.loadingObservations')}
                 </p>
               ) : null}
               {!isLoadingObservations && observations.length === 0 ? (
                 <EmptyState
-                  description="No probe observations are available for this device yet."
+                  description={t('topologyDrawer.noObservationsDesc')}
                   icon={Network}
-                  title="No observations"
+                  title={t('topologyDrawer.noObservationsTitle')}
                 />
               ) : null}
               {!isLoadingObservations &&
@@ -648,7 +677,7 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({
                         variant="ghost"
                       >
                         <FileJson className="h-4 w-4" />
-                        Copy JSON
+                        {t('topologyDrawer.copyJson')}
                       </Button>
                     </div>
                     {observation.raw_summary ? (
@@ -684,7 +713,7 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({
                     variant="secondary"
                   >
                     <Download className="h-4 w-4" />
-                    Export NDJSON
+                    {t('topologyDrawer.exportNdjson')}
                   </Button>
                 </div>
               ) : null}
@@ -700,7 +729,7 @@ export const NodeDrawer: React.FC<NodeDrawerProps> = ({
           color: 'var(--text-tertiary)',
         }}
       >
-        Manage active defense actions from the Interference page.
+        {t('topologyDrawer.footerHint')}
       </div>
     </div>
   );
