@@ -1,15 +1,25 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { TopologyGraph } from '../components/topology/TopologyGraph';
-import { NodeDrawer } from '../components/topology/NodeDrawer';
-import { topologyService } from '../lib/services/topology';
-import { NetworkTopology, TopologyNode } from '../types/topology';
-import { useWebSocketEvent } from '../contexts/WebSocketContext';
-import { WSEventType } from '../types/websocket';
-import { RefreshCw, Network, Terminal } from 'lucide-react';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  Activity,
+  Network,
+  RefreshCw,
+  Terminal,
+} from 'lucide-react';
 import { useTranslation } from 'react-i18next';
 import { ScanButton } from '../components/actions/ScanButton';
 import { RealtimeLogPanel } from '../components/logs/RealtimeLogPanel';
-import { clsx } from 'clsx';
+import { NodeDrawer } from '../components/topology/NodeDrawer';
+import { TopologyGraph } from '../components/topology/TopologyGraph';
+import { Button } from '../components/ui/Button';
+import { EmptyState } from '../components/ui/EmptyState';
+import { PageHeader } from '../components/ui/PageHeader';
+import { StatCard } from '../components/ui/StatCard';
+import { Surface } from '../components/ui/Surface';
+import { useWebSocketEvent } from '../contexts/WebSocketContext';
+import { topologyService } from '../lib/services/topology';
+import { Device } from '../types/device';
+import { NetworkTopology, TopologyNode } from '../types/topology';
+import { WSEventType } from '../types/websocket';
 
 export const Topology: React.FC = () => {
   const [data, setData] = useState<NetworkTopology>({ nodes: [], links: [] });
@@ -19,6 +29,7 @@ export const Topology: React.FC = () => {
   const { t } = useTranslation();
 
   const fetchTopology = useCallback(async () => {
+    setIsLoading(true);
     try {
       const topology = await topologyService.getTopology();
       setData(topology);
@@ -33,103 +44,175 @@ export const Topology: React.FC = () => {
     fetchTopology();
   }, [fetchTopology]);
 
-  // WebSocket Updates
-  // When a device is added or status changes, we refresh the topology
-  // In a more optimized version, we would update the local graph data directly
-  // but fetching fresh topology is safer for consistency for now.
-  useWebSocketEvent(WSEventType.DEVICE_ADDED, () => {
-    console.log('WS: Device Added, refreshing topology');
-    fetchTopology();
-  });
+  useWebSocketEvent(WSEventType.DEVICE_ADDED, fetchTopology);
+  useWebSocketEvent(WSEventType.DEVICE_STATUS_CHANGED, fetchTopology);
 
-  useWebSocketEvent(WSEventType.DEVICE_STATUS_CHANGED, () => {
-    console.log('WS: Status Changed, refreshing topology');
-    fetchTopology();
-  });
+  const onlineCount = useMemo(
+    () => data.nodes.filter((node) => node.data?.status === 'online').length,
+    [data.nodes]
+  );
+
+  const blockedCount = useMemo(
+    () => data.nodes.filter((node) => node.data?.status === 'blocked').length,
+    [data.nodes]
+  );
+
+  const handleDeviceUpdate = (device: Device) => {
+    setData((previous) => ({
+      ...previous,
+      nodes: previous.nodes.map((node) =>
+        node.data.mac === device.mac
+          ? {
+              ...node,
+              label:
+                device.display_name ||
+                device.name ||
+                device.alias ||
+                device.model ||
+                device.mac,
+              data: device,
+            }
+          : node
+      ),
+    }));
+
+    setSelectedNode((previous) =>
+      previous && previous.data.mac === device.mac
+        ? {
+            ...previous,
+            label:
+              device.display_name ||
+              device.name ||
+              device.alias ||
+              device.model ||
+              device.mac,
+            data: device,
+          }
+        : previous
+    );
+  };
 
   return (
-    <div className="h-[calc(100vh-4rem)] flex flex-col relative">
-      <div className="flex justify-between items-center mb-4 px-1">
-        <div className="flex items-center space-x-2">
-          <Network className="h-6 w-6" style={{ color: 'var(--winui-accent)' }} />
-          <h1 className="text-2xl font-semibold" style={{ color: 'var(--winui-text-primary)', letterSpacing: '-0.02em' }}>
-            {t('topology.title')}
-          </h1>
-        </div>
-        <div className="flex space-x-2">
-          <ScanButton />
-          <button
-            onClick={() => setShowLogs(!showLogs)}
-            className={clsx(
-              "btn-winui-secondary inline-flex items-center",
-              showLogs && "bg-opacity-80"
-            )}
-          >
-            <Terminal className="h-4 w-4 mr-2" />
-            {t('topology.logs')}
-          </button>
-          <button
-            onClick={() => {
-              setIsLoading(true);
-              fetchTopology();
-            }}
-            className="btn-winui-secondary inline-flex items-center"
-          >
-            <RefreshCw className={clsx("h-4 w-4 mr-2", isLoading && "animate-spin")} />
-            {t('topology.refresh')}
-          </button>
-        </div>
-      </div>
-
-      <div className="flex-1 relative card-winui overflow-hidden" style={{ borderRadius: 'var(--winui-radius-lg)' }}>
-        {isLoading && data.nodes.length === 0 && (
-          <div className="absolute inset-0 flex items-center justify-center z-10" style={{ backgroundColor: 'var(--winui-surface)', opacity: 0.9 }}>
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2" style={{ borderColor: 'var(--winui-accent)' }}></div>
-          </div>
-        )}
-
-        {!isLoading && data.nodes.length === 0 && (
-          <div className="absolute inset-0 flex flex-col items-center justify-center z-10" style={{ backgroundColor: 'var(--winui-surface)' }}>
-            <Network className="h-16 w-16 mb-4" style={{ color: 'var(--winui-text-tertiary)' }} />
-            <h3 className="text-xl font-semibold mb-2" style={{ color: 'var(--winui-text-primary)' }}>
-              {t('topology.emptyTitle')}
-            </h3>
-            <p className="mb-6" style={{ color: 'var(--winui-text-secondary)' }}>
-              {t('topology.emptyHint')}
-            </p>
+    <div className="zh-page">
+      <PageHeader
+        actions={
+          <>
             <ScanButton />
-          </div>
-        )}
+            <Button
+              leadingIcon={<Terminal className="h-4 w-4" />}
+              onClick={() => setShowLogs((previous) => !previous)}
+              variant={showLogs ? 'accent' : 'secondary'}
+            >
+              {t('topology.logs')}
+            </Button>
+            <Button
+              leadingIcon={<RefreshCw className={isLoading ? 'h-4 w-4 animate-spin' : 'h-4 w-4'} />}
+              onClick={fetchTopology}
+              variant="secondary"
+            >
+              {t('topology.refresh')}
+            </Button>
+          </>
+        }
+        eyebrow="Visualization"
+        icon={Network}
+        subtitle="Trace relationships between gateways and observed hosts with an editable detail pane."
+        title={t('topology.title')}
+      />
 
-        <TopologyGraph
-          data={data}
-          onNodeClick={setSelectedNode}
+      <div className="zh-stat-grid">
+        <StatCard
+          hint="Detected graph nodes"
+          icon={Network}
+          label="Nodes"
+          value={data.nodes.length}
         />
-
-        {/* Drawer Overlay */}
-        {selectedNode && (
-          <div
-            className="absolute inset-0 z-40 transition-opacity"
-            style={{ backgroundColor: 'rgba(0, 0, 0, 0.4)', backdropFilter: 'blur(4px)' }}
-            onClick={() => setSelectedNode(null)}
-          />
-        )}
-
-        {/* Drawer */}
-        {selectedNode && (
-          <NodeDrawer
-            node={selectedNode}
-            onClose={() => setSelectedNode(null)}
-          />
-        )}
+        <StatCard
+          hint="Topology relationships"
+          icon={Activity}
+          label="Links"
+          tone="var(--accent)"
+          value={data.links.length}
+        />
+        <StatCard
+          hint="Currently reachable devices"
+          icon={Activity}
+          label={t('devices.statusOnline')}
+          tone="var(--success)"
+          value={onlineCount}
+        />
+        <StatCard
+          hint="Blocked or isolated hosts"
+          icon={Activity}
+          label={t('devices.statusBlocked')}
+          tone="var(--danger)"
+          value={blockedCount}
+        />
       </div>
 
-      {/* Realtime Log Panel */}
-      <RealtimeLogPanel
-        isOpen={showLogs}
-        onClose={() => setShowLogs(false)}
-        maxLogs={50}
-      />
+      <Surface className="p-6 lg:p-7" tone="raised">
+        <div className="zh-toolbar zh-toolbar--spread">
+          <div>
+            <p className="zh-kicker">Canvas</p>
+            <h2 className="mt-2 text-2xl font-semibold" style={{ color: 'var(--text-primary)' }}>
+              Network relationship map
+            </h2>
+          </div>
+          <div className="zh-legend">
+            <div className="zh-legend__item">
+              <span className="zh-legend__swatch" style={{ background: '#7c4dff' }} />
+              Router
+            </div>
+            <div className="zh-legend__item">
+              <span className="zh-legend__swatch" style={{ background: 'var(--success)' }} />
+              Online
+            </div>
+            <div className="zh-legend__item">
+              <span className="zh-legend__swatch" style={{ background: 'var(--danger)' }} />
+              Blocked
+            </div>
+            <div className="zh-legend__item">
+              <span className="zh-legend__swatch" style={{ background: 'var(--text-tertiary)' }} />
+              Offline
+            </div>
+          </div>
+        </div>
+
+        <div className="mt-6 rounded-[1.5rem] border" style={{ borderColor: 'var(--border)' }}>
+          {isLoading && data.nodes.length === 0 ? (
+            <div className="grid min-h-[42rem] place-items-center">
+              <RefreshCw className="h-10 w-10 animate-spin" style={{ color: 'var(--accent)' }} />
+            </div>
+          ) : !isLoading && data.nodes.length === 0 ? (
+            <EmptyState
+              action={<ScanButton />}
+              description={t('topology.emptyHint')}
+              icon={Network}
+              title={t('topology.emptyTitle')}
+            />
+          ) : (
+            <TopologyGraph data={data} onNodeClick={setSelectedNode} />
+          )}
+        </div>
+      </Surface>
+
+      {selectedNode ? (
+        <div
+          className="fixed inset-0 z-40"
+          onClick={() => setSelectedNode(null)}
+          style={{ background: 'rgba(15, 23, 42, 0.42)', backdropFilter: 'blur(10px)' }}
+        />
+      ) : null}
+
+      {selectedNode ? (
+        <NodeDrawer
+          node={selectedNode}
+          onClose={() => setSelectedNode(null)}
+          onDeviceUpdate={handleDeviceUpdate}
+        />
+      ) : null}
+
+      <RealtimeLogPanel isOpen={showLogs} maxLogs={50} onClose={() => setShowLogs(false)} />
     </div>
   );
 };
