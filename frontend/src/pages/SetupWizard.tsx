@@ -1,10 +1,22 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { configService } from '../lib/services/config';
 import { useNavigate } from 'react-router-dom';
+import {
+  AlertTriangle,
+  ArrowRight,
+  CheckCircle2,
+  Clock3,
+  ShieldCheck,
+  UserRoundPlus,
+} from 'lucide-react';
 import toast from 'react-hot-toast';
-import { useAuth } from '../contexts/AuthContext';
-import { OOBERegisterRequest, OOBEStatus } from '../types/config';
 import { useTranslation } from 'react-i18next';
+import { Button } from '../components/ui/Button';
+import { Dialog } from '../components/ui/Dialog';
+import { LoadingScreen } from '../components/ui/LoadingScreen';
+import { Surface } from '../components/ui/Surface';
+import { useAuth } from '../contexts/AuthContext';
+import { configService } from '../lib/services/config';
+import { OOBERegisterRequest, OOBEStatus } from '../types/config';
 
 export const SetupWizard: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -27,36 +39,47 @@ export const SetupWizard: React.FC = () => {
   useEffect(() => {
     const loadStatus = async () => {
       try {
-        const s = await configService.getStatus();
-        setStatus(s);
-        if (s.first_run_completed) {
+        const response = await configService.getStatus();
+        setStatus(response);
+        if (response.first_run_completed) {
           navigate('/', { replace: true });
         }
       } catch (error) {
         console.error('Failed to load setup status', error);
+      } finally {
+        setStatusLoading(false);
       }
-      setStatusLoading(false);
     };
+
     loadStatus();
   }, [navigate]);
 
   useEffect(() => {
-    if (showDisclaimer) {
-      setSecondsLeft(30);
-      setTimerReady(false);
-      timerRef.current = setInterval(() => {
-        setSecondsLeft((prev) => {
-          if (prev <= 1) {
-            if (timerRef.current) clearInterval(timerRef.current);
-            setTimerReady(true);
-            return 0;
-          }
-          return prev - 1;
-        });
-      }, 1000);
+    if (!showDisclaimer) {
+      return undefined;
     }
+
+    setSecondsLeft(30);
+    setTimerReady(false);
+
+    timerRef.current = setInterval(() => {
+      setSecondsLeft((previous) => {
+        if (previous <= 1) {
+          if (timerRef.current) {
+            clearInterval(timerRef.current);
+          }
+          setTimerReady(true);
+          return 0;
+        }
+
+        return previous - 1;
+      });
+    }, 1000);
+
     return () => {
-      if (timerRef.current) clearInterval(timerRef.current);
+      if (timerRef.current) {
+        clearInterval(timerRef.current);
+      }
     };
   }, [showDisclaimer]);
 
@@ -69,20 +92,22 @@ export const SetupWizard: React.FC = () => {
     ) {
       setShowDisclaimer(true);
     }
-  }, [status, isAuthenticated]);
+  }, [isAuthenticated, status]);
 
   const handleScroll = () => {
-    // Any scroll/wheel interaction counts as read acknowledgement
     setHasScrolled(true);
   };
 
   const handleRegister = async () => {
     const username = formData.username.trim();
+
     if (!username || username.toLowerCase() === 'admin') {
       toast.error(t('setup.adminReserved'));
       return;
     }
+
     setLoading(true);
+
     try {
       const result = await configService.register({ ...formData, username });
       login(result.access_token, { limitedAdmin: false });
@@ -126,184 +151,255 @@ export const SetupWizard: React.FC = () => {
     isAdminReserved;
 
   if (statusLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-brand-600" aria-label="Loading setup" />
-      </div>
-    );
+    return <LoadingScreen message="Preparing first-run experience..." />;
   }
 
   return (
-    <div className="min-h-screen relative overflow-hidden" style={{ backgroundColor: 'var(--winui-bg-primary)' }}>
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-10 left-10 w-24 h-24 rounded-full blur-3xl opacity-20" style={{ backgroundColor: 'var(--winui-accent)' }}></div>
-        <div className="absolute bottom-10 right-10 w-32 h-32 rounded-full blur-3xl opacity-15" style={{ backgroundColor: 'var(--winui-text-tertiary)' }}></div>
-      </div>
-      <div className="relative max-w-5xl mx-auto px-4 py-12">
-        <div className="text-center mb-10">
-          <p className="text-sm font-semibold tracking-wide" style={{ color: 'var(--winui-accent)' }}>{t('setup.welcomeTag')}</p>
-          <h1 className="mt-2 text-3xl sm:text-4xl font-bold" style={{ color: 'var(--winui-text-primary)' }}>{t('setup.welcomeTitle')}</h1>
-          <p className="mt-3 text-base" style={{ color: 'var(--winui-text-secondary)' }}>
+    <div className="min-h-screen px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-7xl">
+        <div className="mb-8 max-w-3xl">
+          <p className="zh-kicker">{t('setup.welcomeTag')}</p>
+          <h1
+            className="mt-3 text-4xl font-bold tracking-[-0.05em]"
+            style={{ color: 'var(--text-primary)' }}
+          >
+            {t('setup.welcomeTitle')}
+          </h1>
+          <p className="mt-4 max-w-2xl text-base leading-7" style={{ color: 'var(--text-secondary)' }}>
             {t('setup.welcomeDesc')}
           </p>
         </div>
 
-        <div className="grid md:grid-cols-5 gap-6 items-start">
-          <div className="md:col-span-3">
-            <div className="card-winui shadow-xl rounded-2xl">
-              <div className="px-6 py-4 border-b flex items-center gap-3" style={{ borderColor: 'var(--winui-border-subtle)' }}>
-                <div className="h-10 w-10 rounded-full flex items-center justify-center font-semibold" style={{ backgroundColor: 'var(--winui-bg-tertiary)', color: 'var(--winui-accent)' }}>
-                  1
-                </div>
-                <div>
-                  <p className="text-sm font-semibold" style={{ color: 'var(--winui-text-primary)' }}>{t('setup.accountStep')}</p>
-                  <p className="text-sm" style={{ color: 'var(--winui-text-secondary)' }}>{t('setup.accountSub')}</p>
-                </div>
+        <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
+          <Surface className="p-8 lg:p-10" tone="raised">
+            <div className="flex items-start justify-between gap-6">
+              <div>
+                <p className="zh-kicker">{t('setup.accountStep')}</p>
+                <h2
+                  className="mt-2 text-3xl font-semibold tracking-[-0.04em]"
+                  style={{ color: 'var(--text-primary)' }}
+                >
+                  {t('setup.createAdmin')}
+                </h2>
+                <p className="mt-3 text-sm leading-6" style={{ color: 'var(--text-secondary)' }}>
+                  {t('setup.accountSub')}
+                </p>
               </div>
-              <div className="p-6 space-y-6">
-                <div>
-                  <label className="block text-sm font-medium" style={{ color: 'var(--winui-text-primary)' }}>{t('setup.username')}</label>
-                  <input
-                    type="text"
-                    className="mt-1 input-winui block w-full"
-                    value={formData.username}
-                    onChange={(e) => setFormData({ ...formData, username: e.target.value })}
-                    placeholder={t('setup.usernamePlaceholder')}
-                    required
-                  />
-                  <p className="mt-1 text-xs text-gray-500">{t('setup.accountSub')}</p>
-                  {isAdminReserved && (
-                    <p className="mt-2 text-sm" style={{ color: '#d13438' }}>
-                      {t('setup.adminReserved')}
-                    </p>
-                  )}
-                </div>
-                <div>
-                  <label className="block text-sm font-medium" style={{ color: 'var(--winui-text-primary)' }}>{t('setup.password')}</label>
-                  <input
-                    type="password"
-                    className="mt-1 input-winui block w-full"
-                    value={formData.password}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                    placeholder="Enter a strong password"
-                    required
-                    minLength={8}
-                  />
-                  <p className="mt-2 text-sm" style={{ color: 'var(--winui-text-secondary)' }}>
-                    {t('setup.passwordNote')}
-                  </p>
-                  {status?.admin_exists && (
-                    <p className="mt-2 text-sm" style={{ color: '#d13438' }}>
-                      {t('setup.adminExists')}
-                    </p>
-                  )}
-                </div>
-                <div className="flex items-center justify-end">
-                  <button
-                    onClick={handleRegister}
-                    disabled={registerDisabled}
-                    className="btn-winui px-6 py-2 text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
-                  >
-                    {loading ? t('setup.creating') : t('setup.createAdmin')}
-                  </button>
-                </div>
+              <div
+                className="inline-flex h-14 w-14 items-center justify-center rounded-[1.2rem]"
+                style={{ background: 'var(--accent-soft)', color: 'var(--accent)' }}
+              >
+                <UserRoundPlus className="h-6 w-6" />
               </div>
             </div>
-          </div>
 
-          <div className="md:col-span-2">
-            <div className="card-winui shadow-lg rounded-2xl p-6 space-y-4">
+            <div className="mt-8 grid gap-5">
+              <div>
+                <label className="mb-2 block text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                  {t('setup.username')}
+                </label>
+                <input
+                  className="zh-field"
+                  onChange={(event) =>
+                    setFormData({ ...formData, username: event.target.value })
+                  }
+                  placeholder={t('setup.usernamePlaceholder')}
+                  required
+                  type="text"
+                  value={formData.username}
+                />
+                <p className="mt-2 text-xs" style={{ color: 'var(--text-tertiary)' }}>
+                  {t('setup.accountSub')}
+                </p>
+                {isAdminReserved ? (
+                  <p className="mt-2 text-sm" style={{ color: 'var(--danger)' }}>
+                    {t('setup.adminReserved')}
+                  </p>
+                ) : null}
+              </div>
+
+              <div>
+                <label className="mb-2 block text-sm font-medium" style={{ color: 'var(--text-primary)' }}>
+                  {t('setup.password')}
+                </label>
+                <input
+                  className="zh-field"
+                  minLength={8}
+                  onChange={(event) =>
+                    setFormData({ ...formData, password: event.target.value })
+                  }
+                  placeholder="Enter a strong password"
+                  required
+                  type="password"
+                  value={formData.password}
+                />
+                <p className="mt-2 text-sm" style={{ color: 'var(--text-secondary)' }}>
+                  {t('setup.passwordNote')}
+                </p>
+                {status?.admin_exists ? (
+                  <p className="mt-2 text-sm" style={{ color: 'var(--danger)' }}>
+                    {t('setup.adminExists')}
+                  </p>
+                ) : null}
+              </div>
+
+              <Surface className="p-5" tone="subtle">
+                <p className="zh-kicker">{t('setup.safetyStep')}</p>
+                <div className="mt-4 space-y-3">
+                  {[t('setup.safetyList1'), t('setup.safetyList2'), t('setup.safetyList3')].map(
+                    (item) => (
+                      <div className="flex items-start gap-3" key={item}>
+                        <CheckCircle2
+                          className="mt-0.5 h-4 w-4 flex-shrink-0"
+                          style={{ color: 'var(--success)' }}
+                        />
+                        <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                          {item}
+                        </span>
+                      </div>
+                    )
+                  )}
+                </div>
+              </Surface>
+
+              <div className="flex justify-end">
+                <Button
+                  disabled={registerDisabled}
+                  loading={loading}
+                  onClick={handleRegister}
+                  trailingIcon={!loading ? <ArrowRight className="h-4 w-4" /> : undefined}
+                  type="button"
+                >
+                  {loading ? t('setup.creating') : t('setup.createAdmin')}
+                </Button>
+              </div>
+            </div>
+          </Surface>
+
+          <div className="space-y-6">
+            <Surface className="p-8" tone="raised">
               <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-full flex items-center justify-center font-semibold" style={{ backgroundColor: 'var(--winui-bg-tertiary)', color: 'var(--winui-accent)' }}>
-                  2
+                <div
+                  className="inline-flex h-12 w-12 items-center justify-center rounded-[1.1rem]"
+                  style={{ background: 'var(--success-soft)', color: 'var(--success)' }}
+                >
+                  <ShieldCheck className="h-5 w-5" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold" style={{ color: 'var(--winui-text-primary)' }}>{t('setup.safetyStep')}</p>
-                  <p className="text-sm" style={{ color: 'var(--winui-text-secondary)' }}>{t('setup.safetySub')}</p>
+                  <p className="zh-kicker">{t('setup.safetyStep')}</p>
+                  <h2 className="mt-1 text-2xl font-semibold" style={{ color: 'var(--text-primary)' }}>
+                    {t('setup.safetySub')}
+                  </h2>
                 </div>
               </div>
-              <p className="text-sm" style={{ color: 'var(--winui-text-secondary)' }}>
+              <p className="mt-5 text-sm leading-7" style={{ color: 'var(--text-secondary)' }}>
                 {t('setup.safetyDesc')}
               </p>
-              <ul className="text-sm space-y-1 list-disc list-inside" style={{ color: 'var(--winui-text-secondary)' }}>
-                <li>{t('setup.safetyList1')}</li>
-                <li>{t('setup.safetyList2')}</li>
-                <li>{t('setup.safetyList3')}</li>
-              </ul>
-              <div className="rounded-lg p-4 text-sm" style={{ backgroundColor: 'var(--winui-bg-tertiary)', color: 'var(--winui-text-secondary)', border: '1px solid var(--winui-border-subtle)' }}>
-                {t('setup.safetyInfo')}
+              <Surface className="mt-5 p-5" tone="subtle">
+                <p className="text-sm leading-7" style={{ color: 'var(--text-secondary)' }}>
+                  {t('setup.safetyInfo')}
+                </p>
+              </Surface>
+            </Surface>
+
+            <Surface className="p-8" tone="subtle">
+              <p className="zh-kicker">Guidance</p>
+              <div className="mt-5 space-y-4">
+                <div className="flex items-start gap-3">
+                  <Clock3 className="mt-0.5 h-5 w-5" style={{ color: 'var(--accent)' }} />
+                  <div>
+                    <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
+                      Timed acknowledgement
+                    </p>
+                    <p className="mt-1 text-sm" style={{ color: 'var(--text-secondary)' }}>
+                      Review the safety notice for 30 seconds and scroll through it before the
+                      primary console unlocks.
+                    </p>
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <AlertTriangle className="mt-0.5 h-5 w-5" style={{ color: 'var(--warning)' }} />
+                  <div>
+                    <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
+                      Restricted networks only
+                    </p>
+                    <p className="mt-1 text-sm" style={{ color: 'var(--text-secondary)' }}>
+                      The active defense surface is intentionally separated from setup so you can
+                      confirm policy before using any disruptive action.
+                    </p>
+                  </div>
+                </div>
               </div>
-            </div>
+            </Surface>
           </div>
         </div>
       </div>
 
-      {showDisclaimer && (
-        <div
-          className="fixed inset-0 z-50 flex items-center justify-center px-4"
-          role="dialog"
-          aria-modal="true"
-          aria-label="Safety and Disclaimer"
-          style={{ backgroundColor: 'rgba(0,0,0,0.4)' }}
-        >
-          <div className="rounded-2xl shadow-2xl max-w-3xl w-full outline-none overflow-hidden" style={{ backgroundColor: 'var(--winui-surface)', color: 'var(--winui-text-primary)' }}>
-            <div className="p-6" style={{ backgroundColor: 'var(--winui-accent)' }}>
-              <h2 className="text-xl font-semibold text-white">{t('setup.modalTitle')}</h2>
-              <p className="text-sm text-indigo-50 mt-2">
-                {t('setup.modalLead')}
+      <Dialog
+        description={t('setup.modalLead')}
+        footer={
+          <>
+            <div>
+              <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
+                {t('setup.timerLabel')}:{' '}
+                {timerReady
+                  ? t('setup.timerReady')
+                  : t('setup.timerRemaining', { seconds: secondsLeft })}
               </p>
-            </div>
-            <div
-              className="p-6 max-h-96 overflow-y-auto space-y-4 text-sm"
-              onScroll={handleScroll}
-              onWheel={handleScroll}
-              ref={scrollRef}
-              tabIndex={0}
-              style={{ color: 'var(--winui-text-secondary)' }}
-            >
-              <div className="space-y-2">
-                <p className="text-base font-semibold" style={{ color: 'var(--winui-text-primary)' }}>{t('setup.modalPurpose')}</p>
-                <p>{t('setup.modalPurposeDesc')}</p>
-              </div>
-              <div className="space-y-2">
-                <p className="text-base font-semibold" style={{ color: 'var(--winui-text-primary)' }}>{t('setup.modalResp')}</p>
-                <ul className="list-disc list-inside space-y-1">
-                  <li>{t('setup.modalResp1')}</li>
-                  <li>{t('setup.modalResp2')}</li>
-                  <li>{t('setup.modalResp3')}</li>
-                </ul>
-              </div>
-              <div className="space-y-2">
-                <p className="text-base font-semibold" style={{ color: 'var(--winui-text-primary)' }}>{t('setup.modalSafety')}</p>
-                <ul className="list-disc list-inside space-y-1">
-                  <li>{t('setup.modalSafety1')}</li>
-                  <li>{t('setup.modalSafety2')}</li>
-                  <li>{t('setup.modalSafety3')}</li>
-                </ul>
-              </div>
-              <p className="text-xs" style={{ color: 'var(--winui-text-tertiary)' }}>
+              <p className="mt-1 text-xs" style={{ color: 'var(--text-tertiary)' }}>
                 {t('setup.modalFooterHint')}
               </p>
             </div>
-            <div className="px-6 pb-6 pt-3 flex items-center justify-between border-t border-gray-200">
-              <div className="text-sm" style={{ color: 'var(--winui-text-secondary)' }}>
-                <div>
-                  {t('setup.timerLabel')}: {timerReady ? t('setup.timerReady') : t('setup.timerRemaining', { seconds: secondsLeft })}
-                </div>
-                <div className="text-xs" style={{ color: 'var(--winui-text-tertiary)' }}>{t('setup.modalFooterHint')}</div>
-              </div>
-              <button
-                className="btn-winui px-6 py-2 text-sm font-semibold disabled:opacity-50 disabled:cursor-not-allowed"
-                onClick={handleAcknowledge}
-                disabled={!readyToAcknowledge || loading || !isAuthenticated}
-                autoFocus
-              >
-                {t('setup.iUnderstand')}
-              </button>
-            </div>
-          </div>
+            <Button
+              disabled={!readyToAcknowledge || loading || !isAuthenticated}
+              loading={loading}
+              onClick={handleAcknowledge}
+              type="button"
+            >
+              {t('setup.iUnderstand')}
+            </Button>
+          </>
+        }
+        open={showDisclaimer}
+        title={t('setup.modalTitle')}
+      >
+        <div
+          className="max-h-[22rem] space-y-6 overflow-y-auto pr-2"
+          onScroll={handleScroll}
+          onWheel={handleScroll}
+          ref={scrollRef}
+          tabIndex={0}
+        >
+          <Surface className="p-5" tone="subtle">
+            <p className="zh-kicker">{t('setup.modalPurpose')}</p>
+            <p className="mt-3 text-sm leading-7" style={{ color: 'var(--text-secondary)' }}>
+              {t('setup.modalPurposeDesc')}
+            </p>
+          </Surface>
+          <Surface className="p-5" tone="subtle">
+            <p className="zh-kicker">{t('setup.modalResp')}</p>
+            <ul
+              className="mt-3 space-y-2 text-sm leading-7"
+              style={{ color: 'var(--text-secondary)' }}
+            >
+              <li>{t('setup.modalResp1')}</li>
+              <li>{t('setup.modalResp2')}</li>
+              <li>{t('setup.modalResp3')}</li>
+            </ul>
+          </Surface>
+          <Surface className="p-5" tone="subtle">
+            <p className="zh-kicker">{t('setup.modalSafety')}</p>
+            <ul
+              className="mt-3 space-y-2 text-sm leading-7"
+              style={{ color: 'var(--text-secondary)' }}
+            >
+              <li>{t('setup.modalSafety1')}</li>
+              <li>{t('setup.modalSafety2')}</li>
+              <li>{t('setup.modalSafety3')}</li>
+            </ul>
+          </Surface>
         </div>
-      )}
+      </Dialog>
     </div>
   );
 };
