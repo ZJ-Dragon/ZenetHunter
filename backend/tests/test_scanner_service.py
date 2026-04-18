@@ -5,7 +5,7 @@ from unittest.mock import AsyncMock, MagicMock, patch
 import pytest
 
 from app.models.scan import ScanRequest
-from app.services.scanner import DeviceRepository, ScannerService
+from app.services.scanner import DeviceRepository, ScannerService, get_scanner_service
 
 
 @pytest.mark.asyncio
@@ -79,3 +79,8 @@ def test_guess_vendor():
     result = service._guess_vendor("00:11:22:33:44:55")
     # Result should be None or a string
     assert result is None or isinstance(result, str)
+
+
+def test_get_scanner_service_returns_singleton():
+    """Scanner service must be shared so status/tasks survive across requests."""
+    assert get_scanner_service() is get_scanner_service()

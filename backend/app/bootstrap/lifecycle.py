@@ -5,9 +5,9 @@ from __future__ import annotations
 import asyncio
 import logging
 import signal
+from collections.abc import AsyncIterator
 from contextlib import asynccontextmanager
 from datetime import UTC, datetime
-from typing import AsyncIterator
 
 from fastapi import FastAPI
 

@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import logging
+
 from app.bootstrap import create_app
 from app.core.config import get_settings
 

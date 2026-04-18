@@ -37,6 +37,8 @@ class DeviceRepository:
             tags=json.dumps(device.tags) if device.tags else None,
             alias=device.alias,
             manual_profile_id=getattr(device, "manual_profile_id", None),
+            discovery_source=getattr(device, "discovery_source", None),
+            freshness_score=getattr(device, "freshness_score", None),
         )
         self.session.add(device_model)
         await self.session.flush()
@@ -82,6 +84,8 @@ class DeviceRepository:
             db_device.vendor_guess = device.vendor_guess
             db_device.model_guess = device.model_guess
             db_device.recognition_confidence = device.recognition_confidence
+            db_device.discovery_source = getattr(device, "discovery_source", None)
+            db_device.freshness_score = getattr(device, "freshness_score", None)
             db_device.recognition_evidence = (
                 json.dumps(device.recognition_evidence)
                 if device.recognition_evidence
@@ -136,6 +140,8 @@ class DeviceRepository:
                 vendor_guess=device.vendor_guess,
                 model_guess=device.model_guess,
                 recognition_confidence=device.recognition_confidence,
+                discovery_source=getattr(device, "discovery_source", None),
+                freshness_score=getattr(device, "freshness_score", None),
                 recognition_evidence=(
                     json.dumps(device.recognition_evidence)
                     if device.recognition_evidence
@@ -193,6 +199,8 @@ class DeviceRepository:
         device_model.last_seen = device.last_seen
         device_model.tags = json.dumps(device.tags) if device.tags else None
         device_model.alias = device.alias
+        device_model.discovery_source = getattr(device, "discovery_source", None)
+        device_model.freshness_score = getattr(device, "freshness_score", None)
 
         await self.session.flush()
         return self.to_domain_model(device_model)
@@ -400,6 +408,8 @@ class DeviceRepository:
             vendor_manual=vendor_manual,
             manual_override_at=getattr(device_model, "manual_override_at", None),
             manual_override_by=getattr(device_model, "manual_override_by", None),
+            discovery_source=getattr(device_model, "discovery_source", None),
+            freshness_score=getattr(device_model, "freshness_score", None),
             display_name=display_name,
             display_vendor=display_vendor,
             name_auto=name_auto,

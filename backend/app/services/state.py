@@ -95,7 +95,7 @@ class StateManager:
             self._devices.clear()
             logger.info(f"Cleared {device_count} devices from in-memory state")
 
-    def update_device(self, device: Device) -> Device:
+    def update_device(self, device: Device, *, emit_events: bool = True) -> Device:
         """Update or add a device."""
         with self._data_lock:
             mac = device.mac.lower()
@@ -106,6 +106,9 @@ class StateManager:
             status_changed = existing and existing.status != device.status
 
             self._devices[mac] = device
+
+        if not emit_events:
+            return device
 
         # Emit events outside lock
         if is_new:

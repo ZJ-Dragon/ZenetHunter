@@ -66,5 +66,7 @@ Refactor the backend into a stable layered architecture with replaceable low-lev
 
 ## Progress Snapshot
 - Completed: Subtask 1 (`refactor(backend): add layered bootstrap and provider contracts`)
-- In progress: Subtask 2 (unified capability reporting and defense executor abstraction)
-- Pending: Subtasks 3-6
+- Completed: Subtask 2 (`refactor(backend): unify capability reporting and defense execution`)
+- Completed: Subtask 3 (explicit scan orchestration, shared scanner singleton, candidate fallback, final scan status updates)
+- In progress: Subtask 4 (recognition/manual/display pipeline cleanup and broken device routes)
+- Pending: Subtasks 5-6

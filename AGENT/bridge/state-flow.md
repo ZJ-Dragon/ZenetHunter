@@ -11,9 +11,12 @@
 ## Scan Flow
 1. Frontend starts a scan with `POST /api/scan/start`
 2. Backend scanner clears existing device cache before running a fresh scan
-3. Scanner writes devices to the database and updates `StateManager`
-4. Backend emits `scanStarted`, `deviceAdded`, `scanLog`, and `scanCompleted`
-5. Frontend refreshes device/topology views from REST and WS events
+3. Backend scan orchestration runs in this order:
+   discovery -> observations -> fingerprint extraction -> device upsert -> manual profile match -> display field generation -> websocket refresh
+4. Discovery prefers candidate refresh and may fall back to unconfirmed cached candidates when active confirmation is unavailable
+5. Repository conversion remains the source of truth for `display_name` and `display_vendor`
+6. Backend updates database state first, then synchronizes `StateManager`, then emits `scanStarted`, `deviceAdded` or `deviceRecognitionUpdated`, `scanLog`, and `scanCompleted`
+7. Frontend refreshes device/topology views from REST and WS events
 
 ## Device Label Flow
 1. Operator submits manual labels through `PUT /api/devices/{mac}/manual-label`
