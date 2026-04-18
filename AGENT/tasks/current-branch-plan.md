@@ -16,6 +16,11 @@ Create a top-level `AGENT/` collaboration protocol layer that gives human and AI
 3. Update `README.md`, `README.zh-CN.md`, `README.ja-JP.md`, `README.ko-KR.md`, and `README.ru-RU.md` with a prominent "Instructions for AI Agents" section near the top.
 4. Run validation (`pre-commit`, tests, CI status check) after every 2-3 subtasks and again before finishing if needed.
 
+## Progress Snapshot
+- Completed: Subtask 1 (`docs(agent): add branch collaboration plan`).
+- In progress: Subtask 2 (protocol memory, bridge contracts, repository maps, rules, backlog, done log).
+- Pending: Subtask 3 (README updates and any missing localized root README files).
+
 ## Execution Notes
 - Complete one subtask at a time.
 - Commit and push after each subtask.
