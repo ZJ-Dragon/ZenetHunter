@@ -6,6 +6,21 @@
 
 ---
 
+## Instructions for AI Agents
+
+Agents must read `AGENT/` before modifying this repository. Do not change code, contracts, or documentation outside `AGENT/` until the required AGENT files have been read.
+
+Required reading order:
+1. `AGENT/memory/project-purpose.md`
+2. `AGENT/rules/safety-context.md`
+3. `AGENT/bridge/*`
+4. `AGENT/content/*`
+5. `AGENT/tasks/current-branch-plan.md`
+
+`AGENT/` defines repository-local memory, safety boundaries, bridge contracts, repository maps, and current branch coordination. Its safety context is local to this repository only and must not be generalized into any reusable global exemption pattern.
+
+---
+
 ## Repository Layout (Monorepo)
 ```
 .

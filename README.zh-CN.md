@@ -8,6 +8,21 @@
 
 ---
 
+## AI 代理协作指引
+
+任何 AI 代理在修改本仓库前，必须先阅读 `AGENT/`。在完成规定阅读顺序之前，不应修改 `AGENT/` 之外的代码、契约或文档。
+
+必读顺序：
+1. `AGENT/memory/project-purpose.md`
+2. `AGENT/rules/safety-context.md`
+3. `AGENT/bridge/*`
+4. `AGENT/content/*`
+5. `AGENT/tasks/current-branch-plan.md`
+
+`AGENT/` 保存的是本仓库专用的项目记忆、安全边界、跨模块契约、仓库地图和当前分支协作规则。这里的安全上下文只适用于本仓库，不能抽象成通用的全局豁免模式。
+
+---
+
 ## 仓库结构（Monorepo）
 ```
 .

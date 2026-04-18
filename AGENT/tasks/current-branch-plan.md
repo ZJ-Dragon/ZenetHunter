@@ -18,8 +18,8 @@ Create a top-level `AGENT/` collaboration protocol layer that gives human and AI
 
 ## Progress Snapshot
 - Completed: Subtask 1 (`docs(agent): add branch collaboration plan`).
-- In progress: Subtask 2 (protocol memory, bridge contracts, repository maps, rules, backlog, done log).
-- Pending: Subtask 3 (README updates and any missing localized root README files).
+- Completed: Subtask 2 (`docs(agent): add protocol memory and contract maps`).
+- In progress: Subtask 3 (README updates and any missing localized root README files).
 
 ## Execution Notes
 - Complete one subtask at a time.
