@@ -19,9 +19,9 @@ This file records the REST and WebSocket contracts that agents should treat as s
 - `POST /api/config/replay`
   - Resets the system back toward first-run state
 - `GET /api/config/platform`
-  - Returns platform summary and capability data
+  - Returns platform summary, legacy capability booleans, and normalized `capability_state`
 - `GET /api/config/scan`
-  - Returns effective scan configuration and feature flags
+  - Returns effective scan configuration, feature flags, and normalized `capability_state`
 
 ## Devices
 - `GET /api/devices`
@@ -56,6 +56,7 @@ This file records the REST and WebSocket contracts that agents should treat as s
 - `GET /api/logs`
 - `POST /api/logs`
 - `GET /api/logs/system-info`
+  - Returns legacy capability booleans plus normalized `capability_state`
 - `GET /api/devices/{mac}/observations`
 - `GET /api/scan/{scan_run_id}/observations`
 

@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Body, Depends, status
 
+from app.application.capabilities import get_capability_reporting_service
 from app.core.security import get_current_admin
 from app.models.auth import User
 from app.models.setup import (
@@ -37,11 +38,13 @@ async def get_platform_config():
 
     platform_features = get_platform_features()
     summary = platform_features.get_summary()
+    capability_report = get_capability_reporting_service().get_serialized_report()
 
     return {
         "platform": summary["platform"],
         "platform_name": summary["platform_name"],
         "capabilities": summary["capabilities"],
+        "capability_state": capability_report["capabilities"],
         "recommended_platform": (
             "darwin" if summary["platform"] == "darwin" else summary["platform"]
         ),
@@ -62,6 +65,7 @@ async def get_scan_config():
     from app.services.scanner.network_detection import detect_local_subnet
 
     settings = get_settings()
+    capability_report = get_capability_reporting_service().get_serialized_report()
 
     # Detect actual subnet (will fallback to config if detection fails)
     try:
@@ -92,6 +96,7 @@ async def get_scan_config():
             "fingerbank": settings.feature_fingerbank,
             "active_probe": getattr(settings, "feature_active_probe", True),
         },
+        "capability_state": capability_report["capabilities"],
     }
 
 

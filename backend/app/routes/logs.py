@@ -3,6 +3,7 @@ from typing import Any
 
 from fastapi import APIRouter, Depends, Query
 
+from app.application.capabilities import get_capability_reporting_service
 from app.core.config import get_settings
 from app.models.log import SystemLog
 from app.services.state import StateManager, get_state_manager
@@ -33,6 +34,7 @@ async def get_system_info() -> dict[str, Any]:
     settings = get_settings()
     platform_features = get_platform_features()
     summary = platform_features.get_summary()
+    capability_report = get_capability_reporting_service().get_serialized_report()
 
     return {
         "platform": summary["platform"],
@@ -44,4 +46,5 @@ async def get_system_info() -> dict[str, Any]:
         "database_url": "***" if settings.database_url else None,  # Hide sensitive info
         "docker": summary["is_docker"],
         "capabilities": summary["capabilities"],
+        "capability_state": capability_report["capabilities"],
     }

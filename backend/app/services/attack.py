@@ -12,13 +12,13 @@ import asyncio
 import logging
 from datetime import UTC, datetime
 
-from app.core.engine.factory import get_attack_engine
 from app.models.attack import (
     ActiveDefenseRequest,
     ActiveDefenseResponse,
     ActiveDefenseStatus,
 )
 from app.models.device import Device
+from app.providers.defense import get_defense_executor
 from app.services.state import get_state_manager
 from app.services.websocket import get_connection_manager
 
@@ -56,12 +56,12 @@ class ActiveDefenseService:
         self.settings = get_settings()
         self.state = get_state_manager()
         self.ws = get_connection_manager()
-        self.engine = get_attack_engine()
+        self.executor = get_defense_executor()
         # Track active operation tasks for proper cleanup and cancellation
         self.active_tasks: dict[str, asyncio.Task] = {}
         logger.info(
-            f"ActiveDefenseService initialized with engine: "
-            f"{self.engine.__class__.__name__} | "
+            f"ActiveDefenseService initialized with executor: "
+            f"{self.executor.engine.__class__.__name__} | "
             f"Global enabled: {self.settings.active_defense_enabled} | "
             f"Readonly mode: {self.settings.active_defense_readonly}"
         )
@@ -160,7 +160,8 @@ class ActiveDefenseService:
             )
 
         # Check engine capabilities and permissions
-        if not self.engine.check_permissions():
+        capability = self.executor.get_capability()
+        if not capability.available:
             logger.error(
                 f"Insufficient permissions for active defense: " f"{request.type.value}"
             )
@@ -176,9 +177,8 @@ class ActiveDefenseService:
                 device_mac=mac,
                 status=ActiveDefenseStatus.FAILED,
                 message=(
-                    "Operation requires elevated permissions. "
-                    "Please run backend with root/administrator privileges "
-                    "or add CAP_NET_RAW capability."
+                    capability.reason
+                    or "Low-level defense execution is unavailable on this runtime."
                 ),
             )
 
@@ -240,7 +240,7 @@ class ActiveDefenseService:
 
         task.add_done_callback(cleanup_task)
 
-        engine_name = self.engine.__class__.__name__
+        engine_name = self.executor.engine.__class__.__name__
         logger.info(
             f"Started {request.type.value} operation on {mac} "
             f"(duration={request.duration}s, intensity={request.intensity}) "
@@ -287,7 +287,7 @@ class ActiveDefenseService:
                     logger.info(f"Operation cancelled successfully for {mac}")
 
         # Signal the engine to stop any ongoing operations
-        await self.engine.stop_attack(mac)
+        await self.executor.stop(mac)
 
         # Update device status
         self.state.update_device_attack_status(mac, ActiveDefenseStatus.STOPPED)
@@ -417,7 +417,7 @@ class ActiveDefenseService:
             max_duration = request.duration + 10
             try:
                 await asyncio.wait_for(
-                    self.engine.start_attack(mac, request.type, request.duration),
+                    self.executor.start(mac, request.type.value, request.duration),
                     timeout=max_duration,
                 )
             except TimeoutError:
@@ -425,7 +425,7 @@ class ActiveDefenseService:
                     f"Operation on {mac} exceeded maximum duration "
                     f"{max_duration}s, forcing termination"
                 )
-                await self.engine.stop_attack(mac)
+                await self.executor.stop(mac)
                 raise
 
             # Operation completed successfully

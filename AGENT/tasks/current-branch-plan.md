@@ -65,5 +65,6 @@ Refactor the backend into a stable layered architecture with replaceable low-lev
   - WebSocket event stability
 
 ## Progress Snapshot
-- In progress: Subtask 1 (layered package structure, provider interfaces, branch coordination refresh)
-- Pending: Subtasks 2-6
+- Completed: Subtask 1 (`refactor(backend): add layered bootstrap and provider contracts`)
+- In progress: Subtask 2 (unified capability reporting and defense executor abstraction)
+- Pending: Subtasks 3-6

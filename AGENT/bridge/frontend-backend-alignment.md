@@ -10,6 +10,7 @@
 - WebSocket URL is injected from `VITE_WS_URL` and defaults to `ws://localhost:8000/api/ws`
 - Auth token is stored in `localStorage` key `token` and attached by the Axios interceptor
 - Limited-admin client gating is tracked in `localStorage` key `limited_admin`
+- Backend now exposes additive normalized capability details through `capability_state`; legacy boolean capability maps remain for compatibility
 
 ## Known Naming Drift
 - Backend canonical field: `active_defense_status`
