@@ -43,31 +43,11 @@ const LANGUAGE_OPTIONS = [
   { label: 'Русский', value: 'ru-RU' },
 ];
 
-const THEME_OPTIONS: Array<{
-  description: string;
-  icon: React.ElementType;
-  label: string;
-  value: ThemeMode;
-}> = [
-  {
-    description: 'Bright surfaces with strong contrast for daylight work.',
-    icon: Sun,
-    label: 'Light',
-    value: 'light',
-  },
-  {
-    description: 'Lower-glare surfaces tuned for darker operating environments.',
-    icon: Moon,
-    label: 'Dark',
-    value: 'dark',
-  },
-  {
-    description: 'Follow the host OS preference automatically.',
-    icon: Monitor,
-    label: 'System',
-    value: 'system',
-  },
-];
+const THEME_ICON_MAP: Record<ThemeMode, React.ElementType> = {
+  light: Sun,
+  dark: Moon,
+  system: Monitor,
+};
 
 const getStoredPlatform = (): Platform | null => {
   const value = localStorage.getItem('platform');
@@ -200,6 +180,30 @@ export const Settings: React.FC = () => {
     return Object.values(systemInfo.capabilities).filter(Boolean).length;
   }, [systemInfo]);
 
+  const themeOptions = useMemo(
+    () => [
+      {
+        description: t('settings.themeLightDesc'),
+        icon: THEME_ICON_MAP.light,
+        label: t('settings.themeLight'),
+        value: 'light' as const,
+      },
+      {
+        description: t('settings.themeDarkDesc'),
+        icon: THEME_ICON_MAP.dark,
+        label: t('settings.themeDark'),
+        value: 'dark' as const,
+      },
+      {
+        description: t('settings.themeSystemDesc'),
+        icon: THEME_ICON_MAP.system,
+        label: t('settings.themeSystem'),
+        value: 'system' as const,
+      },
+    ],
+    [t]
+  );
+
   const scanFeatures: Array<{ enabled: boolean; label: string }> = scanConfig
     ? [
         { label: 'mDNS', enabled: scanConfig.features.mdns },
@@ -300,7 +304,11 @@ export const Settings: React.FC = () => {
       <PageHeader
         actions={
           <>
-            {isDirty ? <Badge tone="warning">Unsaved</Badge> : <Badge tone="success">Saved</Badge>}
+            {isDirty ? (
+              <Badge tone="warning">{t('settings.unsaved')}</Badge>
+            ) : (
+              <Badge tone="success">{t('settings.saved')}</Badge>
+            )}
             <Button
               leadingIcon={<Save className={isSaving ? 'h-4 w-4 animate-spin' : 'h-4 w-4'} />}
               loading={isSaving}
@@ -311,7 +319,7 @@ export const Settings: React.FC = () => {
             </Button>
           </>
         }
-        eyebrow="Preferences"
+        eyebrow={t('settings.eyebrow')}
         icon={SettingsIcon}
         subtitle={t('settings.subtitle')}
         title={t('settings.title')}
@@ -319,25 +327,25 @@ export const Settings: React.FC = () => {
 
       <div className="zh-stat-grid">
         <StatCard
-          hint="Live preview is applied immediately"
+          hint={t('settings.themeHint')}
           icon={theme === 'dark' ? Moon : theme === 'light' ? Sun : Monitor}
           label={t('settings.theme')}
-          value={THEME_OPTIONS.find((option) => option.value === theme)?.label || theme}
+          value={themeOptions.find((option) => option.value === theme)?.label || theme}
         />
         <StatCard
-          hint="Interface locale used across the frontend"
+          hint={t('settings.languageHint')}
           icon={Globe2}
           label={t('settings.language')}
           value={LANGUAGE_OPTIONS.find((option) => option.value === language)?.label || language}
         />
         <StatCard
-          hint="Local helper scripts preference"
+          hint={t('settings.platformHintShort')}
           icon={Monitor}
           label={t('settings.platformPref')}
           value={platform}
         />
         <StatCard
-          hint="Available capabilities reported by backend"
+          hint={t('settings.capabilitiesHint')}
           icon={Server}
           label={t('settings.capabilities')}
           tone="var(--success)"
@@ -346,7 +354,7 @@ export const Settings: React.FC = () => {
       </div>
 
       <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
-        <Surface className="p-6 lg:p-7" tone="raised">
+        <Surface className="p-5 lg:p-6" tone="raised">
           <div className="flex items-center gap-3">
             <div
               className="inline-flex h-12 w-12 items-center justify-center rounded-[1.1rem]"
@@ -356,14 +364,14 @@ export const Settings: React.FC = () => {
             </div>
             <div>
               <p className="zh-kicker">{t('settings.appearance')}</p>
-              <h2 className="mt-1 text-2xl font-semibold" style={{ color: 'var(--text-primary)' }}>
-                Theme and language
+              <h2 className="mt-1 text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
+                {t('settings.themeAndLanguage')}
               </h2>
             </div>
           </div>
 
           <div className="mt-6 grid gap-3 md:grid-cols-3">
-            {THEME_OPTIONS.map((option) => {
+            {themeOptions.map((option) => {
               const Icon = option.icon;
               const active = theme === option.value;
               return (
@@ -416,7 +424,7 @@ export const Settings: React.FC = () => {
           </div>
         </Surface>
 
-        <Surface className="p-6 lg:p-7" tone="raised">
+        <Surface className="p-5 lg:p-6" tone="raised">
           <div className="flex items-center gap-3">
             <div
               className="inline-flex h-12 w-12 items-center justify-center rounded-[1.1rem]"
@@ -426,8 +434,8 @@ export const Settings: React.FC = () => {
             </div>
             <div>
               <p className="zh-kicker">{t('settings.platformPref')}</p>
-              <h2 className="mt-1 text-2xl font-semibold" style={{ color: 'var(--text-primary)' }}>
-                Platform and runtime
+              <h2 className="mt-1 text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
+                {t('settings.platformRuntime')}
               </h2>
             </div>
           </div>
@@ -484,12 +492,12 @@ export const Settings: React.FC = () => {
       </div>
 
       {scanConfig ? (
-        <Surface className="p-6 lg:p-7" tone="raised">
+        <Surface className="p-5 lg:p-6" tone="raised">
           <div className="zh-toolbar zh-toolbar--spread">
             <div>
               <p className="zh-kicker">{t('settings.scanConfig')}</p>
-              <h2 className="mt-2 text-2xl font-semibold" style={{ color: 'var(--text-primary)' }}>
-                Discovery profile
+              <h2 className="mt-2 text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
+                {t('settings.discoveryProfile')}
               </h2>
             </div>
             <Button
@@ -523,7 +531,7 @@ export const Settings: React.FC = () => {
               <p className="zh-detail-card__value text-sm">
                 {scanConfig.scan_interval_sec !== null
                   ? `${scanConfig.scan_interval_sec} s`
-                  : 'manual'}
+                  : t('settings.manual')}
               </p>
             </Surface>
           </div>
@@ -542,12 +550,12 @@ export const Settings: React.FC = () => {
       ) : null}
 
       {systemInfo ? (
-        <Surface className="p-6 lg:p-7" tone="raised">
+        <Surface className="p-5 lg:p-6" tone="raised">
           <div className="zh-toolbar zh-toolbar--spread">
             <div>
               <p className="zh-kicker">{t('settings.capabilities')}</p>
-              <h2 className="mt-2 text-2xl font-semibold" style={{ color: 'var(--text-primary)' }}>
-                Backend diagnostics
+              <h2 className="mt-2 text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
+                {t('settings.backendDiagnostics')}
               </h2>
             </div>
             <Button
@@ -597,7 +605,7 @@ export const Settings: React.FC = () => {
         </Surface>
       ) : null}
 
-      <Surface className="p-6 lg:p-7" tone="danger">
+      <Surface className="p-5 lg:p-6" tone="danger">
         <div className="flex items-start gap-4">
           <div
             className="inline-flex h-12 w-12 items-center justify-center rounded-[1.1rem]"
@@ -607,8 +615,8 @@ export const Settings: React.FC = () => {
           </div>
           <div className="flex-1">
             <p className="zh-kicker">{t('common.dangerZone')}</p>
-            <h2 className="mt-2 text-2xl font-semibold" style={{ color: 'var(--text-primary)' }}>
-              Destructive operations
+            <h2 className="mt-2 text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
+              {t('settings.destructiveOps')}
             </h2>
             <p className="mt-3 text-sm leading-7" style={{ color: 'var(--text-secondary)' }}>
               {t('settings.dangerText')}

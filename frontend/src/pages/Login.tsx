@@ -73,8 +73,8 @@ export const Login: React.FC = () => {
           <Surface className="overflow-hidden p-8 lg:p-10" tone="raised">
             <div className="zh-hero-grid h-full">
               <div className="flex flex-wrap items-center gap-3">
-                <Badge tone="accent">Fluent Workspace</Badge>
-                <Badge tone="success">Secure Session</Badge>
+                <Badge tone="accent">{t('login.workspaceTag')}</Badge>
+                <Badge tone="success">{t('login.sessionTag')}</Badge>
               </div>
               <div>
                 <div
@@ -87,7 +87,7 @@ export const Login: React.FC = () => {
                 >
                   <ShieldAlert className="h-8 w-8" />
                 </div>
-                <p className="zh-kicker">Sign In</p>
+                <p className="zh-kicker">{t('login.kicker')}</p>
                 <h1
                   className="mt-2 text-4xl font-bold tracking-[-0.04em]"
                   style={{ color: 'var(--text-primary)' }}
@@ -103,25 +103,25 @@ export const Login: React.FC = () => {
               </div>
               <div className="zh-detail-grid">
                 <Surface className="zh-detail-card" tone="subtle">
-                  <p className="zh-detail-card__label">Access</p>
+                  <p className="zh-detail-card__label">{t('login.accessLabel')}</p>
                   <p className="zh-detail-card__value text-sm font-semibold">
-                    Device inventory, topology, controls, and logs stay behind local auth.
+                    {t('login.accessDesc')}
                   </p>
                 </Surface>
                 <Surface className="zh-detail-card" tone="subtle">
-                  <p className="zh-detail-card__label">First Run</p>
+                  <p className="zh-detail-card__label">{t('login.firstRunLabel')}</p>
                   <p className="zh-detail-card__value text-sm font-semibold">
-                    Create the administrator account once, then complete the safety acknowledgement.
+                    {t('login.firstRunDesc')}
                   </p>
                 </Surface>
               </div>
               <Surface className="p-5" tone="subtle">
-                <p className="zh-kicker">What you get</p>
+                <p className="zh-kicker">{t('login.benefitsKicker')}</p>
                 <div className="mt-4 space-y-3">
                   {[
-                    'Unified monitoring surfaces for devices, topology, and system logs.',
-                    'Persistent theme and language preferences across the whole console.',
-                    'Fast access to setup when the appliance is still in first-run mode.',
+                    t('login.benefit1'),
+                    t('login.benefit2'),
+                    t('login.benefit3'),
                   ].map((item) => (
                     <div className="flex items-start gap-3" key={item}>
                       <CheckCircle2
@@ -147,7 +147,7 @@ export const Login: React.FC = () => {
                 <KeyRound className="h-5 w-5" />
               </div>
               <div>
-                <p className="zh-kicker">Authentication</p>
+                <p className="zh-kicker">{t('login.authKicker')}</p>
                 <h2 className="mt-1 text-2xl font-semibold" style={{ color: 'var(--text-primary)' }}>
                   {t('login.signIn')}
                 </h2>
@@ -193,7 +193,7 @@ export const Login: React.FC = () => {
                   <input
                     className="zh-field"
                     onChange={(e) => setPassword(e.target.value)}
-                    placeholder="Password"
+                    placeholder={t('login.password')}
                     required
                     type="password"
                     value={password}
@@ -229,7 +229,7 @@ export const Login: React.FC = () => {
 
             {from !== '/' ? (
               <p className="mt-6 text-xs" style={{ color: 'var(--text-tertiary)' }}>
-                You will be returned to <span className="font-mono">{from}</span> after sign-in.
+                {t('login.returnTo', { path: from })}
               </p>
             ) : null}
           </Surface>

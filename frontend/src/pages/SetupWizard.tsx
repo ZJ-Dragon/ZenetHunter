@@ -151,7 +151,7 @@ export const SetupWizard: React.FC = () => {
     isAdminReserved;
 
   if (statusLoading) {
-    return <LoadingScreen message="Preparing first-run experience..." />;
+    return <LoadingScreen message={t('loading.preparingFirstRun')} />;
   }
 
   return (
@@ -171,7 +171,7 @@ export const SetupWizard: React.FC = () => {
         </div>
 
         <div className="grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
-          <Surface className="p-8 lg:p-10" tone="raised">
+          <Surface className="p-7 lg:p-8" tone="raised">
             <div className="flex items-start justify-between gap-6">
               <div>
                 <p className="zh-kicker">{t('setup.accountStep')}</p>
@@ -228,7 +228,7 @@ export const SetupWizard: React.FC = () => {
                   onChange={(event) =>
                     setFormData({ ...formData, password: event.target.value })
                   }
-                  placeholder="Enter a strong password"
+                  placeholder={t('setup.passwordPlaceholder')}
                   required
                   type="password"
                   value={formData.password}
@@ -277,7 +277,7 @@ export const SetupWizard: React.FC = () => {
           </Surface>
 
           <div className="space-y-6">
-            <Surface className="p-8" tone="raised">
+            <Surface className="p-7" tone="raised">
               <div className="flex items-center gap-3">
                 <div
                   className="inline-flex h-12 w-12 items-center justify-center rounded-[1.1rem]"
@@ -302,18 +302,17 @@ export const SetupWizard: React.FC = () => {
               </Surface>
             </Surface>
 
-            <Surface className="p-8" tone="subtle">
-              <p className="zh-kicker">Guidance</p>
+            <Surface className="p-7" tone="subtle">
+              <p className="zh-kicker">{t('setup.guidanceKicker')}</p>
               <div className="mt-5 space-y-4">
                 <div className="flex items-start gap-3">
                   <Clock3 className="mt-0.5 h-5 w-5" style={{ color: 'var(--accent)' }} />
                   <div>
                     <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
-                      Timed acknowledgement
+                      {t('setup.guidanceTimerTitle')}
                     </p>
                     <p className="mt-1 text-sm" style={{ color: 'var(--text-secondary)' }}>
-                      Review the safety notice for 30 seconds and scroll through it before the
-                      primary console unlocks.
+                      {t('setup.guidanceTimerDesc')}
                     </p>
                   </div>
                 </div>
@@ -321,11 +320,10 @@ export const SetupWizard: React.FC = () => {
                   <AlertTriangle className="mt-0.5 h-5 w-5" style={{ color: 'var(--warning)' }} />
                   <div>
                     <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
-                      Restricted networks only
+                      {t('setup.guidancePolicyTitle')}
                     </p>
                     <p className="mt-1 text-sm" style={{ color: 'var(--text-secondary)' }}>
-                      The active defense surface is intentionally separated from setup so you can
-                      confirm policy before using any disruptive action.
+                      {t('setup.guidancePolicyDesc')}
                     </p>
                   </div>
                 </div>

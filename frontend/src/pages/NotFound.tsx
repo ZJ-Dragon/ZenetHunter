@@ -18,7 +18,7 @@ export const NotFound: React.FC = () => {
           >
             <AlertTriangle className="h-10 w-10" />
           </div>
-          <p className="zh-kicker">Navigation Error</p>
+          <p className="zh-kicker">{t('notfound.kicker')}</p>
           <h1
             className="mt-3 text-5xl font-bold tracking-[-0.05em]"
             style={{ color: 'var(--text-primary)' }}

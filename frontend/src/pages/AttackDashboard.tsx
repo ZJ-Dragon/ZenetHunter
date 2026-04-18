@@ -19,6 +19,7 @@ import { StatCard } from '../components/ui/StatCard';
 import { Surface } from '../components/ui/Surface';
 import { useWebSocketEvent } from '../contexts/WebSocketContext';
 import { attackService, AttackType } from '../lib/services/attack';
+import { getAttackTypeLabel } from '../lib/attackTypeI18n';
 import { deviceService } from '../lib/services/device';
 import { AttackStatus, Device } from '../types/device';
 import {
@@ -29,21 +30,20 @@ import {
 } from '../types/websocket';
 
 interface AttackTypeMeta {
-  label: string;
   tone: 'accent' | 'warning' | 'danger' | 'neutral' | 'success';
 }
 
 const attackTypeMetadata: Record<AttackType, AttackTypeMeta> = {
-  [AttackType.KICK]: { label: 'WiFi Deauth', tone: 'warning' },
-  [AttackType.BLOCK]: { label: 'ARP Jam', tone: 'danger' },
-  [AttackType.DHCP_SPOOF]: { label: 'DHCP Spoof', tone: 'accent' },
-  [AttackType.DNS_SPOOF]: { label: 'DNS Spoof', tone: 'accent' },
-  [AttackType.ICMP_REDIRECT]: { label: 'ICMP Redirect', tone: 'warning' },
-  [AttackType.PORT_SCAN]: { label: 'Port Scan', tone: 'success' },
-  [AttackType.TRAFFIC_SHAPE]: { label: 'Traffic Shape', tone: 'warning' },
-  [AttackType.MAC_FLOOD]: { label: 'MAC Flood', tone: 'danger' },
-  [AttackType.VLAN_HOP]: { label: 'VLAN Hop', tone: 'neutral' },
-  [AttackType.BEACON_FLOOD]: { label: 'Beacon Flood', tone: 'warning' },
+  [AttackType.KICK]: { tone: 'warning' },
+  [AttackType.BLOCK]: { tone: 'danger' },
+  [AttackType.DHCP_SPOOF]: { tone: 'accent' },
+  [AttackType.DNS_SPOOF]: { tone: 'accent' },
+  [AttackType.ICMP_REDIRECT]: { tone: 'warning' },
+  [AttackType.PORT_SCAN]: { tone: 'success' },
+  [AttackType.TRAFFIC_SHAPE]: { tone: 'warning' },
+  [AttackType.MAC_FLOOD]: { tone: 'danger' },
+  [AttackType.VLAN_HOP]: { tone: 'neutral' },
+  [AttackType.BEACON_FLOOD]: { tone: 'warning' },
 };
 
 interface ActiveAttackInfo {
@@ -276,11 +276,10 @@ export const AttackDashboard: React.FC = () => {
 
   const handleLaunchAttack = async (device: Device) => {
     setLaunchingMacs((previous) => new Set(previous).add(device.mac.toLowerCase()));
-    const metadata = attackTypeMetadata[selectedAttackType];
     const toastId = toast.loading(
       t('attack.launching', {
         target: getDeviceName(device, t('common.unknown')),
-        type: metadata.label,
+        type: getAttackTypeLabel(t, selectedAttackType),
       })
     );
 
@@ -291,7 +290,9 @@ export const AttackDashboard: React.FC = () => {
         globalDuration,
         globalIntensity
       );
-      toast.success(t('attack.started', { type: metadata.label }), { id: toastId });
+      toast.success(t('attack.started', { type: getAttackTypeLabel(t, selectedAttackType) }), {
+        id: toastId,
+      });
     } catch (error) {
       console.error('Failed to start attack:', error);
       toast.error(t('attack.startFailed'), { id: toastId });
@@ -315,7 +316,7 @@ export const AttackDashboard: React.FC = () => {
             {t('attack.refresh')}
           </Button>
         }
-        eyebrow="Response"
+        eyebrow={t('attack.eyebrow')}
         icon={ShieldAlert}
         subtitle={t('attack.subtitle')}
         title={t('attack.title')}
@@ -323,27 +324,27 @@ export const AttackDashboard: React.FC = () => {
 
       <div className="zh-stat-grid">
         <StatCard
-          hint="Currently active interventions"
+          hint={t('attack.activeOpsHint')}
           icon={ShieldAlert}
           label={t('attack.activeOps')}
           tone="var(--danger)"
           value={displayAttacks.length}
         />
         <StatCard
-          hint="Observed devices available as targets"
+          hint={t('attack.totalDevicesHint')}
           icon={Shield}
           label={t('attack.totalDevices')}
           value={devices.length}
         />
         <StatCard
-          hint={logs.length > 0 ? 'Realtime events streaming in' : 'No live events yet'}
+          hint={logs.length > 0 ? t('attack.logsHintActive') : t('attack.logsHintIdle')}
           icon={Terminal}
           label={t('attack.logs')}
           tone="var(--accent)"
           value={logs.length}
         />
         <StatCard
-          hint="Backend connection and WebSocket event flow are active"
+          hint={t('attack.systemStatusHint')}
           icon={Activity}
           label={t('attack.systemStatus')}
           tone="var(--success)"
@@ -353,16 +354,16 @@ export const AttackDashboard: React.FC = () => {
 
       <div className="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
         <div className="space-y-6">
-          <Surface className="p-6 lg:p-7" tone="raised">
+          <Surface className="p-5 lg:p-6" tone="raised">
             <div className="zh-toolbar zh-toolbar--spread">
               <div>
                 <p className="zh-kicker">{t('attack.targets')}</p>
-                <h2 className="mt-2 text-2xl font-semibold" style={{ color: 'var(--text-primary)' }}>
-                  Active operations
+                <h2 className="mt-2 text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
+                  {t('attack.activeOpsTitle')}
                 </h2>
               </div>
             </div>
-            <div className="mt-6">
+            <div className="mt-5">
               {displayAttacks.length > 0 ? (
                 <div className="zh-list">
                   {displayAttacks.map((attack) => {
@@ -400,7 +401,7 @@ export const AttackDashboard: React.FC = () => {
                               }
                             >
                               {attack.type in attackTypeMetadata
-                                ? attackTypeMetadata[attack.type as AttackType].label
+                                ? getAttackTypeLabel(t, attack.type as AttackType)
                                 : attack.type}
                             </Badge>
                           </div>
@@ -409,7 +410,9 @@ export const AttackDashboard: React.FC = () => {
                           </p>
                           <div className="mt-2 flex flex-wrap gap-2">
                             {attack.duration > 0 ? (
-                              <Badge tone="neutral">{attack.duration}s duration</Badge>
+                              <Badge tone="neutral">
+                                {t('attack.durationBadge', { value: attack.duration })}
+                              </Badge>
                             ) : null}
                             {attack.intensity > 0 ? (
                               <Badge tone="warning">
@@ -440,17 +443,17 @@ export const AttackDashboard: React.FC = () => {
             </div>
           </Surface>
 
-          <Surface className="p-6 lg:p-7" tone="raised">
+          <Surface className="p-5 lg:p-6" tone="raised">
             <div className="zh-toolbar zh-toolbar--spread">
               <div>
                 <p className="zh-kicker">{t('attack.logs')}</p>
-                <h2 className="mt-2 text-2xl font-semibold" style={{ color: 'var(--text-primary)' }}>
-                  Operation timeline
+                <h2 className="mt-2 text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
+                  {t('attack.timelineTitle')}
                 </h2>
               </div>
               <Badge tone="neutral">{logs.length}</Badge>
             </div>
-            <div className="mt-6">
+            <div className="mt-5">
               {logs.length > 0 ? (
                 <div className="space-y-3">
                   {logs.map((log, index) => (
@@ -480,20 +483,20 @@ export const AttackDashboard: React.FC = () => {
                 <EmptyState
                   description={t('attack.logsEmpty')}
                   icon={Terminal}
-                  title="No live operation logs"
+                  title={t('attack.logsEmptyTitle')}
                 />
               )}
             </div>
           </Surface>
         </div>
 
-        <Surface className="p-6 lg:p-7" tone="raised">
+        <Surface className="p-5 lg:p-6" tone="raised">
           <div>
             <p className="zh-kicker">{t('attack.allDevices')}</p>
-            <h2 className="mt-2 text-2xl font-semibold" style={{ color: 'var(--text-primary)' }}>
-              Attack control center
+            <h2 className="mt-2 text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
+              {t('attack.controlCenterTitle')}
             </h2>
-            <p className="mt-3 text-sm leading-7" style={{ color: 'var(--text-secondary)' }}>
+            <p className="mt-2 text-sm leading-6" style={{ color: 'var(--text-secondary)' }}>
               {t('attack.allDevicesHint')}
             </p>
           </div>
@@ -511,9 +514,9 @@ export const AttackDashboard: React.FC = () => {
                   }
                   value={selectedAttackType}
                 >
-                  {Object.entries(attackTypeMetadata).map(([value, metadata]) => (
+                  {Object.entries(attackTypeMetadata).map(([value]) => (
                     <option key={value} value={value}>
-                      {metadata.label}
+                      {getAttackTypeLabel(t, value as AttackType)}
                     </option>
                   ))}
                 </select>
@@ -545,11 +548,11 @@ export const AttackDashboard: React.FC = () => {
                   onChange={(event) => setGlobalDuration(parseInt(event.target.value, 10))}
                   value={globalDuration}
                 >
-                  <option value={30}>30s</option>
-                  <option value={60}>60s</option>
-                  <option value={120}>2min</option>
-                  <option value={300}>5min</option>
-                  <option value={600}>10min</option>
+                  <option value={30}>{t('attack.duration30')}</option>
+                  <option value={60}>{t('attack.duration60')}</option>
+                  <option value={120}>{t('attack.duration120')}</option>
+                  <option value={300}>{t('attack.duration300')}</option>
+                  <option value={600}>{t('attack.duration600')}</option>
                 </select>
               </div>
 
@@ -575,7 +578,6 @@ export const AttackDashboard: React.FC = () => {
                   const underAttack = isDeviceUnderAttack(device.mac);
                   const isLaunching = launchingMacs.has(device.mac.toLowerCase());
                   const isStopping = stoppingMacs.has(device.mac.toLowerCase());
-                  const metadata = attackTypeMetadata[selectedAttackType];
 
                   return (
                     <div className="zh-list-item" key={device.mac}>
@@ -621,7 +623,7 @@ export const AttackDashboard: React.FC = () => {
                           variant="secondary"
                         >
                           <Play className="h-4 w-4" />
-                          {metadata.label}
+                          {getAttackTypeLabel(t, selectedAttackType)}
                         </Button>
                       )}
                     </div>
