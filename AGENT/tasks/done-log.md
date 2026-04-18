@@ -13,3 +13,6 @@
 - Reworked `routes/devices.py` to update alias/tags and recognition overrides through repository methods instead of treating domain models as ORM rows
 - Switched manual-label fingerprint matching to persisted fingerprint records and refreshed manual-profile-backed display fields in the same session
 - Added legacy device payload compatibility for frontend consumers that still read `attack_status` while keeping `active_defense_status` canonical
+- Fixed frontend capability display drift by normalizing `capability_state` into the legacy settings/logs badges instead of treating missing old keys as `false`
+- Added runtime diagnostics for interpreter path, environment kind, and module imports so support issues can distinguish backend `.venv`, conda, and system Python cleanly
+- Hardened `start-local.sh` to use the selected interpreter consistently for `pip`, maintenance tasks, uvicorn startup, runtime dependency checks, and optional macOS authorization relaunch

@@ -26,6 +26,7 @@ cd "$SCRIPT_DIR"
 # ============================================================
 CLEAN_MODE=false
 CLEAN_ALL=false
+SCRIPT_ARGS=("$@")
 
 while [[ $# -gt 0 ]]; do
     case $1 in
@@ -68,6 +69,8 @@ print_header() { echo -e "${BLUE}=== $1 ===${NC}"; }
 print_success() { echo -e "${GREEN}✓ $1${NC}"; }
 print_warning() { echo -e "${YELLOW}⚠ $1${NC}"; }
 print_error() { echo -e "${RED}✗ $1${NC}"; }
+
+PYTHON_BIN=""
 
 # ============================================================
 # Process cleanup
@@ -212,6 +215,113 @@ clean_all() {
     print_success "Virtualenv removed"
 }
 
+quote_args() {
+    python3 - "$@" <<'PY'
+import shlex
+import sys
+print(" ".join(shlex.quote(arg) for arg in sys.argv[1:]))
+PY
+}
+
+maybe_request_macos_admin() {
+    if [ "$(uname -s)" != "Darwin" ]; then
+        return
+    fi
+
+    if [ "${EUID:-$(id -u)}" -eq 0 ]; then
+        return
+    fi
+
+    if [ "${ZENETHUNTER_ELEVATED_RELAUNCH:-0}" = "1" ]; then
+        return
+    fi
+
+    echo ""
+    print_warning "Raw packet features and active defense need administrator privileges on macOS."
+    read -p "Open the macOS authorization dialog and relaunch elevated? (Y/n) " -n 1 -r
+    echo
+    if [[ $REPLY =~ ^[Nn]$ ]]; then
+        print_warning "Continuing without elevation"
+        return
+    fi
+
+    if ! command -v osascript >/dev/null 2>&1; then
+        print_warning "osascript not found; cannot open macOS authorization dialog"
+        return
+    fi
+
+    local quoted_script quoted_args command_text apple_script
+    quoted_script=$(quote_args "$SCRIPT_DIR/start-local.sh")
+    quoted_args=$(quote_args "${SCRIPT_ARGS[@]}")
+    command_text="cd $(quote_args "$SCRIPT_DIR") && ZENETHUNTER_ELEVATED_RELAUNCH=1 ${quoted_script}"
+    if [ -n "$quoted_args" ]; then
+        command_text="${command_text} ${quoted_args}"
+    fi
+    apple_script=$(python3 - "$command_text" <<'PY'
+import sys
+
+command = sys.argv[1].replace("\\", "\\\\").replace('"', '\\"')
+print(f'do shell script "{command}" with administrator privileges')
+PY
+)
+
+    if osascript -e "$apple_script"; then
+        print_success "Elevated launcher started"
+        exit 0
+    fi
+
+    print_warning "Administrator authorization was cancelled or failed"
+}
+
+select_python_runtime() {
+    if [ -n "$CONDA_DEFAULT_ENV" ] && [ "$CONDA_DEFAULT_ENV" != "base" ]; then
+        print_success "Conda env detected: $CONDA_DEFAULT_ENV"
+        PYTHON_BIN="$(command -v python)"
+        return
+    fi
+
+    if [ -n "$VIRTUAL_ENV" ]; then
+        print_success "Virtualenv detected: $VIRTUAL_ENV"
+        PYTHON_BIN="$(command -v python)"
+        return
+    fi
+
+    if [ -d ".venv" ]; then
+        echo "Activating local virtualenv..."
+        # shellcheck disable=SC1091
+        source .venv/bin/activate
+        print_success "Activated .venv"
+        PYTHON_BIN="$(command -v python)"
+        return
+    fi
+
+    print_warning "No virtualenv detected"
+    echo ""
+    echo "Recommended:"
+    echo "  1) conda activate <env-name>"
+    echo "  2) python3 -m venv backend/.venv && source backend/.venv/bin/activate"
+    echo ""
+    read -p "Create backend/.venv automatically? (Y/n) " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Nn]$ ]]; then
+        python3 -m venv .venv
+        # shellcheck disable=SC1091
+        source .venv/bin/activate
+        print_success "Created and activated backend/.venv"
+        PYTHON_BIN="$(command -v python)"
+        return
+    fi
+
+    read -p "Continue in the current system environment? (y/N) " -n 1 -r
+    echo
+    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
+        echo "Cancelled."
+        exit 1
+    fi
+    PYTHON_BIN="$(command -v python3)"
+    print_warning "Using system interpreter: $PYTHON_BIN"
+}
+
 # ============================================================
 # Graceful shutdown
 # ============================================================
@@ -269,6 +379,7 @@ print_header "Step 1/6: Cleanup stale resources"
 cleanup_old_processes
 check_and_free_port 8000 "Backend"
 check_and_free_port 5173 "Frontend"
+maybe_request_macos_admin
 
 # ============================================================
 # Step 2: caches
@@ -298,53 +409,33 @@ PYTHON_VERSION=$(python3 --version 2>&1)
 print_success "Python: $PYTHON_VERSION"
 
 cd backend
-
-IN_CONDA=false
-IN_VENV=false
-
-if [ -n "$CONDA_DEFAULT_ENV" ] && [ "$CONDA_DEFAULT_ENV" != "base" ]; then
-    IN_CONDA=true
-    print_success "Conda env detected: $CONDA_DEFAULT_ENV"
-elif [ -n "$VIRTUAL_ENV" ]; then
-    IN_VENV=true
-    print_success "Virtualenv detected: $VIRTUAL_ENV"
-elif [ -d ".venv" ]; then
-    echo "Activating local virtualenv..."
-    # shellcheck disable=SC1091
-    source .venv/bin/activate
-    IN_VENV=true
-    print_success "Activated .venv"
-else
-    print_warning "No virtualenv detected"
-    echo ""
-    echo "Recommended:"
-    echo "  1) conda env create -f ../environment.yml && conda activate zenethunter"
-    echo "  2) python3 -m venv .venv && source .venv/bin/activate"
-    echo ""
-    read -p "Continue in system env? (y/n) " -n 1 -r
-    echo
-    if [[ ! $REPLY =~ ^[Yy]$ ]]; then
-        echo "Cancelled. Please create a virtualenv first."
-        exit 1
-    fi
-    print_warning "Installing deps into system environment"
-fi
+select_python_runtime
+print_success "Runtime interpreter: $PYTHON_BIN"
 
 # ============================================================
 # Step 4: deps
 # ============================================================
 print_header "Step 4/6: Install/update backend deps"
 
-pip install -q --upgrade pip
+"$PYTHON_BIN" -m pip install -q --upgrade pip
 
-if pip install -q -e . 2>/dev/null; then
+if "$PYTHON_BIN" -m pip install -q -e . 2>/dev/null; then
     print_success "Backend deps installed (editable)"
 else
     print_warning "Editable install failed, trying fallback..."
-    pip install -q greenlet>=3.0.0 alembic>=1.13.0
-    pip install -q -e .
+    "$PYTHON_BIN" -m pip install -q "greenlet>=3.0.0" "alembic>=1.13.0"
+    "$PYTHON_BIN" -m pip install -q -e .
     print_success "Backend deps installed (fallback)"
 fi
+
+print_header "Step 4.5/6: Runtime support check"
+if ! "$PYTHON_BIN" scripts/check_runtime.py --strict; then
+    print_error "Runtime dependency check failed"
+    print_warning "The interpreter above is not ready for the backend."
+    print_warning "If you use conda and venv interchangeably, restart with the intended environment activated."
+    exit 1
+fi
+print_success "Runtime support check passed"
 
 # ============================================================
 # Step 5: DB check
@@ -385,7 +476,7 @@ fi
 # Step 5.5: reset runtime (keep manual library)
 # ============================================================
 print_header "Step 5.5/6: Reset volatile runtime data"
-if ! python3 -m app.maintenance.reset_runtime_data; then
+if ! "$PYTHON_BIN" -m app.maintenance.reset_runtime_data; then
     print_error "Runtime reset failed (allowed only for APP_ENV=development)"
     exit 1
 fi
@@ -465,7 +556,7 @@ echo -e "${GREEN}║  Press Ctrl+C to stop all services                     ║$
 echo -e "${GREEN}╚════════════════════════════════════════════════════════╝${NC}"
 echo ""
 
-uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload &
+"$PYTHON_BIN" -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload &
 BACKEND_PID=$!
 print_success "Backend started (PID: $BACKEND_PID)"
 

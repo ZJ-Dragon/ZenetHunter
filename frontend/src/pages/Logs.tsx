@@ -52,7 +52,7 @@ const capabilitySummary = (systemInfo: SystemInfo | null) => {
     return 0;
   }
 
-  return Object.values(systemInfo.capabilities).filter(Boolean).length;
+  return Object.values(systemInfo.capabilities).filter((value) => value).length;
 };
 
 export const Logs: React.FC = () => {
@@ -197,6 +197,33 @@ export const Logs: React.FC = () => {
               {systemInfo.capabilities.network_scan_available ? t('common.yes') : t('common.no')}
             </div>
           </div>
+          {systemInfo.runtime ? (
+            <div className="mt-6 zh-detail-grid">
+              <Surface className="zh-detail-card" tone="subtle">
+                <p className="zh-detail-card__label">Python</p>
+                <p className="zh-detail-card__value font-mono text-sm">
+                  {systemInfo.runtime.python_executable}
+                </p>
+              </Surface>
+              <Surface className="zh-detail-card" tone="subtle">
+                <p className="zh-detail-card__label">Environment</p>
+                <p className="zh-detail-card__value text-sm">
+                  {systemInfo.runtime.environment_kind}
+                  {systemInfo.runtime.environment_name
+                    ? ` (${systemInfo.runtime.environment_name})`
+                    : ''}
+                </p>
+              </Surface>
+              <Surface className="zh-detail-card" tone="subtle">
+                <p className="zh-detail-card__label">Dependencies</p>
+                <p className="zh-detail-card__value text-sm">
+                  {systemInfo.runtime.dependencies_ready
+                    ? t('common.yes')
+                    : systemInfo.runtime.missing_modules.join(', ')}
+                </p>
+              </Surface>
+            </div>
+          ) : null}
         </Surface>
       ) : null}
 

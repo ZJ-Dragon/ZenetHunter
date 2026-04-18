@@ -177,7 +177,7 @@ export const Settings: React.FC = () => {
     if (!systemInfo) {
       return 0;
     }
-    return Object.values(systemInfo.capabilities).filter(Boolean).length;
+    return Object.values(systemInfo.capabilities).filter((value) => value).length;
   }, [systemInfo]);
 
   const themeOptions = useMemo(
@@ -602,6 +602,24 @@ export const Settings: React.FC = () => {
                 : t('settings.unavailable')}
             </Badge>
           </div>
+          {systemInfo.runtime ? (
+            <div className="mt-4 text-sm" style={{ color: 'var(--text-secondary)' }}>
+              <div>
+                Python: <span className="font-mono">{systemInfo.runtime.python_executable}</span>
+              </div>
+              <div>
+                Environment: {systemInfo.runtime.environment_kind}
+                {systemInfo.runtime.environment_name
+                  ? ` (${systemInfo.runtime.environment_name})`
+                  : ''}
+              </div>
+              {!systemInfo.runtime.dependencies_ready ? (
+                <div>
+                  Missing modules: {systemInfo.runtime.missing_modules.join(', ')}
+                </div>
+              ) : null}
+            </div>
+          ) : null}
         </Surface>
       ) : null}
 

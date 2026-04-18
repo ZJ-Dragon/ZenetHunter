@@ -5,6 +5,7 @@ from fastapi import APIRouter, Depends, Query
 
 from app.application.capabilities import get_capability_reporting_service
 from app.core.config import get_settings
+from app.infrastructure.runtime_checks import collect_runtime_diagnostics
 from app.models.log import SystemLog
 from app.services.state import StateManager, get_state_manager
 
@@ -35,6 +36,7 @@ async def get_system_info() -> dict[str, Any]:
     platform_features = get_platform_features()
     summary = platform_features.get_summary()
     capability_report = get_capability_reporting_service().get_serialized_report()
+    runtime = collect_runtime_diagnostics().to_dict()
 
     return {
         "platform": summary["platform"],
@@ -47,4 +49,5 @@ async def get_system_info() -> dict[str, Any]:
         "docker": summary["is_docker"],
         "capabilities": summary["capabilities"],
         "capability_state": capability_report["capabilities"],
+        "runtime": runtime,
     }
