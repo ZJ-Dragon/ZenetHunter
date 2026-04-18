@@ -11,7 +11,7 @@ export const RequireAuth: React.FC<{ children: JSX.Element }> = ({ children }) =
   const { t } = useTranslation();
 
   if (isLoading) {
-    return <LoadingScreen message="Restoring session..." />;
+    return <LoadingScreen message={t('loading.restoringSession')} />;
   }
 
   if (isLimitedAdmin && location.pathname !== '/settings') {

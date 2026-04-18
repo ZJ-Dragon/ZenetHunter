@@ -2,6 +2,7 @@
   "common": {
     "save": "Save",
     "saving": "Saving...",
+    "back": "Back",
     "cancel": "Cancel",
     "confirm": "Confirm",
     "resetToFirstRun": "Reset to First Run",
@@ -11,6 +12,31 @@
     "unknown": "Unknown",
     "yes": "Yes",
     "no": "No"
+  },
+  "shell": {
+    "brandTag": "Security Console",
+    "session": "Session",
+    "limitedAccess": "Limited access mode",
+    "fullAccess": "Full console access",
+    "settingsOnly": "Settings only",
+    "allRoutes": "All routes available",
+    "primaryNav": "Primary",
+    "closeNavigation": "Close navigation",
+    "workspace": "Workspace",
+    "backendLive": "Live backend",
+    "reconnecting": "Reconnecting",
+    "limitedAdmin": "Limited admin",
+    "signOut": "Sign Out"
+  },
+  "loading": {
+    "preparingWorkspace": "Preparing workspace...",
+    "checkingSystemStatus": "Checking system status...",
+    "restoringSession": "Restoring session...",
+    "preparingFirstRun": "Preparing first-run experience..."
+  },
+  "dialog": {
+    "attentionRequired": "Attention Required",
+    "closeDialog": "Close dialog"
   },
   "login": {
     "title": "ZenetHunter",
@@ -125,11 +151,41 @@
   },
   "logs": {
     "realtime": "Realtime Logs",
-    "waiting": "Waiting for logs..."
+    "waiting": "Waiting for logs...",
+    "feedKicker": "Live Feed",
+    "panelAria": "Realtime logs",
+    "closePanel": "Close realtime log panel",
+    "waitingHint": "Logs will appear here as the backend emits new events."
   },
   "scan": {
     "loginRequired": "Please login before starting a scan.",
-    "authFailed": "Authentication failed: please login again to refresh token."
+    "authFailed": "Authentication failed: please login again to refresh token.",
+    "start": "Start Scan",
+    "scanning": "Scanning...",
+    "starting": "Starting network scan...",
+    "started": "Scan initiated (ID: {{id}}...)",
+    "completed": "Scan completed. Found {{count}} devices.",
+    "failed": "Scan failed: {{error}}",
+    "startFailed": "Failed to start scan: {{error}}",
+    "unknownError": "Unknown error",
+    "networkError": "Network error: check Docker host networking and NET_RAW / NET_ADMIN privileges.",
+    "connectionError": "Connection error: the backend server is not reachable."
+  },
+  "scheduler": {
+    "button": "AI Auto",
+    "runTitle": "Run AI Strategy Scheduler",
+    "analyzing": "AI analyzing strategy...",
+    "applied": "AI applied {{count}} strategies",
+    "failed": "Failed to execute AI scheduler",
+    "failedWithError": "AI execution failed: {{error}}"
+  },
+  "attackMenu": {
+    "selectTypeTitle": "Select Attack Type",
+    "selectTypeDesc": "Choose an attack method",
+    "confirmTitle": "Confirm Attack",
+    "target": "Target",
+    "duration": "Duration",
+    "durationValue": "{{seconds}} seconds"
   },
   "topology": {
     "title": "Network Map",
@@ -251,7 +307,49 @@
     "searchEmpty": "No devices match your search",
     "searchHint": "Try a different search term.",
     "emptyTitle": "No devices found",
-    "emptyHint": "Run a network scan first to discover devices."
+    "emptyHint": "Run a network scan first to discover devices.",
+    "types": {
+      "kick": {
+        "label": "WiFi Deauth",
+        "description": "Disconnect via WiFi deauthentication"
+      },
+      "block": {
+        "label": "ARP Jam",
+        "description": "Block traffic via ARP spoofing"
+      },
+      "dhcp_spoof": {
+        "label": "DHCP Spoof",
+        "description": "Redirect DHCP requests"
+      },
+      "dns_spoof": {
+        "label": "DNS Spoof",
+        "description": "Redirect DNS queries"
+      },
+      "icmp_redirect": {
+        "label": "ICMP Redirect",
+        "description": "Manipulate routing via ICMP"
+      },
+      "port_scan": {
+        "label": "Port Scan",
+        "description": "Reconnaissance scanning"
+      },
+      "traffic_shape": {
+        "label": "Traffic Shape",
+        "description": "Limit bandwidth"
+      },
+      "mac_flood": {
+        "label": "MAC Flood",
+        "description": "Exhaust switch table"
+      },
+      "vlan_hop": {
+        "label": "VLAN Hop",
+        "description": "VLAN hopping attack"
+      },
+      "beacon_flood": {
+        "label": "Beacon Flood",
+        "description": "WiFi AP confusion"
+      }
+    }
   },
   "auth": {
     "accessDenied": "Access denied: insufficient permissions."

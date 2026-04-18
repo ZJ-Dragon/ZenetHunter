@@ -22,13 +22,12 @@ import { Button } from '../ui/Button';
 import { Surface } from '../ui/Surface';
 
 const NavItem: React.FC<{
-  hint?: string;
   to: string;
   icon: React.ElementType;
   children: React.ReactNode;
   disabled?: boolean;
   onBlocked?: () => void;
-}> = ({ to, icon: Icon, children, disabled, hint, onBlocked }) => {
+}> = ({ to, icon: Icon, children, disabled, onBlocked }) => {
   const location = useLocation();
   const navigate = useNavigate();
   const isActive =
@@ -55,10 +54,7 @@ const NavItem: React.FC<{
       style={{ cursor: disabled ? 'not-allowed' : 'pointer', opacity: disabled ? 0.65 : 1 }}
     >
       <Icon className="zh-nav-button__icon h-5 w-5" />
-      <span className="zh-nav-button__copy">
-        <span className="zh-nav-button__label">{children}</span>
-        {hint ? <span className="zh-nav-button__hint">{hint}</span> : null}
-      </span>
+      <span className="zh-nav-button__label">{children}</span>
     </button>
   );
 };
@@ -90,37 +86,31 @@ export const AppShell: React.FC = () => {
         to: '/',
         icon: LayoutDashboard,
         label: t('dashboard.title'),
-        hint: t('dashboard.subtitle'),
       },
       {
         to: '/devices',
         icon: Network,
         label: t('devices.title'),
-        hint: 'Inventory, recognition, and probe evidence',
       },
       {
         to: '/topology',
         icon: Activity,
         label: t('topology.title'),
-        hint: 'Graph view with device detail drawer',
       },
       {
         to: '/attacks',
         icon: Shield,
         label: t('attack.title'),
-        hint: t('attack.subtitle'),
       },
       {
         to: '/logs',
         icon: Terminal,
         label: t('logsPage.title'),
-        hint: t('logsPage.subtitle'),
       },
       {
         to: '/settings',
         icon: Settings,
         label: t('settings.title'),
-        hint: t('settings.subtitle'),
       },
     ],
     [t]
@@ -153,13 +143,12 @@ export const AppShell: React.FC = () => {
               <Activity className="h-6 w-6" />
             </div>
             <div>
-              <p className="zh-kicker">Security Console</p>
+              <p className="zh-kicker">{t('shell.brandTag')}</p>
               <h1 className="zh-brand__title">ZenetHunter</h1>
-              <p className="zh-brand__copy">WinUI-inspired network operations workspace</p>
             </div>
           </div>
           <Button
-            aria-label="Close navigation"
+            aria-label={t('shell.closeNavigation')}
             className="lg:hidden"
             onClick={() => setIsSidebarOpen(false)}
             size="icon"
@@ -172,9 +161,9 @@ export const AppShell: React.FC = () => {
         <Surface className="p-4" tone="subtle">
           <div className="zh-toolbar zh-toolbar--spread">
             <div>
-              <p className="zh-kicker">Session</p>
+              <p className="zh-kicker">{t('shell.session')}</p>
               <p className="mt-2 text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
-                {isLimitedAdmin ? 'Limited access mode' : 'Full console access'}
+                {isLimitedAdmin ? t('shell.limitedAccess') : t('shell.fullAccess')}
               </p>
             </div>
             {isLimitedAdmin ? (
@@ -189,17 +178,16 @@ export const AppShell: React.FC = () => {
               {isConnected ? t('settings.connected') : t('settings.disconnected')}
             </span>
             <span className="zh-status-chip">
-              {isLimitedAdmin ? 'Settings only' : 'All routes available'}
+              {isLimitedAdmin ? t('shell.settingsOnly') : t('shell.allRoutes')}
             </span>
           </div>
         </Surface>
 
-        <nav className="zh-nav-list flex-1 overflow-y-auto" aria-label="Primary">
+        <nav className="zh-nav-list flex-1 overflow-y-auto" aria-label={t('shell.primaryNav')}>
           {navItems.map((item) => (
             <NavItem
               key={item.to}
               disabled={isLimitedAdmin && item.to !== '/settings'}
-              hint={item.hint}
               icon={item.icon}
               onBlocked={handleBlockedNav}
               to={item.to}
@@ -216,7 +204,7 @@ export const AppShell: React.FC = () => {
             variant="secondary"
             fullWidth
           >
-            Sign Out
+            {t('shell.signOut')}
           </Button>
         </div>
       </Surface>
@@ -233,16 +221,16 @@ export const AppShell: React.FC = () => {
               <Menu className="h-5 w-5" />
             </Button>
             <div className="zh-shell__topbar-title">
-              <p className="zh-kicker">Workspace</p>
+              <p className="zh-kicker">{t('shell.workspace')}</p>
               <h2>{activeItem.label}</h2>
             </div>
           </div>
           <div className="zh-status-strip">
             <span className={clsx('zh-status-chip', isConnected && 'zh-status-chip--live')}>
               <span className="zh-status-chip__dot" />
-              {isConnected ? 'Live backend' : 'Reconnecting'}
+              {isConnected ? t('shell.backendLive') : t('shell.reconnecting')}
             </span>
-            {isLimitedAdmin ? <span className="zh-status-chip">Limited admin</span> : null}
+            {isLimitedAdmin ? <span className="zh-status-chip">{t('shell.limitedAdmin')}</span> : null}
           </div>
         </Surface>
         <main className="zh-shell__content">

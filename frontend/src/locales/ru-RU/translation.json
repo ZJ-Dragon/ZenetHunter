@@ -2,6 +2,7 @@
   "common": {
     "save": "Сохранить",
     "saving": "Сохранение...",
+    "back": "Назад",
     "cancel": "Отмена",
     "confirm": "Подтвердить",
     "resetToFirstRun": "Сбросить до первого запуска",
@@ -11,6 +12,31 @@
     "unknown": "Неизвестно",
     "yes": "Да",
     "no": "Нет"
+  },
+  "shell": {
+    "brandTag": "Консоль безопасности",
+    "session": "Сеанс",
+    "limitedAccess": "Режим ограниченного доступа",
+    "fullAccess": "Полный доступ к консоли",
+    "settingsOnly": "Только настройки",
+    "allRoutes": "Доступны все маршруты",
+    "primaryNav": "Основная навигация",
+    "closeNavigation": "Закрыть навигацию",
+    "workspace": "Рабочая область",
+    "backendLive": "Бэкенд активен",
+    "reconnecting": "Переподключение",
+    "limitedAdmin": "Ограниченный администратор",
+    "signOut": "Выйти"
+  },
+  "loading": {
+    "preparingWorkspace": "Подготовка рабочей области...",
+    "checkingSystemStatus": "Проверка состояния системы...",
+    "restoringSession": "Восстановление сеанса...",
+    "preparingFirstRun": "Подготовка режима первого запуска..."
+  },
+  "dialog": {
+    "attentionRequired": "Требуется внимание",
+    "closeDialog": "Закрыть диалог"
   },
   "login": {
     "title": "ZenetHunter",
@@ -125,11 +151,41 @@
   },
   "logs": {
     "realtime": "Живые логи",
-    "waiting": "Ожидание логов..."
+    "waiting": "Ожидание логов...",
+    "feedKicker": "Живая лента",
+    "panelAria": "Живые логи",
+    "closePanel": "Закрыть панель живых логов",
+    "waitingHint": "Логи появятся здесь, когда бэкенд начнёт отправлять новые события."
   },
   "scan": {
     "loginRequired": "Войдите перед запуском сканирования.",
-    "authFailed": "Ошибка аутентификации: войдите снова, чтобы обновить токен."
+    "authFailed": "Ошибка аутентификации: войдите снова, чтобы обновить токен.",
+    "start": "Запустить сканирование",
+    "scanning": "Сканирование...",
+    "starting": "Запуск сетевого сканирования...",
+    "started": "Сканирование запущено (ID: {{id}}...)",
+    "completed": "Сканирование завершено. Найдено устройств: {{count}}.",
+    "failed": "Сканирование не выполнено: {{error}}",
+    "startFailed": "Не удалось запустить сканирование: {{error}}",
+    "unknownError": "Неизвестная ошибка",
+    "networkError": "Ошибка сети: проверьте Docker host networking и права NET_RAW / NET_ADMIN.",
+    "connectionError": "Ошибка соединения: бэкенд-сервер недоступен."
+  },
+  "scheduler": {
+    "button": "AI авто",
+    "runTitle": "Запустить AI-планировщик стратегии",
+    "analyzing": "AI анализирует стратегию...",
+    "applied": "AI применил стратегий: {{count}}",
+    "failed": "Не удалось выполнить AI-планировщик",
+    "failedWithError": "Ошибка выполнения AI: {{error}}"
+  },
+  "attackMenu": {
+    "selectTypeTitle": "Выберите тип атаки",
+    "selectTypeDesc": "Выберите метод атаки",
+    "confirmTitle": "Подтвердить атаку",
+    "target": "Цель",
+    "duration": "Длительность",
+    "durationValue": "{{seconds}} секунд"
   },
   "topology": {
     "title": "Карта сети",
@@ -251,7 +307,49 @@
     "searchEmpty": "Устройства по поиску не найдены",
     "searchHint": "Попробуйте другой запрос.",
     "emptyTitle": "Устройства не найдены",
-    "emptyHint": "Сначала выполните сканирование сети, чтобы обнаружить устройства."
+    "emptyHint": "Сначала выполните сканирование сети, чтобы обнаружить устройства.",
+    "types": {
+      "kick": {
+        "label": "WiFi деавторизация",
+        "description": "Отключение через WiFi-деавторизацию"
+      },
+      "block": {
+        "label": "ARP блокировка",
+        "description": "Блокировка трафика через ARP-спуфинг"
+      },
+      "dhcp_spoof": {
+        "label": "DHCP спуфинг",
+        "description": "Перенаправление DHCP-запросов"
+      },
+      "dns_spoof": {
+        "label": "DNS спуфинг",
+        "description": "Перенаправление DNS-запросов"
+      },
+      "icmp_redirect": {
+        "label": "ICMP redirect",
+        "description": "Манипуляция маршрутизацией через ICMP"
+      },
+      "port_scan": {
+        "label": "Сканирование портов",
+        "description": "Разведывательное сканирование"
+      },
+      "traffic_shape": {
+        "label": "Ограничение трафика",
+        "description": "Ограничение пропускной способности"
+      },
+      "mac_flood": {
+        "label": "MAC flood",
+        "description": "Переполнение таблицы коммутатора"
+      },
+      "vlan_hop": {
+        "label": "VLAN hop",
+        "description": "Атака VLAN hopping"
+      },
+      "beacon_flood": {
+        "label": "Beacon flood",
+        "description": "Создание путаницы с WiFi AP"
+      }
+    }
   },
   "auth": {
     "accessDenied": "Доступ запрещён: недостаточно прав."

@@ -2,6 +2,7 @@
   "common": {
     "save": "保存",
     "saving": "保存中...",
+    "back": "返回",
     "cancel": "取消",
     "confirm": "确认",
     "resetToFirstRun": "重置到首次启动",
@@ -11,6 +12,31 @@
     "unknown": "未知",
     "yes": "是",
     "no": "否"
+  },
+  "shell": {
+    "brandTag": "安全控制台",
+    "session": "会话",
+    "limitedAccess": "受限访问模式",
+    "fullAccess": "完整控制台访问",
+    "settingsOnly": "仅设置",
+    "allRoutes": "所有路由可用",
+    "primaryNav": "主导航",
+    "closeNavigation": "关闭导航",
+    "workspace": "工作区",
+    "backendLive": "后端在线",
+    "reconnecting": "重连中",
+    "limitedAdmin": "受限管理员",
+    "signOut": "退出登录"
+  },
+  "loading": {
+    "preparingWorkspace": "正在准备工作区...",
+    "checkingSystemStatus": "正在检查系统状态...",
+    "restoringSession": "正在恢复会话...",
+    "preparingFirstRun": "正在准备首次使用流程..."
+  },
+  "dialog": {
+    "attentionRequired": "需要确认",
+    "closeDialog": "关闭对话框"
   },
   "login": {
     "title": "ZenetHunter",
@@ -125,11 +151,41 @@
   },
   "logs": {
     "realtime": "实时日志",
-    "waiting": "等待日志..."
+    "waiting": "等待日志...",
+    "feedKicker": "实时流",
+    "panelAria": "实时日志",
+    "closePanel": "关闭实时日志面板",
+    "waitingHint": "后端产生新事件后，日志会显示在这里。"
   },
   "scan": {
     "loginRequired": "请先登录以使用扫描功能。",
-    "authFailed": "认证失败：请重新登录以刷新 token。"
+    "authFailed": "认证失败：请重新登录以刷新 token。",
+    "start": "开始扫描",
+    "scanning": "扫描中...",
+    "starting": "正在启动网络扫描...",
+    "started": "扫描已启动（ID：{{id}}...）",
+    "completed": "扫描完成，发现 {{count}} 台设备。",
+    "failed": "扫描失败：{{error}}",
+    "startFailed": "启动扫描失败：{{error}}",
+    "unknownError": "未知错误",
+    "networkError": "网络错误：请检查 Docker 主机网络和 NET_RAW / NET_ADMIN 权限。",
+    "connectionError": "连接错误：后端服务器不可达。"
+  },
+  "scheduler": {
+    "button": "AI 自动",
+    "runTitle": "运行 AI 策略调度器",
+    "analyzing": "AI 正在分析策略...",
+    "applied": "AI 已应用 {{count}} 个策略",
+    "failed": "执行 AI 调度器失败",
+    "failedWithError": "AI 执行失败：{{error}}"
+  },
+  "attackMenu": {
+    "selectTypeTitle": "选择攻击类型",
+    "selectTypeDesc": "选择一种攻击方式",
+    "confirmTitle": "确认攻击",
+    "target": "目标",
+    "duration": "持续时间",
+    "durationValue": "{{seconds}} 秒"
   },
   "topology": {
     "title": "网络拓扑",
@@ -251,7 +307,49 @@
     "searchEmpty": "没有匹配的设备",
     "searchHint": "请尝试其他搜索条件。",
     "emptyTitle": "暂无设备",
-    "emptyHint": "请先运行网络扫描以发现设备。"
+    "emptyHint": "请先运行网络扫描以发现设备。",
+    "types": {
+      "kick": {
+        "label": "WiFi 断连",
+        "description": "通过 WiFi 去认证使设备断线"
+      },
+      "block": {
+        "label": "ARP 阻断",
+        "description": "通过 ARP 欺骗阻断流量"
+      },
+      "dhcp_spoof": {
+        "label": "DHCP 欺骗",
+        "description": "重定向 DHCP 请求"
+      },
+      "dns_spoof": {
+        "label": "DNS 欺骗",
+        "description": "重定向 DNS 查询"
+      },
+      "icmp_redirect": {
+        "label": "ICMP 重定向",
+        "description": "通过 ICMP 操纵路由"
+      },
+      "port_scan": {
+        "label": "端口扫描",
+        "description": "执行侦察扫描"
+      },
+      "traffic_shape": {
+        "label": "流量整形",
+        "description": "限制带宽"
+      },
+      "mac_flood": {
+        "label": "MAC 洪泛",
+        "description": "耗尽交换机表项"
+      },
+      "vlan_hop": {
+        "label": "VLAN 跳跃",
+        "description": "执行 VLAN 跳跃攻击"
+      },
+      "beacon_flood": {
+        "label": "Beacon 洪泛",
+        "description": "制造 WiFi AP 混乱"
+      }
+    }
   },
   "auth": {
     "accessDenied": "权限不足，被拒绝。"

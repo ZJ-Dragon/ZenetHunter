@@ -7,6 +7,7 @@ import {
   X,
   XCircle,
 } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useWebSocketEvent } from '../../contexts/WebSocketContext';
 import { SystemLog } from '../../lib/services/logs';
 import { WSEventType } from '../../types/websocket';
@@ -55,6 +56,7 @@ export const RealtimeLogPanel: React.FC<RealtimeLogPanelProps> = ({
   maxLogs = 50,
 }) => {
   const [logs, setLogs] = useState<SystemLog[]>([]);
+  const { t } = useTranslation();
 
   useEffect(() => {
     if (!isOpen) {
@@ -83,7 +85,7 @@ export const RealtimeLogPanel: React.FC<RealtimeLogPanelProps> = ({
     <div
       className="fixed bottom-4 right-4 z-50 w-[min(28rem,calc(100vw-2rem))]"
       role="dialog"
-      aria-label="Realtime logs"
+      aria-label={t('logs.panelAria')}
     >
       <Surface className="overflow-hidden" tone="raised">
         <div
@@ -91,16 +93,16 @@ export const RealtimeLogPanel: React.FC<RealtimeLogPanelProps> = ({
           style={{ borderBottom: '1px solid var(--border)' }}
         >
           <div>
-            <p className="zh-kicker">Live Feed</p>
+            <p className="zh-kicker">{t('logs.feedKicker')}</p>
             <div className="mt-2 flex items-center gap-2">
               <Terminal className="h-5 w-5" style={{ color: 'var(--accent)' }} />
               <h3 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>
-                Realtime Logs
+                {t('logs.realtime')}
               </h3>
               <Badge tone="neutral">{logs.length}</Badge>
             </div>
           </div>
-          <Button aria-label="Close realtime log panel" onClick={onClose} size="icon" variant="ghost">
+          <Button aria-label={t('logs.closePanel')} onClick={onClose} size="icon" variant="ghost">
             <X className="h-4 w-4" />
           </Button>
         </div>
@@ -108,9 +110,9 @@ export const RealtimeLogPanel: React.FC<RealtimeLogPanelProps> = ({
         <div className="max-h-[30rem] overflow-y-auto p-4">
           {logs.length === 0 ? (
             <EmptyState
-              description="Logs will appear here as the backend emits new events."
+              description={t('logs.waitingHint')}
               icon={Terminal}
-              title="Waiting for logs"
+              title={t('logs.waiting')}
             />
           ) : (
             <div className="space-y-3">

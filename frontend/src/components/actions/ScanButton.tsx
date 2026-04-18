@@ -30,15 +30,17 @@ export const ScanButton: React.FC<{ className?: string }> = ({ className }) => {
         currentScanIdRef.current = null;
 
         if (data.status === 'failed') {
-          const errorMsg = data.error || 'Unknown error';
+          const errorMsg = data.error || t('scan.unknownError');
           const errorType = data.error_type || '';
           toast.error(
-            `Scan failed: ${errorMsg}${errorType ? ` (${errorType})` : ''}`,
+            t('scan.failed', {
+              error: `${errorMsg}${errorType ? ` (${errorType})` : ''}`,
+            }),
             { duration: 6000 }
           );
         } else if (data.status === 'completed') {
           toast.success(
-            `Scan completed. Found ${data.devices_found || 0} devices.`,
+            t('scan.completed', { count: data.devices_found || 0 }),
             { duration: 4000 }
           );
         }
@@ -58,18 +60,18 @@ export const ScanButton: React.FC<{ className?: string }> = ({ className }) => {
     }
 
     setIsScanning(true);
-    const toastId = toast.loading('Starting network scan...');
+    const toastId = toast.loading(t('scan.starting'));
 
     try {
       const result = await scanService.startScan();
       currentScanIdRef.current = result.id;
-      toast.success(`Scan initiated (ID: ${result.id.substring(0, 8)}...)`, {
+      toast.success(t('scan.started', { id: result.id.substring(0, 8) }), {
         duration: 3000,
         id: toastId,
       });
     } catch (error: unknown) {
       console.error('Scan failed:', error);
-      let errorMessage = 'Unknown error';
+      let errorMessage = t('scan.unknownError');
       let errorCode: string | number | undefined;
 
       if (error && typeof error === 'object' && 'response' in error) {
@@ -78,7 +80,7 @@ export const ScanButton: React.FC<{ className?: string }> = ({ className }) => {
           message?: string;
         };
         errorMessage =
-          axiosError.response?.data?.detail || axiosError.message || 'Unknown error';
+          axiosError.response?.data?.detail || axiosError.message || t('scan.unknownError');
         errorCode =
           axiosError.response?.data?.error_code || axiosError.response?.status;
       } else if (error instanceof Error) {
@@ -98,7 +100,7 @@ export const ScanButton: React.FC<{ className?: string }> = ({ className }) => {
         errorMessage.toLowerCase().includes('network error')
       ) {
         errorMessage =
-          'Network error: check Docker host networking and NET_RAW / NET_ADMIN privileges.';
+          t('scan.networkError');
       } else if (error && typeof error === 'object' && 'code' in error) {
         const codeError = error as { code?: string | number; message?: string };
         if (
@@ -106,15 +108,13 @@ export const ScanButton: React.FC<{ className?: string }> = ({ className }) => {
           (codeError.message &&
             String(codeError.message).includes('Failed to fetch'))
         ) {
-          errorMessage =
-            'Connection error: the backend server is not reachable.';
+          errorMessage = t('scan.connectionError');
         }
       }
 
-      toast.error(
-        `Failed to start scan: ${errorMessage}${errorCode ? ` (${errorCode})` : ''}`,
-        { duration: 6000, id: toastId }
-      );
+      toast.error(t('scan.startFailed', {
+        error: `${errorMessage}${errorCode ? ` (${errorCode})` : ''}`,
+      }), { duration: 6000, id: toastId });
       setIsScanning(false);
       currentScanIdRef.current = null;
     }
@@ -128,7 +128,7 @@ export const ScanButton: React.FC<{ className?: string }> = ({ className }) => {
       }
       onClick={handleScan}
     >
-      {isScanning ? 'Scanning...' : 'Start Scan'}
+      {isScanning ? t('scan.scanning') : t('scan.start')}
     </Button>
   );
 };

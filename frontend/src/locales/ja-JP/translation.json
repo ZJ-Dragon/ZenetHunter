@@ -2,6 +2,7 @@
   "common": {
     "save": "保存",
     "saving": "保存中...",
+    "back": "戻る",
     "cancel": "キャンセル",
     "confirm": "確認",
     "resetToFirstRun": "初回起動にリセット",
@@ -11,6 +12,31 @@
     "unknown": "不明",
     "yes": "はい",
     "no": "いいえ"
+  },
+  "shell": {
+    "brandTag": "セキュリティコンソール",
+    "session": "セッション",
+    "limitedAccess": "制限付きアクセスモード",
+    "fullAccess": "フルコンソールアクセス",
+    "settingsOnly": "設定のみ",
+    "allRoutes": "すべてのルートが利用可能",
+    "primaryNav": "メインナビゲーション",
+    "closeNavigation": "ナビゲーションを閉じる",
+    "workspace": "ワークスペース",
+    "backendLive": "バックエンド稼働中",
+    "reconnecting": "再接続中",
+    "limitedAdmin": "制限付き管理者",
+    "signOut": "サインアウト"
+  },
+  "loading": {
+    "preparingWorkspace": "ワークスペースを準備中...",
+    "checkingSystemStatus": "システム状態を確認中...",
+    "restoringSession": "セッションを復元中...",
+    "preparingFirstRun": "初回起動体験を準備中..."
+  },
+  "dialog": {
+    "attentionRequired": "確認が必要です",
+    "closeDialog": "ダイアログを閉じる"
   },
   "login": {
     "title": "ZenetHunter",
@@ -125,11 +151,41 @@
   },
   "logs": {
     "realtime": "リアルタイムログ",
-    "waiting": "ログを待機中..."
+    "waiting": "ログを待機中...",
+    "feedKicker": "ライブフィード",
+    "panelAria": "リアルタイムログ",
+    "closePanel": "リアルタイムログパネルを閉じる",
+    "waitingHint": "バックエンドから新しいイベントが届くと、ここにログが表示されます。"
   },
   "scan": {
     "loginRequired": "スキャンを使用するにはログインしてください。",
-    "authFailed": "認証に失敗しました。再度ログインしてトークンを更新してください。"
+    "authFailed": "認証に失敗しました。再度ログインしてトークンを更新してください。",
+    "start": "スキャン開始",
+    "scanning": "スキャン中...",
+    "starting": "ネットワークスキャンを開始中...",
+    "started": "スキャンを開始しました (ID: {{id}}...)",
+    "completed": "スキャンが完了しました。{{count}} 台のデバイスを検出しました。",
+    "failed": "スキャン失敗: {{error}}",
+    "startFailed": "スキャン開始に失敗しました: {{error}}",
+    "unknownError": "不明なエラー",
+    "networkError": "ネットワークエラー: Docker ホストネットワークと NET_RAW / NET_ADMIN 権限を確認してください。",
+    "connectionError": "接続エラー: バックエンドサーバーに到達できません。"
+  },
+  "scheduler": {
+    "button": "AI 自動",
+    "runTitle": "AI 戦略スケジューラを実行",
+    "analyzing": "AI が戦略を解析中...",
+    "applied": "AI が {{count}} 件の戦略を適用しました",
+    "failed": "AI スケジューラの実行に失敗しました",
+    "failedWithError": "AI 実行失敗: {{error}}"
+  },
+  "attackMenu": {
+    "selectTypeTitle": "攻撃タイプを選択",
+    "selectTypeDesc": "攻撃方法を選択してください",
+    "confirmTitle": "攻撃を確認",
+    "target": "対象",
+    "duration": "継続時間",
+    "durationValue": "{{seconds}} 秒"
   },
   "topology": {
     "title": "ネットワークマップ",
@@ -251,7 +307,49 @@
     "searchEmpty": "検索条件に一致するデバイスがありません",
     "searchHint": "別の検索語を試してください。",
     "emptyTitle": "デバイスが見つかりません",
-    "emptyHint": "まずネットワークをスキャンしてデバイスを検出してください。"
+    "emptyHint": "まずネットワークをスキャンしてデバイスを検出してください。",
+    "types": {
+      "kick": {
+        "label": "WiFi 切断",
+        "description": "WiFi ディアソシエーションで切断します"
+      },
+      "block": {
+        "label": "ARP 妨害",
+        "description": "ARP スプーフィングで通信を遮断します"
+      },
+      "dhcp_spoof": {
+        "label": "DHCP スプーフ",
+        "description": "DHCP 要求をリダイレクトします"
+      },
+      "dns_spoof": {
+        "label": "DNS スプーフ",
+        "description": "DNS クエリをリダイレクトします"
+      },
+      "icmp_redirect": {
+        "label": "ICMP リダイレクト",
+        "description": "ICMP によって経路を操作します"
+      },
+      "port_scan": {
+        "label": "ポートスキャン",
+        "description": "偵察スキャンを実行します"
+      },
+      "traffic_shape": {
+        "label": "トラフィック整形",
+        "description": "帯域を制限します"
+      },
+      "mac_flood": {
+        "label": "MAC フラッド",
+        "description": "スイッチテーブルを枯渇させます"
+      },
+      "vlan_hop": {
+        "label": "VLAN ホップ",
+        "description": "VLAN ホッピング攻撃です"
+      },
+      "beacon_flood": {
+        "label": "ビーコンフラッド",
+        "description": "WiFi AP を混乱させます"
+      }
+    }
   },
   "auth": {
     "accessDenied": "権限が不足しています。アクセスが拒否されました。"

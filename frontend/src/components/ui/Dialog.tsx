@@ -1,5 +1,6 @@
 import React from 'react';
 import { X } from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { Button } from './Button';
 
 interface DialogProps {
@@ -19,6 +20,8 @@ export const Dialog: React.FC<DialogProps> = ({
   open,
   title,
 }) => {
+  const { t } = useTranslation();
+
   if (!open) {
     return null;
   }
@@ -36,7 +39,7 @@ export const Dialog: React.FC<DialogProps> = ({
           style={{ borderBottom: '1px solid var(--border)' }}
         >
           <div>
-            <p className="zh-kicker">Attention Required</p>
+            <p className="zh-kicker">{t('dialog.attentionRequired')}</p>
             <h2 className="mt-2 text-2xl font-semibold" style={{ color: 'var(--text-primary)' }}>
               {title}
             </h2>
@@ -48,7 +51,7 @@ export const Dialog: React.FC<DialogProps> = ({
           </div>
           {onClose ? (
             <Button
-              aria-label="Close dialog"
+              aria-label={t('dialog.closeDialog')}
               onClick={onClose}
               size="icon"
               variant="ghost"
