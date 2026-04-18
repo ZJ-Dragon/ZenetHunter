@@ -1,61 +1,37 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { deviceService } from '../lib/services/device';
-import { Device } from '../types/device';
-import { attackService } from '../lib/services/attack';
-import { useWebSocketEvent } from '../contexts/WebSocketContext';
-import { WSEventType } from '../types/websocket';
+import React, { useCallback, useEffect, useState } from 'react';
 import {
+  Activity,
+  ArrowRight,
   LayoutDashboard,
   Network,
-  Shield,
-  Activity,
   RefreshCw,
-  TrendingUp,
-  AlertTriangle,
-  CheckCircle,
-  Clock,
+  Shield,
+  ShieldAlert,
 } from 'lucide-react';
-import { ScanButton } from '../components/actions/ScanButton';
-import { clsx } from 'clsx';
 import { useTranslation } from 'react-i18next';
+import { useNavigate } from 'react-router-dom';
+import { ScanButton } from '../components/actions/ScanButton';
+import { Button } from '../components/ui/Button';
+import { DeviceAvatar } from '../components/ui/DeviceAvatar';
+import { DeviceStatusBadge } from '../components/ui/DeviceStatusBadge';
+import { EmptyState } from '../components/ui/EmptyState';
+import { PageHeader } from '../components/ui/PageHeader';
+import { StatCard } from '../components/ui/StatCard';
+import { Surface } from '../components/ui/Surface';
+import { useWebSocketEvent } from '../contexts/WebSocketContext';
+import { attackService } from '../lib/services/attack';
+import { deviceService } from '../lib/services/device';
+import { Device } from '../types/device';
+import { WSEventType } from '../types/websocket';
 
-interface StatCardProps {
-  title: string;
-  value: string | number;
-  icon: React.ElementType;
-  trend?: string;
-  color?: string;
-}
-
-const StatCard: React.FC<StatCardProps> = ({ title, value, icon: Icon, trend, color = 'var(--winui-accent)' }) => {
-  return (
-    <div className="card-winui p-6">
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>
-            {title}
-          </p>
-          <p className="mt-2 text-3xl font-bold" style={{ color: 'var(--winui-text-primary)' }}>
-            {value}
-          </p>
-          {trend && (
-            <p className="mt-1 text-xs flex items-center" style={{ color: 'var(--winui-text-tertiary)' }}>
-              <TrendingUp className="h-3 w-3 mr-1" />
-              {trend}
-            </p>
-          )}
-        </div>
-        <div
-          className="p-3 rounded-lg"
-          style={{ backgroundColor: `${color}15`, color }}
-        >
-          <Icon className="h-6 w-6" />
-        </div>
-      </div>
-    </div>
-  );
-};
+const getDeviceName = (device: Device, fallback: string) =>
+  device.display_name ||
+  device.manual_profile?.manual_name ||
+  device.name ||
+  device.alias ||
+  device.model ||
+  device.model_guess ||
+  fallback;
 
 export const Dashboard: React.FC = () => {
   const navigate = useNavigate();
@@ -70,19 +46,19 @@ export const Dashboard: React.FC = () => {
   });
 
   const fetchDevices = useCallback(async () => {
+    setIsLoading(true);
     try {
       const data = await deviceService.getDevices();
       setDevices(data);
 
-      // Calculate statistics
-      const online = data.filter(d => d.status === 'online').length;
-      const blocked = data.filter(d => d.status === 'blocked').length;
+      const online = data.filter((device) => device.status === 'online').length;
+      const blocked = data.filter((device) => device.status === 'blocked').length;
 
       setStats({
         totalDevices: data.length,
         onlineDevices: online,
         blockedDevices: blocked,
-        recentAttacks: data.filter(d => d.attack_status === 'running').length,
+        recentAttacks: data.filter((device) => device.attack_status === 'running').length,
       });
     } catch (error) {
       console.error('Failed to fetch devices:', error);
@@ -95,211 +71,252 @@ export const Dashboard: React.FC = () => {
     fetchDevices();
   }, [fetchDevices]);
 
-  // Listen for device updates
-  useWebSocketEvent(WSEventType.DEVICE_ADDED, () => {
-    fetchDevices();
-  });
+  useWebSocketEvent(WSEventType.DEVICE_ADDED, fetchDevices);
+  useWebSocketEvent(WSEventType.DEVICE_STATUS_CHANGED, fetchDevices);
+  useWebSocketEvent(WSEventType.DEVICE_RECOGNITION_UPDATED, fetchDevices);
 
-  useWebSocketEvent(WSEventType.DEVICE_STATUS_CHANGED, () => {
-    fetchDevices();
-  });
+  const recentDevices = [...devices]
+    .sort(
+      (left, right) =>
+        new Date(right.last_seen).getTime() - new Date(left.last_seen).getTime()
+    )
+    .slice(0, 6);
 
-  useWebSocketEvent(WSEventType.DEVICE_RECOGNITION_UPDATED, () => {
-    fetchDevices();
-  });
-
-  // Get recent devices (last 5)
-  const recentDevices = devices
-    .sort((a, b) => new Date(b.last_seen).getTime() - new Date(a.last_seen).getTime())
-    .slice(0, 5);
-
-  // Get devices with active attacks (using AttackStatus.RUNNING)
-  const attackedDevices = devices.filter(d => d.attack_status === 'running');
+  const attackedDevices = devices.filter(
+    (device) => device.attack_status === 'running'
+  );
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-semibold flex items-center gap-2" style={{ color: 'var(--winui-text-primary)', letterSpacing: '-0.02em' }}>
-            <LayoutDashboard className="h-8 w-8" style={{ color: 'var(--winui-accent)' }} />
-            {t('dashboard.title')}
-          </h1>
-          <p className="mt-1 text-sm" style={{ color: 'var(--winui-text-secondary)' }}>
-            {t('dashboard.subtitle')}
-          </p>
-        </div>
-        <div className="flex space-x-2">
-          <ScanButton />
-          <button
-            onClick={() => {
-              setIsLoading(true);
-              fetchDevices();
-            }}
-            className="btn-winui-secondary inline-flex items-center"
-          >
-            <RefreshCw className={clsx("h-4 w-4 mr-2", isLoading && "animate-spin")} />
-            {t('dashboard.refresh')}
-          </button>
-        </div>
-      </div>
+    <div className="zh-page">
+      <PageHeader
+        actions={
+          <>
+            <ScanButton />
+            <Button
+              leadingIcon={
+                <RefreshCw className={isLoading ? 'h-4 w-4 animate-spin' : 'h-4 w-4'} />
+              }
+              onClick={fetchDevices}
+              variant="secondary"
+            >
+              {t('dashboard.refresh')}
+            </Button>
+          </>
+        }
+        eyebrow={t('dashboard.eyebrow')}
+        icon={LayoutDashboard}
+        subtitle={t('dashboard.subtitle')}
+        title={t('dashboard.title')}
+      />
 
-      {/* Statistics Cards */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+      <div className="zh-stat-grid">
         <StatCard
-          title={t('dashboard.totalDevices')}
-          value={stats.totalDevices}
+          hint={
+            stats.totalDevices > 0
+              ? t('dashboard.totalDevicesHintActive')
+              : t('dashboard.totalDevicesHintEmpty')
+          }
           icon={Network}
-          color="var(--winui-accent)"
+          label={t('dashboard.totalDevices')}
+          value={stats.totalDevices}
         />
         <StatCard
-          title={t('dashboard.onlineDevices')}
-          value={stats.onlineDevices}
-          icon={CheckCircle}
-          color="#10b981"
-        />
-        <StatCard
-          title={t('dashboard.blockedDevices')}
-          value={stats.blockedDevices}
-          icon={Shield}
-          color="#dc2626"
-        />
-        <StatCard
-          title={t('dashboard.runningAttacks')}
-          value={stats.recentAttacks}
+          hint={
+            stats.totalDevices > 0
+              ? t('dashboard.onlineDevicesHintActive', {
+                  online: stats.onlineDevices,
+                  total: stats.totalDevices,
+                })
+              : t('dashboard.onlineDevicesHintEmpty')
+          }
           icon={Activity}
-          color="#f59e0b"
+          label={t('dashboard.onlineDevices')}
+          tone="var(--success)"
+          value={stats.onlineDevices}
+        />
+        <StatCard
+          hint={
+            stats.blockedDevices > 0
+              ? t('dashboard.blockedDevicesHintActive')
+              : t('dashboard.blockedDevicesHintEmpty')
+          }
+          icon={Shield}
+          label={t('dashboard.blockedDevices')}
+          tone="var(--danger)"
+          value={stats.blockedDevices}
+        />
+        <StatCard
+          hint={
+            attackedDevices.length > 0
+              ? t('dashboard.runningAttacksHintActive')
+              : t('dashboard.runningAttacksHintIdle')
+          }
+          icon={ShieldAlert}
+          label={t('dashboard.runningAttacks')}
+          tone="var(--warning)"
+          value={stats.recentAttacks}
         />
       </div>
 
-      {/* Quick Actions & Recent Devices */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Quick Actions */}
-        <div className="card-winui p-6">
-          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ color: 'var(--winui-text-primary)' }}>
-            <Activity className="h-5 w-5" style={{ color: 'var(--winui-accent)' }} />
-            {t('dashboard.quickActions')}
+      <div className="grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
+        <Surface className="p-5 lg:p-6" tone="raised">
+          <p className="zh-kicker">{t('dashboard.quickActions')}</p>
+          <h2 className="mt-2 text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
+            {t('dashboard.shortcutsTitle')}
           </h2>
-          <div className="space-y-3">
+          <p className="mt-2 text-sm leading-6" style={{ color: 'var(--text-secondary)' }}>
+            {t('dashboard.shortcutsDesc')}
+          </p>
+          <div className="mt-5 grid gap-3">
             <ScanButton className="w-full" />
-            <button
-              className="btn-winui-secondary w-full inline-flex items-center justify-center"
+            <Button
+              fullWidth
+              leadingIcon={<Network className="h-4 w-4" />}
               onClick={() => navigate('/devices')}
+              trailingIcon={<ArrowRight className="h-4 w-4" />}
+              variant="secondary"
             >
-              <Network className="h-4 w-4 mr-2" />
               {t('dashboard.viewDevices')}
-            </button>
-            <button
-              className="btn-winui-secondary w-full inline-flex items-center justify-center"
+            </Button>
+            <Button
+              fullWidth
+              leadingIcon={<Activity className="h-4 w-4" />}
               onClick={() => navigate('/topology')}
+              trailingIcon={<ArrowRight className="h-4 w-4" />}
+              variant="secondary"
             >
-              <Activity className="h-4 w-4 mr-2" />
               {t('dashboard.viewTopology')}
-            </button>
-            <button
-              className="btn-winui-secondary w-full inline-flex items-center justify-center"
+            </Button>
+            <Button
+              fullWidth
+              leadingIcon={<Shield className="h-4 w-4" />}
               onClick={() => navigate('/attacks')}
+              trailingIcon={<ArrowRight className="h-4 w-4" />}
+              variant="secondary"
             >
-              <Shield className="h-4 w-4 mr-2" />
               {t('dashboard.viewAttacks')}
-            </button>
+            </Button>
           </div>
-        </div>
+        </Surface>
 
-        {/* Recent Devices */}
-        <div className="card-winui p-6">
-          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ color: 'var(--winui-text-primary)' }}>
-            <Clock className="h-5 w-5" style={{ color: 'var(--winui-accent)' }} />
-            {t('dashboard.recentDevices')}
-          </h2>
-          <div className="space-y-2">
+        <Surface className="p-5 lg:p-6" tone="raised">
+          <div className="zh-toolbar zh-toolbar--spread">
+            <div>
+              <p className="zh-kicker">{t('dashboard.recentDevices')}</p>
+              <h2 className="mt-2 text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
+                {t('dashboard.snapshotTitle')}
+              </h2>
+            </div>
+            <Button onClick={() => navigate('/devices')} variant="ghost">
+              {t('dashboard.viewDevices')}
+            </Button>
+          </div>
+          <div className="mt-5">
             {recentDevices.length === 0 ? (
-              <p className="text-sm text-center py-4" style={{ color: 'var(--winui-text-tertiary)' }}>
-                {t('dashboard.noDevices')}
-              </p>
+              <EmptyState
+                action={<ScanButton />}
+                description={t('dashboard.noDevices')}
+                icon={Network}
+                title={t('dashboard.noRecentTitle')}
+              />
             ) : (
-              recentDevices.map((device) => (
-                <div
-                  key={device.mac}
-                  className="flex items-center justify-between p-3 rounded-lg transition-colors"
-                  style={{
-                    backgroundColor: device.status === 'online' ? 'var(--winui-bg-tertiary)' : 'transparent',
-                    border: '1px solid var(--winui-border-subtle)',
-                  }}
-                >
-                  <div className="flex items-center space-x-3">
-                    <div
-                      className={clsx(
-                        "w-2 h-2 rounded-full",
-                        device.status === 'online' ? "bg-green-500" : "bg-gray-400"
-                      )}
-                    />
-                    <div>
-                      <p className="text-sm font-medium" style={{ color: 'var(--winui-text-primary)' }}>
-                        {device.name || device.alias || device.model || device.model_guess || device.mac}
+              <div className="zh-list">
+                {recentDevices.map((device) => (
+                  <div className="zh-list-item" key={device.mac}>
+                    <DeviceAvatar status={device.status} type={device.type} />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <p
+                          className="truncate text-sm font-semibold"
+                          style={{ color: 'var(--text-primary)' }}
+                        >
+                          {getDeviceName(device, device.mac)}
+                        </p>
+                        <DeviceStatusBadge status={device.status} />
+                      </div>
+                      <p className="mt-1 text-sm" style={{ color: 'var(--text-secondary)' }}>
+                        {device.ip} • {device.display_vendor || device.vendor || device.vendor_guess || t('common.unknown')}
                       </p>
-                      <p className="text-xs" style={{ color: 'var(--winui-text-secondary)' }}>
-                        {device.ip} • {device.vendor || device.vendor_guess || t('common.unknown')}
-                        {(device.model || device.model_guess) && ` • ${device.model || device.model_guess}`}
+                      <p className="mt-1 text-xs" style={{ color: 'var(--text-tertiary)' }}>
+                        {t('dashboard.lastSeenPrefix')} {new Date(device.last_seen).toLocaleString()}
                       </p>
                     </div>
+                    {device.attack_status === 'running' ? (
+                      <Button
+                        onClick={async () => {
+                          try {
+                            await attackService.stopAttack(device.mac);
+                            fetchDevices();
+                          } catch (error) {
+                            console.error('Failed to stop attack:', error);
+                          }
+                        }}
+                        size="sm"
+                        variant="danger"
+                      >
+                        {t('dashboard.stop')}
+                      </Button>
+                    ) : null}
                   </div>
-                  {device.attack_status === 'running' && (
-                    <AlertTriangle className="h-4 w-4 text-yellow-500" />
-                  )}
-                </div>
-              ))
+                ))}
+              </div>
             )}
           </div>
-        </div>
+        </Surface>
       </div>
 
-      {/* Active Attacks */}
-      {attackedDevices.length > 0 && (
-        <div className="card-winui p-6">
-          <h2 className="text-lg font-semibold mb-4 flex items-center gap-2" style={{ color: 'var(--winui-text-primary)' }}>
-            <Shield className="h-5 w-5" style={{ color: '#dc2626' }} />
-            {t('dashboard.activeAttacks', { count: attackedDevices.length })}
-          </h2>
-          <div className="space-y-2">
-            {attackedDevices.map((device) => (
-              <div
-                key={device.mac}
-                className="flex items-center justify-between p-3 rounded-lg"
-                style={{
-                  backgroundColor: 'rgba(220, 38, 38, 0.1)',
-                  border: '1px solid rgba(220, 38, 38, 0.2)',
-                }}
-              >
-                <div className="flex items-center space-x-3">
-                  <Activity className="h-5 w-5 text-red-500" />
-                  <div>
-                  <p className="text-sm font-medium" style={{ color: 'var(--winui-text-primary)' }}>
-                    {device.name || device.mac}
-                  </p>
-                  <p className="text-xs" style={{ color: 'var(--winui-text-secondary)' }}>
-                    {device.ip} • {device.attack_status || t('common.unknown')}
-                  </p>
-                </div>
-              </div>
-              <button
-                className="btn-winui text-sm px-3 py-1"
-                  onClick={async () => {
-                    try {
-                      await attackService.stopAttack(device.mac);
-                      fetchDevices();
-                    } catch (error) {
-                      console.error('Failed to stop attack:', error);
-                    }
-                  }}
-                >
-                  {t('dashboard.stop')}
-                </button>
-              </div>
-            ))}
+      <Surface className="p-5 lg:p-6" tone="raised">
+        <div className="zh-toolbar zh-toolbar--spread">
+          <div>
+            <p className="zh-kicker">{t('dashboard.responseEyebrow')}</p>
+            <h2 className="mt-2 text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
+              {t('dashboard.responseTitle')}
+            </h2>
           </div>
+          <Button onClick={() => navigate('/attacks')} variant="secondary">
+            {t('dashboard.openOperations')}
+          </Button>
         </div>
-      )}
+        <div className="mt-5">
+          {attackedDevices.length === 0 ? (
+            <EmptyState
+              description={t('dashboard.noInterventionsDesc')}
+              icon={Shield}
+              title={t('dashboard.noInterventionsTitle')}
+            />
+          ) : (
+            <div className="zh-list">
+              {attackedDevices.map((device) => (
+                <div className="zh-list-item" key={device.mac}>
+                  <DeviceAvatar active status={device.status} type={device.type} />
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-semibold" style={{ color: 'var(--text-primary)' }}>
+                      {getDeviceName(device, device.mac)}
+                    </p>
+                    <p className="mt-1 text-sm" style={{ color: 'var(--text-secondary)' }}>
+                      {device.ip} • {device.attack_status}
+                    </p>
+                  </div>
+                  <Button
+                    onClick={async () => {
+                      try {
+                        await attackService.stopAttack(device.mac);
+                        fetchDevices();
+                      } catch (error) {
+                        console.error('Failed to stop attack:', error);
+                      }
+                    }}
+                    size="sm"
+                    variant="danger"
+                  >
+                    {t('dashboard.stop')}
+                  </Button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      </Surface>
     </div>
   );
 };

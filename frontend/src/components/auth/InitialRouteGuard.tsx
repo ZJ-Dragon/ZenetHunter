@@ -1,7 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useTranslation } from 'react-i18next';
 import { configService } from '../../lib/services/config';
 import { useAuth } from '../../contexts/AuthContext';
+import { LoadingScreen } from '../ui/LoadingScreen';
 
 interface InitialRouteGuardProps {
   children: JSX.Element;
@@ -14,6 +16,7 @@ interface InitialRouteGuardProps {
  */
 export const InitialRouteGuard: React.FC<InitialRouteGuardProps> = ({ children }) => {
   const { isLoading: authLoading, isLimitedAdmin } = useAuth();
+  const { t } = useTranslation();
   const navigate = useNavigate();
   const location = useLocation();
   const [isChecking, setIsChecking] = useState(true);
@@ -57,11 +60,7 @@ export const InitialRouteGuard: React.FC<InitialRouteGuardProps> = ({ children }
 
   // Show loading while checking initial status
   if (isChecking || authLoading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-brand-600"></div>
-      </div>
-    );
+    return <LoadingScreen message={t('loading.checkingSystemStatus')} />;
   }
 
   return children;

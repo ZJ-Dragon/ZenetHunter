@@ -13,6 +13,7 @@ export interface SystemLog {
 
 export interface SystemInfo {
   platform: string;
+  platform_name?: string;
   python_version: string;
   app_version: string;
   app_env: string;

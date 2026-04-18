@@ -4,6 +4,7 @@ import { Device } from '../../types/device';
 import { Brain } from 'lucide-react';
 import { clsx } from 'clsx';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
 
 interface SchedulerControlProps {
   device: Device;
@@ -11,22 +12,25 @@ interface SchedulerControlProps {
 }
 
 export const SchedulerControl: React.FC<SchedulerControlProps> = ({ device, className }) => {
+  const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
 
   const handleExecute = async () => {
     setIsLoading(true);
-    const toastId = toast.loading('AI analyzing strategy...');
+    const toastId = toast.loading(t('scheduler.analyzing'));
     try {
       const result = await schedulerService.executeStrategy(device.mac);
 
       if (result.success) {
-        toast.success(`AI applied ${result.strategies_applied} strategies`, { id: toastId });
+        toast.success(t('scheduler.applied', { count: result.strategies_applied }), {
+          id: toastId,
+        });
       } else {
-        toast.error(`AI execution failed: ${result.error}`, { id: toastId });
+        toast.error(t('scheduler.failedWithError', { error: result.error }), { id: toastId });
       }
     } catch (error) {
       console.error(error);
-      toast.error('Failed to execute AI scheduler', { id: toastId });
+      toast.error(t('scheduler.failed'), { id: toastId });
     } finally {
       setIsLoading(false);
     }
@@ -38,7 +42,7 @@ export const SchedulerControl: React.FC<SchedulerControlProps> = ({ device, clas
     <button
       onClick={handleExecute}
       disabled={isLoading}
-      title="Run AI Strategy Scheduler"
+      title={t('scheduler.runTitle')}
       className={clsx(
         "btn-winui-secondary inline-flex items-center px-3 py-1.5 text-xs font-medium rounded-lg transition-all duration-200",
         className
@@ -50,7 +54,7 @@ export const SchedulerControl: React.FC<SchedulerControlProps> = ({ device, clas
       ) : (
         <Brain className="mr-1.5 h-3 w-3" style={{ color: '#9a4dff' }} />
       )}
-      AI Auto
+      {t('scheduler.button')}
     </button>
   );
 };

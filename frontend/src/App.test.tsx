@@ -1,20 +1,13 @@
-
-
-import React from 'react'
-import { render } from '@testing-library/react'
-import App from './App'
-import test, { describe } from "node:test"
-
-// Minimal smoke test to ensure the App mounts in a jsdom environment
-// Docs:
-// - React Testing Library example & APIs: https://testing-library.com/docs/react-testing-library/example-intro/
-// - Vitest test environment (jsdom): https://vitest.dev/guide/environment
+import React from 'react';
+import { render } from '@testing-library/react';
+import { describe, expect, it } from 'vitest';
+import App from './App';
 
 describe('App', () => {
-  test('renders without crashing', () => {
-    const { container } = render(<App />)
-    // container is appended to document.body by default
-    expect(container).toBeTruthy()
-    expect(container.firstChild).not.toBeNull()
-  })
-})
+  it('renders the placeholder root without crashing', () => {
+    const { container } = render(<App />);
+
+    expect(container).toBeTruthy();
+    expect(container.innerHTML).toBe('');
+  });
+});

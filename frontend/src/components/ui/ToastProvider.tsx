@@ -7,18 +7,26 @@ export const ToastProvider: React.FC = () => {
       position="top-right"
       reverseOrder={false}
       toastOptions={{
+        style: {
+          background: 'var(--surface-raised)',
+          border: '1px solid var(--border)',
+          borderRadius: '16px',
+          boxShadow: 'var(--shadow-md)',
+          color: 'var(--text-primary)',
+          padding: '14px 16px',
+        },
         success: {
           style: {
-            background: '#ecfdf5',
-            color: '#065f46',
-            border: '1px solid #a7f3d0',
+            background: 'var(--surface-raised)',
+            color: 'var(--success)',
+            border: '1px solid rgba(15, 123, 15, 0.2)',
           },
         },
         error: {
           style: {
-            background: '#fef2f2',
-            color: '#991b1b',
-            border: '1px solid #fecaca',
+            background: 'var(--surface-raised)',
+            color: 'var(--danger)',
+            border: '1px solid rgba(196, 43, 28, 0.22)',
           },
         },
         duration: 4000,

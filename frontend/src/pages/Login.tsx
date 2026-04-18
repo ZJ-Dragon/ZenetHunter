@@ -2,8 +2,18 @@ import React, { useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import { api } from '../lib/api';
-import { Lock, User, ShieldAlert } from 'lucide-react';
+import {
+  ArrowRight,
+  CheckCircle2,
+  KeyRound,
+  Lock,
+  ShieldAlert,
+  User,
+} from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { Badge } from '../components/ui/Badge';
+import { Button } from '../components/ui/Button';
+import { Surface } from '../components/ui/Surface';
 
 export const Login: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -57,87 +67,172 @@ export const Login: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center p-4" style={{ backgroundColor: 'var(--winui-bg-primary)' }}>
-      <div className="max-w-md w-full card-winui overflow-hidden">
-        <div className="p-6 text-center" style={{ backgroundColor: 'var(--winui-accent)', color: '#ffffff' }}>
-          <div className="flex justify-center mb-4">
-            <div className="p-3 rounded-full" style={{ backgroundColor: '#ffffff' }}>
-              <ShieldAlert className="w-8 h-8" style={{ color: 'var(--winui-accent)' }} />
-            </div>
-          </div>
-          <h1 className="text-2xl font-semibold text-white">{t('login.title')}</h1>
-          <p className="mt-2 text-sm" style={{ color: 'rgba(255, 255, 255, 0.9)' }}>{t('login.subtitle')}</p>
-        </div>
-
-        <div className="p-8">
-          <form onSubmit={handleSubmit} className="space-y-6">
-            {error && (
-              <div className="p-4 text-sm rounded-lg" style={{ backgroundColor: 'rgba(209, 52, 56, 0.1)', color: '#d13438', border: '1px solid rgba(209, 52, 56, 0.3)' }}>
-                {error}
+    <div className="min-h-screen px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mx-auto flex min-h-[calc(100vh-4rem)] max-w-6xl items-center">
+        <div className="grid w-full gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+          <Surface className="overflow-hidden p-8 lg:p-10" tone="raised">
+            <div className="zh-hero-grid h-full">
+              <div className="flex flex-wrap items-center gap-3">
+                <Badge tone="accent">{t('login.workspaceTag')}</Badge>
+                <Badge tone="success">{t('login.sessionTag')}</Badge>
               </div>
-            )}
-
-            <div>
-              <label className="block text-sm font-medium mb-1" style={{ color: 'var(--winui-text-primary)' }}>{t('login.username')}</label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <User className="h-5 w-5" style={{ color: 'var(--winui-text-tertiary)' }} />
+              <div>
+                <div
+                  className="mb-6 inline-flex h-16 w-16 items-center justify-center rounded-[1.5rem]"
+                  style={{
+                    background:
+                      'linear-gradient(180deg, var(--accent-soft), rgba(255,255,255,0.12))',
+                    color: 'var(--accent)',
+                  }}
+                >
+                  <ShieldAlert className="h-8 w-8" />
                 </div>
-                <input
-                  type="text"
-                  required
-                  value={username}
-                  onChange={(e) => setUsername(e.target.value)}
-                  className="input-winui block w-full pr-3 py-2"
-                  style={{ paddingLeft: '42px' }}
-                  placeholder={t('login.username')}
-                />
+                <p className="zh-kicker">{t('login.kicker')}</p>
+                <h1
+                  className="mt-2 text-4xl font-bold tracking-[-0.04em]"
+                  style={{ color: 'var(--text-primary)' }}
+                >
+                  {t('login.title')}
+                </h1>
+                <p
+                  className="mt-4 max-w-xl text-base leading-7"
+                  style={{ color: 'var(--text-secondary)' }}
+                >
+                  {t('login.subtitle')}
+                </p>
               </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium mb-1" style={{ color: 'var(--winui-text-primary)' }}>{t('login.password')}</label>
-              <div className="relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <Lock className="h-5 w-5" style={{ color: 'var(--winui-text-tertiary)' }} />
+              <div className="zh-detail-grid">
+                <Surface className="zh-detail-card" tone="subtle">
+                  <p className="zh-detail-card__label">{t('login.accessLabel')}</p>
+                  <p className="zh-detail-card__value text-sm font-semibold">
+                    {t('login.accessDesc')}
+                  </p>
+                </Surface>
+                <Surface className="zh-detail-card" tone="subtle">
+                  <p className="zh-detail-card__label">{t('login.firstRunLabel')}</p>
+                  <p className="zh-detail-card__value text-sm font-semibold">
+                    {t('login.firstRunDesc')}
+                  </p>
+                </Surface>
+              </div>
+              <Surface className="p-5" tone="subtle">
+                <p className="zh-kicker">{t('login.benefitsKicker')}</p>
+                <div className="mt-4 space-y-3">
+                  {[
+                    t('login.benefit1'),
+                    t('login.benefit2'),
+                    t('login.benefit3'),
+                  ].map((item) => (
+                    <div className="flex items-start gap-3" key={item}>
+                      <CheckCircle2
+                        className="mt-0.5 h-4 w-4 flex-shrink-0"
+                        style={{ color: 'var(--success)' }}
+                      />
+                      <span className="text-sm" style={{ color: 'var(--text-secondary)' }}>
+                        {item}
+                      </span>
+                    </div>
+                  ))}
                 </div>
-                <input
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="input-winui block w-full pr-3 py-2"
-                  style={{ paddingLeft: '42px' }}
-                  placeholder="••••••••"
-                />
+              </Surface>
+            </div>
+          </Surface>
+
+          <Surface className="p-8 lg:p-10" tone="raised">
+            <div className="flex items-center gap-3">
+              <div
+                className="inline-flex h-12 w-12 items-center justify-center rounded-[1.1rem]"
+                style={{ background: 'var(--surface-inset)', color: 'var(--accent)' }}
+              >
+                <KeyRound className="h-5 w-5" />
+              </div>
+              <div>
+                <p className="zh-kicker">{t('login.authKicker')}</p>
+                <h2 className="mt-1 text-2xl font-semibold" style={{ color: 'var(--text-primary)' }}>
+                  {t('login.signIn')}
+                </h2>
               </div>
             </div>
 
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="btn-winui w-full flex justify-center py-2 px-4 text-sm font-medium text-white transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {isLoading ? t('login.signingIn') : t('login.signIn')}
-            </button>
+            <form onSubmit={handleSubmit} className="mt-8 space-y-5">
+              {error ? (
+                <Surface className="p-4 text-sm" tone="danger">
+                  {error}
+                </Surface>
+              ) : null}
 
-            <div className="mt-4 pt-4" style={{ borderTop: '1px solid var(--winui-border-subtle)' }}>
-              <div className="p-3 rounded-lg" style={{ backgroundColor: 'rgba(0, 120, 212, 0.1)', border: '1px solid rgba(0, 120, 212, 0.3)' }}>
-                <p className="text-xs font-semibold mb-1" style={{ color: 'var(--winui-accent)' }}>{t('login.firstUse')}</p>
-                <div className="text-xs flex items-start gap-2" style={{ color: 'var(--winui-text-secondary)' }}>
-                  <span>{t('login.firstUseHint')}</span>
-                  <button
-                    type="button"
-                    onClick={() => navigate('/setup')}
-                    className="font-semibold underline"
-                    style={{ color: 'var(--winui-accent)' }}
-                  >
-                    {t('login.setupLink')}
-                  </button>
+              <div>
+                <label
+                  className="mb-2 block text-sm font-medium"
+                  style={{ color: 'var(--text-primary)' }}
+                >
+                  {t('login.username')}
+                </label>
+                <div className="zh-field-wrap">
+                  <User className="zh-field-icon h-4 w-4" />
+                  <input
+                    className="zh-field"
+                    onChange={(e) => setUsername(e.target.value)}
+                    placeholder={t('login.username')}
+                    required
+                    type="text"
+                    value={username}
+                  />
                 </div>
               </div>
-            </div>
-          </form>
+
+              <div>
+                <label
+                  className="mb-2 block text-sm font-medium"
+                  style={{ color: 'var(--text-primary)' }}
+                >
+                  {t('login.password')}
+                </label>
+                <div className="zh-field-wrap">
+                  <Lock className="zh-field-icon h-4 w-4" />
+                  <input
+                    className="zh-field"
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder={t('login.password')}
+                    required
+                    type="password"
+                    value={password}
+                  />
+                </div>
+              </div>
+
+              <Button
+                fullWidth
+                loading={isLoading}
+                trailingIcon={!isLoading ? <ArrowRight className="h-4 w-4" /> : undefined}
+                type="submit"
+              >
+                {isLoading ? t('login.signingIn') : t('login.signIn')}
+              </Button>
+            </form>
+
+            <Surface className="mt-6 p-4" tone="subtle">
+              <p className="zh-kicker">{t('login.firstUse')}</p>
+              <p className="mt-2 text-sm leading-6" style={{ color: 'var(--text-secondary)' }}>
+                {t('login.firstUseHint')}
+              </p>
+              <Button
+                className="mt-4"
+                onClick={() => navigate('/setup')}
+                trailingIcon={<ArrowRight className="h-4 w-4" />}
+                type="button"
+                variant="secondary"
+              >
+                {t('login.setupLink')}
+              </Button>
+            </Surface>
+
+            {from !== '/' ? (
+              <p className="mt-6 text-xs" style={{ color: 'var(--text-tertiary)' }}>
+                {t('login.returnTo', { path: from })}
+              </p>
+            ) : null}
+          </Surface>
         </div>
       </div>
     </div>

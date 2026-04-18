@@ -4,6 +4,8 @@ import { AttackStatus, Device } from '../../types/device';
 import { ShieldOff, AlertTriangle, Zap, Radio, ChevronDown, Network, Globe, RefreshCw, Activity, Wifi, Layers } from 'lucide-react';
 import { clsx } from 'clsx';
 import toast from 'react-hot-toast';
+import { useTranslation } from 'react-i18next';
+import { getAttackTypeDescription, getAttackTypeLabel } from '../../lib/attackTypeI18n';
 
 interface AttackControlProps {
   device: Device;
@@ -11,70 +13,51 @@ interface AttackControlProps {
 }
 
 // Attack type metadata for UI
-const attackTypeMetadata: Record<AttackType, { label: string; description: string; icon: React.ReactNode; color: string }> = {
+const attackTypeMetadata: Record<AttackType, { icon: React.ReactNode; color: string }> = {
   [AttackType.KICK]: {
-    label: 'WiFi Deauth (Kick)',
-    description: 'Disconnect via WiFi deauthentication',
     icon: <Zap className="h-4 w-4" />,
     color: '#ffaa44',
   },
   [AttackType.BLOCK]: {
-    label: 'ARP Jam (Block)',
-    description: 'Block traffic via ARP spoofing',
     icon: <Radio className="h-4 w-4" />,
     color: '#9a4dff',
   },
   [AttackType.DHCP_SPOOF]: {
-    label: 'DHCP Spoof',
-    description: 'Redirect DHCP requests',
     icon: <Network className="h-4 w-4" />,
     color: '#0078d4',
   },
   [AttackType.DNS_SPOOF]: {
-    label: 'DNS Spoof',
-    description: 'Redirect DNS queries',
     icon: <Globe className="h-4 w-4" />,
     color: '#00bcf2',
   },
   [AttackType.ICMP_REDIRECT]: {
-    label: 'ICMP Redirect',
-    description: 'Manipulate routing via ICMP',
     icon: <RefreshCw className="h-4 w-4" />,
     color: '#8764b8',
   },
   [AttackType.PORT_SCAN]: {
-    label: 'Port Scan',
-    description: 'Reconnaissance scanning',
     icon: <Activity className="h-4 w-4" />,
     color: '#107c10',
   },
   [AttackType.TRAFFIC_SHAPE]: {
-    label: 'Traffic Shape',
-    description: 'Limit bandwidth',
     icon: <Layers className="h-4 w-4" />,
     color: '#ff8c00',
   },
   [AttackType.MAC_FLOOD]: {
-    label: 'MAC Flood',
-    description: 'Exhaust switch table',
     icon: <Network className="h-4 w-4" />,
     color: '#e81123',
   },
   [AttackType.VLAN_HOP]: {
-    label: 'VLAN Hop',
-    description: 'VLAN hopping attack',
     icon: <Layers className="h-4 w-4" />,
     color: '#737373',
   },
   [AttackType.BEACON_FLOOD]: {
-    label: 'Beacon Flood',
-    description: 'WiFi AP confusion',
     icon: <Wifi className="h-4 w-4" />,
     color: '#ffaa44',
   },
 };
 
 export const AttackControl: React.FC<AttackControlProps> = ({ device, className }) => {
+  const { t } = useTranslation();
   const [isLoading, setIsLoading] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
   const [selectedType, setSelectedType] = useState<AttackType | null>(null);
@@ -113,16 +96,22 @@ export const AttackControl: React.FC<AttackControlProps> = ({ device, className 
 
     setIsLoading(true);
     setShowMenu(false);
-    const metadata = attackTypeMetadata[selectedType];
-    const toastId = toast.loading(`Initiating ${metadata.label}...`);
+    const toastId = toast.loading(
+      t('attack.launching', {
+        target: device.mac,
+        type: getAttackTypeLabel(t, selectedType),
+      })
+    );
 
     try {
       await attackService.startAttack(device.mac, selectedType, 60);
-      toast.success(`${metadata.label} attack started`, { id: toastId });
+      toast.success(t('attack.started', { type: getAttackTypeLabel(t, selectedType) }), {
+        id: toastId,
+      });
       setSelectedType(null);
     } catch (error: unknown) {
       console.error(error);
-      toast.error(`Failed to start ${metadata.label}`, { id: toastId });
+      toast.error(t('attack.startFailed'), { id: toastId });
     } finally {
       setIsLoading(false);
     }
@@ -130,14 +119,14 @@ export const AttackControl: React.FC<AttackControlProps> = ({ device, className 
 
   const stopAttack = async () => {
     setIsLoading(true);
-    const toastId = toast.loading('Stopping attack...');
+    const toastId = toast.loading(t('attack.stopping'));
 
     try {
       await attackService.stopAttack(device.mac);
-      toast.success('Attack stopped', { id: toastId });
+      toast.success(t('attack.stopped'), { id: toastId });
     } catch (error: unknown) {
       console.error(error);
-      toast.error('Failed to stop attack', { id: toastId });
+      toast.error(t('attack.stopFailed'), { id: toastId });
     } finally {
       setIsLoading(false);
     }
@@ -172,7 +161,7 @@ export const AttackControl: React.FC<AttackControlProps> = ({ device, className 
         ) : (
           <ShieldOff className="mr-1.5 h-3 w-3" />
         )}
-        Stop Attack
+        {t('attack.stop')}
       </button>
     );
   }
@@ -186,7 +175,7 @@ export const AttackControl: React.FC<AttackControlProps> = ({ device, className 
         style={{ minHeight: '24px' }}
       >
         <AlertTriangle className="mr-1.5 h-3 w-3" style={{ color: '#ffaa44' }} />
-        Attack
+        {t('attack.attack')}
         <ChevronDown className="ml-1 h-3 w-3" style={{ color: 'var(--winui-text-tertiary)' }} />
       </button>
 
@@ -203,8 +192,8 @@ export const AttackControl: React.FC<AttackControlProps> = ({ device, className 
             // Attack type selection menu
             <div className="py-2 max-h-96 overflow-y-auto" role="menu">
               <div className="px-4 py-2 border-b" style={{ borderColor: 'var(--winui-border-subtle)' }}>
-                <h3 className="text-xs font-semibold" style={{ color: 'var(--winui-text-primary)' }}>Select Attack Type</h3>
-                <p className="text-[10px] mt-0.5" style={{ color: 'var(--winui-text-secondary)' }}>Choose an attack method</p>
+                <h3 className="text-xs font-semibold" style={{ color: 'var(--winui-text-primary)' }}>{t('attackMenu.selectTypeTitle')}</h3>
+                <p className="text-[10px] mt-0.5" style={{ color: 'var(--winui-text-secondary)' }}>{t('attackMenu.selectTypeDesc')}</p>
               </div>
               {Object.entries(attackTypeMetadata).map(([type, metadata]) => (
                 <button
@@ -224,9 +213,9 @@ export const AttackControl: React.FC<AttackControlProps> = ({ device, className 
                     {metadata.icon}
                   </span>
                   <div className="flex-1">
-                    <span className="font-semibold block">{metadata.label}</span>
+                    <span className="font-semibold block">{getAttackTypeLabel(t, type as AttackType)}</span>
                     <span className="text-[10px]" style={{ color: 'var(--winui-text-tertiary)' }}>
-                      {metadata.description}
+                      {getAttackTypeDescription(t, type as AttackType)}
                     </span>
                   </div>
                 </button>
@@ -236,27 +225,27 @@ export const AttackControl: React.FC<AttackControlProps> = ({ device, className 
             // Confirmation menu
             <div className="py-2" role="menu">
               <div className="px-4 py-3 border-b" style={{ borderColor: 'var(--winui-border-subtle)' }}>
-                <h3 className="text-xs font-semibold mb-1" style={{ color: 'var(--winui-text-primary)' }}>Confirm Attack</h3>
+                <h3 className="text-xs font-semibold mb-1" style={{ color: 'var(--winui-text-primary)' }}>{t('attackMenu.confirmTitle')}</h3>
                 <div className="flex items-center space-x-2">
                   <span style={{ color: attackTypeMetadata[selectedType].color }}>
                     {attackTypeMetadata[selectedType].icon}
                   </span>
                   <div>
                     <div className="text-xs font-medium" style={{ color: 'var(--winui-text-primary)' }}>
-                      {attackTypeMetadata[selectedType].label}
+                      {getAttackTypeLabel(t, selectedType)}
                     </div>
                     <div className="text-[10px]" style={{ color: 'var(--winui-text-secondary)' }}>
-                      {attackTypeMetadata[selectedType].description}
+                      {getAttackTypeDescription(t, selectedType)}
                     </div>
                   </div>
                 </div>
               </div>
               <div className="px-4 py-3 space-y-2">
                 <div className="text-[10px]" style={{ color: 'var(--winui-text-tertiary)' }}>
-                  Target: <span className="font-mono">{device.mac}</span>
+                  {t('attackMenu.target')}: <span className="font-mono">{device.mac}</span>
                 </div>
                 <div className="text-[10px]" style={{ color: 'var(--winui-text-tertiary)' }}>
-                  Duration: 60 seconds
+                  {t('attackMenu.duration')}: {t('attackMenu.durationValue', { seconds: 60 })}
                 </div>
                 <div className="flex space-x-2 pt-2">
                   <button
@@ -264,7 +253,7 @@ export const AttackControl: React.FC<AttackControlProps> = ({ device, className 
                     className="flex-1 btn-winui-secondary text-xs py-2 px-3 rounded-lg"
                     style={{ minHeight: '28px' }}
                   >
-                    Back
+                    {t('common.back')}
                   </button>
                   <button
                     onClick={confirmAttack}
@@ -281,7 +270,7 @@ export const AttackControl: React.FC<AttackControlProps> = ({ device, className 
                       if (!isLoading) e.currentTarget.style.backgroundColor = '#d13438';
                     }}
                   >
-                    Confirm
+                    {t('common.confirm')}
                   </button>
                 </div>
               </div>

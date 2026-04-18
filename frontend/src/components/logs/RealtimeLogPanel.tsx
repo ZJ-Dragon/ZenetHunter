@@ -1,141 +1,152 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState } from 'react';
+import {
+  AlertCircle,
+  AlertTriangle,
+  Info,
+  Terminal,
+  X,
+  XCircle,
+} from 'lucide-react';
+import { useTranslation } from 'react-i18next';
 import { useWebSocketEvent } from '../../contexts/WebSocketContext';
-import { WSEventType } from '../../types/websocket';
 import { SystemLog } from '../../lib/services/logs';
-import { X, Terminal, AlertCircle, Info, AlertTriangle, XCircle } from 'lucide-react';
+import { WSEventType } from '../../types/websocket';
+import { Badge } from '../ui/Badge';
+import { Button } from '../ui/Button';
+import { EmptyState } from '../ui/EmptyState';
+import { Surface } from '../ui/Surface';
 
 interface RealtimeLogPanelProps {
   isOpen: boolean;
-  onClose: () => void;
   maxLogs?: number;
+  onClose: () => void;
 }
+
+const getTone = (level: string) => {
+  const normalized = level.toLowerCase();
+  if (normalized === 'error' || normalized === 'critical') {
+    return 'danger';
+  }
+  if (normalized === 'warning') {
+    return 'warning';
+  }
+  if (normalized === 'info') {
+    return 'accent';
+  }
+  return 'neutral';
+};
 
 const LogLevelIcon: React.FC<{ level: string }> = ({ level }) => {
   const levelLower = level.toLowerCase();
   if (levelLower === 'error' || levelLower === 'critical') {
-    return <XCircle className="h-3 w-3 text-red-500" />;
-  } else if (levelLower === 'warning') {
-    return <AlertTriangle className="h-3 w-3 text-yellow-500" />;
-  } else if (levelLower === 'info') {
-    return <Info className="h-3 w-3 text-blue-500" />;
-  } else {
-    return <AlertCircle className="h-3 w-3 text-gray-400" />;
+    return <XCircle className="h-4 w-4" style={{ color: 'var(--danger)' }} />;
   }
+  if (levelLower === 'warning') {
+    return <AlertTriangle className="h-4 w-4" style={{ color: 'var(--warning)' }} />;
+  }
+  if (levelLower === 'info') {
+    return <Info className="h-4 w-4" style={{ color: 'var(--accent)' }} />;
+  }
+  return <AlertCircle className="h-4 w-4" style={{ color: 'var(--text-tertiary)' }} />;
 };
 
 export const RealtimeLogPanel: React.FC<RealtimeLogPanelProps> = ({
   isOpen,
   onClose,
-  maxLogs = 50
+  maxLogs = 50,
 }) => {
   const [logs, setLogs] = useState<SystemLog[]>([]);
-  const logEndRef = useRef<HTMLDivElement>(null);
+  const { t } = useTranslation();
 
-  // Listen for new logs via WebSocket
+  useEffect(() => {
+    if (!isOpen) {
+      return;
+    }
+
+    const onKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    };
+
+    window.addEventListener('keydown', onKeyDown);
+    return () => window.removeEventListener('keydown', onKeyDown);
+  }, [isOpen, onClose]);
+
   useWebSocketEvent<SystemLog>(WSEventType.LOG_ADDED, (log) => {
-    setLogs((prev) => {
-      const newLogs = [log, ...prev].slice(0, maxLogs);
-      return newLogs;
-    });
+    setLogs((previous) => [log, ...previous].slice(0, maxLogs));
   });
 
-  // Auto-scroll to bottom when new log arrives
-  useEffect(() => {
-    if (logEndRef.current) {
-      logEndRef.current.scrollIntoView({ behavior: 'smooth' });
-    }
-  }, [logs]);
-
-  if (!isOpen) return null;
+  if (!isOpen) {
+    return null;
+  }
 
   return (
     <div
-      className="fixed bottom-0 right-0 w-96 h-96 z-50 flex flex-col"
-      style={{
-        backgroundColor: 'var(--winui-surface)',
-        borderTop: '1px solid var(--winui-border-subtle)',
-        borderLeft: '1px solid var(--winui-border-subtle)',
-        borderRadius: 'var(--winui-radius-lg) 0 0 0',
-        boxShadow: '0 -4px 12px rgba(0, 0, 0, 0.15)',
-      }}
+      className="fixed bottom-4 right-4 z-50 w-[min(28rem,calc(100vw-2rem))]"
+      role="dialog"
+      aria-label={t('logs.panelAria')}
     >
-      {/* Header */}
-      <div
-        className="flex items-center justify-between px-4 py-3 border-b"
-        style={{ borderColor: 'var(--winui-border-subtle)' }}
-      >
-        <div className="flex items-center space-x-2">
-          <Terminal className="h-5 w-5" style={{ color: 'var(--winui-accent)' }} />
-          <h3 className="text-sm font-semibold" style={{ color: 'var(--winui-text-primary)' }}>
-            实时日志
-          </h3>
-          <span
-            className="px-2 py-0.5 text-xs rounded-full"
-            style={{
-              backgroundColor: 'var(--winui-bg-tertiary)',
-              color: 'var(--winui-text-secondary)',
-            }}
-          >
-            {logs.length}
-          </span>
-        </div>
-        <button
-          onClick={onClose}
-          className="p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
-          style={{ color: 'var(--winui-text-secondary)' }}
+      <Surface className="overflow-hidden" tone="raised">
+        <div
+          className="flex items-center justify-between gap-4 px-5 py-4"
+          style={{ borderBottom: '1px solid var(--border)' }}
         >
-          <X className="h-4 w-4" />
-        </button>
-      </div>
-
-      {/* Logs List */}
-      <div className="flex-1 overflow-y-auto p-2 space-y-1" style={{ backgroundColor: 'var(--winui-bg-primary)' }}>
-        {logs.length === 0 ? (
-          <div className="text-center py-8" style={{ color: 'var(--winui-text-tertiary)' }}>
-            <Terminal className="h-8 w-8 mx-auto mb-2 opacity-50" />
-            <p className="text-sm">等待日志...</p>
-          </div>
-        ) : (
-          logs.map((log, index) => (
-            <div
-              key={log.id || `${log.timestamp}-${index}`}
-              className="px-3 py-2 rounded text-xs transition-colors"
-              style={{
-                backgroundColor: index % 2 === 0 ? 'transparent' : 'var(--winui-bg-tertiary)',
-              }}
-            >
-              <div className="flex items-start space-x-2">
-                <LogLevelIcon level={log.level} />
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center space-x-2 mb-1">
-                    <span
-                      className="px-1.5 py-0.5 rounded text-xs font-medium"
-                      style={{
-                        backgroundColor: 'var(--winui-bg-tertiary)',
-                        color: 'var(--winui-text-secondary)',
-                      }}
-                    >
-                      {log.level.toUpperCase()}
-                    </span>
-                    <span className="text-xs font-mono" style={{ color: 'var(--winui-text-tertiary)' }}>
-                      {new Date(log.timestamp).toLocaleTimeString()}
-                    </span>
-                  </div>
-                  <p className="text-xs break-words" style={{ color: 'var(--winui-text-primary)' }}>
-                    {log.message}
-                  </p>
-                  {log.module && (
-                    <p className="text-xs mt-0.5" style={{ color: 'var(--winui-text-tertiary)' }}>
-                      {log.module}
-                    </p>
-                  )}
-                </div>
-              </div>
+          <div>
+            <p className="zh-kicker">{t('logs.feedKicker')}</p>
+            <div className="mt-2 flex items-center gap-2">
+              <Terminal className="h-5 w-5" style={{ color: 'var(--accent)' }} />
+              <h3 className="text-lg font-semibold" style={{ color: 'var(--text-primary)' }}>
+                {t('logs.realtime')}
+              </h3>
+              <Badge tone="neutral">{logs.length}</Badge>
             </div>
-          ))
-        )}
-        <div ref={logEndRef} />
-      </div>
+          </div>
+          <Button aria-label={t('logs.closePanel')} onClick={onClose} size="icon" variant="ghost">
+            <X className="h-4 w-4" />
+          </Button>
+        </div>
+
+        <div className="max-h-[30rem] overflow-y-auto p-4">
+          {logs.length === 0 ? (
+            <EmptyState
+              description={t('logs.waitingHint')}
+              icon={Terminal}
+              title={t('logs.waiting')}
+            />
+          ) : (
+            <div className="space-y-3">
+              {logs.map((log, index) => (
+                <Surface
+                  className="p-4"
+                  key={log.id || `${log.timestamp}-${index}`}
+                  tone={index === 0 ? 'subtle' : 'inset'}
+                >
+                  <div className="flex items-start gap-3">
+                    <LogLevelIcon level={log.level} />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex flex-wrap items-center gap-2">
+                        <Badge tone={getTone(log.level)}>{log.level.toUpperCase()}</Badge>
+                        <span className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
+                          {new Date(log.timestamp).toLocaleTimeString()}
+                        </span>
+                        {log.module ? (
+                          <span className="text-xs" style={{ color: 'var(--text-tertiary)' }}>
+                            {log.module}
+                          </span>
+                        ) : null}
+                      </div>
+                      <p className="mt-2 text-sm leading-6" style={{ color: 'var(--text-primary)' }}>
+                        {log.message}
+                      </p>
+                    </div>
+                  </div>
+                </Surface>
+              ))}
+            </div>
+          )}
+        </div>
+      </Surface>
     </div>
   );
 };

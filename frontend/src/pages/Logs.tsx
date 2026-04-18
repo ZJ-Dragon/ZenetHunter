@@ -1,46 +1,58 @@
-import React, { useEffect, useState, useCallback } from 'react';
-import { logsService, SystemLog, SystemInfo } from '../lib/services/logs';
-import { RefreshCw, AlertCircle, Info, AlertTriangle, XCircle, CheckCircle, Terminal, Server } from 'lucide-react';
-import { clsx } from 'clsx';
+import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import {
+  AlertCircle,
+  AlertTriangle,
+  CheckCircle2,
+  Database,
+  Info,
+  RefreshCw,
+  Server,
+  Terminal,
+  XCircle,
+} from 'lucide-react';
 import { useTranslation } from 'react-i18next';
+import { Button } from '../components/ui/Button';
+import { Badge } from '../components/ui/Badge';
+import { EmptyState } from '../components/ui/EmptyState';
+import { PageHeader } from '../components/ui/PageHeader';
+import { StatCard } from '../components/ui/StatCard';
+import { Surface } from '../components/ui/Surface';
+import { logsService, SystemInfo, SystemLog } from '../lib/services/logs';
 
-const LogLevelIcon: React.FC<{ level: string }> = ({ level }) => {
-  const levelLower = level.toLowerCase();
-  if (levelLower === 'error' || levelLower === 'critical') {
-    return <XCircle className="h-4 w-4 text-red-500" />;
-  } else if (levelLower === 'warning') {
-    return <AlertTriangle className="h-4 w-4 text-yellow-500" />;
-  } else if (levelLower === 'info') {
-    return <Info className="h-4 w-4 text-blue-500" />;
-  } else {
-    return <AlertCircle className="h-4 w-4 text-gray-400" />;
+const getLogTone = (level: string) => {
+  const normalized = level.toLowerCase();
+  if (normalized === 'error' || normalized === 'critical') {
+    return 'danger';
   }
+  if (normalized === 'warning') {
+    return 'warning';
+  }
+  if (normalized === 'info') {
+    return 'accent';
+  }
+  return 'neutral';
 };
 
-const LogLevelBadge: React.FC<{ level: string }> = ({ level }) => {
-  const levelLower = level.toLowerCase();
-  const badgeStyles: Record<string, { bg: string; text: string }> = {
-    error: { bg: 'rgba(209, 52, 56, 0.1)', text: '#d13438' },
-    critical: { bg: 'rgba(209, 52, 56, 0.1)', text: '#d13438' },
-    warning: { bg: 'rgba(255, 170, 68, 0.1)', text: '#ffaa44' },
-    info: { bg: 'rgba(0, 120, 212, 0.1)', text: 'var(--winui-accent)' },
-    debug: { bg: 'var(--winui-bg-tertiary)', text: 'var(--winui-text-secondary)' },
-  };
+const getLogIcon = (level: string) => {
+  const normalized = level.toLowerCase();
+  if (normalized === 'error' || normalized === 'critical') {
+    return XCircle;
+  }
+  if (normalized === 'warning') {
+    return AlertTriangle;
+  }
+  if (normalized === 'info') {
+    return Info;
+  }
+  return AlertCircle;
+};
 
-  const style = badgeStyles[levelLower] || badgeStyles.debug;
+const capabilitySummary = (systemInfo: SystemInfo | null) => {
+  if (!systemInfo) {
+    return 0;
+  }
 
-  return (
-    <span
-      className="px-3 py-1 text-xs font-semibold rounded-full"
-      style={{
-        backgroundColor: style.bg,
-        color: style.text,
-        borderRadius: 'var(--winui-radius-lg)'
-      }}
-    >
-      {level.toUpperCase()}
-    </span>
-  );
+  return Object.values(systemInfo.capabilities).filter(Boolean).length;
 };
 
 export const Logs: React.FC = () => {
@@ -52,6 +64,7 @@ export const Logs: React.FC = () => {
   const [limit, setLimit] = useState(100);
 
   const fetchLogs = useCallback(async () => {
+    setIsLoading(true);
     try {
       const data = await logsService.getLogs(limit);
       setLogs(data);
@@ -74,143 +87,132 @@ export const Logs: React.FC = () => {
   useEffect(() => {
     fetchLogs();
     fetchSystemInfo();
-    // Auto-refresh every 5 seconds
     const interval = setInterval(fetchLogs, 5000);
     return () => clearInterval(interval);
   }, [fetchLogs, fetchSystemInfo]);
 
-  const filteredLogs = filterLevel === 'all'
-    ? logs
-    : logs.filter(log => log.level.toLowerCase() === filterLevel.toLowerCase());
+  const filteredLogs = useMemo(
+    () =>
+      filterLevel === 'all'
+        ? logs
+        : logs.filter(
+            (log) => log.level.toLowerCase() === filterLevel.toLowerCase()
+          ),
+    [filterLevel, logs]
+  );
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
-      <div className="flex justify-between items-center">
-        <div>
-          <h1 className="text-2xl font-semibold flex items-center gap-2" style={{ color: 'var(--winui-text-primary)', letterSpacing: '-0.02em' }}>
-            <Terminal className="h-8 w-8" style={{ color: 'var(--winui-accent)' }} />
-            {t('logsPage.title')}
-          </h1>
-          <p className="mt-1 text-sm" style={{ color: 'var(--winui-text-secondary)' }}>
-            {t('logsPage.subtitle')}
-          </p>
-        </div>
-        <button
-          onClick={() => {
-            setIsLoading(true);
-            fetchLogs();
-            fetchSystemInfo();
-          }}
-          className="btn-winui-secondary inline-flex items-center"
-        >
-          <RefreshCw className={clsx("h-4 w-4 mr-2", isLoading && "animate-spin")} />
-          {t('logsPage.refresh')}
-        </button>
+    <div className="zh-page">
+      <PageHeader
+        actions={
+          <Button
+            leadingIcon={<RefreshCw className={isLoading ? 'h-4 w-4 animate-spin' : 'h-4 w-4'} />}
+            onClick={() => {
+              fetchLogs();
+              fetchSystemInfo();
+            }}
+            variant="secondary"
+          >
+            {t('logsPage.refresh')}
+          </Button>
+        }
+        eyebrow={t('logsPage.eyebrow')}
+        icon={Terminal}
+        subtitle={t('logsPage.subtitle')}
+        title={t('logsPage.title')}
+      />
+
+      <div className="zh-stat-grid">
+        <StatCard
+          hint={systemInfo?.platform || t('logsPage.systemInfoHint')}
+          icon={Server}
+          label={t('logsPage.systemInfo')}
+          value={systemInfo?.app_version || '--'}
+        />
+        <StatCard
+          hint={systemInfo?.app_env || t('logsPage.databaseHint')}
+          icon={Database}
+          label={t('logsPage.database')}
+          value={systemInfo?.database_url ? t('settings.connected') : t('settings.disconnected')}
+        />
+        <StatCard
+          hint={t('logsPage.capabilitiesHint')}
+          icon={CheckCircle2}
+          label={t('logsPage.capabilities')}
+          tone="var(--success)"
+          value={`${capabilitySummary(systemInfo)}/3`}
+        />
       </div>
 
-      {/* System Information - WinUI3 Style */}
-      {systemInfo && (
-        <div className="card-winui overflow-hidden">
-          <div className="px-4 py-5 border-b sm:px-6" style={{ borderColor: 'var(--winui-border-subtle)' }}>
-            <h3 className="text-lg leading-6 font-semibold flex items-center gap-2" style={{ color: 'var(--winui-text-primary)' }}>
-              <Server className="h-5 w-5" style={{ color: 'var(--winui-text-tertiary)' }} />
-              {t('logsPage.systemInfo')}
-            </h3>
-          </div>
-          <div className="px-4 py-5 sm:p-6">
-            <dl className="grid grid-cols-1 gap-x-4 gap-y-6 sm:grid-cols-2">
-              <div>
-                <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>{t('logsPage.platform')}</dt>
-                <dd className="mt-1 text-sm font-mono" style={{ color: 'var(--winui-text-primary)' }}>{systemInfo.platform}</dd>
-              </div>
-              <div>
-                <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>{t('logsPage.python')}</dt>
-                <dd className="mt-1 text-sm font-mono" style={{ color: 'var(--winui-text-primary)' }}>{systemInfo.python_version}</dd>
-              </div>
-              <div>
-                <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>{t('logsPage.appVersion')}</dt>
-                <dd className="mt-1 text-sm" style={{ color: 'var(--winui-text-primary)' }}>{systemInfo.app_version}</dd>
-              </div>
-              <div>
-                <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>{t('logsPage.env')}</dt>
-                <dd className="mt-1 text-sm" style={{ color: 'var(--winui-text-primary)' }}>{systemInfo.app_env}</dd>
-              </div>
-              <div>
-                <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>{t('logsPage.docker')}</dt>
-                <dd className="mt-1 text-sm">
-                  {systemInfo.docker ? (
-                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold" style={{ backgroundColor: 'rgba(0, 120, 212, 0.1)', color: 'var(--winui-accent)' }}>
-                      {t('common.yes', { defaultValue: 'Yes' })}
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold" style={{ backgroundColor: 'var(--winui-bg-tertiary)', color: 'var(--winui-text-secondary)' }}>
-                      {t('common.no', { defaultValue: 'No' })}
-                    </span>
-                  )}
-                </dd>
-              </div>
-              <div>
-                <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>{t('logsPage.database')}</dt>
-                <dd className="mt-1 text-sm">
-                  {systemInfo.database_url ? (
-                    <CheckCircle className="h-5 w-5" style={{ color: '#107c10' }} />
-                  ) : (
-                    <XCircle className="h-5 w-5" style={{ color: '#d13438' }} />
-                  )}
-                </dd>
-              </div>
-            </dl>
-
-            {/* Capabilities */}
-            <div className="mt-6 pt-6" style={{ borderTop: '1px solid var(--winui-border-subtle)' }}>
-              <h4 className="text-sm font-semibold mb-4" style={{ color: 'var(--winui-text-primary)' }}>{t('logsPage.capabilities')}</h4>
-              <dl className="grid grid-cols-1 gap-x-4 gap-y-4 sm:grid-cols-3">
-                <div>
-                  <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>{t('logsPage.scapy')}</dt>
-                  <dd className="mt-1">
-                    {systemInfo.capabilities.scapy_available ? (
-                      <CheckCircle className="h-5 w-5" style={{ color: '#107c10' }} />
-                    ) : (
-                      <XCircle className="h-5 w-5" style={{ color: '#d13438' }} />
-                    )}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>{t('logsPage.root')}</dt>
-                  <dd className="mt-1">
-                    {systemInfo.capabilities.root_permissions ? (
-                      <CheckCircle className="h-5 w-5" style={{ color: '#107c10' }} />
-                    ) : (
-                      <XCircle className="h-5 w-5" style={{ color: '#d13438' }} />
-                    )}
-                  </dd>
-                </div>
-                <div>
-                  <dt className="text-sm font-medium" style={{ color: 'var(--winui-text-secondary)' }}>{t('logsPage.network')}</dt>
-                  <dd className="mt-1">
-                    {systemInfo.capabilities.network_scan_available ? (
-                      <CheckCircle className="h-5 w-5" style={{ color: '#107c10' }} />
-                    ) : (
-                      <XCircle className="h-5 w-5" style={{ color: '#d13438' }} />
-                    )}
-                  </dd>
-                </div>
-              </dl>
+      {systemInfo ? (
+        <Surface className="p-5 lg:p-6" tone="raised">
+          <div className="zh-toolbar zh-toolbar--spread">
+            <div>
+              <p className="zh-kicker">{t('logsPage.systemInfo')}</p>
+              <h2 className="mt-2 text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
+                {t('logsPage.diagnosticsTitle')}
+              </h2>
+            </div>
+            <div className="zh-status-strip">
+              <Badge tone={systemInfo.docker ? 'accent' : 'neutral'}>
+                {t('logsPage.docker')}: {systemInfo.docker ? t('common.yes') : t('common.no')}
+              </Badge>
+              <Badge tone={systemInfo.database_url ? 'success' : 'danger'}>
+                {t('logsPage.database')}
+              </Badge>
             </div>
           </div>
-        </div>
-      )}
+          <div className="mt-6 zh-detail-grid">
+            <Surface className="zh-detail-card" tone="subtle">
+              <p className="zh-detail-card__label">{t('logsPage.platform')}</p>
+              <p className="zh-detail-card__value font-mono text-sm">{systemInfo.platform}</p>
+            </Surface>
+            <Surface className="zh-detail-card" tone="subtle">
+              <p className="zh-detail-card__label">{t('logsPage.python')}</p>
+              <p className="zh-detail-card__value font-mono text-sm">{systemInfo.python_version}</p>
+            </Surface>
+            <Surface className="zh-detail-card" tone="subtle">
+              <p className="zh-detail-card__label">{t('logsPage.appVersion')}</p>
+              <p className="zh-detail-card__value text-sm">{systemInfo.app_version}</p>
+            </Surface>
+            <Surface className="zh-detail-card" tone="subtle">
+              <p className="zh-detail-card__label">{t('logsPage.env')}</p>
+              <p className="zh-detail-card__value text-sm">{systemInfo.app_env}</p>
+            </Surface>
+          </div>
+          <div className="mt-6 zh-legend">
+            <div className="zh-legend__item">
+              <span className="zh-legend__swatch" style={{ background: 'var(--success)' }} />
+              {t('logsPage.scapy')}:{' '}
+              {systemInfo.capabilities.scapy_available ? t('common.yes') : t('common.no')}
+            </div>
+            <div className="zh-legend__item">
+              <span className="zh-legend__swatch" style={{ background: 'var(--accent)' }} />
+              {t('logsPage.root')}:{' '}
+              {systemInfo.capabilities.root_permissions ? t('common.yes') : t('common.no')}
+            </div>
+            <div className="zh-legend__item">
+              <span className="zh-legend__swatch" style={{ background: 'var(--warning)' }} />
+              {t('logsPage.network')}:{' '}
+              {systemInfo.capabilities.network_scan_available ? t('common.yes') : t('common.no')}
+            </div>
+          </div>
+        </Surface>
+      ) : null}
 
-      {/* Logs - WinUI3 Style */}
-      <div className="card-winui overflow-hidden">
-        <div className="px-4 py-5 border-b sm:px-6 flex justify-between items-center" style={{ borderColor: 'var(--winui-border-subtle)' }}>
-          <h3 className="text-lg leading-6 font-semibold" style={{ color: 'var(--winui-text-primary)' }}>{t('logsPage.logsTitle')}</h3>
-          <div className="flex items-center space-x-4">
+      <Surface className="p-5 lg:p-6" tone="raised">
+        <div className="zh-toolbar zh-toolbar--spread">
+          <div>
+            <p className="zh-kicker">{t('logsPage.logsTitle')}</p>
+            <h2 className="mt-2 text-xl font-semibold" style={{ color: 'var(--text-primary)' }}>
+              {t('logsPage.eventsTitle')}
+            </h2>
+          </div>
+          <div className="zh-toolbar__group">
             <select
+              className="zh-field"
+              onChange={(event) => setFilterLevel(event.target.value)}
               value={filterLevel}
-              onChange={(e) => setFilterLevel(e.target.value)}
-              className="input-winui block pl-3 pr-10 py-2 text-sm"
             >
               <option value="all">{t('logsPage.levelAll')}</option>
               <option value="debug">{t('logsPage.levelDebug')}</option>
@@ -220,9 +222,9 @@ export const Logs: React.FC = () => {
               <option value="critical">{t('logsPage.levelCritical')}</option>
             </select>
             <select
+              className="zh-field"
+              onChange={(event) => setLimit(Number(event.target.value))}
               value={limit}
-              onChange={(e) => setLimit(Number(e.target.value))}
-              className="input-winui block pl-3 pr-10 py-2 text-sm"
             >
               <option value="50">{t('logsPage.limit', { count: 50 })}</option>
               <option value="100">{t('logsPage.limit', { count: 100 })}</option>
@@ -231,73 +233,96 @@ export const Logs: React.FC = () => {
             </select>
           </div>
         </div>
-        <div className="overflow-y-auto max-h-[600px]">
-          <table className="min-w-full" style={{ borderCollapse: 'separate', borderSpacing: 0 }}>
-            <thead className="sticky top-0" style={{ backgroundColor: 'var(--winui-bg-tertiary)' }}>
-              <tr>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--winui-text-secondary)' }}>Time</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--winui-text-secondary)' }}>{t('logsPage.level')}</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--winui-text-secondary)' }}>{t('logsPage.module')}</th>
-                <th scope="col" className="px-6 py-3 text-left text-xs font-semibold uppercase tracking-wider" style={{ color: 'var(--winui-text-secondary)' }}>{t('logsPage.message')}</th>
-              </tr>
-            </thead>
-            <tbody style={{ backgroundColor: 'var(--winui-surface)' }}>
-              {filteredLogs.length > 0 ? (
-                filteredLogs.map((log) => (
-                  <tr
-                    key={log.id || `${log.timestamp}-${log.message}`}
-                    className="transition-colors duration-150"
-                    style={{ borderBottom: '1px solid var(--winui-border-subtle)' }}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.backgroundColor = 'var(--winui-bg-tertiary)';
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.backgroundColor = 'var(--winui-surface)';
-                    }}
-                  >
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-mono" style={{ color: 'var(--winui-text-secondary)' }}>
-                      {new Date(log.timestamp).toLocaleString()}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <LogLevelBadge level={log.level} />
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm" style={{ color: 'var(--winui-text-secondary)' }}>
-                      {log.module}
-                    </td>
-                    <td className="px-6 py-4 text-sm" style={{ color: 'var(--winui-text-primary)' }}>
-                      <div className="flex items-start">
-                        <div className="mr-2 mt-0.5 flex-shrink-0">
-                          <LogLevelIcon level={log.level} />
-                        </div>
-                        <div>
-                          <div>{log.message}</div>
-                          {log.device_mac && (
-                            <div className="text-xs mt-1" style={{ color: 'var(--winui-text-tertiary)' }}>{t('logsPage.device')}: {log.device_mac}</div>
-                          )}
-                          {log.context && Object.keys(log.context).length > 0 && (
-                            <details className="mt-1">
-                              <summary className="text-xs cursor-pointer" style={{ color: 'var(--winui-text-tertiary)' }}>{t('logsPage.context')}</summary>
-                              <pre className="text-xs mt-1 ml-4 overflow-x-auto" style={{ color: 'var(--winui-text-secondary)' }}>
-                                {JSON.stringify(log.context, null, 2)}
-                              </pre>
-                            </details>
-                          )}
-                        </div>
-                      </div>
+        <div className="mt-6 zh-table-shell">
+          <div className="zh-table-scroll max-h-[40rem]">
+            <table className="zh-table">
+              <thead>
+                <tr>
+                  <th>{t('logsPage.time')}</th>
+                  <th>{t('logsPage.level')}</th>
+                  <th>{t('logsPage.module')}</th>
+                  <th>{t('logsPage.message')}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {filteredLogs.length > 0 ? (
+                  filteredLogs.map((log) => {
+                    const Icon = getLogIcon(log.level);
+                    return (
+                      <tr key={log.id || `${log.timestamp}-${log.message}`}>
+                        <td className="font-mono text-sm" style={{ color: 'var(--text-secondary)' }}>
+                          {new Date(log.timestamp).toLocaleString()}
+                        </td>
+                        <td>
+                          <Badge tone={getLogTone(log.level)}>{log.level.toUpperCase()}</Badge>
+                        </td>
+                        <td style={{ color: 'var(--text-secondary)' }}>{log.module}</td>
+                        <td>
+                          <div className="flex items-start gap-3">
+                            <Icon
+                              className="mt-0.5 h-4 w-4 flex-shrink-0"
+                              style={{
+                                color:
+                                  getLogTone(log.level) === 'danger'
+                                    ? 'var(--danger)'
+                                    : getLogTone(log.level) === 'warning'
+                                      ? 'var(--warning)'
+                                      : getLogTone(log.level) === 'accent'
+                                        ? 'var(--accent)'
+                                        : 'var(--text-tertiary)',
+                              }}
+                            />
+                            <div>
+                              <p className="text-sm" style={{ color: 'var(--text-primary)' }}>
+                                {log.message}
+                              </p>
+                              {log.device_mac ? (
+                                <p className="mt-1 text-xs" style={{ color: 'var(--text-tertiary)' }}>
+                                  {t('logsPage.device')}: {log.device_mac}
+                                </p>
+                              ) : null}
+                              {log.context && Object.keys(log.context).length > 0 ? (
+                                <details className="mt-2">
+                                  <summary
+                                    className="cursor-pointer text-xs"
+                                    style={{ color: 'var(--text-tertiary)' }}
+                                  >
+                                    {t('logsPage.context')}
+                                  </summary>
+                                  <pre
+                                    className="mt-2 overflow-x-auto rounded-2xl border p-3 text-xs"
+                                    style={{
+                                      background: 'var(--surface-inset)',
+                                      borderColor: 'var(--border)',
+                                      color: 'var(--text-secondary)',
+                                    }}
+                                  >
+                                    {JSON.stringify(log.context, null, 2)}
+                                  </pre>
+                                </details>
+                              ) : null}
+                            </div>
+                          </div>
+                        </td>
+                      </tr>
+                    );
+                  })
+                ) : (
+                  <tr>
+                    <td colSpan={4}>
+                      <EmptyState
+                        description={t('logsPage.empty')}
+                        icon={Terminal}
+                        title={t('logsPage.emptyTitle')}
+                      />
                     </td>
                   </tr>
-                ))
-              ) : (
-                <tr>
-                  <td colSpan={4} className="px-6 py-8 text-center" style={{ color: 'var(--winui-text-secondary)' }}>
-                    {t('logsPage.empty')}
-                  </td>
-                </tr>
-              )}
-            </tbody>
-          </table>
+                )}
+              </tbody>
+            </table>
+          </div>
         </div>
-      </div>
+      </Surface>
     </div>
   );
 };
