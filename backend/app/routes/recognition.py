@@ -14,7 +14,7 @@ from app.services.recognition.providers.macvendors import MACVendorsProvider
 
 logger = logging.getLogger(__name__)
 
-router = APIRouter(prefix="/api/recognition", tags=["Recognition"])
+router = APIRouter(prefix="/recognition", tags=["Recognition"])
 
 
 @router.get("/providers")

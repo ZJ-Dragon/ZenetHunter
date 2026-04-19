@@ -56,11 +56,16 @@ This file records the REST and WebSocket contracts that agents should treat as s
 - `GET /api/scan/status`
 - `GET /api/topology`
 - `GET /api/logs`
+  - Returns a merged view of persisted `event_log` entries and in-memory runtime logs
 - `POST /api/logs`
 - `GET /api/logs/system-info`
   - Returns legacy capability booleans plus normalized `capability_state`
 - `GET /api/devices/{mac}/observations`
 - `GET /api/scan/{scan_run_id}/observations`
+
+## Recognition
+- `GET /api/recognition/providers`
+- `POST /api/recognition/settings/external-lookup`
 
 ## Config Lists
 - `GET /api/config/lists`

@@ -36,3 +36,11 @@ def test_config_lists(client: TestClient, admin_headers):
     response = client.get("/api/config/lists")
     assert mac not in response.json()["allow_list"]
     assert mac not in response.json()["block_list"]
+
+
+def test_recognition_providers_route(client: TestClient):
+    response = client.get("/api/recognition/providers")
+    assert response.status_code == 200
+    payload = response.json()
+    assert "providers" in payload
+    assert isinstance(payload["providers"], list)

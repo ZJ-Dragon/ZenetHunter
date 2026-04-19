@@ -32,7 +32,7 @@
 4. Frontend views should treat operation state as event-driven but remain able to reload from REST
 
 ## Logs and Topology Flow
-- Logs are stored in memory via `StateManager` and exposed through `/api/logs`
+- `/api/logs` returns a merged view of in-memory `StateManager` logs and persisted `event_log` audit entries
 - Topology is rebuilt from database-backed devices synchronized into `StateManager`
 - Observations are persisted and retrieved through dedicated repositories and routes
 
