@@ -75,3 +75,27 @@ Refactor the backend into a stable layered architecture with replaceable low-lev
 ## Remaining Follow-up
 - Frontend helper drift still exists in unused service wrappers such as `deviceService.update()` using `PUT /devices/{mac}` and `scanService.getScanStatus()` using `GET /scan/{id}`.
 - CI still only triggers on `push` to `main` and `pull_request` targeting `main`; branch pushes require manual local validation.
+
+## Stabilization Pass: 2026-04-19
+
+### Newly Confirmed Drift / Broken Spots
+- Active-defense status does not fully round-trip through database, `StateManager`, and WebSocket events when an operation finishes naturally or fails in the background task.
+- `topology` and several device mutation routes synchronize database-backed devices into `StateManager` with event emission still enabled, which can create false `deviceAdded` / `deviceStatusChanged` broadcasts during read-only refresh flows.
+- `/api/logs` only reads in-memory state while many runtime paths write audit data to `event_log`, so the logs page misses persisted events and restarts drop useful history.
+- `routes/recognition.py` still carries a hard-coded `/api/recognition` prefix even though the root router already mounts everything under `/api`, producing a broken `/api/api/recognition/*` path.
+- Frontend WebSocket listeners and service wrappers still miss canonical backend updates (`deviceUpdated`, `recognitionOverridden`, canonical scan status route, removed scheduler paths).
+- Dead/stale frontend adapters (`schedulerService`, `SchedulerControl`, generic `deviceService.update()`/`delete()`) still point at removed backend routes.
+
+### New Subtasks
+7. Close active-defense and state-sync gaps:
+   - move device status persistence and websocket/device refresh emission into the active-defense service lifecycle
+   - prevent read-only state hydrations from emitting false device lifecycle events
+   - make operation completion/failure/cancel paths converge on the same state update contract
+8. Close logs and route drift:
+   - make `/logs` return persisted audit logs together with in-memory runtime logs
+   - persist POSTed logs through the repository path as well
+   - fix the broken recognition router prefix and document any bridge-visible alignment changes
+9. Remove stale frontend adapters and finish WS/frontend sync:
+   - replace or remove dead service wrappers pointing at missing routes
+   - subscribe dashboard/device/topology views to canonical backend update events
+   - remove clearly dead scheduler UI/service code

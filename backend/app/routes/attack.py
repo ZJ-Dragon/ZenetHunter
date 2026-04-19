@@ -11,9 +11,7 @@ security research and testing purposes only.
 from typing import Annotated
 
 from fastapi import APIRouter, Depends, Path, status
-from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.core.database import get_db
 from app.core.exceptions import AppError, ErrorCode
 from app.core.security import get_current_user
 from app.models.attack import (
@@ -22,7 +20,6 @@ from app.models.attack import (
     ActiveDefenseType,
 )
 from app.models.auth import User
-from app.repositories.device import DeviceRepository
 from app.services.attack import get_active_defense_service
 
 router = APIRouter(
@@ -104,7 +101,6 @@ async def start_operation(
     request: ActiveDefenseRequest = ...,
     current_user: Annotated[User, Depends(get_current_user)] = ...,
     service=Depends(get_active_defense_service),
-    db: AsyncSession = Depends(get_db),
 ) -> ActiveDefenseResponse:
     """Start an active defense operation on a target device.
 
@@ -131,11 +127,6 @@ async def start_operation(
             response.message or "Failed to start active defense operation",
         )
 
-    # Update device status in database
-    repo = DeviceRepository(db)
-    await repo.update_attack_status(mac, response.status)
-    await db.commit()
-
     return response
 
 
@@ -155,7 +146,6 @@ async def stop_operation(
     ),
     current_user: Annotated[User, Depends(get_current_user)] = ...,
     service=Depends(get_active_defense_service),
-    db: AsyncSession = Depends(get_db),
 ) -> ActiveDefenseResponse:
     """Stop an active defense operation on a target device.
 
@@ -180,11 +170,6 @@ async def stop_operation(
             ErrorCode.CONFIG_NOT_FOUND, response.message or "Target device not found"
         )
 
-    # Update device status in database
-    repo = DeviceRepository(db)
-    await repo.update_attack_status(mac, response.status)
-    await db.commit()
-
     return response
 
 
@@ -203,10 +188,9 @@ async def legacy_start_attack(
     request: ActiveDefenseRequest,
     current_user: Annotated[User, Depends(get_current_user)],
     service=Depends(get_active_defense_service),
-    db: AsyncSession = Depends(get_db),
 ):
     """Legacy endpoint for backward compatibility."""
-    return await start_operation(mac, request, current_user, service, db)
+    return await start_operation(mac, request, current_user, service)
 
 
 @router.post(
@@ -222,10 +206,9 @@ async def legacy_stop_attack(
     mac: str,
     current_user: Annotated[User, Depends(get_current_user)],
     service=Depends(get_active_defense_service),
-    db: AsyncSession = Depends(get_db),
 ):
     """Legacy endpoint for backward compatibility."""
-    return await stop_operation(mac, current_user, service, db)
+    return await stop_operation(mac, current_user, service)
 
 
 # Additional legacy router to serve /api/devices/* paths
@@ -244,10 +227,9 @@ async def legacy_start_attack_flat(
     request: ActiveDefenseRequest,
     current_user: Annotated[User, Depends(get_current_user)],
     service=Depends(get_active_defense_service),
-    db: AsyncSession = Depends(get_db),
 ):
     """Compatibility endpoint at /api/devices/{mac}/attack."""
-    return await start_operation(mac, request, current_user, service, db)
+    return await start_operation(mac, request, current_user, service)
 
 
 @legacy_router.post(
@@ -259,7 +241,6 @@ async def legacy_stop_attack_flat(
     mac: str,
     current_user: Annotated[User, Depends(get_current_user)],
     service=Depends(get_active_defense_service),
-    db: AsyncSession = Depends(get_db),
 ):
     """Compatibility endpoint at /api/devices/{mac}/attack/stop."""
-    return await stop_operation(mac, current_user, service, db)
+    return await stop_operation(mac, current_user, service)

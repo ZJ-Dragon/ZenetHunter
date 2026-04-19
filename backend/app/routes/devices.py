@@ -155,7 +155,7 @@ async def update_device(
     await db.commit()
 
     # Also update in-memory state for immediate WebSocket notifications
-    state.update_device(updated_device)
+    state.update_device(updated_device, emit_events=False)
 
     return updated_device
 
@@ -194,7 +194,7 @@ async def patch_device(
     await db.commit()
 
     # Update state manager
-    state.update_device(updated_device)
+    state.update_device(updated_device, emit_events=False)
 
     # Broadcast device updated event
     await ws.broadcast(
@@ -285,7 +285,7 @@ async def override_recognition(
     await db.commit()
 
     # Update state manager
-    state.update_device(updated_device)
+    state.update_device(updated_device, emit_events=False)
 
     # Broadcast recognition override event
     await ws.broadcast(
@@ -420,7 +420,7 @@ async def update_manual_label(
         )
 
     # Update state manager
-    state.update_device(updated_device)
+    state.update_device(updated_device, emit_events=False)
 
     # Broadcast device updated event via WebSocket
     await ws.broadcast(

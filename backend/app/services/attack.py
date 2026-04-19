@@ -95,13 +95,72 @@ class ActiveDefenseService:
 
                 if device:
                     # Found in DB, add to state manager for future lookups
-                    self.state.update_device(device)
+                    self.state.update_device(device, emit_events=False)
                     logger.info(f"Loaded device {mac} from database into state manager")
                     return device
         except Exception as e:
             logger.error(f"Failed to load device {mac} from database: {e}")
 
         return None
+
+    async def _sync_device_status(
+        self,
+        mac: str,
+        status: ActiveDefenseStatus,
+        *,
+        emit_stop_event: bool = False,
+    ) -> Device | None:
+        """Persist the canonical operation status and broadcast a coherent refresh."""
+        device: Device | None = None
+
+        try:
+            from app.core.database import get_session_factory
+            from app.repositories.device import DeviceRepository
+
+            session_factory = get_session_factory()
+            async with session_factory() as session:
+                repo = DeviceRepository(session)
+                await repo.update_attack_status(mac, status)
+                device = await repo.get_by_mac(mac)
+                await session.commit()
+        except Exception as exc:
+            logger.error("Failed to persist active defense status for %s: %s", mac, exc)
+
+        if device is None:
+            device = self.state.update_device_attack_status(mac, status)
+        else:
+            self.state.update_device(device, emit_events=False)
+
+        if device is not None:
+            await self.ws.broadcast(
+                {
+                    "event": "deviceUpdated",
+                    "data": {
+                        "mac": device.mac,
+                        "active_defense_status": device.active_defense_status.value,
+                        "attack_status": device.attack_status.value
+                        if device.attack_status
+                        else None,
+                        "display_name": device.display_name,
+                        "display_vendor": device.display_vendor,
+                        "device": device.model_dump(mode="json"),
+                        "timestamp": datetime.now(UTC).isoformat(),
+                    },
+                }
+            )
+
+        if emit_stop_event:
+            await self.ws.broadcast(
+                {
+                    "event": "activeDefenseStopped",
+                    "data": {
+                        "mac": mac,
+                        "timestamp": datetime.now(UTC).isoformat(),
+                    },
+                }
+            )
+
+        return device
 
     async def start_operation(
         self, mac: str, request: ActiveDefenseRequest
@@ -182,8 +241,7 @@ class ActiveDefenseService:
                 ),
             )
 
-        # Update device status in state manager
-        self.state.update_device_attack_status(mac, ActiveDefenseStatus.RUNNING)
+        await self._sync_device_status(mac, ActiveDefenseStatus.RUNNING)
 
         start_time = datetime.now(UTC)
 
@@ -202,7 +260,7 @@ class ActiveDefenseService:
                 "event": "activeDefenseStarted",
                 "data": {
                     "mac": mac,
-                    "type": request.type,
+                    "type": request.type.value,
                     "duration": request.duration,
                     "intensity": request.intensity,
                     "start_time": start_time.isoformat(),
@@ -276,7 +334,8 @@ class ActiveDefenseService:
             )
 
         # Cancel the background task if it's running
-        if mac in self.active_tasks:
+        had_running_task = mac in self.active_tasks
+        if had_running_task:
             task = self.active_tasks[mac]
             if not task.done():
                 logger.info(f"Cancelling active defense operation for {mac}")
@@ -289,9 +348,6 @@ class ActiveDefenseService:
         # Signal the engine to stop any ongoing operations
         await self.executor.stop(mac)
 
-        # Update device status
-        self.state.update_device_attack_status(mac, ActiveDefenseStatus.STOPPED)
-
         # Log operation stop to audit trail
         await self._log_operation_attempt(
             mac=mac,
@@ -301,16 +357,10 @@ class ActiveDefenseService:
             user=None,  # TODO: Extract from request context
         )
 
-        # Notify clients via WebSocket
-        await self.ws.broadcast(
-            {
-                "event": "activeDefenseStopped",
-                "data": {
-                    "mac": mac,
-                    "timestamp": datetime.now(UTC).isoformat(),
-                },
-            }
-        )
+        if not had_running_task:
+            await self._sync_device_status(
+                mac, ActiveDefenseStatus.STOPPED, emit_stop_event=True
+            )
 
         logger.info(f"Stopped active defense operation on {mac}")
 
@@ -442,9 +492,6 @@ class ActiveDefenseService:
                 }
             )
 
-            # Update final status
-            self.state.update_device_attack_status(mac, ActiveDefenseStatus.IDLE)
-
             # Log successful completion to audit trail
             await self._log_operation_attempt(
                 mac=mac,
@@ -456,6 +503,9 @@ class ActiveDefenseService:
                 ),
                 user=None,
             )
+            await self._sync_device_status(
+                mac, ActiveDefenseStatus.IDLE, emit_stop_event=True
+            )
 
             logger.info(
                 f"Operation {request.type.value} on {mac} completed successfully"
@@ -463,7 +513,6 @@ class ActiveDefenseService:
 
         except asyncio.CancelledError:
             logger.info(f"Operation for {mac} was cancelled by user")
-            self.state.update_device_attack_status(mac, ActiveDefenseStatus.STOPPED)
             await self.ws.broadcast(
                 {
                     "event": "activeDefenseLog",
@@ -475,9 +524,11 @@ class ActiveDefenseService:
                     },
                 }
             )
+            await self._sync_device_status(
+                mac, ActiveDefenseStatus.STOPPED, emit_stop_event=True
+            )
         except Exception as e:
             logger.error(f"Operation execution error for {mac}: {e}", exc_info=True)
-            self.state.update_device_attack_status(mac, ActiveDefenseStatus.FAILED)
 
             # Log failure to audit trail
             await self._log_operation_attempt(
@@ -499,6 +550,9 @@ class ActiveDefenseService:
                         "timestamp": datetime.now(UTC).isoformat(),
                     },
                 }
+            )
+            await self._sync_device_status(
+                mac, ActiveDefenseStatus.FAILED, emit_stop_event=True
             )
 
 

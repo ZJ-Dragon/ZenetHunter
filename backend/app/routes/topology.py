@@ -21,7 +21,7 @@ async def get_topology(
 
     # Sync devices to in-memory state (for topology generation)
     for device in db_devices:
-        state.update_device(device)
+        state.update_device(device, emit_events=False)
 
     # Generate topology from state
     return state.get_topology()
