@@ -46,6 +46,10 @@ export const Topology: React.FC = () => {
 
   useWebSocketEvent(WSEventType.DEVICE_ADDED, fetchTopology);
   useWebSocketEvent(WSEventType.DEVICE_STATUS_CHANGED, fetchTopology);
+  useWebSocketEvent(WSEventType.DEVICE_UPDATED, fetchTopology);
+  useWebSocketEvent(WSEventType.DEVICE_RECOGNITION_UPDATED, fetchTopology);
+  useWebSocketEvent(WSEventType.RECOGNITION_OVERRIDDEN, fetchTopology);
+  useWebSocketEvent(WSEventType.DEVICE_LIST_CLEARED, fetchTopology);
 
   const onlineCount = useMemo(
     () => data.nodes.filter((node) => node.data?.status === 'online').length,

@@ -178,7 +178,7 @@ class StateManager:
 
             return NetworkTopology(nodes=nodes, links=links)
 
-    def add_log(self, log: SystemLog) -> None:
+    def add_log(self, log: SystemLog, *, emit_events: bool = True) -> None:
         """Add a system log entry."""
         with self._data_lock:
             self._logs.append(log)
@@ -186,8 +186,8 @@ class StateManager:
             if len(self._logs) > 1000:
                 self._logs = self._logs[-1000:]
 
-        # Emit log event
-        self._emit_event("logAdded", log.model_dump(mode="json"))
+        if emit_events:
+            self._emit_event("logAdded", log.model_dump(mode="json"))
 
     def get_logs(self, limit: int = 100) -> list[SystemLog]:
         """Get recent system logs."""

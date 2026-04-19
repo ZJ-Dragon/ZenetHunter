@@ -9,10 +9,14 @@ export enum WSEventType {
   DEVICE_STATUS_CHANGED = 'deviceStatusChanged',
   DEVICE_UPDATED = 'deviceUpdated',
   DEVICE_RECOGNITION_UPDATED = 'deviceRecognitionUpdated',
+  RECOGNITION_OVERRIDDEN = 'recognitionOverridden',
+  DEVICE_LIST_CLEARED = 'deviceListCleared',
 
   // Scan Events
   SCAN_STARTED = 'scanStarted',
   SCAN_COMPLETED = 'scanCompleted',
+  SCAN_PROGRESS = 'scanProgress',
+  SCAN_LOG = 'scanLog',
 
   // Active Defense Events (from backend)
   ACTIVE_DEFENSE_STARTED = 'activeDefenseStarted',
@@ -26,6 +30,8 @@ export enum WSEventType {
 
   // Log Events
   LOG_ADDED = 'logAdded',
+  PING = 'ping',
+  ERROR = 'error',
 }
 
 // Active Defense Log Entry

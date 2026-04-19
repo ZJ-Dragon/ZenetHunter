@@ -1,7 +1,7 @@
+import json
 import sys
 from collections.abc import Iterable
 from datetime import UTC, datetime
-import json
 from typing import Any
 
 from fastapi import APIRouter, Depends, Query
@@ -14,6 +14,7 @@ from app.infrastructure.runtime_checks import collect_runtime_diagnostics
 from app.models.log import SystemLog
 from app.repositories.event_log import EventLogRepository
 from app.services.state import StateManager, get_state_manager
+from app.services.websocket import get_connection_manager
 
 router = APIRouter(prefix="/logs", tags=["logs"])
 
@@ -73,6 +74,7 @@ async def add_log(
     log: SystemLog,
     state: StateManager = Depends(get_state_manager),
     db: AsyncSession = Depends(get_db),
+    ws=Depends(get_connection_manager),
 ):
     """Add a system log entry."""
     repo = EventLogRepository(db)
@@ -84,7 +86,9 @@ async def add_log(
         device_mac=log.device_mac,
         context=log.context,
     )
-    state.add_log(log)
+    await db.commit()
+    state.add_log(log, emit_events=False)
+    await ws.broadcast({"event": "logAdded", "data": log.model_dump(mode="json")})
 
 
 @router.get("/system-info")

@@ -22,7 +22,7 @@ def test_logs_api(client: TestClient):
     assert response.status_code == 200
     logs = response.json()
     assert len(logs) >= 1
-    assert logs[-1]["message"] == "Test log message"
+    assert any(log["message"] == "Test log message" for log in logs)
 
 
 def test_logs_api_includes_persisted_audit_entries(client: TestClient):

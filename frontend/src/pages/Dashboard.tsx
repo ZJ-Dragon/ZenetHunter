@@ -73,7 +73,9 @@ export const Dashboard: React.FC = () => {
 
   useWebSocketEvent(WSEventType.DEVICE_ADDED, fetchDevices);
   useWebSocketEvent(WSEventType.DEVICE_STATUS_CHANGED, fetchDevices);
+  useWebSocketEvent(WSEventType.DEVICE_UPDATED, fetchDevices);
   useWebSocketEvent(WSEventType.DEVICE_RECOGNITION_UPDATED, fetchDevices);
+  useWebSocketEvent(WSEventType.RECOGNITION_OVERRIDDEN, fetchDevices);
 
   const recentDevices = [...devices]
     .sort(

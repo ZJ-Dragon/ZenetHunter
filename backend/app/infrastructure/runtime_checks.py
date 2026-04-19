@@ -8,7 +8,6 @@ import platform
 import sys
 from dataclasses import asdict, dataclass, field
 
-
 REQUIRED_MODULES: dict[str, str] = {
     "fastapi": "fastapi",
     "uvicorn": "uvicorn",
@@ -50,11 +49,7 @@ class RuntimeDiagnostics:
 
     @property
     def missing_modules(self) -> list[str]:
-        return [
-            name
-            for name, module in self.modules.items()
-            if not module.available
-        ]
+        return [name for name, module in self.modules.items() if not module.available]
 
     @property
     def dependencies_ready(self) -> bool:
@@ -73,9 +68,7 @@ class RuntimeDiagnostics:
             "conda_env": self.conda_env,
             "dependencies_ready": self.dependencies_ready,
             "missing_modules": self.missing_modules,
-            "modules": {
-                name: asdict(module) for name, module in self.modules.items()
-            },
+            "modules": {name: asdict(module) for name, module in self.modules.items()},
         }
 
 

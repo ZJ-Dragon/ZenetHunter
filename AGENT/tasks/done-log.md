@@ -16,3 +16,6 @@
 - Fixed frontend capability display drift by normalizing `capability_state` into the legacy settings/logs badges instead of treating missing old keys as `false`
 - Added runtime diagnostics for interpreter path, environment kind, and module imports so support issues can distinguish backend `.venv`, conda, and system Python cleanly
 - Hardened `start-local.sh` to use the selected interpreter consistently for `pip`, maintenance tasks, uvicorn startup, runtime dependency checks, and optional macOS authorization relaunch
+- Closed active-defense state drift by persisting final operation status from the service layer, emitting canonical `deviceUpdated` refresh events, and preventing read-only topology/device hydrations from creating false device lifecycle broadcasts
+- Unified `/api/logs` around merged persisted audit logs plus runtime state logs and fixed the recognition router path back to `/api/recognition/*`
+- Removed dead frontend scheduler adapters, aligned `deviceService`/`scanService` with canonical backend routes, and subscribed dashboard/device/topology views to canonical backend update events

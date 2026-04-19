@@ -138,9 +138,9 @@ class ActiveDefenseService:
                     "data": {
                         "mac": device.mac,
                         "active_defense_status": device.active_defense_status.value,
-                        "attack_status": device.attack_status.value
-                        if device.attack_status
-                        else None,
+                        "attack_status": (
+                            device.attack_status.value if device.attack_status else None
+                        ),
                         "display_name": device.display_name,
                         "display_vendor": device.display_vendor,
                         "device": device.model_dump(mode="json"),

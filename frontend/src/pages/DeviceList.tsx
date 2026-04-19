@@ -125,7 +125,14 @@ export const DeviceList: React.FC = () => {
     fetchDevices();
     setIsLoading(false);
   });
+  useWebSocketEvent(WSEventType.DEVICE_LIST_CLEARED, () => {
+    setDevices([]);
+    setObservationsByMac({});
+  });
+  useWebSocketEvent(WSEventType.DEVICE_STATUS_CHANGED, fetchDevices);
+  useWebSocketEvent(WSEventType.DEVICE_UPDATED, fetchDevices);
   useWebSocketEvent(WSEventType.DEVICE_RECOGNITION_UPDATED, fetchDevices);
+  useWebSocketEvent(WSEventType.RECOGNITION_OVERRIDDEN, fetchDevices);
   useWebSocketEvent(WSEventType.DEVICE_ADDED, fetchDevices);
 
   const filteredDevices = useMemo(() => {

@@ -4,6 +4,9 @@ export interface ScanResult {
   id: string;
   status: string;
   devices_found: number;
+  started_at?: string;
+  completed_at?: string | null;
+  error?: string | null;
 }
 
 export interface ScanRequest {
@@ -22,8 +25,8 @@ export const scanService = {
     return response.data;
   },
 
-  getScanStatus: async (scanId: string) => {
-    const response = await api.get(`/scan/${scanId}`);
+  getScanStatus: async (): Promise<ScanResult> => {
+    const response = await api.get<ScanResult>('/scan/status');
     return response.data;
   },
 };

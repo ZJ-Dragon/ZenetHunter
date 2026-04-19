@@ -148,14 +148,44 @@ async def update_device(
     device: Device,
     db: AsyncSession = Depends(get_db),
     state: StateManager = Depends(get_state_manager),
+    ws=Depends(get_connection_manager),
 ):
     """Update or add a device (Internal/Scanner use)."""
     repo = DeviceRepository(db)
+    existing_device = await repo.get_by_mac(device.mac)
     updated_device = await repo.upsert(device)
     await db.commit()
 
     # Also update in-memory state for immediate WebSocket notifications
     state.update_device(updated_device, emit_events=False)
+
+    if existing_device is None:
+        await ws.broadcast(
+            {
+                "event": "deviceAdded",
+                "data": updated_device.model_dump(mode="json"),
+            }
+        )
+        return updated_device
+
+    if existing_device.status != updated_device.status:
+        await ws.broadcast(
+            {
+                "event": "deviceStatusChanged",
+                "data": {
+                    "mac": updated_device.mac,
+                    "status": updated_device.status.value,
+                    "device": updated_device.model_dump(mode="json"),
+                },
+            }
+        )
+
+    await ws.broadcast(
+        {
+            "event": "deviceUpdated",
+            "data": updated_device.model_dump(mode="json"),
+        }
+    )
 
     return updated_device
 
@@ -524,7 +554,7 @@ async def clear_manual_label(
         )
 
     # Update state manager
-    state.update_device(updated_device)
+    state.update_device(updated_device, emit_events=False)
 
     # Broadcast device updated event
     await ws.broadcast(

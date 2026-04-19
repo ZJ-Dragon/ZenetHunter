@@ -71,9 +71,12 @@ Refactor the backend into a stable layered architecture with replaceable low-lev
 - Completed: Subtask 4 (recognition/manual/display pipeline cleanup and broken device routes)
 - Completed: Subtask 5 (defense executor abstraction and coherent capability reporting)
 - Completed: Subtask 6 (bridge synchronization, legacy compatibility aliasing, validation pass)
+- Completed: Subtask 7 (active-defense/state-sync convergence and false event suppression)
+- Completed: Subtask 8 (merged persisted/runtime logs and recognition route repair)
+- Completed: Subtask 9 (frontend stale adapter removal and canonical websocket sync)
 
 ## Remaining Follow-up
-- Frontend helper drift still exists in unused service wrappers such as `deviceService.update()` using `PUT /devices/{mac}` and `scanService.getScanStatus()` using `GET /scan/{id}`.
+- Frontend still reads the legacy compatibility alias `attack_status` in a few places even though the backend canonical field is `active_defense_status`.
 - CI still only triggers on `push` to `main` and `pull_request` targeting `main`; branch pushes require manual local validation.
 
 ## Stabilization Pass: 2026-04-19

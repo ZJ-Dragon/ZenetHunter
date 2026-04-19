@@ -19,9 +19,9 @@
 - Backend canonical terminology prefers "active defense"; frontend still uses "attack" in filenames, route names, and parts of the UI
 
 ## Known Service Drift
-- Backend alias/tags update route is `PATCH /api/devices/{mac}`; frontend generic `deviceService.update()` currently targets `PUT /devices/{mac}`
-- Backend scan status route is `GET /api/scan/status`; frontend `scanService.getScanStatus(scanId)` currently targets `GET /scan/{scanId}`
-- Frontend scheduler service still exists, but scheduler routes are not exposed in the active backend router set
+- Backend canonical device metadata update route is `PATCH /api/devices/{mac}` and the frontend now uses that path through `deviceService.updateMetadata()`
+- Backend scan status route is `GET /api/scan/status` and the frontend now consumes that canonical route through `scanService.getScanStatus()`
+- Legacy scheduler service/components were removed from the frontend because scheduler routes are not exposed in the active backend router set
 
 ## Alignment Rule
 When changing code:

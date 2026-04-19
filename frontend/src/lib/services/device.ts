@@ -1,5 +1,5 @@
 import { api } from '../api';
-import { Device, DeviceType, DeviceStatus } from '../../types/device';
+import { Device } from '../../types/device';
 
 export interface ManualLabelRequest {
   name_manual: string | null;
@@ -10,6 +10,17 @@ export interface ManualLabelResponse {
   device: Device;
   fingerprint_key: string;
   message: string;
+}
+
+export interface DeviceMetadataUpdate {
+  alias?: string | null;
+  tags?: string[] | null;
+}
+
+export interface RecognitionOverrideRequest {
+  vendor?: string | null;
+  model?: string | null;
+  device_type?: string | null;
 }
 
 export const deviceService = {
@@ -27,22 +38,23 @@ export const deviceService = {
     return response.data;
   },
 
-  update: async (mac: string, data: Partial<Device>): Promise<Device> => {
-    const response = await api.put<Device>(`/devices/${mac}`, data);
+  updateMetadata: async (
+    mac: string,
+    data: DeviceMetadataUpdate
+  ): Promise<Device> => {
+    const response = await api.patch<Device>(`/devices/${mac}`, data);
     return response.data;
   },
 
-  updateType: async (mac: string, type: DeviceType): Promise<Device> => {
-    // Backend likely expects { type: "..." }
-    return deviceService.update(mac, { type });
-  },
-
-  updateStatus: async (mac: string, status: DeviceStatus): Promise<Device> => {
-    return deviceService.update(mac, { status });
-  },
-
-  delete: async (mac: string): Promise<void> => {
-    await api.delete(`/devices/${mac}`);
+  overrideRecognition: async (
+    mac: string,
+    payload: RecognitionOverrideRequest
+  ): Promise<Device> => {
+    const response = await api.post<Device>(
+      `/devices/${mac}/recognition/override`,
+      payload
+    );
+    return response.data;
   },
 
   /**
